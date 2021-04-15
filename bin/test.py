@@ -8,30 +8,37 @@ import os, subprocess, sys
 
 if ( __name__ == '__main__' ) :
   def run( ARCH, CONF ) :
-    print( [ 'make', os.path.expandvars( '--directory="${REPO_HOME}/src/alzette"' ), 'ARCH="%s"' % ( ARCH ), 'CONF="%s"' % ( ' '.join( [ '-D%s' % ( x ) for x in CONF ] ) ), 'clean', 'all', 'run' ] )
+    CONF = ' '.join( [ '-D%s' % ( x ) for x in CONF ] )
+
+    print( '>>> ARCH="%s"' % ( ARCH ) )
+    print( '>>> CONF="%s"' % ( CONF ) )
+
+    subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/alzette' ), 'clean', 'all', 'run' ], env = { **os.environ, 'ARCH' : ARCH, 'CONF' : CONF } )
+
+    print( '<<<'                      )
 
   for TYPE in [ 'RV32_TYPE1', 'RV32_TYPE2', 'RV32_TYPE3', 'RV32_TYPE4'               ] :
     for BITMANIP in [ False, True ] :
       for UNROLL in [ False, True ] :
-        CONF  = [ 'DRIVER_TRIALS=10', 'DRIVER_MEASURE', TYPE ]
+        CONF  = [ 'DRIVER_TRIALS=10', 'DRIVER_MEASURE', 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN', TYPE ]
 
         if ( BITMANIP ) :
-          CONF += [ '-DRV32B' ]
+          CONF += [ 'RV32B' ]
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL' ]
 
-        run( 'rv32', CONF )
+        run( os.path.expandvars( '${REPO_DEV}/src/alzette/rv32' ), CONF )
 
   for TYPE in [ 'RV64_TYPE1', 'RV64_TYPE2', 'RV64_TYPE3', 'RV64_TYPE4', 'RV64_TYPE5' ] :
     for BITMANIP in [ False, True ] :
       for UNROLL in [ False, True ] :
-        CONF  = [ 'DRIVER_TRIALS=10', 'DRIVER_MEASURE', TYPE ]
+        CONF  = [ 'DRIVER_TRIALS=10', 'DRIVER_MEASURE', 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN', TYPE ]
 
         if ( BITMANIP ) :
-          CONF += [ '-DRV64B' ]
+          CONF += [ 'RV64B' ]
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL' ]
 
-        run( 'rv64', CONF )
+        run( os.path.expandvars( '${REPO_DEV}/src/alzette/rv64' ), CONF )
