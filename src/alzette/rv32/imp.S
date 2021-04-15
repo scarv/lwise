@@ -248,10 +248,10 @@
               
               lw           t0,  0(a0)                    // t0 = MEM[ a0 +  0 ]  => xw = state[ 0 ]
               lw           t1,  4(a0)                    // t1 = MEM[ a0 +  4 ]  => yw = state[ 1 ]
-
+#if !( CRAXS10_ENC_UNROLL )
               li           t2,  0                        // t2 =  0              => i =  0
               li           t3, 10                        // t3 = 10              => n = 10
-	
+#endif	
               lw           s0,  0(a1)                    // s0 = MEM[ a1 +  0 ]  => k0 =   key[ 0 ]
               lw           s1,  4(a1)                    // s1 = MEM[ a1 +  4 ]  => k1 =   key[ 1 ]
               lw           s2,  8(a1)                    // s2 = MEM[ a1 +  8 ]  => k2 =   key[ 2 ]
@@ -282,10 +282,10 @@
 
               lw           t0,  0(a0)                    // t0 = MEM[ a0 +  0 ]  => xw = state[ 0 ]
               lw           t1,  4(a0)                    // t1 = MEM[ a0 +  4 ]  => yw = state[ 1 ]
-
+#if !( CRAXS10_DEC_UNROLL )
               li           t2,     10                    // t2 =  10             => i = 10
               li           t3,      0                    // t3 =   0             => n =  0
-
+#endif
               lw           s0,  0(a1)                    // s0 = MEM[ a1 +  0 ]  => k0 =   key[ 0 ]
               lw           s1,  4(a1)                    // s1 = MEM[ a1 +  4 ]  => k1 =   key[ 1 ]
               lw           s2,  8(a1)                    // s2 = MEM[ a1 +  8 ]  => k2 =   key[ 2 ]
