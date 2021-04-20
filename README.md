@@ -1,4 +1,4 @@
-# A "zoo" of Alzette implementations (development repository)
+# A "zoo" of Alzette-based implementations (development repository)
 
 <!--- -------------------------------------------------------------------- --->
  
