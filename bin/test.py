@@ -28,7 +28,7 @@ if ( __name__ == '__main__' ) :
           CONF += [ 'CRAXS10_ENC_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL' ]
 
-        run( os.path.expandvars( '${REPO_DEV}/src/alzette/rv32' ), CONF )
+        run( os.path.expandvars( '${REPO_HOME}/src/alzette/rv32' ), CONF )
 
   for TYPE in [ 'RV64_TYPE1', 'RV64_TYPE2', 'RV64_TYPE3', 'RV64_TYPE4', 'RV64_TYPE5' ] :
     for BITMANIP in [ False, True ] :
@@ -41,4 +41,4 @@ if ( __name__ == '__main__' ) :
           CONF += [ 'CRAXS10_ENC_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL' ]
 
-        run( os.path.expandvars( '${REPO_DEV}/src/alzette/rv64' ), CONF )
+        run( os.path.expandvars( '${REPO_HOME}/src/alzette/rv64' ), CONF )
