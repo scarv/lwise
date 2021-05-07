@@ -11,13 +11,19 @@ ifndef RISCV_ALZETTE
   $(error "set RISCV_ALZETTE environment variable to point at toolchain installation")
 endif
 
+# =============================================================================
+
 export GCC_PREFIX = ${RISCV}/bin/riscv64-unknown-elf
 
-export GCC_FLAGS  = -march='rv64gc' -mabi='lp64'
+export GCC_FLAGS  = -march='rv32gc' -mabi='ilp32'
 export GCC_PATHS  = 
 export GCC_LIBS   = 
 
+# -----------------------------------------------------------------------------
+
 run       : ${TARGET}.elf
-	@${RISCV_ALZETTE}/bin/spike    --isa='rv64gc' ${RISCV_ALZETTE}/riscv64-unknown-elf/bin/pk ${<}
+	@${RISCV_ALZETTE}/bin/spike    --isa='rv32gc' ${RISCV_ALZETTE}/riscv32-unknown-elf/bin/pk ${<}
 run-debug : ${TARGET}.elf
-	@${RISCV_ALZETTE}/bin/spike -d --isa='rv64gc' ${RISCV_ALZETTE}/riscv64-unknown-elf/bin/pk ${<}
+	@${RISCV_ALZETTE}/bin/spike -d --isa='rv32gc' ${RISCV_ALZETTE}/riscv32-unknown-elf/bin/pk ${<}
+
+# =============================================================================

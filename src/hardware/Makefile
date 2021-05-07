@@ -3,14 +3,3 @@
 # Use of this source code is restricted per the MIT license, a copy of which 
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
-
-export GCC_PREFIX = 
-
-export GCC_FLAGS  = 
-export GCC_PATHS  = 
-export GCC_LIBS   = 
-
-run       : ${TARGET}.elf
-	@${<}
-run-debug : ${TARGET}.elf
-	@${<}

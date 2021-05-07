@@ -35,7 +35,8 @@ to consider a wide range of different platforms, e.g., some subset of
 ├── bin                     - scripts (e.g., environment configuration)
 ├── build                   - working directory for build
 └── src                     - source code
-    ├── alzette               - source code for implementations
+    ├── hardware              - source code for hardware
+    ├── software              - source code for software
     │   ├── arch                - architecture-specific support
     │   │   ├── generic           - generic, i.e., vanilla C
     │   │   ├── rv32              - 32-bit RISC-V
@@ -91,7 +92,7 @@ to consider a wide range of different platforms, e.g., some subset of
 - Build and execute implementation, e.g.,
 
   ```sh
-  make --directory="${REPO_HOME}/src/alzette" ARCH="generic" IMP="generic" CONF="-DDRIVER_TRIALS='10'" clean all run
+  make --directory="${REPO_HOME}/src/software" ARCH="generic" IMP="generic" CONF="-DDRIVER_TRIALS='10'" clean all run
   ```
 
   or use the test script provided
@@ -103,58 +104,72 @@ to consider a wide range of different platforms, e.g., some subset of
   to automatically scan through various different configurations, e.g., 
   ISEs, unrolling strategies, etc.
 
-- Note that:
+<!--- -------------------------------------------------------------------- --->
 
-  - The `Makefile` is controlled by three environment variables, namely
+## Notes
 
-    - `${ARCH}`
-    - `${IMP}` 
-    - `${CONF}`
+### Hardware
 
-  - The idea is that
+### Software
 
-    - there's one set of generic driver source code located in
-      `${REPO_HOME}/src/alzette`,
-    - `${REPO_HOME}/src/alzette/arch/${ARCH}`,
-      contains any architecture-specific resources, e.g.,
-      a `Makefile.in` to support the build system, definitions allowing use of any ISEs,
-    - `${REPO_HOME}/src/alzette/imp/${IMP}`
-      contains any architecture-specific implementations, e.g.,
-      an implementation of `craxs10_enc`.
+- The build system in
+
+  ```sh
+  ${REPO_HOME}/src/software/Makefile
+  ```
+
+  is controlled by three environment variables, namely
+
+  - `${ARCH}`
+  - `${IMP}` 
+  - `${CONF}`
+
+- The idea is that
+
+  - there's one set of generic driver source code located in
+    `${REPO_HOME}/src/software`,
+  - `${REPO_HOME}/src/software/arch/${ARCH}`,
+    contains any architecture-specific resources, e.g.,
+    a `Makefile.in` to support the build system, definitions allowing use of any ISEs,
+  - `${REPO_HOME}/src/software/imp/${IMP}`
+    contains any architecture-specific implementations, e.g.,
+    an implementation of `craxs10_enc`.
 
     Note that the separation of `${ARCH}` and `${IMP}` allows, for example, the generic
     C implementation to be compiled and simulated on an RV32I architecture.
 
-  - `${CONF}` allows a set of options passed to GCC:
+- `${CONF}` allows a set of options passed to GCC:
 
-    | `${ARCH}` | Symbol               | Meaning                                                                                                        |
-    | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-    |           | `DRIVER_TRIALS`      | number of verification trials performed by the driver                                                          |
-    |           | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                |
-    |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc.                                                                    |
-    |           | `CRAXS10_ENC_EXTERN` | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
-    |           | `CRAXS10_DEC_EXTERN` | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
-    |           | `CRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
-    |           | `CRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
-    |           | `TRAXL17_ENC_EXTERN` | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
-    |           | `TRAXL17_DEC_EXTERN` | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
-    |           | `TRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
-    |           | `TRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
-    | `rv32`    | `RV32B`              | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
-    | `rv32`    | `RV32_TYPE1`         | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
-    | `rv32`    | `RV32_TYPE2`         | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-    | `rv32`    | `RV32_TYPE3`         | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-    | `rv32`    | `RV32_TYPE4`         | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-    | `rv64`    | `RV64B`              | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
-    | `rv64`    | `RV64_TYPE1`         | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
-    | `rv64`    | `RV64_TYPE2`         | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-    | `rv64`    | `RV64_TYPE3`         | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-    | `rv64`    | `RV64_TYPE4`         | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-    | `rv64`    | `RV64_TYPE5`         | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
+  | `${ARCH}` | Symbol               | Meaning                                                                                                        |
+  | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
+  |           | `DRIVER_TRIALS`      | number of verification trials performed by the driver                                                          |
+  |           | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                |
+  |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc.                                                                    |
+  |           | `CRAXS10_ENC_EXTERN` | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
+  |           | `CRAXS10_DEC_EXTERN` | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
+  |           | `CRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
+  |           | `CRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
+  |           | `TRAXL17_ENC_EXTERN` | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
+  |           | `TRAXL17_DEC_EXTERN` | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
+  |           | `TRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
+  |           | `TRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
+  | `rv32`    | `RV32B`              | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
+  | `rv32`    | `RV32_TYPE1`         | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
+  | `rv32`    | `RV32_TYPE2`         | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+  | `rv32`    | `RV32_TYPE3`         | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
+  | `rv32`    | `RV32_TYPE4`         | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
+  | `rv64`    | `RV64B`              | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
+  | `rv64`    | `RV64_TYPE1`         | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
+  | `rv64`    | `RV64_TYPE2`         | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+  | `rv64`    | `RV64_TYPE3`         | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
+  | `rv64`    | `RV64_TYPE4`         | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
+  | `rv64`    | `RV64_TYPE5`         | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
 
-  - The RISC-V plus custom ISE options make use of the ISE via the
-    [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
-    directive, rather than an invasive change to `binutils` itself.
+### Tool-chain
+
+- The RISC-V plus custom ISE options make use of the ISE via the
+  [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
+  directive, rather than an invasive change to `binutils` itself.
 
 - Since the RISC-V tool-chain is 
   [patch](https://savannah.gnu.org/projects/patch)-based,
