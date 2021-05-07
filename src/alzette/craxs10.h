@@ -9,7 +9,10 @@
 #define __CRAXS10_H
 
 #include "share.h"
-#include   "imp.h"
+
+#define CRAXS10_NSTEPS ( 10 )
+
+extern const uint32_t CRAXS10_RCON[ 10 ];
 
 extern void craxs10_enc( uint32_t* state, const uint32_t* key );
 extern void craxs10_dec( uint32_t* state, const uint32_t* key );

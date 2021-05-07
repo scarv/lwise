@@ -5,8 +5,8 @@
 ## Overview
 
 This is a repository to support a project on efficient implementation
-of Alzette [1] (and so also CRAX and TRAX).  The goal is to consider
-a wide range of different platforms, e.g., some subset of
+of Alzette [1] (and so also, e.g., CRAXS10 and TRAXL17).  The goal is 
+to consider a wide range of different platforms, e.g., some subset of
 
 1. AVR
 2. MSP430
@@ -36,9 +36,14 @@ a wide range of different platforms, e.g., some subset of
 ├── build                   - working directory for build
 └── src                     - source code
     ├── alzette               - source code for implementations
-    │   ├── generic             - generic, i.e., vanilla C
-    │   ├── rv32                - 32-bit RISC-V
-    │   └── rv64                - 64-bit RISC-V
+    │   ├── arch                - architecture-specific support
+    │   │   ├── generic           - generic, i.e., vanilla C
+    │   │   ├── rv32              - 32-bit RISC-V
+    │   │   └── rv64              - 64-bit RISC-V
+    │   └── imp                 - implementation
+    │       ├── generic           - generic, i.e., vanilla C
+    │       ├── rv32              - 32-bit RISC-V
+    │       └── rv64              - 64-bit RISC-V
     └── toolchain             - source code for tool-chain
 ```
 
@@ -86,7 +91,7 @@ a wide range of different platforms, e.g., some subset of
 - Build and execute implementation, e.g.,
 
   ```sh
-  make --directory="${REPO_HOME}/src/alzette" ARCH="generic" CONF="-DDRIVER_TRIALS='10'" clean all run
+  make --directory="${REPO_HOME}/src/alzette" ARCH="generic" IMP="generic" CONF="-DDRIVER_TRIALS='10'" clean all run
   ```
 
   or, there's a test script in 
@@ -96,12 +101,27 @@ a wide range of different platforms, e.g., some subset of
 
 - Note that:
 
-  - The idea is there's one set of generic driver source code located in
-    `${REPO_HOME}/src/alzette`, 
-    plus one architecture-specific implementation in each 
-    `${REPO_HOME}/src/alzette/${ARCH}`.
-  - The `Makefile` expects `${ARCH}` and allows `${CONF}` to be defined;
-    the latter is a set of options passed to GCC, noting that, e.g.,
+  - The `Makefile` is controlled by three environment variables, namely
+
+    - `${ARCH}`
+    - `${IMP}` 
+    - `${CONF}`
+
+  - The idea is that
+
+    - there's one set of generic driver source code located in
+      `${REPO_HOME}/src/alzette`,
+    - `${REPO_HOME}/src/alzette/arch/${ARCH}`,
+      contains any architecture-specific resources, e.g.,
+      a `Makefile.in` to support the build system, definitions allowing use of any ISEs,
+    - `${REPO_HOME}/src/alzette/imp/${IMP}`
+      contains any architecture-specific implementations, e.g.,
+      an implementation of `craxs10_enc`.
+
+    Note that the separation of `${ARCH}` and `${IMP}` allows, for example, the generic
+    C implementation to be compiled and simulated on an RV32I architecture.
+
+  - `${CONF}` allows a set of options passed to GCC:
 
     | `${ARCH}` | Symbol               | Meaning                                                                                                        |
     | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |

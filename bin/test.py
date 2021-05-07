@@ -7,38 +7,67 @@
 import os, subprocess, sys
 
 if ( __name__ == '__main__' ) :
-  def run( ARCH, CONF ) :
+  def run( ARCH, IMP, CONF ) :
     CONF = ' '.join( [ '-D%s' % ( x ) for x in CONF ] )
 
-    print( '>>> ARCH="%s"' % ( ARCH ) )
-    print( '>>> CONF="%s"' % ( CONF ) )
+    print( '>>> ARCH = "%s"' % ( ARCH ) )
+    print( '>>> IMP  = "%s"' % ( IMP  ) )
+    print( '>>> CONF = "%s"' % ( CONF ) )
 
-    subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/alzette' ), 'clean', 'all', 'run' ], env = { **os.environ, 'ARCH' : ARCH, 'CONF' : CONF } )
+    subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/alzette' ), 'clean', 'all', 'run' ], env = { **os.environ, 'ARCH' : ARCH, 'IMP' : IMP, 'CONF' : CONF } )
 
-    print( '<<<'                      )
+    print( '<<<'                        )
 
-  for TYPE in [ 'RV32_TYPE1', 'RV32_TYPE2', 'RV32_TYPE3', 'RV32_TYPE4'               ] :
-    for BITMANIP in [ False, True ] :
-      for UNROLL in [ False, True ] :
-        CONF  = [ 'DRIVER_TRIALS=10', 'DRIVER_MEASURE', 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN', TYPE ]
+  trials = 1000
 
+  # rv32/generic
+
+  for UNROLL in [ False, True ] :
+        CONF = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE' ]
+
+        if ( UNROLL   ) :
+          CONF += [ 'CRAXS10_ENC_UNROLL' ]
+          CONF += [ 'CRAXS10_DEC_UNROLL' ]
+
+        run( 'rv32', 'generic', CONF )
+
+  # rv32/rv32
+
+  for UNROLL in [ False, True ] :
+    for TYPE in [ 'RV32_TYPE1', 'RV32_TYPE2', 'RV32_TYPE3', 'RV32_TYPE4'               ] :
+      for BITMANIP in [ False, True ] :
+        CONF = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE', TYPE, 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN' ]
+
+        if ( UNROLL   ) :
+          CONF += [ 'CRAXS10_ENC_UNROLL' ]
+          CONF += [ 'CRAXS10_DEC_UNROLL' ]
         if ( BITMANIP ) :
           CONF += [ 'RV32B' ]
+
+        run( 'rv32',    'rv32', CONF )
+
+  # rv64/generic
+
+  for UNROLL in [ False, True ] :
+        CONF = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE' ]
+
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL' ]
 
-        run( os.path.expandvars( '${REPO_HOME}/src/alzette/rv32' ), CONF )
+        run( 'rv64', 'generic', CONF )
 
-  for TYPE in [ 'RV64_TYPE1', 'RV64_TYPE2', 'RV64_TYPE3', 'RV64_TYPE4', 'RV64_TYPE5' ] :
-    for BITMANIP in [ False, True ] :
-      for UNROLL in [ False, True ] :
-        CONF  = [ 'DRIVER_TRIALS=10', 'DRIVER_MEASURE', 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN', TYPE ]
+  # rv64/rv64
 
+  for UNROLL in [ False, True ] :
+    for TYPE in [ 'RV64_TYPE1', 'RV64_TYPE2', 'RV64_TYPE3', 'RV64_TYPE4', 'RV64_TYPE5' ] :
+      for BITMANIP in [ False, True ] :
+        CONF = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE', TYPE, 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN' ]
+
+        if ( UNROLL   ) :
+          CONF += [ 'CRAXS10_ENC_UNROLL' ]
+          CONF += [ 'CRAXS10_DEC_UNROLL' ]
         if ( BITMANIP ) :
           CONF += [ 'RV64B' ]
-        if ( UNROLL   ) :
-          CONF += [ 'CRAXS10_ENC_UNROLL' ]
-          CONF += [ 'CRAXS10_DEC_UNROLL' ]
 
-        run( os.path.expandvars( '${REPO_HOME}/src/alzette/rv64' ), CONF )
+        run( 'rv64',    'rv64', CONF )

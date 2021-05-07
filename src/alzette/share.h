@@ -15,4 +15,29 @@
 
 #include <string.h>
 
+#define ROL32(x,n) (((x) << (n)) | ((x) >> (32 - (n))))
+#define ROR32(x,n) (((x) >> (n)) | ((x) << (32 - (n))))
+
+#define ALZETTE_ENC(xi,yi,ci)                       \
+  (xi) += ROR32((yi), 31); (yi) ^= ROR32((xi), 24); \
+  (xi) ^= (ci);                                     \
+  (xi) += ROR32((yi), 17); (yi) ^= ROR32((xi), 17); \
+  (xi) ^= (ci);                                     \
+  (xi) +=       (yi)     ; (yi) ^= ROR32((xi), 31); \
+  (xi) ^= (ci);                                     \
+  (xi) += ROR32((yi), 24); (yi) ^= ROR32((xi), 16); \
+  (xi) ^= (ci);
+
+#define ALZETTE_DEC(xi,yi,ci)                       \
+  (xi) ^= (ci);                                     \
+  (yi) ^= ROR32((xi), 16); (xi) -= ROR32((yi), 24); \
+  (xi) ^= (ci);                                     \
+  (yi) ^= ROR32((xi), 31); (xi) -=       (yi)     ; \
+  (xi) ^= (ci);                                     \
+  (yi) ^= ROR32((xi), 17); (xi) -= ROR32((yi), 17); \
+  (xi) ^= (ci);                                     \
+  (yi) ^= ROR32((xi), 24); (xi) -= ROR32((yi), 31);
+
+#define ELL(x) ( ROR32( ( (x) ^ ( (x) << 16 ) ), 16 ) )
+
 #endif

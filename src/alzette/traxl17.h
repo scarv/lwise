@@ -9,7 +9,10 @@
 #define __TRAXL17_H
 
 #include "share.h"
-#include   "imp.h"
+
+#define TRAXL17_NSTEPS ( 17 )
+
+extern const uint32_t TRAXL17_RCON[ 8 ];
 
 extern void traxl17_genkeys( uint32_t* subkeys, const uint32_t* key );
 

@@ -4,27 +4,28 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
-#include "imp_alzette.S"
+#include     "ise.h"
+#include "alzette.h"
 
 // ============================================================================
 // register allocation
 
-// t0 => state[ 0 ] = xw => yw || xw
-// t1 => state[ 1 ] = yw
-// t2 => i          ~ loop counter 
-// t3 => n          ~ loop bound
-// t4 => temp
-// t5 => temp
-// t6 => temp
+// t0  => state[ 0 ] = xw => yw || xw
+// t1  => state[ 1 ] = yw
+// t2  => i          ~ loop counter 
+// t3  => n          ~ loop bound
+// t4  => temp
+// t5  => temp
+// t6  => temp
 
-// s0 =>   key[ 0 ] = k0 => k1 || k0
-// s1 =>   key[ 1 ] = k1
-// s2 =>   key[ 2 ] = k2 => k3 || k2
-// s3 =>   key[ 3 ] = k3
-// s4 =>  &CRAXS10_RCON
+// s0  =>   key[ 0 ] = k0 => k1 || k0
+// s1  =>   key[ 1 ] = k1
+// s2  =>   key[ 2 ] = k2 => k3 || k2
+// s3  =>   key[ 3 ] = k3
+// s4  =>  &CRAXS10_RCON
 
 // ============================================================================
-// CRAX    implementation => en/decrypt prologue + epilogue
+// CRAXS10 implementation => en/decrypt prologue + epilogue
 
 .macro CRAXS10_ENC_PROLOGUE
               addi         sp, sp, -40                   // adjust SP
@@ -37,12 +38,7 @@
               lwu          t0,  0(a0)                    // t0 = MEM[ a0 +  0 ]  => xw = state[ 0 ]
               lwu          t1,  4(a0)                    // t1 = MEM[ a0 +  4 ]  => yw = state[ 1 ]
 #if ( RV64_TYPE2 ) || ( RV64_TYPE3 ) || ( RV64_TYPE4 ) || ( RV64_TYPE5 )
-#if ( RV64B )
-              alz.pack     t0, t0, t1                    //                      => ( yw || xw )
-#else	
-              slli         t1, t1,  32                   // t1 = t1 << 32
-              or           t0, t0, t1                    // t0 = t0 | t1         => ( yw || xw )
-#endif
+              PACK         t0, t0, t1                    //                      => ( yw || xw )
 #endif
               li           t2,       0                   // t2 =  0              => i =  0
               li           t3,      10                   // t3 = 10              => n = 10
@@ -50,22 +46,12 @@
               lwu          s0,  0(a1)                    // s0 = MEM[ a1 +  0 ]  => k0 =   key[ 0 ]
               lwu          s1,  4(a1)                    // s1 = MEM[ a1 +  4 ]  => k1 =   key[ 1 ]
 #if ( RV64_TYPE2 ) || ( RV64_TYPE3 ) || ( RV64_TYPE4 ) || ( RV64_TYPE5 )
-#if ( RV64B )
-              alz.pack     s0, s0, s1                    //                      => ( k1 || k0 )
-#else
-              slli         s1, s1,  32                   // s1 = s1 << 32
-              or           s0, s0, s1                    // s0 = s0 | s1         => ( k1 || k0 )
-#endif
+              PACK         s0, s0, s1                    //                      => ( k1 || k0 )
 #endif
               lwu          s2,  8(a1)                    // s2 = MEM[ a1 +  8 ]  => k2 =   key[ 2 ]
               lwu          s3, 12(a1)                    // s3 = MEM[ a1 + 12 ]  => k3 =   key[ 3 ]
 #if ( RV64_TYPE2 ) || ( RV64_TYPE3 ) || ( RV64_TYPE4 ) || ( RV64_TYPE5 )
-#if ( RV64B )
-              alz.pack     s2, s2, s3                    //                      => ( k3 || k2 )
-#else
-              slli         s3, s3,  32                   // s3 = s3 << 32
-              or           s2, s2, s3                    // s2 = s2 | s3         => ( k3 || k2 )
-#endif
+              PACK         s2, s2, s3                    //                      => ( k3 || k2 )
 #endif
 .endm
 
@@ -97,12 +83,7 @@
               lwu          t0,  0(a0)                    // t0 = MEM[ a0 +  0 ]  => xw = state[ 0 ]
               lwu          t1,  4(a0)                    // t1 = MEM[ a0 +  4 ]  => yw = state[ 1 ]
 #if ( RV64_TYPE2 ) || ( RV64_TYPE3 ) || ( RV64_TYPE4 ) || ( RV64_TYPE5 )
-#if ( RV64B )
-              alz.pack     t0, t0, t1                    //                      => ( yw || xw )
-#else
-              slli         t1, t1,  32                   // t1 = t1 << 32
-              or           t0, t0, t1                    // t0 = t0 | t1         => ( yw || xw )
-#endif
+              PACK         t0, t0, t1                    //                      => ( yw || xw )
 #endif
               li           t2,      10                   // t2 =  10             => i = 10
               li           t3,       0                   // t3 =   0             => n =  0
@@ -110,22 +91,12 @@
               lwu          s0,  0(a1)                    // s0 = MEM[ a1 +  0 ]  => k0 =   key[ 0 ]
               lwu          s1,  4(a1)                    // s1 = MEM[ a1 +  4 ]  => k1 =   key[ 1 ]
 #if ( RV64_TYPE2 ) || ( RV64_TYPE3 ) || ( RV64_TYPE4 ) || ( RV64_TYPE5 )
-#if ( RV64B )
-              alz.pack     s0, s0, s1                    //                      => ( k1 || k0 )
-#else
-              slli         s1, s1,  32                   // s1 = s1 << 32
-              or           s0, s0, s1                    // s0 = s0 | s1         => ( k1 || k0 )
-#endif
+              PACK         s0, s0, s1                    //                      => ( k1 || k0 )
 #endif
               lwu          s2,  8(a1)                    // s2 = MEM[ a1 +  8 ]  => k2 =   key[ 2 ]
               lwu          s3, 12(a1)                    // s3 = MEM[ a1 + 12 ]  => k3 =   key[ 3 ]
 #if ( RV64_TYPE2 ) || ( RV64_TYPE3 ) || ( RV64_TYPE4 ) || ( RV64_TYPE5 )
-#if ( RV64B )
-              alz.pack     s2, s2, s3                    //                      => ( k3 || k2 )
-#else
-              slli         s3, s3,  32                   // s3 = s3 << 32
-              or           s2, s2, s3                    // s2 = s2 | s3         => ( k3 || k2 )
-#endif
+              PACK         s2, s2, s3                    //                      => ( k3 || k2 )
 #endif
 .endm
 
@@ -147,7 +118,7 @@
 .endm
 
 // ----------------------------------------------------------------------------
-// CRAX    implementation => en/decrypt step
+// CRAXS10 implementation => en/decrypt step
 
 #if ( RV64_TYPE1 )
 .macro CRAXS10_ENC_STEP xw, yw, xk, yk, i
@@ -237,28 +208,8 @@
 .endm
 #endif
 
-// ----------------------------------------------------------------------------
-// CRAX    implementation => RCON
-
-#if ( CRAXS10_ENC_EXTERN ) || ( CRAXS10_DEC_EXTERN )
-.section .rodata
-
-.balign 4
-
-CRAXS10_RCON: .word 0xB7E15162
-              .word 0xBF715880
-              .word 0x38B4DA56
-              .word 0x324E7738
-              .word 0xBB1185EB
-              .word 0xB7E15162
-              .word 0xBF715880
-              .word 0x38B4DA56
-              .word 0x324E7738
-              .word 0xBB1185EB
-#endif
-
 // ----------------------------------------------------------------------------	
-// CRAX    implementation => encrypt
+// CRAXS10 implementation => encrypt
 
 #if ( CRAXS10_ENC_EXTERN )
 .section .text
@@ -334,7 +285,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
 #endif
 
 // ----------------------------------------------------------------------------	
-// CRAX    implementation => decrypt
+// CRAXS10 implementation => decrypt
 
 #if ( CRAXS10_DEC_EXTERN )
 .section .text

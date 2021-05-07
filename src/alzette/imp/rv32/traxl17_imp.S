@@ -4,19 +4,19 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
-#include "imp_alzette.S"
+#include     "ise.h"
+#include "alzette.h"
 
 // ============================================================================
 // register allocation
 
-// t0 => subkey
-// t1 => &TRAXL17_RCON
-// t2 => i          ~ loop counter 
-// t3 => n          ~ loop bound
-// t4 => temp 
-// t5 => temp
-// t6 => temp
-
+// t0  => subkey
+// t1  => &TRAXL17_RCON
+// t2  => i          ~ loop counter 
+// t3  => n          ~ loop bound
+// t4  => temp 
+// t5  => temp
+// t6  => temp
 
 // s0  =>  xstate[ 0 ] =  x0
 // s1  =>  xstate[ 1 ] =  x1
@@ -31,28 +31,8 @@
 // s10 =>   tweak[ 2 ] = tk2
 // s11 =>   tweak[ 3 ] = tk3
 
-
-
-// ----------------------------------------------------------------------------
-// TRAX    implementation => RCON
-
-#if ( TRAXL17_ENC_EXTERN ) || ( TRAXL17_DEC_EXTERN )
-.section .rodata
-
-.balign 4
-
-TRAXL17_RCON: .word 0xB7E15162
-              .word 0xBF715880
-              .word 0x38B4DA56
-              .word 0x324E7738
-              .word 0xBB1185EB
-              .word 0x4F7C7B57
-              .word 0xCFBFA1C8
-              .word 0xC2B3293D
-#endif
-
 // ============================================================================
-// TRAX    implementation => en/decrypt prologue + epilogue
+// TRAXL17 implementation => en/decrypt prologue + epilogue
 
 .macro TRAXL17_ENC_PROLOGUE
               addi         sp, sp, -48                    // adjust SP
@@ -156,7 +136,7 @@ TRAXL17_RCON: .word 0xB7E15162
 .endm
 
 // ----------------------------------------------------------------------------
-// TRAX    implementation => add tweak
+// TRAXL17 implementation => add tweak
 
 .macro TRAXL17_ADD_TWEAK 
               xor          s0,  s0,  s8                  // x0 ^= tk[0]
@@ -166,7 +146,7 @@ TRAXL17_RCON: .word 0xB7E15162
 .endm
 
 // ----------------------------------------------------------------------------
-// TRAX    implementation => en/decrypt linear layer
+// TRAXL17 implementation => en/decrypt linear layer
 
 .macro TRAXL17_ENC_LINEAR 
               xor          t4,  s2,  s3
@@ -223,7 +203,7 @@ TRAXL17_RCON: .word 0xB7E15162
 .endm
 
 // ----------------------------------------------------------------------------
-// TRAX    implementation => add subkeys
+// TRAXL17 implementation => add subkeys
 
 .macro TRAXL17_ADD_SUBKEY sk
               lw           t6,  0(\sk)
@@ -245,7 +225,7 @@ TRAXL17_RCON: .word 0xB7E15162
 .endm
 
 // ----------------------------------------------------------------------------
-// TRAX    implementation => en/decrypt substitution
+// TRAXL17 implementation => en/decrypt substitution
 #if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
 .macro TRAXL17_ENC_SUBS rc
               lw          t4,     0(\rc)                 // t4 = MEM[ \rc +  0 ] => TRAXL1710_RCON[ 0/4 ]
@@ -302,7 +282,7 @@ TRAXL17_RCON: .word 0xB7E15162
 .endm
 #endif
 // ----------------------------------------------------------------------------
-// TRAX    implementation => en/decrypt step
+// TRAXL17 implementation => en/decrypt step
 	
 #if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 ) || ( RV32_TYPE4 )
 .macro TRAXL17_ENC_STEP_EVE sk, rc
@@ -358,7 +338,7 @@ TRAXL17_RCON: .word 0xB7E15162
 #endif
 
 // ----------------------------------------------------------------------------	
-// TRAX    implementation => encrypt
+// TRAXL17 implementation => encrypt
 
 #if ( TRAXL17_ENC_EXTERN )
 .section .text
@@ -431,7 +411,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
 #endif
 
 // ----------------------------------------------------------------------------	
-// TRAX    implementation => decrypt
+// TRAXL17 implementation => decrypt
 
 #if ( TRAXL17_DEC_EXTERN )
 .section .text

@@ -4,27 +4,28 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
-#include "imp_alzette.S"
+#include     "ise.h"
+#include "alzette.h"
 
 // ============================================================================
 // register allocation
 
-// t0 => state[ 0 ] = xw
-// t1 => state[ 1 ] = yw
-// t2 => i          ~ loop counter 
-// t3 => n          ~ loop bound
-// t4 => temp
-// t5 => temp
-// t6 => temp
+// t0  => state[ 0 ] = xw
+// t1  => state[ 1 ] = yw
+// t2  => i          ~ loop counter 
+// t3  => n          ~ loop bound
+// t4  => temp
+// t5  => temp
+// t6  => temp
 
-// s0 =>   key[ 0 ] = k0
-// s1 =>   key[ 1 ] = k1
-// s2 =>   key[ 2 ] = k2
-// s3 =>   key[ 3 ] = k3
-// s4 =>  &CRAXS10_RCON
+// s0  =>   key[ 0 ] = k0
+// s1  =>   key[ 1 ] = k1
+// s2  =>   key[ 2 ] = k2
+// s3  =>   key[ 3 ] = k3
+// s4  =>  &CRAXS10_RCON
 
 // ============================================================================
-// CRAX    implementation => en/decrypt prologue + epilogue
+// CRAXS10 implementation => en/decrypt prologue + epilogue
 
 .macro CRAXS10_ENC_PROLOGUE
               addi         sp, sp, -20                   // adjust SP
@@ -95,7 +96,7 @@
 .endm
 
 // ----------------------------------------------------------------------------
-// CRAX    implementation => en/decrypt step
+// CRAXS10 implementation => en/decrypt step
 	
 #if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
 .macro CRAXS10_ENC_STEP xw, yw, xk, yk, i
@@ -151,29 +152,8 @@
 .endm       
 #endif
 
-// ----------------------------------------------------------------------------
-// CRAX    implementation => RCON
-
-
-#if ( CRAXS10_ENC_EXTERN ) || ( CRAXS10_DEC_EXTERN )
-.section .rodata
-
-.balign 4
-
-CRAXS10_RCON: .word 0xB7E15162
-              .word 0xBF715880
-              .word 0x38B4DA56
-              .word 0x324E7738
-              .word 0xBB1185EB
-              .word 0xB7E15162
-              .word 0xBF715880
-              .word 0x38B4DA56
-              .word 0x324E7738
-              .word 0xBB1185EB
-#endif
-	
 // ----------------------------------------------------------------------------	
-// CRAX    implementation => encrypt
+// CRAXS10 implementation => encrypt
 
 #if ( CRAXS10_ENC_EXTERN )
 .section .text
@@ -228,7 +208,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
 #endif
 
 // ----------------------------------------------------------------------------	
-// CRAX    implementation => decrypt
+// CRAXS10 implementation => decrypt
 
 #if ( CRAXS10_DEC_EXTERN )
 .section .text

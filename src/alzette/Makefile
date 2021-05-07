@@ -16,16 +16,19 @@ endif
 ifndef ARCH
 export ARCH     = generic
 endif
+ifndef IMP
+export IMP      = generic
+endif
 
-export INCLUDES = ${ARCH}
+export INCLUDES = ./ ./arch/${ARCH} ./imp/${IMP}
 
-export SOURCES  = $(wildcard *.c ${ARCH}/*.c)
-export SOURCES += $(wildcard *.S ${ARCH}/*.S)
-export HEADERS  = $(wildcard *.h ${ARCH}/*.h)
+export SOURCES  = $(wildcard ./*.c ./arch/${ARCH}/*.c ./imp/${IMP}/*.c)
+export SOURCES += $(wildcard ./*.S ./arch/${ARCH}/*.S ./imp/${IMP}/*.S)
+export HEADERS  = $(wildcard ./*.h ./arch/${ARCH}/*.h ./imp/${IMP}/*.h)
 
 export TARGET   = ${REPO_HOME}/build/driver
 
-include ${ARCH}/Makefile.in
+include ./arch/${ARCH}/Makefile.in
 
 # -----------------------------------------------------------------------------
 

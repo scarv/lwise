@@ -5,18 +5,9 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#ifndef __DRIVER_H
-#define __DRIVER_H
+#ifndef __CRAXS10_IMP_H
+#define __CRAXS10_IMP_H
 
 #include "share.h"
-
-#include "craxs10.h"
-#include "traxl17.h"
-
-#include "measure.h"
-
-#if !defined( DRIVER_TRIALS )
-#define DRIVER_TRIALS 100
-#endif
 
 #endif

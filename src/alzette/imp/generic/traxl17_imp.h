@@ -5,4 +5,9 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#include "imp.h"
+#ifndef __TRAXL17_IMP_H
+#define __TRAXL17_IMP_H
+
+#include "share.h"
+
+#endif
