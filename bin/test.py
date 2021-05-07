@@ -14,7 +14,7 @@ if ( __name__ == '__main__' ) :
     print( '>>> IMP  = "%s"' % ( IMP  ) )
     print( '>>> CONF = "%s"' % ( CONF ) )
 
-    subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/alzette' ), 'clean', 'all', 'run' ], env = { **os.environ, 'ARCH' : ARCH, 'IMP' : IMP, 'CONF' : CONF } )
+    subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/software' ), 'clean', 'all', 'run' ], env = { **os.environ, 'ARCH' : ARCH, 'IMP' : IMP, 'CONF' : CONF } )
 
     print( '<<<'                        )
 
