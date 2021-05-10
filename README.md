@@ -242,7 +242,7 @@ ALZETTE(xi,yi,ci) {
 
 intentionally typeset to stress repeat use of a `add-xor-xor` block.
 
-### RV32 (also see [`doc/encoding.txt`](`doc/encoding.txt`))
+### RV32 (see also [`doc/encoding.txt`](./doc/encoding.txt))
 
 - The (optional) BitManip-like ISE:
 
@@ -360,7 +360,7 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
     DEC = { 0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D }
     ```
 
-### RV64 (see also [`doc/encoding.txt`](`doc/encoding.txt`))
+### RV64 (see also [`doc/encoding.txt`](./doc/encoding.txt))
 
 - The (optional) BitManip-like ISE:
 
