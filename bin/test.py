@@ -4,22 +4,20 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-import os, subprocess, sys
+import argparse, os, subprocess, sys
 
-if ( __name__ == '__main__' ) :
-  def run( ARCH, IMP, CONF ) :
-    CONF = ' '.join( [ '-D%s' % ( x ) for x in CONF ] )
+def run( ARCH, IMP, CONF ) :
+  CONF = ' '.join( [ '-D%s' % ( x ) for x in CONF ] )
 
-    print( '>>> ARCH = "%s"' % ( ARCH ) )
-    print( '>>> IMP  = "%s"' % ( IMP  ) )
-    print( '>>> CONF = "%s"' % ( CONF ) )
+  print( '>>> ARCH = "%s"' % ( ARCH ) )
+  print( '>>> IMP  = "%s"' % ( IMP  ) )
+  print( '>>> CONF = "%s"' % ( CONF ) )
 
-    subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/software' ), 'clean', 'all', 'run' ], env = { **os.environ, 'ARCH' : ARCH, 'IMP' : IMP, 'CONF' : CONF } )
+  subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/software' ), 'clean', 'all', 'run' ], env = { **os.environ, 'ARCH' : ARCH, 'IMP' : IMP, 'CONF' : CONF } )
 
-    print( '<<<'                        )
+  print( '<<<'                        )
 
-  trials = 1000
-
+def rv32( trials ) :
   # rv32/generic
 
   for UNROLL in [ False, True ] :
@@ -51,6 +49,7 @@ if ( __name__ == '__main__' ) :
 
         run( 'rv32',    'rv32', CONF )
 
+def rv64( trials ) :
   # rv64/generic
 
   for UNROLL in [ False, True ] :
@@ -81,3 +80,18 @@ if ( __name__ == '__main__' ) :
 
 
         run( 'rv64',    'rv64', CONF )
+
+if ( __name__ == '__main__' ) :
+  parser = argparse.ArgumentParser()
+
+  parser.add_argument( '--trials', dest = 'trials', action = 'store', type = int, default = 1000  )
+
+  parser.add_argument( '--rv32',   dest =   'rv32', action = 'store_true',        default = False )
+  parser.add_argument( '--rv64',   dest =   'rv64', action = 'store_true',        default = False )
+
+  args = parser.parse_args()
+
+  if ( args.rv32 ) :
+    rv32( args.trials )
+  if ( args.rv64 ) :
+    rv64( args.trials )

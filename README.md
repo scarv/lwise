@@ -105,7 +105,7 @@ but focused on RISC-V in particular.
   or use the test script provided
 
   ```sh
-  python3 ${REPO_HOME}/bin/test.py
+  python3 ${REPO_HOME}/bin/test.py --rv32 --rv64 --trials=10
   ```
 
   to automatically scan through various different configurations, e.g., 
