@@ -12,10 +12,14 @@ to consider a wide range of different platforms, e.g., some subset of
 2. MSP430
 3. ARM
    - ARM
-   - ARM+NEON/SVE
+   - ARM+NEON
+   - ARM+SVE
+   - ...
 4. x86
    - x86
-   - x86+SSE/AVX
+   - x86+SSE
+   - x86+AVX
+   - ...
 5. RISC-V
    - RV32I
    - RV32IB, i.e., with [BitManip](https://github.com/riscv/riscv-bitmanip) ISE
@@ -27,12 +31,15 @@ to consider a wide range of different platforms, e.g., some subset of
    - RV64I         with  custom                                             ISE (see below)
 6. ...
 
+but focused on RISC-V in particular.
+
 <!--- -------------------------------------------------------------------- --->
 
 ## Organisation
 
 ```
 ├── bin                     - scripts (e.g., environment configuration)
+├── doc                     - documentation
 ├── build                   - working directory for build
 └── src                     - source code
     ├── hardware              - source code for hardware
@@ -151,14 +158,16 @@ to consider a wide range of different platforms, e.g., some subset of
   |           | `CRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
   |           | `TRAXL17_ENC_EXTERN` | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
   |           | `TRAXL17_DEC_EXTERN` | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
-  |           | `TRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
-  |           | `TRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
+  |           | `TRAXL17_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
+  |           | `TRAXL17_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
   | `rv32`    | `RV32B`              | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
+  | `rv32`    | `RV32_ELL`           | enable ISE for `\ell` function (as used in, e.g., TRAXL17)                                                     |
   | `rv32`    | `RV32_TYPE1`         | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
   | `rv32`    | `RV32_TYPE2`         | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
   | `rv32`    | `RV32_TYPE3`         | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
   | `rv32`    | `RV32_TYPE4`         | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
   | `rv64`    | `RV64B`              | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
+  | `rv32`    | `RV64_ELL`           | enable ISE for `\ell` function (as used in, e.g., TRAXL17)                                                     |
   | `rv64`    | `RV64_TYPE1`         | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
   | `rv64`    | `RV64_TYPE2`         | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
   | `rv64`    | `RV64_TYPE3`         | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
@@ -179,7 +188,7 @@ to consider a wide range of different platforms, e.g., some subset of
   - perform a fresh clone of the component repository,
   - apply the existing patch to the cloned component repository,
   - implement the change in the cloned component repository,
-  - stage the change via git add, but do *not* commit it, in the cloned component repository,
+  - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
   - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
   - optionally commit and push the updated patch.
   
@@ -233,14 +242,20 @@ ALZETTE(xi,yi,ci) {
 
 intentionally typeset to stress repeat use of a `add-xor-xor` block.
 
-### RV32I(B): 32-bit
-
-#### Instructions
+### RV32 (also see [`doc/encoding.txt`](`doc/encoding.txt`))
 
 - The (optional) BitManip-like ISE:
 
   ```
   alz.rori          rd, rs1,      imm => GPR[rd] <-              GPR[rs1] >>> imm
+  ```
+
+- The (optional) ISE for `\ell` function (as used in, e.g., TRAXL17):
+
+  ```
+  alz.ell           rd, rs1           => x    <- GPR[rs1]
+                                         r    <- ( x    ^ ( x    << 16 ) ) >>> 16
+                                         GPR[rd] <- r
   ```
 
 - `RV32_TYPE1`: base ISA.
@@ -262,9 +277,9 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
   alz.subror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ( GPR[rs2] >>> 31 )
   alz.subror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ( GPR[rs2] >>> 17 )
   alz.subror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ( GPR[rs2] >>> 24 )
-  alz.xorror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 24 )
-  alz.xorror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 17 )
   alz.xorror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 31 )
+  alz.xorror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 17 )
+  alz.xorror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 24 )
   alz.xorror.16     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 16 )
   ```
      
@@ -345,87 +360,7 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
     DEC = { 0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D }
     ```
 
-#### Encodings
-
-- The (optional) BitManip-like ISE:
-
-  ```
-  .macro alz.rori         rd, rs1,      imm     // alz.rori         => iiii iii0 0000 rrrr r000 rrrr r000 1011
-  .insn r CUSTOM_0,    0, \imm, \rd, \rs1,   x0 //                  => #define MATCH_ALZ_RORI         0x0000000B
-  .endm                                         //                  => #define  MASK_ALZ_RORI         0x0000707F
-  ```
-
-- `RV32_TYPE1`: base ISA.
-
-- `RV32_TYPE2`: base ISA plus custom   ISE.
-
-  ```
-  .macro alz.addrori      rd, rs1, rs2, imm     // alz.addrori      => iiii iiir rrrr rrrr r001 rrrr r000 1011
-  .insn r CUSTOM_0,    1, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDRORI      0x0000100B
-  .endm                                         //                  => #define  MASK_ALZ_ADDRORI      0x0000707F
-  .macro alz.subrori      rd, rs1, rs2, imm     // alz.subrori      => iiii iiir rrrr rrrr r010 rrrr r000 1011
-  .insn r CUSTOM_0,    2, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_SUBRORI      0x0000200B
-  .endm                                         //                  => #define  MASK_ALZ_SUBRORI      0x0000707F
-  .macro alz.xorrori      rd, rs1, rs2, imm     // alz.xorrori      => iiii iiir rrrr rrrr r011 rrrr r000 1011 
-  .insn r CUSTOM_0,    3, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORRORI      0x0000300B
-  .endm                                         //                  => #define  MASK_ALZ_XORRORI      0x0000707F
-  ```
-
-- `RV32_TYPE3`: base ISA plus custom   ISE.
-
-  ```
-  .macro alz.addror.31    rd, rs1, rs2          // alz.addror.31    => 0000 000r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    0, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDROR_31    0x0000002B
-  .endm                                         //                  => #define  MASK_ALZ_ADDROR_31    0xFE00007F
-  .macro alz.addror.17    rd, rs1, rs2          // alz.addror.17    => 0000 001r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    1, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDROR_17    0x0200002B
-  .endm                                         //                  => #define  MASK_ALZ_ADDROR_17    0xFE00007F
-  .macro alz.addror.24    rd, rs1, rs2          // alz.addror.24    => 0000 010r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    2, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDROR_24    0x0400002B
-  .endm                                         //                  => #define  MASK_ALZ_ADDROR_24    0xFE00007F
-  .macro alz.subror.31    rd, rs1, rs2          // alz.subror.31    => 0000 011r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    3, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_SUBROR_31    0x0600002B
-  .endm                                         //                  => #define  MASK_ALZ_SUBROR_31    0xFE00007F
-  .macro alz.subror.17    rd, rs1, rs2          // alz.subror.17    => 0000 100r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    4, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_SUBROR_17    0x0800002B
-  .endm                                         //                  => #define  MASK_ALZ_SUBROR_17    0xFE00007F
-  .macro alz.subror.24    rd, rs1, rs2          // alz.subror.24    => 0000 101r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    5, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_SUBROR_24    0x0A00002B
-  .endm                                         //                  => #define  MASK_ALZ_SUBROR_24    0xFE00007F
-  .macro alz.xorror.31    rd, rs1, rs2          // alz.xorror.31    => 0000 110r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    6, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORROR_31    0x0C00002B
-  .endm                                         //                  => #define  MASK_ALZ_XORROR_31    0xFE00007F
-  .macro alz.xorror.17    rd, rs1, rs2          // alz.xorror.17    => 0000 111r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,     7,\rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORROR_17    0x0E00002B
-  .endm                                         //                  => #define  MASK_ALZ_XORROR_17    0xFE00007F
-  .macro alz.xorror.24    rd, rs1, rs2          // alz.xorror.24    => 0001 000r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    8, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORROR_24    0x1000002B
-  .endm                                         //                  => #define  MASK_ALZ_XORROR_24    0xFE00007F
-  .macro alz.xorror.16    rd, rs1, rs2          // alz.xorror.16    => 0001 001r rrrr rrrr r000 rrrr r010 1011 
-  .insn r CUSTOM_1,    0,    9, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORROR_16    0x1200002B
-  .endm                                         //                  => #define  MASK_ALZ_XORROR_16    0xFE00007F
-  ```
-     
-- `RV32_TYPE4`: base ISA plus custom   ISE.
-   
-  ```
-  .macro alz.whole.enci.x rd, rs1, rs2, imm     // alz.whole.enci.x => iiii iiir rrrr rrrr r100 rrrr r000 1011 
-  .insn r CUSTOM_0,    4, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_ENCI_X 0x0000400B
-  .endm                                         //                  => #define  MASK_ALZ_WHOLE_ENCI_X 0x0000707F
-  .macro alz.whole.enci.y rd, rs1, rs2, imm     // alz.whole.enci.y => iiii iiir rrrr rrrr r101 rrrr r000 1011 
-  .insn r CUSTOM_0,    5, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_ENCI_Y 0x0000500B
-  .endm                                         //                  => #define  MASK_ALZ_WHOLE_ENCI_Y 0x0000707F
-  .macro alz.whole.deci.x rd, rs1, rs2, imm     // alz.whole.deci.x => iiii iiir rrrr rrrr r110 rrrr r000 1011 
-  .insn r CUSTOM_0,    6, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_DECI_X 0x0000600B
-  .endm                                         //                  => #define  MASK_ALZ_WHOLE_DECI_X 0x0000707F
-  .macro alz.whole.deci.y rd, rs1, rs2, imm     // alz.whole.deci.y => iiii iiir rrrr rrrr r111 rrrr r000 1011 
-  .insn r CUSTOM_0,    7, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_DECI_Y 0x0000700B
-  .endm                                         //                  => #define  MASK_ALZ_WHOLE_DECI_Y 0x0000707F
-  ```
-
-### RV64I(B): 64-bit
-
-#### Instructions
+### RV64 (see also [`doc/encoding.txt`](`doc/encoding.txt`))
 
 - The (optional) BitManip-like ISE:
 
@@ -439,6 +374,16 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
   alz.packu         rd, rs1, rs2      => lo <-   GPR[rs1] >> 32
                                          hi <- ( GPR[rs2] >> 32 ) << 32
                                          GPR[rd] <- lo | hi
+  ```
+
+- The (optional) ISE for `\ell` function (as used in, e.g., TRAXL17):
+
+  ```
+  alz.ell           rd, rs1           => xh   <- GPR[rs1]_{63..32}
+                                         xl   <- GPR[rs1]_{31.. 0}
+                                         rh   <- ( xh ^ ( xh << 16 ) ) >>> 16
+                                         rl   <- ( xl ^ ( xl << 16 ) ) >>> 16
+                                         GPR[rd] <- rh || rl
   ```
 
 - `RV64_TYPE1`: base ISA.
@@ -576,6 +521,12 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
                                          GPR[rd] <- yi || xi
   ```
 
+    such that
+
+    ```
+    DEC = { 0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D }
+    ```
+
 - `RV64_TYPE5`: base ISA plus custom   ISE.
 
   ```
@@ -612,86 +563,6 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
                                          yi <- yi ^ ( xi >>> 24 )
                                          xi <- xi - ( yi >>> 31 )
                                          GPR[rd] <- yi || xi
-  ```
-
-#### Encodings
-
-- The (optional) BitManip-like ISE:
-
-  ```
-  .macro alz.roriw        rd, rs1,      imm     // alz.roriw        => iiii iii0 0000 rrrr r000 rrrr r101 1011
-  .insn r CUSTOM_2,    0, \imm, \rd, \rs1,   x0 //                  => #define MATCH_ALZ_RORIW        0x0000005B
-  .endm                                         //                  => #define  MASK_ALZ_RORIW        0x0000707F
-  .macro alz.pack         rd, rs1, rs2          // alz.pack         => 0000 000r rrrr rrrr r001 rrrr r101 1011
-  .insn r CUSTOM_2,    1,    0, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_PACK         0x0000105B
-  .endm                                         //                  => #define  MASK_ALZ_PACK         0x0000707F
-  .macro alz.packu        rd, rs1, rs2          // alz.packu        => 0000 000r rrrr rrrr r010 rrrr r101 1011
-  .insn r CUSTOM_2,    2,    0, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_PACKU        0x0000205B
-  .endm                                         //                  => #define  MASK_ALZ_PACKU        0x0000707F
-  ```
-
-- `RV64_TYPE1`: base ISA.
-
-- `RV64_TYPE2`: base ISA plus custom   ISE.
-
-  ```
-  .macro alz.block.enci   rd, rs1, rs2, imm     // alz.block.enci   => iiii iiir rrrr rrrr r011 rrrr r101 1011
-  .insn r CUSTOM_2,    3, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENCI   0x0000305B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_ENCI   0x0000707F
-  .macro alz.block.deci   rd, rs1, rs2, imm     // alz.block.deci   => iiii iiir rrrr rrrr r100 rrrr r101 1011
-  .insn r CUSTOM_2,    4, \imm, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DECI   0x0000405B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_DECI   0x0000707F
-  ```
-
-- `RV64_TYPE3`: base ISA plus custom   ISE.
-
-  ```
-  .macro alz.block.enc.0  rd, rs1, rs2          // alz.block.enc.0  => 0000 000r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    0, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENC_0  0x0000007B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_ENC_0  0xFE00007F
-  .macro alz.block.enc.1  rd, rs1, rs2          // alz.block.enc.1  => 0000 001r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    1, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENC_1  0x0200007B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_ENC_1  0xFE00007F
-  .macro alz.block.enc.2  rd, rs1, rs2          // alz.block.enc.2  => 0000 010r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    2, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENC_2  0x0400007B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_ENC_2  0xFE00007F
-  .macro alz.block.enc.3  rd, rs1, rs2          // alz.block.enc.3  => 0000 011r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    3, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENC_3  0x0600007B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_ENC_3  0xFE00007F
-  .macro alz.block.dec.0  rd, rs1, rs2          // alz.block.dec.0  => 0000 100r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    4, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DEC_0  0x0800007B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_DEC_0  0xFE00007F
-  .macro alz.block.dec.1  rd, rs1, rs2          // alz.block.dec.1  => 0000 101r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    5, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DEC_1  0x0A00007B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_DEC_1  0xFE00007F
-  .macro alz.block.dec.2  rd, rs1, rs2          // alz.block.dec.2  => 0000 110r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    6, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DEC_2  0x0C00007B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_DEC_2  0xFE00007F
-  .macro alz.block.dec.3  rd, rs1, rs2          // alz.block.dec.3  => 0000 111r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    7, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DEC_3  0x0E00007B
-  .endm                                         //                  => #define  MASK_ALZ_BLOCK_DEC_3  0xFE00007F
-  ```
-
-- `RV64_TYPE4`: base ISA plus custom   ISE.
-
-  ```
-  .macro alz.whole.enci   rd, rs1,      imm     // alz.whole.enci   => iiii iii0 0000 rrrr r101 rrrr r101 1011
-  .insn r CUSTOM_2,    5, \imm, \rd, \rs1,   x0 //                  => #define MATCH_ALZ_WHOLE_ENCI   0x0000505B
-  .endm                                         //                  => #define  MASK_ALZ_WHOLE_ENCI   0x0000707F
-  .macro alz.whole.deci   rd, rs1,      imm     // alz.whole.deci   => iiii iii0 0000 rrrr r110 rrrr r101 1011
-  .insn r CUSTOM_2,    6, \imm, \rd, \rs1,   x0 //                  => #define MATCH_ALZ_WHOLE_DECI   0x0000605B
-  .endm                                         //                  => #define  MASK_ALZ_WHOLE_DECI   0x0000707F
-  ```
-
-- `RV64_TYPE5`: base ISA plus custom   ISE.
-
-  ```
-  .macro alz.whole.enc    rd, rs1, rs2          // alz.whole.enc    => 0001 000r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    8, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_ENC    0x1000007B
-  .endm                                         //                  => #define  MASK_ALZ_WHOLE_ENC    0xFE00007F
-  .macro alz.whole.dec    rd, rs1, rs2          // alz.whole.dec    => 0001 001r rrrr rrrr r000 rrrr r111 1011 
-  .insn r CUSTOM_3,    0,    9, \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_DEC    0x1200007B
-  .endm                                         //                  => #define  MASK_ALZ_WHOLE_DEC    0xFE00007F
   ```
 
 <!--- -------------------------------------------------------------------- --->
