@@ -10,10 +10,18 @@
 .macro ROR32 r, x, n, t0, t1
   alz.roriw \r,  \x,      \n
 .endm
+.macro ROR64 r, x, n, t0, t1
+  alz.rori  \r,  \x,      \n
+.endm
 #else
 .macro ROR32 r, x, n, t0, t1
   srliw     \t0, \x,      \n
   slliw     \t1, \x,   32-\n
+  or        \r,  \t0, \t1
+.endm
+.macro ROR64 r, x, n, t0, t1
+  srli      \t0, \x,      \n
+  slli      \t1, \x,   64-\n
   or        \r,  \t0, \t1
 .endm
 #endif
@@ -32,9 +40,12 @@
 // ============================================================================
 
 #if ( RV64B )
+.macro alz.rori         rd, rs1,      imm          
+.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0
+.endm
 .macro alz.roriw        rd, rs1,      imm          
 .insn r CUSTOM_0, 6, \imm+( 1*32), \rd, \rs1,   x0 
-.endm                                              
+.endm        
 .macro alz.pack         rd, rs1, rs2               
 .insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 
 .endm                                              
@@ -48,6 +59,9 @@
 #if ( RV64_ELL )
 .macro alz.ell          rd, rs1                    
 .insn r CUSTOM_3, 6,      ( 2* 1), \rd, \rs1,   x0 
+.endm           
+.macro alz.ellrev       rd, rs1                    
+.insn r CUSTOM_3, 6,      ( 3* 1), \rd, \rs1,   x0 
 .endm           
 #endif                                   
 

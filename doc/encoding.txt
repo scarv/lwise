@@ -19,6 +19,7 @@
 +=============+==================+==========+=======+======+=====================+=========+=============+
 |             |                  |          |       |      |                     |         |             |
 | RV32B       | alz.rori         | 1R+I->1R | imm5  |      | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
+| RV64B       | alz.rori         | 1R+I->1R | imm5  |      | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
 | RV64B       | alz.roriw        | 1R+I->1R | imm5  |      | 01 : imm5           | 6 = 110 | 0 = 0001011 |
 |             |                  |          |       |      |                     |         |             |
 | RV32_TYPE2  | alz.addrori      | 2R+I->1R | imm5  |      | 00 : imm5           | 7 = 111 | 1 = 0101011 |
@@ -90,6 +91,7 @@
 |             |                  |          |       |      |                     |         |             |     
 | RV32_ELL    | alz.ell          | 1R  ->1R |       |      | 00 : 00010          | 6 = 110 | 3 = 1111011 |
 | RV64_ELL    | alz.ell          | 1R  ->1R |       |      | 00 : 00010          | 6 = 110 | 3 = 1111011 |
+| RV64_ELL    | alz.ellrev       | 1R  ->1R |       |      | 00 : 00011          | 6 = 110 | 3 = 1111011 |
 |             |                  |          |       |      |                     |         |             |
 | RV32_TYPE3  | alz.addror.31    | 2R  ->1R | const |      | 01 : 00000          | 7 = 111 | 3 = 1111011 |
 | RV32_TYPE3  | alz.addror.17    | 2R  ->1R | const |      | 01 : 00001          | 7 = 111 | 3 = 1111011 |
@@ -126,6 +128,9 @@
 .macro alz.ell          rd, rs1                    // alz.packu        => 0000 010r rrrr rrrr r110 rrrr r111 1011
 .insn r CUSTOM_3, 6,      ( 2* 1), \rd, \rs1,   x0 //                  => #define MATCH_ALZ_ELL          0x0400607B
 .endm                                              //                  => #define  MASK_ALZ_ELL          0xFE00707F
+.macro alz.ellrev       rd, rs1                    // alz.packu        => 0000 011r rrrr rrrr r110 rrrr r111 1011
+.insn r CUSTOM_3, 6,      ( 3* 1), \rd, \rs1,   x0 //                  => #define MATCH_ALZ_ELLREV       0x0600607B
+.endm                                              //                  => #define  MASK_ALZ_ELLREV       0xFE00707F
 
 .macro alz.addror.31    rd, rs1, rs2               // alz.addror.31    => 0100 000r rrrr rrrr r111 rrrr r111 1011
 .insn r CUSTOM_3, 7,      (32* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDROR_31    0x4000707B

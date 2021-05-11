@@ -1,8 +1,8 @@
 diff --git a/riscv/arith.h b/riscv/arith.h
-index 398217e..ab26d85 100644
+index 398217e..df2a9f9 100644
 --- a/riscv/arith.h
 +++ b/riscv/arith.h
-@@ -8,6 +8,15 @@
+@@ -8,6 +8,21 @@
  #include <climits>
  #include <cstddef>
  
@@ -12,6 +12,12 @@ index 398217e..ab26d85 100644
 +}
 +inline uint32_t ror32( uint32_t x, int n ) {
 +  return ( ( x >> n ) | ( x << ( 32 - n ) ) );
++}
++inline uint32_t rol64( uint64_t x, int n ) {
++  return ( ( x << n ) | ( x >> ( 64 - n ) ) );
++}
++inline uint32_t ror64( uint64_t x, int n ) {
++  return ( ( x >> n ) | ( x << ( 64 - n ) ) );
 +}
 +// -- alzette
 +
@@ -34,7 +40,7 @@ index 591e41d..dc28fd7 100644
    int64_t shamt() { return x(20, 6); }
    int64_t s_imm() { return x(7, 5) + (xs(25, 7) << 5); }
 diff --git a/riscv/encoding.h b/riscv/encoding.h
-index 881ed7d..940dd32 100644
+index 881ed7d..4fd8f4b 100644
 --- a/riscv/encoding.h
 +++ b/riscv/encoding.h
 @@ -286,6 +286,82 @@
@@ -44,8 +50,16 @@ index 881ed7d..940dd32 100644
 +// ++ alzette
 +#define MATCH_ALZ_RORI         0x0000600B
 +#define  MASK_ALZ_RORI         0xC000707F
++#define MATCH_ALZ_RORIW        0x4000600B
++#define  MASK_ALZ_RORIW        0xC000707F
++#define MATCH_ALZ_PACK         0x0000707B
++#define  MASK_ALZ_PACK         0xFE00707F
++#define MATCH_ALZ_PACKU        0x0200707B
++#define  MASK_ALZ_PACKU        0xFE00707F
 +#define MATCH_ALZ_ELL          0x0400607B
 +#define  MASK_ALZ_ELL          0xFE00707F
++#define MATCH_ALZ_ELLREV       0x0600607B
++#define  MASK_ALZ_ELLREV       0xFE00707F
 +#define MATCH_ALZ_ADDRORI      0x0000702B
 +#define  MASK_ALZ_ADDRORI      0xC000707F
 +#define MATCH_ALZ_SUBRORI      0x4000702B
@@ -80,14 +94,6 @@ index 881ed7d..940dd32 100644
 +#define  MASK_ALZ_WHOLE_DECI_X 0xF000707F
 +#define MATCH_ALZ_WHOLE_DECI_Y 0x7000705B
 +#define  MASK_ALZ_WHOLE_DECI_Y 0xF000707F
-+#define MATCH_ALZ_RORIW        0x4000600B
-+#define  MASK_ALZ_RORIW        0xC000707F
-+#define MATCH_ALZ_PACK         0x0000707B
-+#define  MASK_ALZ_PACK         0xFE00707F
-+#define MATCH_ALZ_PACKU        0x0200707B
-+#define  MASK_ALZ_PACKU        0xFE00707F
-+#define MATCH_ALZ_ELLW         0x0600607B
-+#define  MASK_ALZ_ELLW         0xFE00707F
 +#define MATCH_ALZ_BLOCK_ENCI   0x0000705B
 +#define  MASK_ALZ_BLOCK_ENCI   0xF000707F
 +#define MATCH_ALZ_BLOCK_DECI   0x1000705B
@@ -126,7 +132,11 @@ index 881ed7d..940dd32 100644
  #ifdef DECLARE_INSN
 +// ++ alzette
 +DECLARE_INSN(alz_rori,         MATCH_ALZ_RORI,         MASK_ALZ_RORI)
++DECLARE_INSN(alz_roriw,        MATCH_ALZ_RORIW,        MASK_ALZ_RORIW)
++DECLARE_INSN(alz_pack,         MATCH_ALZ_PACK,         MASK_ALZ_PACK)
++DECLARE_INSN(alz_packu,        MATCH_ALZ_PACKU,        MASK_ALZ_PACKU)
 +DECLARE_INSN(alz_ell,          MATCH_ALZ_ELL,          MASK_ALZ_ELL)
++DECLARE_INSN(alz_ellrev,       MATCH_ALZ_ELLREV,       MASK_ALZ_ELLREV)
 +DECLARE_INSN(alz_addrori,      MATCH_ALZ_ADDRORI,      MASK_ALZ_ADDRORI)
 +DECLARE_INSN(alz_subrori,      MATCH_ALZ_SUBRORI,      MASK_ALZ_SUBRORI)
 +DECLARE_INSN(alz_xorrori,      MATCH_ALZ_XORRORI,      MASK_ALZ_XORRORI)
@@ -144,10 +154,6 @@ index 881ed7d..940dd32 100644
 +DECLARE_INSN(alz_whole_enci_y, MATCH_ALZ_WHOLE_ENCI_Y, MASK_ALZ_WHOLE_ENCI_Y)
 +DECLARE_INSN(alz_whole_deci_x, MATCH_ALZ_WHOLE_DECI_X, MASK_ALZ_WHOLE_DECI_X)
 +DECLARE_INSN(alz_whole_deci_y, MATCH_ALZ_WHOLE_DECI_Y, MASK_ALZ_WHOLE_DECI_Y)
-+DECLARE_INSN(alz_roriw,        MATCH_ALZ_RORIW,        MASK_ALZ_RORIW)
-+DECLARE_INSN(alz_pack,         MATCH_ALZ_PACK,         MASK_ALZ_PACK)
-+DECLARE_INSN(alz_packu,        MATCH_ALZ_PACKU,        MASK_ALZ_PACKU)
-+DECLARE_INSN(alz_ellw,         MATCH_ALZ_ELLW,         MASK_ALZ_ELLW)
 +DECLARE_INSN(alz_block_enci,   MATCH_ALZ_BLOCK_ENCI,   MASK_ALZ_BLOCK_ENCI)
 +DECLARE_INSN(alz_block_deci,   MATCH_ALZ_BLOCK_DECI,   MASK_ALZ_BLOCK_DECI)
 +DECLARE_INSN(alz_block_enc_0,  MATCH_ALZ_BLOCK_ENC_0,  MASK_ALZ_BLOCK_ENC_0)
@@ -372,7 +378,7 @@ index 0000000..234c992
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
 diff --git a/riscv/insns/alz_ell.h b/riscv/insns/alz_ell.h
 new file mode 100644
-index 0000000..9e76b17
+index 0000000..d13c12d
 --- /dev/null
 +++ b/riscv/insns/alz_ell.h
 @@ -0,0 +1,17 @@
@@ -384,63 +390,107 @@ index 0000000..9e76b17
 +  WRITE_REG( insn.rd(), ( ( uint32_t )( r_lo ) << 0 )                                  );
 +}
 +else if( xlen == 64 ) {
-+  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +  uint32_t x_hi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
++  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +
-+  uint32_t r_lo = ror32( ( x_lo ^ ( x_lo << 16 ) ), 16 );
 +  uint32_t r_hi = ror32( ( x_hi ^ ( x_hi << 16 ) ), 16 );
++  uint32_t r_lo = ror32( ( x_lo ^ ( x_lo << 16 ) ), 16 );
 +
 +  WRITE_REG( insn.rd(), ( ( uint64_t )( r_lo ) << 0 ) | ( ( uint64_t )( r_hi ) << 32 ) );
 +}
 +
+diff --git a/riscv/insns/alz_ellrev.h b/riscv/insns/alz_ellrev.h
+new file mode 100644
+index 0000000..62fd7a3
+--- /dev/null
++++ b/riscv/insns/alz_ellrev.h
+@@ -0,0 +1,13 @@
++if     ( xlen == 32 ) {
++
++}
++else if( xlen == 64 ) {
++  uint32_t x_hi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
++  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
++
++  uint32_t r_hi = ror32( ( x_hi ^ ( x_hi << 16 ) ), 16 );
++  uint32_t r_lo = ror32( ( x_lo ^ ( x_lo << 16 ) ), 16 );
++
++  WRITE_REG( insn.rd(), ( ( uint64_t )( r_hi ) << 0 ) | ( ( uint64_t )( r_lo ) << 32 ) );
++}
++
 diff --git a/riscv/insns/alz_pack.h b/riscv/insns/alz_pack.h
 new file mode 100644
-index 0000000..3ad838a
+index 0000000..b6b20ec
 --- /dev/null
 +++ b/riscv/insns/alz_pack.h
-@@ -0,0 +1,7 @@
-+uint64_t x  = READ_REG( insn.rs1() );
-+uint64_t y  = READ_REG( insn.rs2() );
+@@ -0,0 +1,12 @@
++if     ( xlen == 32 ) {
 +
-+uint64_t lo = ( x << 32 ) >> 32;
-+uint64_t hi = ( y << 32 ) >>  0;
++}
++else if( xlen == 64 ) {
++  uint64_t x  = READ_REG( insn.rs1() );
++  uint64_t y  = READ_REG( insn.rs2() );
 +
-+WRITE_REG( insn.rd(), lo | hi );
++  uint64_t hi = ( y << 32 ) >>  0;
++  uint64_t lo = ( x << 32 ) >> 32;
++
++  WRITE_REG( insn.rd(), lo | hi );
++}
 diff --git a/riscv/insns/alz_packu.h b/riscv/insns/alz_packu.h
 new file mode 100644
-index 0000000..af9143e
+index 0000000..1f8fdf4
 --- /dev/null
 +++ b/riscv/insns/alz_packu.h
-@@ -0,0 +1,7 @@
-+uint64_t x  = READ_REG( insn.rs1() );
-+uint64_t y  = READ_REG( insn.rs2() );
+@@ -0,0 +1,12 @@
++if     ( xlen == 32 ) {
 +
-+uint64_t lo = ( x >> 32 ) <<  0;
-+uint64_t hi = ( y >> 32 ) << 32;
++}
++else if( xlen == 64 ) {
++  uint64_t x  = READ_REG( insn.rs1() );
++  uint64_t y  = READ_REG( insn.rs2() );
 +
-+WRITE_REG( insn.rd(), lo | hi );
++  uint64_t hi = ( y >> 32 ) << 32;
++  uint64_t lo = ( x >> 32 ) <<  0;
++
++  WRITE_REG( insn.rd(), lo | hi );
++}
 diff --git a/riscv/insns/alz_rori.h b/riscv/insns/alz_rori.h
 new file mode 100644
-index 0000000..6c09c86
+index 0000000..9814297
 --- /dev/null
 +++ b/riscv/insns/alz_rori.h
-@@ -0,0 +1,5 @@
-+uint32_t x = READ_REG( insn.rs1() );
+@@ -0,0 +1,15 @@
++if     ( xlen == 32 ) {
++  uint32_t x = READ_REG( insn.rs1() );
 +
-+uint32_t r = ror32( x, insn.funct7() & 0x1F );
++  uint32_t r = ror32( x, insn.funct7() & 0x1F );
 +
-+WRITE_REG( insn.rd(), r );
++  WRITE_REG( insn.rd(), r );
++}
++else if( xlen == 64 ) {
++  uint64_t x = READ_REG( insn.rs1() );
++
++  uint64_t r = ror64( x, insn.funct7() & 0x1F );
++
++  WRITE_REG( insn.rd(), r );
++}
++
 diff --git a/riscv/insns/alz_roriw.h b/riscv/insns/alz_roriw.h
 new file mode 100644
-index 0000000..6c09c86
+index 0000000..5099a58
 --- /dev/null
 +++ b/riscv/insns/alz_roriw.h
-@@ -0,0 +1,5 @@
-+uint32_t x = READ_REG( insn.rs1() );
+@@ -0,0 +1,10 @@
++if     ( xlen == 32 ) {
 +
-+uint32_t r = ror32( x, insn.funct7() & 0x1F );
++}
++else if( xlen == 64 ) {
++  uint32_t x = READ_REG( insn.rs1() );
 +
-+WRITE_REG( insn.rd(), r );
++  uint32_t r = ror32( x, insn.funct7() & 0x1F );
++
++  WRITE_REG( insn.rd(), r );
++}
 diff --git a/riscv/insns/alz_subror_17.h b/riscv/insns/alz_subror_17.h
 new file mode 100644
 index 0000000..0cbd04e
@@ -754,7 +804,7 @@ index 0000000..2f7e7b8
 +
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/riscv.mk.in b/riscv/riscv.mk.in
-index d4422fe..acb3c84 100644
+index d4422fe..04f045b 100644
 --- a/riscv/riscv.mk.in
 +++ b/riscv/riscv.mk.in
 @@ -918,6 +918,9 @@ riscv_insn_priv = \
@@ -762,7 +812,7 @@ index d4422fe..acb3c84 100644
  	wfi \
  
 +# ++ alzette
-+riscv_insn_alz = alz_addror_17 alz_addror_24 alz_addror_31 alz_addrori alz_block_dec_0 alz_block_dec_1 alz_block_dec_2 alz_block_dec_3 alz_block_deci alz_ell alz_block_enc_0 alz_block_enc_1 alz_block_enc_2 alz_block_enc_3 alz_block_enci alz_pack alz_packu alz_rori alz_roriw alz_subror_17 alz_subror_24 alz_subror_31 alz_subrori alz_whole_dec alz_whole_deci alz_whole_deci_x alz_whole_deci_y alz_whole_enc alz_whole_enci alz_whole_enci_x alz_whole_enci_y alz_xorror_16 alz_xorror_17 alz_xorror_24 alz_xorror_31 alz_xorrori
++riscv_insn_alz = alz_addror_17 alz_addror_24 alz_addror_31 alz_addrori alz_block_dec_0 alz_block_dec_1 alz_block_dec_2 alz_block_dec_3 alz_block_deci alz_ell alz_ellrev alz_block_enc_0 alz_block_enc_1 alz_block_enc_2 alz_block_enc_3 alz_block_enci alz_pack alz_packu alz_rori alz_roriw alz_subror_17 alz_subror_24 alz_subror_31 alz_subrori alz_whole_dec alz_whole_deci alz_whole_deci_x alz_whole_deci_y alz_whole_enc alz_whole_enci alz_whole_enci_x alz_whole_enci_y alz_xorror_16 alz_xorror_17 alz_xorror_24 alz_xorror_31 alz_xorrori
 +# -- alzette
  
  riscv_insn_list = \

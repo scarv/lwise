@@ -210,12 +210,12 @@
 .macro TRAXL17_ENC_LINEAR 
 #if ( RV64_TYPE1 )
               xor          t4,  s2,  s3
-              ELL          t4,  t4,  t5,  t6
+              ELL32        t4,  t4,  t5,  t6
               xor          s4,  s4,  t4 
               xor          s5,  s5,  t4 
 
               xor          t4,  s6,  s7
-              ELL          t4,  t4,  t5,  t6
+              ELL32        t4,  t4,  t5,  t6
               xor          s0,  s0,  t4 
               xor          s1,  s1,  t4 
 
@@ -233,7 +233,7 @@
 #endif
 #if ( RV64_TYPE2 ) || ( RV64_TYPE3 ) || ( RV64_TYPE4 ) || ( RV64_TYPE5 )
               xor          t4,  s2,  s3                 //          t4 = ( y2 || x2) ^ (  y3 || x3  )
-              ELL          t4,  t4,  t1, t5, t6         //          t4 = tmpx || tmpy
+              ELL64        t4,  t4,  t1, t5, t6         //          t4 = tmpx || tmpy
               xor          s0,  s0,  t4                 // ( y0 || x0) = ( y0 || x0) ^ (tmpx || tmpy)
               xor          s1,  s1,  t4                 // ( y1 || x1) = ( y1 || x1) ^ (tmpx || tmpy)  
 
@@ -260,12 +260,12 @@
               mv           s7,  t4
 
               xor          t4,  s2,  s3
-              ELL          t4,  t4,  t5,  t6
+              ELL32        t4,  t4,  t5,  t6
               xor          s4,  s4,  t4 
               xor          s5,  s5,  t4 
 
               xor          t4,  s6,  s7
-              ELL          t4,  t4,  t5,  t6
+              ELL32        t4,  t4,  t5,  t6
               xor          s0,  s0,  t4 
               xor          s1,  s1,  t4 
 #endif
@@ -277,7 +277,7 @@
               mv           s3,  t4
 	
               xor          t4,  s2,  s3                 //          t4 = ( y2 || x2) ^ (  y3 || x3  )
-              ELL          t4,  t4,  t1, t5, t6         //          t4 = tmpx || tmpy
+              ELL64        t4,  t4,  t1, t5, t6         //          t4 = tmpx || tmpy
               xor          s0,  s0,  t4                 // ( y0 || x0) = ( y0 || x0) ^ (tmpx || tmpy)
               xor          s1,  s1,  t4                 // ( y1 || x1) = ( y1 || x1) ^ (tmpx || tmpy)  
 #endif

@@ -222,39 +222,41 @@ or, as more C-like pseudo-code
 
 ```
 ALZETTE(xi,yi,ci) {
-  xi = xi + ( yi >>> 31 )
-  yi = yi ^ ( xi >>> 24 )
-  xi = xi ^   ci
+  xi = xi + ROR32( yi, 31 )
+  yi = yi ^ ROR32( xi, 24 )
+  xi = xi ^        ci
 
-  xi = xi + ( yi >>> 17 )
-  yi = yi ^ ( xi >>> 17 )
-  xi = xi ^   ci
+  xi = xi + ROR32( yi, 17 )
+  yi = yi ^ ROR32( xi, 17 )
+  xi = xi ^        ci
 
-  xi = xi + ( yi >>>  0 )
-  yi = yi ^ ( xi >>> 31 )
-  xi = xi ^   ci
+  xi = xi + ROR32( yi,  0 )
+  yi = yi ^ ROR32( xi, 31 )
+  xi = xi ^        ci
 
-  xi = xi + ( yi >>> 24 )
-  yi = yi ^ ( xi >>> 16 )
-  xi = xi ^   ci
+  xi = xi + ROR32( yi, 24 )
+  yi = yi ^ ROR32( xi, 16 )
+  xi = xi ^        ci
 }
 ```
 
-intentionally typeset to stress repeat use of a `add-xor-xor` block.
+intentionally typeset to stress repeated use of an `add-xor-xor` block,
+and using `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) 
+right-rotate.
 
 ### RV32 (see also [`doc/encoding.txt`](./doc/encoding.txt))
 
 - The (optional) BitManip-like ISE:
 
   ```
-  alz.rori          rd, rs1,      imm => GPR[rd] <-              GPR[rs1] >>> imm
+  alz.rori          rd, rs1,      imm => ROR32( GPR[rs1], imm )
   ```
 
 - The (optional) ISE for `\ell` function (as used in, e.g., TRAXL17):
 
   ```
   alz.ell           rd, rs1           => x    <- GPR[rs1]
-                                         r    <- ( x    ^ ( x    << 16 ) ) >>> 16
+                                         r    <- ROR32( x  ^ ( x  << 16 ), 16 )
                                          GPR[rd] <- r
   ```
 
@@ -263,24 +265,24 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
 - `RV32_TYPE2`: base ISA plus custom   ISE.
 
   ```
-  alz.addrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] + ( GPR[rs2] >>> imm )
-  alz.subrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] - ( GPR[rs2] >>> imm )
-  alz.xorrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> imm )
+  alz.addrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], imm )
+  alz.subrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], imm )
+  alz.xorrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], imm )
   ```
 
 - `RV32_TYPE3`: base ISA plus custom   ISE.
 
   ```
-  alz.addror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ( GPR[rs2] >>> 31 )
-  alz.addror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ( GPR[rs2] >>> 17 )
-  alz.addror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ( GPR[rs2] >>> 24 )
-  alz.subror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ( GPR[rs2] >>> 31 )
-  alz.subror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ( GPR[rs2] >>> 17 )
-  alz.subror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ( GPR[rs2] >>> 24 )
-  alz.xorror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 31 )
-  alz.xorror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 17 )
-  alz.xorror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 24 )
-  alz.xorror.16     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ( GPR[rs2] >>> 16 )
+  alz.addror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 31 )
+  alz.addror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 17 )
+  alz.addror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 24 )
+  alz.subror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 31 )
+  alz.subror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 17 )
+  alz.subror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 24 )
+  alz.xorror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 31 )
+  alz.xorror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 17 )
+  alz.xorror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 24 )
+  alz.xorror.16     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 16 )
   ```
      
 - `RV32_TYPE4`: base ISA plus custom   ISE.
@@ -289,68 +291,69 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
   alz.whole.enci.x  rd, rs1, rs2, imm => xi <- GPR[rs1]
                                          yi <- GPR[rs2]
                                          ci <- DEC[imm]
-                                         xi <- xi + ( yi >>> 31 )
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>> 17 )
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>>  0 )
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>> 24 )
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi ^   ci
+                                         xi <- xi + ROR32( yi, 31 )
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi, 17 )
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi,  0 )
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi, 24 )
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- xi
 
   alz.whole.enci.y  rd, rs1, rs2, imm => xi <- GPR[rs1]
                                          yi <- GPR[rs2]
                                          ci <- DEC[imm]
-                                         xi <- xi + ( yi >>> 31 )
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>> 17 )
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>>  0 )
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>> 24 )
-                                         yi <- yi ^ ( xi >>> 16 )
+                                         xi <- xi + ROR32( yi, 31 )
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi, 17 )
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi,  0 )
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi, 24 )
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- yi
 
   alz.whole.deci.x  rd, rs1, rs2, imm => xi <- GPR[rs1]
                                          yi <- GPR[rs2]
                                          ci <- DEC[imm]
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi - ( yi >>> 24 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi - ( yi >>>  0 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi - ( yi >>> 17 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi - ( yi >>> 31 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi - ROR32( yi, 24 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi - ROR32( yi,  0 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi - ROR32( yi, 17 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi - ROR32( yi, 31 )
                                          GPR[rd] <- xi
 
   alz.whole.deci.y  rd, rs1, rs2, imm => xi <- GPR[rs1]
                                          yi <- GPR[rs2]
                                          ci <- DEC[imm]
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi - ( yi >>> 24 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi - ( yi >>>  0 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi - ( yi >>> 17 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi - ( yi >>> 31 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi - ROR32( yi, 24 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi - ROR32( yi,  0 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi - ROR32( yi, 17 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi - ROR32( yi, 31 )
                                          GPR[rd] <- yi
     ```
 
@@ -365,15 +368,16 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
 - The (optional) BitManip-like ISE:
 
   ```
-  alz.roriw         rd, rs1,      imm => GPR[rd] <- ( ( GPR[rs1] >> imm ) | ( GPR[rs1] << ( 32 - imm ) )
+  alz.rori          rd, rs1,      imm => GPR[rd] <- ROR64( GPR[rs1], imm )
+  alz.roriw         rd, rs1,      imm => GPR[rd] <- ROR32( GPR[rs1], imm )
 
-  alz.pack          rd, rs1, rs2      => lo <- ( GPR[rs1] << 32 ) >> 32
-                                         hi <-   GPR[rs2] << 32
-                                         GPR[rd] <- lo | hi
+  alz.pack          rd, rs1, rs2      => hi <-   GPR[rs2] << 32
+                                         lo <- ( GPR[rs1] << 32 ) >> 32
+                                         GPR[rd] <- hi || lo
 
-  alz.packu         rd, rs1, rs2      => lo <-   GPR[rs1] >> 32
-                                         hi <- ( GPR[rs2] >> 32 ) << 32
-                                         GPR[rd] <- lo | hi
+  alz.packu         rd, rs1, rs2      => hi <- ( GPR[rs2] >> 32 ) << 32
+                                         lo <-   GPR[rs1] >> 32
+                                         GPR[rd] <- hi || lo
   ```
 
 - The (optional) ISE for `\ell` function (as used in, e.g., TRAXL17):
@@ -381,9 +385,15 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
   ```
   alz.ell           rd, rs1           => xh   <- GPR[rs1]_{63..32}
                                          xl   <- GPR[rs1]_{31.. 0}
-                                         rh   <- ( xh ^ ( xh << 16 ) ) >>> 16
-                                         rl   <- ( xl ^ ( xl << 16 ) ) >>> 16
+                                         rh   <- ROR32( xh ^ ( xh << 16 ), 16 )
+                                         rl   <- ROR32( xl ^ ( xl << 16 ), 16 )
                                          GPR[rd] <- rh || rl
+
+  alz.ellrev        rd, rs1           => xh   <- GPR[rs1]_{63..32}
+                                         xl   <- GPR[rs1]_{31.. 0}
+                                         rh   <- ROR32( xh ^ ( xh << 16 ), 16 )
+                                         rl   <- ROR32( xl ^ ( xl << 16 ), 16 )
+                                         GPR[rd] <- rl || rh
   ```
 
 - `RV64_TYPE1`: base ISA.
@@ -394,17 +404,17 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
   alz.block.enci    rd, rs1, rs2, imm => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ( yi >>> DEC0[imm] )
-                                         yi <- yi ^ ( xi >>> DEC1[imm] )
-                                         xi <- xi ^   ci
+                                         xi <- xi + ROR32( yi, DEC0[imm] )
+                                         yi <- yi ^ ROR32( xi, DEC1[imm] )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- xi || yi
 
   alz.block.deci    rd, rs1, rs2, imm => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
                                          xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> DEC1[imm] )
-                                         xi <- xi - ( yi >>> DEC0[imm] )
+                                         yi <- yi ^ ROR32( xi, DEC1[imm] )
+                                         xi <- xi - ROR32( yi, DEC0[imm] )
                                          GPR[rd] <- xi || yi
   ```
 
@@ -421,65 +431,65 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
   alz.block.enc.0   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ( yi >>> 31 )
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi ^   ci
+                                         xi <- xi + ROR32( yi, 31 )
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- yi || xi
 
   alz.block.enc.1   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ( yi >>> 17 )
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi ^   ci
+                                         xi <- xi + ROR32( yi, 17 )
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- yi || xi
 
   alz.block.enc.2   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ( yi >>>  0 )
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi ^   ci
+                                         xi <- xi + ROR32( yi,  0 )
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- yi || xi
 
   alz.block.enc.3   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ( yi >>> 24 )
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi ^   ci
+                                         xi <- xi + ROR32( yi, 24 )
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- yi || xi
 
   alz.block.dec.0   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi - ( yi >>> 31 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi - ROR32( yi, 31 )
                                          GPR[rd] <- yi || xi
 
   alz.block.dec.1   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi - ( yi >>> 17 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi - ROR32( yi, 17 )
                                          GPR[rd] <- yi || xi
 
   alz.block.dec.2   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi - ( yi >>>  0 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi - ROR32( yi,  0 )
                                          GPR[rd] <- yi || xi
 
   alz.block.dec.3   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
                                          xi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi - ( yi >>> 24 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi - ROR32( yi, 24 )
                                          GPR[rd] <- yi || xi
     ```
 
@@ -489,35 +499,35 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
   alz.whole.enci    rd, rs1,      imm => xi <- GPR[rs1]_{63..32}
                                          yi <- GPR[rs1]_{31.. 0}
                                          ci <- DEC[imm]
-                                         xi <- xi + ( yi >>> 31 )
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>> 17 )
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>>  0 )
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>> 24 )
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi ^   ci
+                                         xi <- xi + ROR32( yi, 31 )
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi, 17 )
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi,  0 )
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi, 24 )
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- yi || xi
 
   alz.whole.deci    rd, rs1,      imm => xi <- GPR[rs1]_{63..32}
                                          yi <- GPR[rs1]_{31.. 0}
                                          ci <- DEC[imm]
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi - ( yi >>> 24 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi - ( yi >>>  0 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi - ( yi >>> 17 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi - ( yi >>> 31 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi - ROR32( yi, 24 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi - ROR32( yi,  0 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi - ROR32( yi, 17 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi - ROR32( yi, 31 )
                                          GPR[rd] <- yi || xi
   ```
 
@@ -533,35 +543,35 @@ intentionally typeset to stress repeat use of a `add-xor-xor` block.
   alz.whole.enc     rd, rs1, rs2      => xi <- GPR[rs1]_{63..32}
                                          yi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ( yi >>> 31 )
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>> 17 )
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>>  0 )
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi ^   ci
-                                         xi <- xi + ( yi >>> 24 )
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi ^   ci
+                                         xi <- xi + ROR32( yi, 31 )
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi, 17 )
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi,  0 )
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi ^        ci
+                                         xi <- xi + ROR32( yi, 24 )
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi ^        ci
                                          GPR[rd] <- yi || xi
 
   alz.whole.dec     rd, rs1, rs2      => xi <- GPR[rs1]_{63..32}
                                          yi <- GPR[rs1]_{31.. 0}
                                          ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 16 )
-                                         xi <- xi - ( yi >>> 24 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 31 )
-                                         xi <- xi - ( yi >>>  0 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 17 )
-                                         xi <- xi - ( yi >>> 17 )
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ( xi >>> 24 )
-                                         xi <- xi - ( yi >>> 31 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 16 )
+                                         xi <- xi - ROR32( yi, 24 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 31 )
+                                         xi <- xi - ROR32( yi,  0 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 17 )
+                                         xi <- xi - ROR32( yi, 17 )
+                                         xi <- xi ^        ci
+                                         yi <- yi ^ ROR32( xi, 24 )
+                                         xi <- xi - ROR32( yi, 31 )
                                          GPR[rd] <- yi || xi
   ```
 
