@@ -79,7 +79,7 @@ void test_craxs10( int n ) {
 
 void test_traxl17( int n ) {
   uint32_t  k[ 8 ];
-  uint32_t tk[ 4 ]; //tweak
+  uint32_t tk[ 4 ];
   uint32_t mx[ 4 ];
   uint32_t my[ 4 ];
   uint32_t cx[ 4 ];
@@ -88,7 +88,7 @@ void test_traxl17( int n ) {
   uint32_t rx[ 4 ];
   uint32_t ry[ 4 ];
 
-  uint32_t sk[ 18*8 ];
+  uint32_t sk[ 18 * 8 ];
 
   measure_prologue( traxl17_enc );
   measure_prologue( traxl17_dec );
@@ -99,25 +99,29 @@ void test_traxl17( int n ) {
     bytes_rand( ( uint8_t* )( mx ), 4 * sizeof( uint32_t ) );
     bytes_rand( ( uint8_t* )( my ), 4 * sizeof( uint32_t ) );
 
-    traxl17_genkeys(sk,k);
+    traxl17_genkeys( sk, k );
 
     memcpy( cx, mx, 4 * sizeof( uint32_t ) );
     memcpy( cy, my, 4 * sizeof( uint32_t ) );
-    measure_step( traxl17_enc, cx,cy, sk, tk );
+    measure_step( traxl17_enc, cx, cy, sk, tk );
     memcpy( rx, cx, 4 * sizeof( uint32_t ) );
     memcpy( ry, cy, 4 * sizeof( uint32_t ) );
-    measure_step( traxl17_dec, rx,ry, sk, tk );
+    measure_step( traxl17_dec, rx, ry, sk, tk );
 
     if(  memcmp( rx, mx, 4 * sizeof( uint32_t ) ) ||  // if r != m, i.e., Dec( k, Enc( k, m ) ) != m
         !memcmp( cx, mx, 4 * sizeof( uint32_t ) ) ||  // or c == m, i.e.,         Enc( k, m )   == m, so Enc is acting as a NOP!
         !memcmp( rx, cx, 4 * sizeof( uint32_t ) ) ) { // or r == c, i.e.,         Dec( k, c )   == c, so Dec is acting as a NOP!
-      printf( "failed traxl10 %d/%d\n", i, n );
+      printf( "failed traxl17 %d/%d\n", i, n );
 
-      bytes_dump( " k", ( uint8_t* )( k ), 8 * sizeof( uint32_t ) );
+      bytes_dump( " k", ( uint8_t* )( k  ), 8 * sizeof( uint32_t ) );
+      bytes_dump( "tk", ( uint8_t* )( tk ), 4 * sizeof( uint32_t ) );
       bytes_dump( "mx", ( uint8_t* )( mx ), 4 * sizeof( uint32_t ) );
+      bytes_dump( "my", ( uint8_t* )( my ), 4 * sizeof( uint32_t ) );
       bytes_dump( "cx", ( uint8_t* )( cx ), 4 * sizeof( uint32_t ) );
+      bytes_dump( "cy", ( uint8_t* )( cy ), 4 * sizeof( uint32_t ) );
 
       bytes_dump( "rx", ( uint8_t* )( rx ), 4 * sizeof( uint32_t ) );
+      bytes_dump( "ry", ( uint8_t* )( ry ), 4 * sizeof( uint32_t ) );
 
       abort();
     }
@@ -128,10 +132,10 @@ void test_traxl17( int n ) {
 }
 
 void test_sparkle( int n ) {
+  uint32_t state_ini [ 2 * MAX_BRANCHES ] = { 0 };
+  uint32_t state_fwd [ 2 * MAX_BRANCHES ] = { 0 };
+  uint32_t state_inv [ 2 *M AX_BRANCHES ] = { 0 };
 
-  uint32_t state_ini[2*MAX_BRANCHES] = { 0 };
-  uint32_t state_fwd[2*MAX_BRANCHES] = { 0 };
-  uint32_t state_inv[2*MAX_BRANCHES] = { 0 };
   int brans = 6;    // use SPARKLE384 7 steps
   int steps = 7;
  
@@ -139,11 +143,10 @@ void test_sparkle( int n ) {
   measure_prologue( sparkle_inv );
 
   for( int i = 0; i < n; i++ ) {
-    bytes_rand( ( uint8_t* )( state_ini ), 2*brans * sizeof( uint32_t ) );
+    bytes_rand( ( uint8_t* )( state_ini ), 2 * brans * sizeof( uint32_t ) );
 
     memcpy( state_fwd, state_ini, 2 * brans * sizeof( uint32_t ) );
     measure_step( sparkle_fwd, state_fwd, brans, steps );
-
     memcpy( state_inv, state_fwd, 2 * brans * sizeof( uint32_t ) );
     measure_step( sparkle_inv, state_inv, brans, steps );
 

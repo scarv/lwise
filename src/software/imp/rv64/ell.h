@@ -36,12 +36,9 @@
   srli        \x,  \x,   32                //   t1 <= tmpy   
   slliw       \t1, \x,   16                    
   xor         \t1, \t1, \x
-
   mv          \x,  \t0
   ROR32       \x,  \x,   16, \t0, \t2
   ROR32       \t1, \t1,  16, \t0, \t2
-
-
 #if ( RV64B )
    PACK       \r,  \t1, \x
 #else
