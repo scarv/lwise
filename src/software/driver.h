@@ -12,6 +12,7 @@
 
 #include "craxs10.h"
 #include "traxl17.h"
+#include "sparkle.h"
 
 #include "measure.h"
 
