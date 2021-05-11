@@ -134,7 +134,7 @@ void test_traxl17( int n ) {
 void test_sparkle( int n ) {
   uint32_t state_ini [ 2 * MAX_BRANCHES ] = { 0 };
   uint32_t state_fwd [ 2 * MAX_BRANCHES ] = { 0 };
-  uint32_t state_inv [ 2 *M AX_BRANCHES ] = { 0 };
+  uint32_t state_inv [ 2 * MAX_BRANCHES ] = { 0 };
 
   int brans = 6;    // use SPARKLE384 7 steps
   int steps = 7;
