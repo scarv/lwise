@@ -136,7 +136,7 @@
               lwu          t4,     0(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
               addi         s4,  s4,  4                   //  s4 =  s4 + 4
 #endif
-              ALZETTE_ENC \xw, \yw,  t4, t5              //                      => ALZETTE_ENC
+              ALZETTE_ENC \xw, \yw,  t4, t5, t6              //                      => ALZETTE_ENC
 .endm          
 
 .macro CRAXS10_DEC_STEP xw, yw, xk, yk, i
@@ -146,7 +146,7 @@
               addi         s4,  s4, -4                   //  s4 =  s4 - 4
               lwu          t4,     0(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
 #endif
-              ALZETTE_DEC \xw, \yw,  t4, t5              //                      => ALZETTE_DEC
+              ALZETTE_DEC \xw, \yw,  t4, t5, t6              //                      => ALZETTE_DEC
 #if ( CRAXS10_DEC_UNROLL )
               xori         t5, \xk, \i                   //  t5 = \xk ^ \i       =>        ( \xk ^ step )
 #else

@@ -19,12 +19,36 @@
 #endif
 
 #if ( RV64_ELL )
-.macro ELL64 r, x, t0, t1
+.macro ELL64 r, x, t0, t1, t2
   alz.ell   \r,  \x
 .endm
 #else
-.macro ELL64 r, x, t0, t1
+.macro ELL64 r, x, t0, t1, t2
+#if ( RV64B )
+  slliw       \t0, \x,   16                // 	t0 <= tmpx 
+  xor         \t0, \t0, \x
+#else
+  slli        \t1, \x,   32                  
+  srli        \t1, \t1,  32              
+  slliw       \t0, \t1,  16                // 	t0 <= tmpx 
+  xor         \t0, \t0, \t1
+#endif
+  srli        \x,  \x,   32                //   t1 <= tmpy   
+  slliw       \t1, \x,   16                    
+  xor         \t1, \t1, \x
 
+  mv          \x,  \t0
+  ROR32       \x,  \x,   16, \t0, \t2
+  ROR32       \t1, \t1,  16, \t0, \t2
+
+
+#if ( RV64B )
+   PACK       \r,  \t1, \x
+#else
+   slli       \t1, \t1, 32                  
+   srli       \t1, \t1, 32   
+   PACK       \r,  \t1, \x
+#endif
 .endm
 #endif
 
@@ -34,8 +58,8 @@
 .endm
 #endif
 #if ( RV64_TYPE2 ) || ( RV64_TYPE3 ) || ( RV64_TYPE4 ) || ( RV64_TYPE5 )
-.macro ELL   r, x, t0, t1
-  ELL64     \r,  \x, \t0, \t1
+.macro ELL   r, x, t0, t1, t2
+  ELL64     \r,  \x, \t0, \t1, \t2
 .endm
 #endif
 
