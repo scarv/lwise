@@ -469,8 +469,6 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_DEC_STEP_EVE t0, t1    
               j                    0b                    //            goto 0
 #endif
-1:           
-            
 #endif
 
 #if ( RV32_TYPE4 )
@@ -498,10 +496,9 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
 #else	
 #error "can't use RV32_TYPE4 without TRAXL17_DEC_UNROLL"
 #endif
-
 #endif
 
-              TRAXL17_DEC_EPILOGUE
+1:            TRAXL17_DEC_EPILOGUE
 #endif
 
 // ============================================================================

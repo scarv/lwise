@@ -90,7 +90,7 @@
               lw           s2,  8(sp)                    // pop  s2
               lw           s3, 12(sp)                    // pop  s3
               lw           s4, 16(sp)                    // pop  s4
-              addi         sp, sp,  20
+              addi         sp, sp,  20                   // adjust SP
 
               ret                                        // return
 .endm
