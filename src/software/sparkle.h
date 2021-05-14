@@ -11,10 +11,7 @@
 
 #define MAX_BRANCHES 8
 
-extern void sparkle_fwd(uint32_t *state, int brans, int steps);
-extern void sparkle_inv(uint32_t *state, int brans, int steps);
-
-void print_state(const uint32_t *state, int brans);
-void test_sparkle_ref(int brans, int steps);
+extern void sparkle_fwd( uint32_t* state, int brans, int steps );
+extern void sparkle_rev( uint32_t* state, int brans, int steps );
 
 #endif
