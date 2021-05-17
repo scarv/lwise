@@ -24,8 +24,8 @@ def rv32( trials ) :
           CONF  = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE' ]
 
           if ( UNROLL   ) :
-            CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL' ]
-            CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL' ]
+            CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
+            CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL', 'SPARKLE_REV_UNROLL' ]
 
           run( 'rv32', 'generic', CONF )
 
@@ -35,12 +35,14 @@ def rv32( trials ) :
     for TYPE in [ 'RV32_TYPE1', 'RV32_TYPE2', 'RV32_TYPE3', 'RV32_TYPE4'               ] :
       for BITMANIP in [ False, True ] :
         for ELL in [ False, True ] :
-          CONF  = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE' ]
-          CONF += [ TYPE, 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN', 'TRAXL17_ENC_EXTERN', 'TRAXL17_DEC_EXTERN' ]
+          CONF  = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE', TYPE ]
+          CONF += [ 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN' ]
+          CONF += [ 'TRAXL17_ENC_EXTERN', 'TRAXL17_DEC_EXTERN' ]
+          CONF += [ 'SPARKLE_FWD_EXTERN', 'SPARKLE_REV_EXTERN' ]
 
           if ( UNROLL   ) :
-            CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL' ]
-            CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL' ]
+            CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
+            CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL', 'SPARKLE_REV_UNROLL' ]
           if ( BITMANIP ) :
             CONF += [ 'RV32B'    ]
           if ( ELL      ) :
@@ -56,8 +58,8 @@ def rv64( trials ) :
           CONF = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE' ]
 
           if ( UNROLL   ) :
-            CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL' ]
-            CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL' ]
+            CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
+            CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL', 'SPARKLE_REV_UNROLL' ]
 
           run( 'rv64', 'generic', CONF )
 
@@ -67,12 +69,14 @@ def rv64( trials ) :
     for TYPE in [ 'RV64_TYPE1', 'RV64_TYPE2', 'RV64_TYPE3', 'RV64_TYPE4', 'RV64_TYPE5' ] :
       for BITMANIP in [ False, True ] :
         for ELL in [ False, True ] :
-          CONF  = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE' ]
-          CONF += [ TYPE, 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN', 'TRAXL17_ENC_EXTERN', 'TRAXL17_DEC_EXTERN' ]
+          CONF  = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE', TYPE ]
+          CONF += [ 'CRAXS10_ENC_EXTERN', 'CRAXS10_DEC_EXTERN' ]
+          CONF += [ 'TRAXL17_ENC_EXTERN', 'TRAXL17_DEC_EXTERN' ]
+          CONF += [ 'SPARKLE_FWD_EXTERN', 'SPARKLE_REV_EXTERN' ]
 
           if ( UNROLL   ) :
-            CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL' ]
-            CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL' ]
+            CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
+            CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL', 'SPARKLE_REV_UNROLL' ]
           if ( BITMANIP ) :
             CONF += [ 'RV64B'    ]
           if ( ELL      ) :
