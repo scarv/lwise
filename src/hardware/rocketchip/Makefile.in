@@ -1,0 +1,31 @@
+# Copyright (C) 2021 SCARV project <info@scarv.org>
+#
+# Use of this source code is restricted per the MIT license, a copy of which 
+# can be found at https://opensource.org/licenses/MIT (or should be included 
+# as LICENSE.txt within the associated archive or repository).
+
+ifndef REPO_HOME
+  $(error "execute 'source ./bin/conf.sh' to configure environment")
+endif
+ifndef REPO_VERSION
+  $(error "execute 'source ./bin/conf.sh' to configure environment")
+endif
+
+# =============================================================================
+
+rocketchip-clone  : 
+	@${REPO_HOME}/src/hardware/rocketchip/rocketchip-clone.sh
+
+rocketchip-apply  :
+	@${REPO_HOME}/src/hardware/rocketchip/rocketchip-apply.sh
+
+rocketchip-update :
+	@${REPO_HOME}/src/hardware/rocketchip/rocketchip-update.sh
+
+rocketchip-revert : 
+	@${REPO_HOME}/src/hardware/rocketchip/rocketchip-revert.sh
+
+rocketchip-clean  :
+	@rm --force --recursive ${REPO_HOME}/build/rocketchip
+
+# =============================================================================

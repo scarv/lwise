@@ -1,0 +1,39 @@
+
+# Copyright (C) 2021 SCARV project <info@scarv.org>
+#
+# Use of this source code is restricted per the MIT license, a copy of which 
+# can be found at https://opensource.org/licenses/MIT (or should be included 
+# as LICENSE.txt within the associated archive or repository).
+
+ifndef REPO_HOME
+  $(error "execute 'source ./bin/conf.sh' to configure environment")
+endif
+
+ROCKETCHIP_REPO = ${REPO_HOME}/build/rocketchip
+
+#--------------------------------------------------------------------
+# Sources
+#--------------------------------------------------------------------
+include ${REPO_HOME}/src/hardware/rtl/rv32/Makefile.in
+include ${REPO_HOME}/src/hardware/rtl/rv64/Makefile.in
+
+#--------------------------------------------------------------------
+# Build emulator
+#--------------------------------------------------------------------
+ROCKET = freechips.rocketchip.system
+MODEL  = SCARVRocketTest
+CONFIG64 = SCARVRocketCoPConfig64
+CONFIG32 = SCARVRocketCoPConfig32
+
+# Notes: building emulator requires RISCV tool supporting the fesvr package
+#        building RISCV gnu-gcc toolchain for 64 bit rocketchip requires option: --with-cmodel=medany
+${REPO_HOME}/build/emulator64: $(rtl64_src)
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(CONFIG64) MODEL=$(MODEL) COP_RTL=$(RTL64) debug
+	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG64)-debug  ${REPO_HOME}/build/emulator64
+
+${REPO_HOME}/build/emulator32: $(rtl32_src)
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(CONFIG32) MODEL=$(MODEL) COP_RTL=$(RTL32) debug
+	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG32)-debug  ${REPO_HOME}/build/emulator32
+  
+
+

@@ -1,0 +1,63 @@
+
+# Copyright (C) 2021 SCARV project <info@scarv.org>
+#
+# Use of this source code is restricted per the MIT license, a copy of which 
+# can be found at https://opensource.org/licenses/MIT (or should be included 
+# as LICENSE.txt within the associated archive or repository).
+
+ifndef REPO_HOME
+  $(error "execute 'source ./bin/conf.sh' to configure environment")
+endif
+
+ROCKETCHIP_REPO = ${REPO_HOME}/build/rocketchip
+GENERATED       = $(ROCKETCHIP_REPO)/vsim/generated-src
+
+#--------------------------------------------------------------------
+# Generate Verilog for a Rocket Core with RoCC
+#--------------------------------------------------------------------
+ROCKET = freechips.rocketchip.system
+MODEL  = SCARVRocketSystem
+CONFIG = $(ARCH:rv%=SCARVRocketCoPConfig%)
+ARCH  ?= rv64
+MODULE?= RoCC_ISE
+
+#--------------------------------------------------------------------
+# Sources
+#--------------------------------------------------------------------
+
+rocket_verilog = $(GENERATED)/$(ROCKET).$(CONFIG).v
+sys_vsrc = plusarg_reader.v AsyncResetReg.v EICG_wrapper.v
+
+export rtl_src  = $(addprefix $(ROCKETCHIP_REPO)/src/main/resources/vsrc/, $(sys_vsrc))
+export rtl_src += $(rocket_verilog) 
+export rtl_src += $(GENERATED)/$(ROCKET).$(CONFIG).behav_srams.v
+export rtl_src += $(REPO_HOME)/src/hardware/rtl/$(ARCH)/*.v
+
+#--------------------------------------------------------------------
+# Targets
+#--------------------------------------------------------------------
+export SYNTH      = ${REPO_HOME}/build/yosys_synth
+export RV_ARCH    = $(ARCH)
+export SYN_MODULE = $(MODULE)
+
+SYNTH_SCRIPT      = $(REPO_HOME)/src/hardware/yosys_synth/yosys_synth.tcl
+SYNTH_LOG_OUT     = $(SYNTH)/synth.log
+
+$(rocket_verilog): 
+	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog CONFIG=$(CONFIG) MODEL=$(MODEL)
+
+synth_verilog   = $(SYNTH)/synth-$(CONFIG).v
+$(synth_verilog): $(SYNTH_SCRIPT) $(rtl_src) 
+	@mkdir -p         $(SYNTH)
+	@mkdir -p         $(SYNTH)/$(ARCH)_rtl_sources
+	cp -f $(rtl_src)  $(SYNTH)/$(ARCH)_rtl_sources/
+	yosys -QT -l $(SYNTH_LOG_OUT) $(SYNTH_SCRIPT)
+
+synthesise: $(synth_verilog)
+
+
+
+
+
+
+
