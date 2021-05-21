@@ -29,10 +29,18 @@
 // ----------------------------------------------------------------------------
 
 #if ( RV32_ELL )
-.macro alz.ell          rd, rs1                    
-.insn r CUSTOM_3, 6,      ( 2* 1), \rd, \rs1,   x0 
+.macro alz.ell          rd, rs1, rs2                    
+.insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2
 .endm         
 #endif                                     
+
+// ----------------------------------------------------------------------------
+
+#if ( RV32_RCON )
+.macro alz.rcon         rd, rs1,      imm
+.insn r CUSTOM_2, 6, \imm+( 0* 8), \rd, \rs1,   x0
+.endm
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -86,18 +94,18 @@
 // ----------------------------------------------------------------------------
 	
 #if ( RV32_TYPE4 )
-.macro alz.whole.enci.x rd, rs1, rs2, imm          
-.insn r CUSTOM_2, 7, \imm+( 4* 8), \rd, \rs1, \rs2 
-.endm                                              
-.macro alz.whole.enci.y rd, rs1, rs2, imm          
-.insn r CUSTOM_2, 7, \imm+( 5* 8), \rd, \rs1, \rs2 
-.endm                                              
-.macro alz.whole.deci.x rd, rs1, rs2, imm          
-.insn r CUSTOM_2, 7, \imm+( 6* 8), \rd, \rs1, \rs2 
-.endm                                              
-.macro alz.whole.deci.y rd, rs1, rs2, imm          
-.insn r CUSTOM_2, 7, \imm+( 7* 8), \rd, \rs1, \rs2 
-.endm                                              
+.macro alz.whole.enci.x rd, rs1, rs2, imm
+.insn r CUSTOM_2, 7, \imm+( 8* 8), \rd, \rs1, \rs2
+.endm
+.macro alz.whole.enci.y rd, rs1, rs2, imm
+.insn r CUSTOM_2, 7, \imm+( 9* 8), \rd, \rs1, \rs2
+.endm
+.macro alz.whole.deci.x rd, rs1, rs2, imm
+.insn r CUSTOM_2, 7, \imm+(10* 8), \rd, \rs1, \rs2
+.endm
+.macro alz.whole.deci.y rd, rs1, rs2, imm
+.insn r CUSTOM_2, 7, \imm+(11* 8), \rd, \rs1, \rs2
+.endm
 #endif
 
 // ============================================================================

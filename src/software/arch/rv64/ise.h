@@ -57,23 +57,34 @@
 // ----------------------------------------------------------------------------
 
 #if ( RV64_ELL )
-.macro alz.ell          rd, rs1                    
-.insn r CUSTOM_3, 6,      ( 2* 1), \rd, \rs1,   x0 
+.macro alz.ell          rd, rs1, rs2                    
+.insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2
 .endm           
-.macro alz.ellrev       rd, rs1                    
-.insn r CUSTOM_3, 6,      ( 3* 1), \rd, \rs1,   x0 
+.macro alz.ellrev       rd, rs1, rs2                    
+.insn r CUSTOM_3, 7,      ( 3* 1), \rd, \rs1, \rs2 
 .endm           
 #endif                                   
 
 // ----------------------------------------------------------------------------
 
+#if ( RV64_RCON )
+.macro alz.rcon         rd, rs1,      imm
+.insn r CUSTOM_2, 6, \imm+( 0* 8), \rd, \rs1,   x0
+.endm
+.macro alz.rconw        rd, rs1,      imm
+.insn r CUSTOM_2, 6, \imm+( 1* 8), \rd, \rs1,   x0
+.endm
+#endif
+
+// ----------------------------------------------------------------------------
+
 #if ( RV64_TYPE2 )
-.macro alz.block.enci   rd, rs1, rs2, imm          
-.insn r CUSTOM_2, 7, \imm+( 0* 8), \rd, \rs1, \rs2 
-.endm                                              
-.macro alz.block.deci   rd, rs1, rs2, imm          
-.insn r CUSTOM_2, 7, \imm+( 1* 8), \rd, \rs1, \rs2 
-.endm                                              
+.macro alz.block.enci   rd, rs1, rs2, imm
+.insn r CUSTOM_2, 7, \imm+( 4* 8), \rd, \rs1, \rs2
+.endm
+.macro alz.block.deci   rd, rs1, rs2, imm
+.insn r CUSTOM_2, 7, \imm+( 5* 8), \rd, \rs1, \rs2
+.endm
 #endif
 
 // ----------------------------------------------------------------------------
@@ -108,12 +119,12 @@
 // ----------------------------------------------------------------------------
 
 #if ( RV64_TYPE4 )
-.macro alz.whole.enci   rd, rs1,      imm          
-.insn r CUSTOM_2, 6, \imm+( 8* 8), \rd, \rs1,   x0 
-.endm                                              
-.macro alz.whole.deci   rd, rs1,      imm          
-.insn r CUSTOM_2, 6, \imm+( 9* 8), \rd, \rs1,   x0 
-.endm                                              
+.macro alz.whole.enci   rd, rs1,      imm
+.insn r CUSTOM_2, 6, \imm+(12* 8), \rd, \rs1,   x0
+.endm
+.macro alz.whole.deci   rd, rs1,      imm
+.insn r CUSTOM_2, 6, \imm+(13* 8), \rd, \rs1,   x0
+.endm
 #endif
 
 // ----------------------------------------------------------------------------
