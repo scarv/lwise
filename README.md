@@ -52,7 +52,8 @@ but focused on RISC-V in particular.
     │       ├── generic           - generic, i.e., vanilla C
     │       ├── rv32              - 32-bit RISC-V
     │       └── rv64              - 64-bit RISC-V
-    └── toolchain             - source code for tool-chain
+    ├── toolchain             - source code for tool-chain
+    └── toolchain-rocket      - source code for tool-chain for use with Rocket
 ```
 
 <!--- -------------------------------------------------------------------- --->
