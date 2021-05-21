@@ -1,0 +1,220 @@
+diff --git a/emulator/Makefile b/emulator/Makefile
+index dffa41713..9defc4d32 100644
+--- a/emulator/Makefile
++++ b/emulator/Makefile
+@@ -9,8 +9,8 @@ output_dir = $(sim_dir)/output
+ include $(base_dir)/Makefrag
+ 
+ CXXSRCS := emulator SimDTM SimJTAG remote_bitbang
+-CXXFLAGS := $(CXXFLAGS) -std=c++11 -I$(RISCV)/include
+-LDFLAGS := $(LDFLAGS) -L$(RISCV)/lib -Wl,-rpath,$(RISCV)/lib -L$(abspath $(sim_dir)) -lfesvr -lpthread
++CXXFLAGS := $(CXXFLAGS) -std=c++11 -I$(RISCV_ROCKET)/include
++LDFLAGS := $(LDFLAGS) -L$(RISCV_ROCKET)/lib -Wl,-rpath,$(RISCV_ROCKET)/lib -L$(abspath $(sim_dir)) -lfesvr -lpthread
+ 
+ emu = emulator-$(PROJECT)-$(CONFIG)
+ emu_debug = emulator-$(PROJECT)-$(CONFIG)-debug
+diff --git a/emulator/Makefrag-verilator b/emulator/Makefrag-verilator
+index d6423ada0..5f9539d41 100644
+--- a/emulator/Makefrag-verilator
++++ b/emulator/Makefrag-verilator
+@@ -5,6 +5,7 @@ firrtl = $(generated_dir)/$(long_name).fir
+ verilog = \
+   $(generated_dir)/$(long_name).v \
+   $(generated_dir)/$(long_name).behav_srams.v \
++  $(wildcard $(COP_RTL)/*.v) \
+ 
+ .SECONDARY: $(firrtl) $(verilog)
+ 
+diff --git a/src/main/scala/system/SCARVRocketCoPConfig.scala b/src/main/scala/system/SCARVRocketCoPConfig.scala
+new file mode 100644
+index 000000000..91ac38e77
+--- /dev/null
++++ b/src/main/scala/system/SCARVRocketCoPConfig.scala
+@@ -0,0 +1,32 @@
++// See LICENSE.SiFive for license details.
++// See LICENSE.Berkeley for license details.
++
++package freechips.rocketchip.system
++
++import Chisel._
++import freechips.rocketchip.config._
++import freechips.rocketchip.subsystem._
++import freechips.rocketchip.tile._
++import freechips.rocketchip.diplomacy._
++import freechips.rocketchip.groundtest.WithTraceGen
++
++class WithISERoCC extends Config((site, here, up) => {
++  case BuildRoCC => List(
++    (p: Parameters) => {
++        val CoP_ISE = LazyModule(new RoCC_ISE(OpcodeSet.all)(p))
++        CoP_ISE
++    })
++})
++
++class SCARVRocketCoPConfig64 extends Config(
++	new WithISERoCC ++
++	new WithNBigCores(1) ++
++	new BaseConfig)
++
++class SCARVRocketCoPConfig32 extends Config(
++	new WithISERoCC ++
++	new DefaultRV32Config ++
++	new BaseConfig)
++
++
++
+diff --git a/src/main/scala/system/SCARVRocketSystem.scala b/src/main/scala/system/SCARVRocketSystem.scala
+new file mode 100644
+index 000000000..195b4c7e9
+--- /dev/null
++++ b/src/main/scala/system/SCARVRocketSystem.scala
+@@ -0,0 +1,30 @@
++
++package freechips.rocketchip.system
++
++import Chisel._
++import freechips.rocketchip.config.Parameters
++import freechips.rocketchip.diplomacy._
++import freechips.rocketchip.tilelink._
++import freechips.rocketchip.subsystem._
++import freechips.rocketchip.devices.tilelink._
++import freechips.rocketchip.util.DontTouch
++
++/** Example Top with periphery devices and ports, and a Rocket subsystem */
++class SCARVRocketSystem(implicit p: Parameters) extends RocketSubsystem
++    with HasHierarchicalBusTopology
++	with HasAsyncExtInterrupts
++    with CanHaveMasterAXI4MemPort
++    with CanHaveMasterAXI4MMIOPort
++    with CanHaveSlaveAXI4Port
++    with HasPeripheryBootROM {
++
++  override lazy val module = new SCARVRocketSystemModuleImp(this)
++}
++
++class SCARVRocketSystemModuleImp[+L <: SCARVRocketSystem](_outer: L) extends RocketSubsystemModuleImp(_outer)
++	with HasRTCModuleImp
++    with HasExtInterruptsModuleImp
++    with HasPeripheryBootROMModuleImp
++    with DontTouch
++
++
+diff --git a/src/main/scala/system/SCARVRocketTest.scala b/src/main/scala/system/SCARVRocketTest.scala
+new file mode 100644
+index 000000000..0c01c85f0
+--- /dev/null
++++ b/src/main/scala/system/SCARVRocketTest.scala
+@@ -0,0 +1,28 @@
++// See LICENSE.SiFive for license details.
++
++package freechips.rocketchip.system
++
++import Chisel._
++import freechips.rocketchip.config.Parameters
++import freechips.rocketchip.devices.debug.Debug
++import freechips.rocketchip.diplomacy.LazyModule
++import freechips.rocketchip.util.AsyncResetReg
++
++class SCARVRocketTest()(implicit p: Parameters) extends Module {
++  val io = new Bundle {
++    val success = Bool(OUTPUT)
++  }
++
++  val ldut = LazyModule(new SCARVRocketSystem)
++  val dut = Module(ldut.module)
++
++  // Allow the debug ndreset to reset the dut, but not until the initial reset has completed
++  dut.reset := reset | dut.debug.map { debug => AsyncResetReg(debug.ndreset) }.getOrElse(false.B)
++
++  dut.dontTouchPorts()
++  dut.tieOffInterrupts()
++  SimAXIMem.connectMem(ldut)
++  SimAXIMem.connectMMIO(ldut)
++  ldut.l2_frontend_bus_axi4.foreach(_.tieoff)
++  Debug.connectDebug(dut.debug, dut.psd, clock, reset, io.success)
++}
+diff --git a/src/main/scala/tile/scarv_rocc.scala b/src/main/scala/tile/scarv_rocc.scala
+new file mode 100644
+index 000000000..80ca67391
+--- /dev/null
++++ b/src/main/scala/tile/scarv_rocc.scala
+@@ -0,0 +1,79 @@
++// See LICENSE for license details.
++
++package freechips.rocketchip.tile
++
++import Chisel._
++import chisel3.util.HasBlackBoxResource
++import chisel3.experimental.IntParam
++
++import freechips.rocketchip.config._
++import freechips.rocketchip.subsystem._
++import freechips.rocketchip.diplomacy._
++import freechips.rocketchip.rocket._
++import freechips.rocketchip.tilelink._
++import freechips.rocketchip.util.InOrderArbiter
++
++class cop_ise(xLen:Int) extends BlackBox {
++	val io = new Bundle() {
++        val cop_clk   = Clock(INPUT)
++        val cop_rst   = Bool(INPUT)
++        val cop_valid = Bool(INPUT)
++        val cop_ready = Bool(OUTPUT)
++        val cop_wait  = Bool(OUTPUT)
++        val cop_wr    = Bool(OUTPUT)
++        val cop_rdywr = Bool(INPUT)		
++        val cop_insn = Bits(INPUT ,width = 32)
++        val cop_rs1  = Bits(INPUT ,width = xLen)
++        val cop_rs2  = Bits(INPUT ,width = xLen)
++        val cop_rd   = Bits(OUTPUT,width = xLen)	}
++}
++ 
++//RoCC Black box which will then be defined in Verilog after generating RC system.
++class RoCC_ISE(opcodes: OpcodeSet)(implicit p: Parameters) extends LazyRoCC(opcodes) {
++  override lazy val module = new RoCC_ISE_Imp(this)
++}
++
++class RoCC_ISE_Imp(outer: RoCC_ISE)(implicit p: Parameters) extends LazyRoCCModuleImp(outer)
++    with HasCoreParameters {
++	
++//  val cmd = Queue(io.cmd)
++  val insn= Cat(io.cmd.bits.inst.funct,
++				io.cmd.bits.inst.rs2,
++				io.cmd.bits.inst.rs1,
++				io.cmd.bits.inst.xd,
++				io.cmd.bits.inst.xs1,
++				io.cmd.bits.inst.xs2,
++				io.cmd.bits.inst.rd,
++				io.cmd.bits.inst.opcode)
++
++  val CoP_BB = Module(new cop_ise(xLen))
++  CoP_BB.io.cop_clk   := clock
++  CoP_BB.io.cop_rst   := reset
++  CoP_BB.io.cop_insn  <> insn
++  CoP_BB.io.cop_rs1   <> io.cmd.bits.rs1
++  CoP_BB.io.cop_rs2   <> io.cmd.bits.rs2
++  CoP_BB.io.cop_valid <> io.cmd.valid
++  io.cmd.ready        := CoP_BB.io.cop_ready  
++	
++  io.busy             := CoP_BB.io.cop_wait
++  CoP_BB.io.cop_rdywr := io.resp.ready
++  io.resp.valid	      := CoP_BB.io.cop_wr
++  io.resp.bits.data   := CoP_BB.io.cop_rd
++  io.resp.bits.rd     := io.cmd.bits.inst.rd
++
++
++  // PROC RESPONSE INTERFACE
++  io.interrupt := Bool(false)
++    // Set this true to trigger an interrupt on the processor (please refer to supervisor documentation)
++
++  // MEMORY REQUEST INTERFACE
++  io.mem.req.valid := Bool(false) // we're not performing any memory request ...
++  io.mem.req.bits.addr := io.cmd.bits.rs1
++  io.mem.req.bits.tag := Bits(0)
++  io.mem.req.bits.size := log2Ceil(8).U
++  io.mem.req.bits.signed := Bool(false)
++  io.mem.req.bits.cmd := M_XRD // perform a load (M_XWR for stores)
++  io.mem.req.bits.data := Bits(0) // we're not performing any stores...
++  io.mem.req.bits.phys := Bool(false)
++}
++
