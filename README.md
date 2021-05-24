@@ -45,8 +45,8 @@ but focused on RISC-V in particular.
     ├── hardware              - source code for hardware
     │   ├── rocketchip          - source code for ISE-enabled Rocket
     │   ├── rtl                 - rtl implementation
-    │   │   ├── rv32              - 32-bit RISC-V
-    │   │   ├── rv64              - 64-bit RISC-V
+    │   │   ├── rv32              - 32-bit implementation
+    │   │   └── rv64              - 64-bit implementation
     │   ├── verilator         - source code for emulator for use with Rocket
     │   └── yosys_synth       - synthesize hardware implementation using yosys
     ├── software              - source code for software
