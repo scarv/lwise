@@ -16,7 +16,7 @@ GENERATED       = $(ROCKETCHIP_REPO)/vsim/generated-src
 # Generate Verilog for a Rocket Core with RoCC
 #--------------------------------------------------------------------
 ROCKET = freechips.rocketchip.system
-MODEL  = SCARVRocketSystem
+MODEL  = SCARVRocketTest
 CONFIG = $(ARCH:rv%=SCARVRocketCoPConfig%)
 ARCH  ?= rv64
 MODULE?= RoCC_ISE
