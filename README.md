@@ -48,7 +48,7 @@ but focused on RISC-V in particular.
     │   │   ├── rv32              - 32-bit implementation
     │   │   └── rv64              - 64-bit implementation
     │   ├── verilator         - source code for emulator for use with Rocket
-    │   └── yosys_synth       - synthesize hardware implementation using yosys
+    │   └── yosys_synth       - synthesise hardware implementation using yosys
     ├── software              - source code for software
     │   ├── arch                - architecture-specific support
     │   │   ├── generic           - generic, i.e., vanilla C
@@ -170,7 +170,7 @@ but focused on RISC-V in particular.
 - Build and execute software on the emulator of the hardware implementation, e.g.,
 
   ```sh
-  make --directory="${REPO_HOME}/src/hardware" ARCH="generic" IMP="generic" CONF="-DDRIVER_TRIALS='10'" clean all emulate
+  make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" CONF="-DDRIVER_TRIALS='10'" clean all emulate
   ```
 
 ### Software
