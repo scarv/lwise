@@ -211,7 +211,7 @@ Throughout the following, we
 - define 
  
   ```
-  ELL( x ) = ROR32( x  ^ ( x  << 16 ), 16 )
+  ELL( x ) = ROR32( x ^ ( x << 16 ), 16 )
   ```
 
 - define a look-up table such that
