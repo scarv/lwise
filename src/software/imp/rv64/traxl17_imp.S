@@ -58,7 +58,6 @@
 .endm
 
 .macro TRAXL17_ENC_EPILOGUE 
-
               ld           s0,   0(sp)                   // push s0
               ld           s1,   8(sp)                   // push s1
               ld           s2,  16(sp)                   // push s2
@@ -142,28 +141,29 @@
               lwu         \yx2,  8(a0)                   // s2  = MEM[ a0 +  8 ] => x[ 2 ] = xstate[ 2 ]
               lwu         \yx3, 12(a0)                   // s3  = MEM[ a0 + 12 ] => x[ 3 ] = xstate[ 3 ]
 
-              lwu         \tk0,   0(a1)                   // s4  = MEM[ a1 +  0 ] => y[ 0 ] = ystate[ 0 ]
-              lwu         \tk1,   4(a1)                   // s5  = MEM[ a1 +  4 ] => y[ 1 ] = ystate[ 1 ]
-              lwu         \tk2,   8(a1)                   // s6  = MEM[ a1 +  8 ] => y[ 2 ] = ystate[ 2 ]
-              lwu         \tk3,  12(a1)                   // s7  = MEM[ a1 + 12 ] => y[ 3 ] = ystate[ 3 ]
+              lwu         \tk0,  0(a1)                   // s4  = MEM[ a1 +  0 ] => y[ 0 ] = ystate[ 0 ]
+              lwu         \tk1,  4(a1)                   // s5  = MEM[ a1 +  4 ] => y[ 1 ] = ystate[ 1 ]
+              lwu         \tk2,  8(a1)                   // s6  = MEM[ a1 +  8 ] => y[ 2 ] = ystate[ 2 ]
+              lwu         \tk3, 12(a1)                   // s7  = MEM[ a1 + 12 ] => y[ 3 ] = ystate[ 3 ]
 
-              PACK        \yx0, \yx0, \tk0                //                      => ( yw || xw )
-              PACK        \yx1, \yx1, \tk1                //                      => ( yw || xw )
-              PACK        \yx2, \yx2, \tk2                //                      => ( yw || xw )
-              PACK        \yx3, \yx3, \tk3                //                      => ( yw || xw )
+              PACK        \yx0, \yx0, \tk0               //                      => ( yw || xw )
+              PACK        \yx1, \yx1, \tk1               //                      => ( yw || xw )
+              PACK        \yx2, \yx2, \tk2               //                      => ( yw || xw )
+              PACK        \yx3, \yx3, \tk3               //                      => ( yw || xw )
 
               lwu         \tk0,  0(a3)                   // s8  = MEM[ a3 +  0 ] => tk[ 0 ] = tweak[ 0 ]
               lwu         \tk1,  4(a3)                   // s9  = MEM[ a3 +  4 ] => tk[ 1 ] = tweak[ 1 ]
               lwu         \tk2,  8(a3)                   // s10 = MEM[ a3 +  8 ] => tk[ 2 ] = tweak[ 2 ]
               lwu         \tk3, 12(a3)                   // s11 = MEM[ a3 + 12 ] => tk[ 3 ] = tweak[ 3 ]
 
-              PACK         \tk0, \tk0, \tk1              //                      => ( yw || xw )
-              PACK         \tk2, \tk2, \tk3              //                      => ( yw || xw )
+              PACK        \tk0, \tk0, \tk1               //                      => ( yw || xw )
+              PACK        \tk2, \tk2, \tk3               //                      => ( yw || xw )
 .endm
 #endif
 
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => TRAXL17_WR_STATE
+	
 #if ( RV64_TYPE1 )
 .macro  TRAXL17_WR_STATE  x0, x1, x2, x3, y0, y1, y2, y3
               sw          \x0,   0(a0)                   // s0  = MEM[ a0 +  0 ] => x[ 0 ] = xstate[ 0 ]
@@ -184,7 +184,7 @@
               srli        \y1, \x1,  32                  // s5  = s1 >> 32       => ( yw || xw )
               srli        \y2, \x2,  32                  // s6  = s2 >> 32       => ( yw || xw )
               srli        \y3, \x3,  32                  // s7  = s3 >> 32       => ( yw || xw )
-              #
+              
               sw          \x0,   0(a0)                   // s0  = MEM[ a0 +  0 ] => x[ 0 ] = xstate[ 0 ]
               sw          \x1,   4(a0)                   // s1  = MEM[ a0 +  4 ] => x[ 1 ] = xstate[ 1 ]
               sw          \x2,   8(a0)                   // s2  = MEM[ a0 +  8 ] => x[ 2 ] = xstate[ 2 ]

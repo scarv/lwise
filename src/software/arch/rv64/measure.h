@@ -19,6 +19,7 @@
   uint32_t id ##  _iret_b;                                              \
   uint32_t id ##  _iret_a;                                              \
   uint32_t id ##  _iret_t;
+
 #define measure_step(id,...)                                            \
   __asm__ __volatile__( "rdcycle   %0 ;"                                \
                         "rdinstret %1 ;"                                \
@@ -34,6 +35,7 @@
                                                                         \
   id ## _cycle_t += ( id ## _cycle_a - id ## _cycle_b );                \
   id ##  _iret_t += ( id ##  _iret_a - id ##  _iret_b );
+
 #define measure_epilogue(id)                                            \
   printf( "cycle : %s => %f\n", #id, ( float )( id ## _cycle_t ) / n ); \
   printf( "iret  : %s => %f\n", #id, ( float )( id ##  _iret_t ) / n );
