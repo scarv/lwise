@@ -27,13 +27,17 @@ CONFIG32 = SCARVRocketCoPConfig32
 
 # Notes: building emulator requires RISCV tool supporting the fesvr package
 #        building RISCV gnu-gcc toolchain for 64 bit rocketchip requires option: --with-cmodel=medany
+emulator64:${REPO_HOME}/build/emulator64
 ${REPO_HOME}/build/emulator64: $(rtl64_src)
 	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(CONFIG64) MODEL=$(MODEL) COP_RTL=$(RTL64) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG64)-debug  ${REPO_HOME}/build/emulator64
-
+emulator32:${REPO_HOME}/build/emulator32
 ${REPO_HOME}/build/emulator32: $(rtl32_src)
 	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(CONFIG32) MODEL=$(MODEL) COP_RTL=$(RTL32) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG32)-debug  ${REPO_HOME}/build/emulator32
-  
+emulator-clean:
+	@rm --force  ${REPO_HOME}/build/emulator64 ${REPO_HOME}/build/emulator32 
+	@rm --force  $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG64)-debug  $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG64)-debug 
+	@rm --force --recursive $(ROCKETCHIP_REPO)/emulator/generated-src $(ROCKETCHIP_REPO)/emulator/generated-src-debug $(ROCKETCHIP_REPO)/emulator/verilator  
 
 

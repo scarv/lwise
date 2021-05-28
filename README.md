@@ -43,6 +43,12 @@ but focused on RISC-V in particular.
 ├── build                   - working directory for build
 └── src                     - source code
     ├── hardware              - source code for hardware
+    │   ├── rocketchip          - source code for ISE-enabled Rocket
+    │   ├── rtl                 - rtl implementation
+    │   │   ├── rv32              - 32-bit implementation
+    │   │   └── rv64              - 64-bit implementation
+    │   ├── verilator         - source code for emulator for use with Rocket
+    │   └── yosys_synth       - synthesise hardware implementation using yosys
     ├── software              - source code for software
     │   ├── arch                - architecture-specific support
     │   │   ├── generic           - generic, i.e., vanilla C
@@ -66,6 +72,7 @@ but focused on RISC-V in particular.
   
     ```sh
     export RISCV="/opt/riscv"
+    export RISCV_ROCKET="/opt/riscv-rocket"
     export RISCV_ALZETTE="/opt/riscv-alzette"
     ```
   
@@ -80,7 +87,6 @@ but focused on RISC-V in particular.
     ./configure --prefix="${RISCV}" --enable-multilib --with-multilib-generator="rv32gc-ilp32--;rv64gc-lp64--"
     make
     ```
-  
   - Build an ISE-enabled 
     [`spike`](https://github.com/riscv/riscv-isa-sim)
     and associated
@@ -95,6 +101,16 @@ but focused on RISC-V in particular.
     make -f ${REPO_HOME}/src/toolchain/Makefile clone 
     make -f ${REPO_HOME}/src/toolchain/Makefile apply 
     make -f ${REPO_HOME}/src/toolchain/Makefile build
+    ```
+  - Build a
+    [toolchain](https://github.com/riscv/riscv-gnu-toolchain)
+    for use with
+    [Rocket-Chip](https://github.com/chipsalliance/rocket-chip.git)
+    into `${RISCV_ROCKET}`:
+
+    ```sh
+    make -f ${REPO_HOME}/src/toolchain-rocket/Makefile clone
+    make -f ${REPO_HOME}/src/toolchain-rocket/Makefile build
     ```
   
 - Build and execute implementation, e.g.,
@@ -117,6 +133,45 @@ but focused on RISC-V in particular.
 ## Notes
 
 ### Hardware
+
+- The build system in
+
+  ```sh
+  ${REPO_HOME}/src/hardware/Makefile
+  ```
+  
+  includes 
+  - ISE-enabled Rocket-Chip implementation, 
+  - An emulator for the implementation, 
+  - Hardware synthesis flow
+
+- Get an ISE-enabled
+  [Rocket-Chip](https://github.com/chipsalliance/rocket-chip.git)
+  implementation
+
+  ```sh
+  make -f ${REPO_HOME}/src/hardware/Makefile rocketchip-clone
+  make -f ${REPO_HOME}/src/hardware/Makefile rocketchip-apply
+  ```
+- Build the emulator of the implementation using 
+  [verilator](https://www.veripool.org/verilator)
+
+  ```sh
+  make -f ${REPO_HOME}/src/hardware/Makefile emulator32
+  make -f ${REPO_HOME}/src/hardware/Makefile emulator64
+  ```
+- Run hardware synthesis flow using
+  [yosys](https://github.com/YosysHQ/yosys)
+
+  ```sh
+  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH=rv32
+  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH=rv64
+  ```
+- Build and execute software on the emulator of the hardware implementation, e.g.,
+
+  ```sh
+  make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" CONF="-DDRIVER_TRIALS='10'" clean all emulate
+  ```
 
 ### Software
 

@@ -10,6 +10,7 @@
 #include "share.h"
 
 #define MAX_BRANCHES 8
+extern const uint32_t SPARKLE_RCON[ 8 ];
 
 extern void sparkle_fwd( uint32_t* state, int brans, int steps );
 extern void sparkle_rev( uint32_t* state, int brans, int steps );
