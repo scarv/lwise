@@ -51,8 +51,6 @@ void craxs10_enc( uint32_t* state, const uint32_t* key ) {
   uint32_t k2 =   key[ 2 ];
   uint32_t k3 =   key[ 3 ];
 
-  int i = 0;
-
   #if defined( CRAXS10_ENC_UNROLL )
     CRAXS10_ENC_STEP( k0, k1, 0 )
     CRAXS10_ENC_STEP( k2, k3, 1 )
@@ -65,6 +63,8 @@ void craxs10_enc( uint32_t* state, const uint32_t* key ) {
     CRAXS10_ENC_STEP( k0, k1, 8 )  
     CRAXS10_ENC_STEP( k2, k3, 9 )
   #else
+  int i = 0;
+
   while( i < CRAXS10_NSTEPS ) {
     CRAXS10_ENC_STEP( k0, k1, i )
     CRAXS10_ENC_STEP( k2, k3, i )
@@ -89,8 +89,6 @@ void craxs10_dec( uint32_t* state, const uint32_t* key ) {
   uint32_t k2 =   key[ 2 ];
   uint32_t k3 =   key[ 3 ];
 
-  int i = CRAXS10_NSTEPS - 1;
-
     xw ^= k0;
     yw ^= k1;
 
@@ -106,6 +104,8 @@ void craxs10_dec( uint32_t* state, const uint32_t* key ) {
     CRAXS10_DEC_STEP( k2, k3, 1 )
     CRAXS10_DEC_STEP( k0, k1, 0 )  
   #else
+  int i = CRAXS10_NSTEPS - 1;
+
   while( i > 0 ) {
     CRAXS10_DEC_STEP( k2, k3, i )
     CRAXS10_DEC_STEP( k0, k1, i )

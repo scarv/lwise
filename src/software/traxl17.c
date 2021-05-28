@@ -29,7 +29,7 @@ void traxl17_genkeys( uint32_t* subkeys, const uint32_t* key ) {
 
     uint32_t tmp = tmpk[ 0 ];
 
-    for( int j = 0; j < 8; j++ ) {
+    for( int j = 1; j < 8; j++ ) {
       tmpk[ j - 1 ] = tmpk[ j ];
     }
 

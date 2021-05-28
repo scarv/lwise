@@ -12,13 +12,13 @@
 
 #if defined( DRIVER_MEASURE )
 #define measure_prologue(id)                                            \
-  uint32_t id ## _cycle_b;                                              \
-  uint32_t id ## _cycle_a;                                              \
-  uint32_t id ## _cycle_t;                                              \
+  uint64_t id ## _cycle_b = 0;                                          \
+  uint64_t id ## _cycle_a = 0;                                          \
+  uint64_t id ## _cycle_t = 0;                                          \
                                                                         \
-  uint32_t id ##  _iret_b;                                              \
-  uint32_t id ##  _iret_a;                                              \
-  uint32_t id ##  _iret_t;
+  uint64_t id ##  _iret_b = 0;                                          \
+  uint64_t id ##  _iret_a = 0;                                          \
+  uint64_t id ##  _iret_t = 0;                                          \
 
 #define measure_step(id,...)                                            \
   __asm__ __volatile__( "rdcycle   %0 ;"                                \
