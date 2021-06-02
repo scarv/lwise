@@ -207,7 +207,7 @@ but focused on RISC-V in particular.
   | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
   |           | `DRIVER_TRIALS`      | number of verification trials performed by the driver                                                          |
   |           | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                |
-  |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc.                                                                    |
+  |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum)      |
   |           | `CRAXS10_ENC_EXTERN` | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
   |           | `CRAXS10_DEC_EXTERN` | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
   |           | `CRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |

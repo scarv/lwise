@@ -6,7 +6,9 @@
 
 import argparse, itertools, os, subprocess, sys
 
-def run( ARCH, IMP, CONF ) :
+MEASURE = [ 'average', 'minimum', 'maximum' ]
+
+def test( ARCH, IMP, CONF ) :
   CONF = ' '.join( [ '-D%s' % ( x ) for x in CONF ] )
 
   print( '>>> ARCH = "%s"' % ( ARCH ) )
@@ -17,24 +19,24 @@ def run( ARCH, IMP, CONF ) :
 
   print( '<<<'                        )
 
-def rv32( trials ) :
+def test_rv32( args ) :
   # rv32/generic
 
   for UNROLL in [ False, True ] :
-        CONF  = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE' ]
+        CONF  = [ 'DRIVER_TRIALS=%d' % ( args.trials ), 'DRIVER_MEASURE=%d' % ( MEASURE.index( args.measure ) ) ]
   
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL', 'SPARKLE_REV_UNROLL' ]
   
-        run( 'rv32', 'generic', CONF )
+        test( 'rv32', 'generic', CONF )
 
   # rv32/rv32
 
   for UNROLL in [ False, True ] :
     for TYPE in [ 'RV32_TYPE1', 'RV32_TYPE2', 'RV32_TYPE3', 'RV32_TYPE4'               ] :
       for ( BITMANIP, ELL, RCON ) in itertools.product( [ False, True ], repeat = 3 ) :
-        CONF  = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE', TYPE ]
+        CONF  = [ 'DRIVER_TRIALS=%d' % ( args.trials ), 'DRIVER_MEASURE=%d' % ( MEASURE.index( args.measure ) ), TYPE ]
   
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
@@ -50,26 +52,26 @@ def rv32( trials ) :
         if ( RCON     ) :
           CONF += [ 'RV32_RCON' ]
     
-        run( 'rv32',    'rv32', CONF )
+        test( 'rv32',    'rv32', CONF )
 
-def rv64( trials ) :
+def test_rv64( args ) :
   # rv64/generic
 
   for UNROLL in [ False, True ] :
-        CONF = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE' ]
+        CONF  = [ 'DRIVER_TRIALS=%d' % ( args.trials ), 'DRIVER_MEASURE=%d' % ( MEASURE.index( args.measure ) ) ]
   
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL', 'SPARKLE_REV_UNROLL' ]
   
-        run( 'rv64', 'generic', CONF )
+        test( 'rv64', 'generic', CONF )
 
   # rv64/rv64
 
   for UNROLL in [ False, True ] :
     for TYPE in [ 'RV64_TYPE1', 'RV64_TYPE2', 'RV64_TYPE3', 'RV64_TYPE4', 'RV64_TYPE5' ] :
       for ( BITMANIP, ELL, RCON ) in itertools.product( [ False, True ], repeat = 3 ) :
-        CONF  = [ 'DRIVER_TRIALS=%d' % ( trials ), 'DRIVER_MEASURE', TYPE ]
+        CONF  = [ 'DRIVER_TRIALS=%d' % ( args.trials ), 'DRIVER_MEASURE=%d' % ( MEASURE.index( args.measure ) ), TYPE ]
   
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
@@ -85,19 +87,20 @@ def rv64( trials ) :
         if ( RCON     ) :
           CONF += [ 'RV64_RCON' ]
 
-        run( 'rv64',    'rv64', CONF )
+        test( 'rv64',    'rv64', CONF )
 
 if ( __name__ == '__main__' ) :
   parser = argparse.ArgumentParser()
 
-  parser.add_argument( '--trials', dest = 'trials', action = 'store', type = int, default = 1000  )
+  parser.add_argument( '--rv32',    dest =    'rv32', action = 'store_true',                           default = False     )
+  parser.add_argument( '--rv64',    dest =    'rv64', action = 'store_true',                           default = False     )
 
-  parser.add_argument( '--rv32',   dest =   'rv32', action = 'store_true',        default = False )
-  parser.add_argument( '--rv64',   dest =   'rv64', action = 'store_true',        default = False )
+  parser.add_argument( '--trials',  dest =  'trials', action = 'store', type = int,                    default = 1000      )
+  parser.add_argument( '--measure', dest = 'measure', action = 'store', type = str, choices = MEASURE, default = 'average' )
 
   args = parser.parse_args()
 
   if ( args.rv32 ) :
-    rv32( args.trials )
+    test_rv32( args )
   if ( args.rv64 ) :
-    rv64( args.trials )
+    test_rv64( args )
