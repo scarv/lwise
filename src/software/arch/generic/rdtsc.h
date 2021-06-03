@@ -5,4 +5,11 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#include "measure.h"
+#ifndef __RDTSC_H
+#define __RDTSC_H
+
+#include "share.h"
+
+extern uint64_t rdtsc();
+
+#endif

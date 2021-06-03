@@ -5,4 +5,8 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#include "measure.h"
+#include "rdtsc.h"
+
+uint64_t rdtsc() {
+  return 0;
+}

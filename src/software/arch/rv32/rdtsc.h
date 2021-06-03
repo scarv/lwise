@@ -5,15 +5,11 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#ifndef __MEASURE_H
-#define __MEASURE_H
+#ifndef __RDTSC_H
+#define __RDTSC_H
 
 #include "share.h"
 
-#if defined( DRIVER_MEASURE )
-#define measure_prologue(id)
-#define measure_step(id,...) id( __VA_ARGS__ )
-#define measure_epilogue(id)
-#endif
+extern uint64_t rdtsc();
 
 #endif

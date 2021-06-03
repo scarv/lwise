@@ -5,15 +5,11 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#ifndef __DRIVER_H
-#define __DRIVER_H
+#ifndef __RDTSC_H
+#define __RDTSC_H
 
 #include "share.h"
 
-#include "craxs10.h"
-#include "traxl17.h"
-#include "sparkle.h"
-
-#include "rdtsc.h"
+extern uint64_t rdtsc();
 
 #endif
