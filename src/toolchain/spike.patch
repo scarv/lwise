@@ -399,39 +399,44 @@ index 0000000..9f9380c
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
 diff --git a/riscv/insns/alz_ell.h b/riscv/insns/alz_ell.h
 new file mode 100644
-index 0000000..4429a94
+index 0000000..c0051fe
 --- /dev/null
 +++ b/riscv/insns/alz_ell.h
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,20 @@
 +if     ( xlen == 32 ) {
 +  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
++  uint32_t y_lo = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
 +
-+  uint32_t r_lo = ELL( x_lo );
++  uint32_t r_lo = ELL( x_lo ^ y_lo );
 +
 +  WRITE_REG( insn.rd(), ( ( uint32_t )( r_lo ) << 0 )                                  );
 +}
 +else if( xlen == 64 ) {
 +  uint32_t x_hi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
++  uint32_t y_hi = ( READ_REG( insn.rs2() ) >> 32 ) & 0xFFFFFFFF;
++  uint32_t y_lo = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
 +
-+  uint32_t r_hi = ELL( x_hi );
-+  uint32_t r_lo = ELL( x_lo );
++  uint32_t r_hi = ELL( x_hi ^ y_hi );
++  uint32_t r_lo = ELL( x_lo ^ y_lo );
 +
 +  WRITE_REG( insn.rd(), ( ( uint64_t )( r_lo ) << 0 ) | ( ( uint64_t )( r_hi ) << 32 ) );
 +}
 +
 diff --git a/riscv/insns/alz_ellrev.h b/riscv/insns/alz_ellrev.h
 new file mode 100644
-index 0000000..cac3c99
+index 0000000..b30f2d7
 --- /dev/null
 +++ b/riscv/insns/alz_ellrev.h
-@@ -0,0 +1,10 @@
+@@ -0,0 +1,12 @@
 +if     ( xlen == 64 ) {
 +  uint32_t x_hi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
++  uint32_t y_hi = ( READ_REG( insn.rs2() ) >> 32 ) & 0xFFFFFFFF;
++  uint32_t y_lo = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
 +
-+  uint32_t r_hi = ELL( x_hi );
-+  uint32_t r_lo = ELL( x_lo );
++  uint32_t r_hi = ELL( x_hi ^ y_hi );
++  uint32_t r_lo = ELL( x_lo ^ y_lo );
 +
 +  WRITE_REG( insn.rd(), ( ( uint64_t )( r_hi ) << 0 ) | ( ( uint64_t )( r_lo ) << 32 ) );
 +}
