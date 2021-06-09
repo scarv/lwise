@@ -7,14 +7,15 @@
 // ============================================================================
 
 #if ( RV32_ELL )
-.macro ELL   r, x, t0, t1
-  alz.ell    \r,  \x,   x0
+.macro ELL   r, x0, x1, t0, t1
+  alz.ell    \r,  \x0, \x1
 .endm
 #else
-.macro ELL   r, x, t0, t1
-  slli       \t0, \x,   16
-  xor        \x,  \x,  \t0
-  ROR32      \r,  \x,   16, \t0, \t1
+.macro ELL   r, x0, x1, t0, t1
+  xor        \t0, \x0, \x1
+  slli       \t1, \t0,  16
+  xor        \r,  \t0,  \t1
+  ROR32      \r,  \r,  16, \t0, \t1
 .endm
 #endif
 
