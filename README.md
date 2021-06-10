@@ -221,23 +221,23 @@ but focused on RISC-V in particular.
   make -f ${REPO_HOME}/src/hardware/Makefile rocketchip-apply
   ```
 - Build the emulator of the implementation using 
-  [verilator](https://www.veripool.org/verilator)
+  [verilator](https://www.veripool.org/verilator),
+  e.g.,
 
   ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile emulator32
-  make -f ${REPO_HOME}/src/hardware/Makefile emulator64
+  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" emulator
   ```
 - Run hardware synthesis flow using
-  [yosys](https://github.com/YosysHQ/yosys)
+  [yosys](https://github.com/YosysHQ/yosys),
+  e.g.,
 
   ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH=rv32
-  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH=rv64
+  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH="rv32" ISE="xalu"
   ```
 - Build and execute software on the emulator of the hardware implementation, e.g.,
 
   ```sh
-  make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" CONF="-DDRIVER_TRIALS_REAL='1000'" clean all emulate
+  make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" ISE="xalu" CONF="-DDRIVER_TRIALS_REAL='10'" clean all emulate
   ```
   
 <!--- -------------------------------------------------------------------- --->
