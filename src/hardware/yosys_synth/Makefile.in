@@ -55,6 +55,8 @@ $(synth_verilog): $(SYNTH_SCRIPT) $(rtl_src)
 
 synthesise: $(synth_verilog)
 
+rocket-chip:
+	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog CONFIG=DefaultRV32Config MODEL=$(MODEL)
 
 
 

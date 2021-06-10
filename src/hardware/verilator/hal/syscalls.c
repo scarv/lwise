@@ -349,6 +349,7 @@ static void vprintfmt(void (*putch)(int, void**), void **putdat, const char *fmt
 
     // (unsigned) hexadecimal
     case 'x':
+    case 'X':
       base = 16;
     unsigned_number:
       num = getuint(&ap, lflag);

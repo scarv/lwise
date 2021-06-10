@@ -21,23 +21,36 @@ include ${REPO_HOME}/src/hardware/rtl/rv64/Makefile.in
 # Build emulator
 #--------------------------------------------------------------------
 ROCKET = freechips.rocketchip.system
-MODEL  = SCARVRocketTest
-CONFIG64 = SCARVRocketCoPConfig64
-CONFIG32 = SCARVRocketCoPConfig32
+MODEL  = SCARVRocketTest 
+COP_CONF64 = SCARVRocketCoPConf64
+COP_CONF32 = SCARVRocketCoPConf32
+
+XALU_CONF32 = SCARVRocketXALUConf32
+XALU_CONF64 = SCARVRocketXALUConf64
+
+export EMULATOR = ${REPO_HOME}/build/$(ISE)_emulator$(subst rv,,$(ARCH))
 
 # Notes: building emulator requires RISCV tool supporting the fesvr package
 #        building RISCV gnu-gcc toolchain for 64 bit rocketchip requires option: --with-cmodel=medany
-emulator64:${REPO_HOME}/build/emulator64
-${REPO_HOME}/build/emulator64: $(rtl64_src)
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(CONFIG64) MODEL=$(MODEL) COP_RTL=$(RTL64) debug
-	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG64)-debug  ${REPO_HOME}/build/emulator64
-emulator32:${REPO_HOME}/build/emulator32
-${REPO_HOME}/build/emulator32: $(rtl32_src)
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(CONFIG32) MODEL=$(MODEL) COP_RTL=$(RTL32) debug
-	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG32)-debug  ${REPO_HOME}/build/emulator32
-emulator-clean:
-	@rm --force  ${REPO_HOME}/build/emulator64 ${REPO_HOME}/build/emulator32 
-	@rm --force  $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG64)-debug  $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(CONFIG64)-debug 
-	@rm --force --recursive $(ROCKETCHIP_REPO)/emulator/generated-src $(ROCKETCHIP_REPO)/emulator/generated-src-debug $(ROCKETCHIP_REPO)/emulator/verilator  
+
+emulator : $(EMULATOR)
+
+${REPO_HOME}/build/cop_emulator64 : $(rtl64_src)
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF64) MODEL=$(MODEL) ISE_RTL=$(RTL64) debug
+	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(COP_CONF64)-debug  $@
+
+${REPO_HOME}/build/cop_emulator32 : $(rtl32_src)
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF32) MODEL=$(MODEL) ISE_RTL=$(RTL32) debug
+	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(COP_CONF32)-debug  $@
+
+${REPO_HOME}/build/xalu_emulator32 : $(rtl32_src)
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF32) MODEL=$(MODEL) ISE_RTL=$(RTL32) debug
+	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(XALU_CONF32)-debug  $@
+
+${REPO_HOME}/build/xalu_emulator64 : $(rtl64_src)
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF64) MODEL=$(MODEL) ISE_RTL=$(RTL64) debug
+	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(XALU_CONF64)-debug  $@
+
+  
 
 
