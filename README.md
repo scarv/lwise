@@ -123,6 +123,18 @@ but focused on RISC-V in particular.
   [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
   directive, rather than an invasive change to `binutils` itself.
 
+- ISE supporting hardware is implemented in Verilog and integrated into a Rocket Chip. 
+  The build hardware system is controlled by two environment variables, 
+  namely `${ARCH}` and `${ISE}`.
+
+  - The base Rocket Chip can be configured with a 32-bit or 64-bit architecture (i.e., `ARCH=rv32` or `ARCH=rv64`, respectively).
+    `${ARCH}` is consistent with the build software system. 
+  - The ISE supporting hardware can be integrated into the base processor 
+    as a co-processor via a RoCC interface or 
+    as a functional module, i.e., extended ALU, inside the processor pipeline 
+    by configuring `ISE=cop` or `ISE=xalu`, respectively. 
+
+
 ### Software-specific
 
 - Build a toolchain:
@@ -189,6 +201,18 @@ but focused on RISC-V in particular.
 
 - Note that since the RISC-V tool-chain is 
   [patch](https://savannah.gnu.org/projects/patch)-based,
+  making changes to it is somewhat tricky.  The idea, for each component,
+  (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
+
+  - perform a fresh clone of the component repository,
+  - apply the existing patch to the cloned component repository,
+  - implement the change in the cloned component repository,
+  - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
+  - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
+  - optionally commit and push the updated patch.
+
+### Hardware-specific
+
   making changes to it is somewhat tricky.  The idea, for each component,
   (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
 
@@ -617,18 +641,6 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   ```
   alz.whole.enc     rd, rs1, rs2      => xi <- GPR[rs1]_{63..32}
                                          yi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ROR32( yi, 31 )
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 17 )
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi,  0 )
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 24 )
-                                         yi <- yi ^ ROR32( xi, 16 )
                                          xi <- xi ^        ci
                                          GPR[rd] <- yi || xi
 
