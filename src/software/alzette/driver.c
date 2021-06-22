@@ -188,9 +188,9 @@ void test_traxl17( int trials_warm, int trials_real ) {
 }
 
 void test_sparkle( int trials_warm, int trials_real ) {
-  uint32_t state_ini[ 2 * MAX_BRANCHES ] = { 0 };
-  uint32_t state_fwd[ 2 * MAX_BRANCHES ] = { 0 };
-  uint32_t state_rev[ 2 * MAX_BRANCHES ] = { 0 };
+  uint32_t state_ini[ 2 * SPARKLE_BRANS ] = { 0 };
+  uint32_t state_fwd[ 2 * SPARKLE_BRANS ] = { 0 };
+  uint32_t state_rev[ 2 * SPARKLE_BRANS ] = { 0 };
 
   int brans = 6;    // use SPARKLE384 7 steps
   int steps = 7;

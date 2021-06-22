@@ -1,6 +1,6 @@
 # `${ALG} = "alzette"`
 
-Alzette [1], e.g., CRAXS10 [1], TRAXL17 [1], and SPARKLE [2].
+Constructions based on Alzette [1], e.g., CRAXS10 [1], TRAXL17 [1], and SPARKLE [2].
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -80,374 +80,376 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 ## Options
 
-| `${ARCH}` | Symbol               | Meaning                                                                                                        |
-| :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `CRAXS10_ENC_EXTERN` | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
-|           | `CRAXS10_DEC_EXTERN` | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
-|           | `CRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
-|           | `CRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
-|           | `TRAXL17_ENC_EXTERN` | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
-|           | `TRAXL17_DEC_EXTERN` | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
-|           | `TRAXL17_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
-|           | `TRAXL17_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
-|           | `SPARKLE_FWD_EXTERN` | don't include implementation of forward SPARKLE in driver, i.e., allow an architecture-specific implementation |
-|           | `SPARKLE_REV_EXTERN` | don't include implementation of reverse SPARKLE in driver, i.e., allow an architecture-specific implementation |
-|           | `SPARKLE_FWD_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
-|           | `SPARKLE_REV_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
-| `rv32`    | `RV32B`              | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
-| `rv32`    | `RV32_ELL`           | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-| `rv32`    | `RV32_RCON`          | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-| `rv32`    | `RV32_TYPE1`         | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
-| `rv32`    | `RV32_TYPE2`         | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-| `rv32`    | `RV32_TYPE3`         | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-| `rv32`    | `RV32_TYPE4`         | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-| `rv64`    | `RV64B`              | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
-| `rv64`    | `RV64_ELL`           | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-| `rv64`    | `RV64_RCON`          | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-| `rv64`    | `RV64_TYPE1`         | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
-| `rv64`    | `RV64_TYPE2`         | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-| `rv64`    | `RV64_TYPE3`         | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-| `rv64`    | `RV64_TYPE4`         | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-| `rv64`    | `RV64_TYPE5`         | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
+| `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol                       | Meaning                                                                                                        |
+| :-------- | :-------- | :-------- :----------------------------- | :------------------------------------------------------------------------------------------------------------- |
+|           | `alzette` |           | `CRAXS10_ENC_EXTERN`         | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `CRAXS10_DEC_EXTERN`         | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `CRAXS10_ENC_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
+|           | `alzette` |           | `CRAXS10_DEC_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
+|           | `alzette` |           | `TRAXL17_ENC_EXTERN`         | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `TRAXL17_DEC_EXTERN`         | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `TRAXL17_ENC_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
+|           | `alzette` |           | `TRAXL17_DEC_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
+|           | `alzette` |           | `SPARKLE_FWD_EXTERN`         | don't include implementation of forward SPARKLE in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `SPARKLE_REV_EXTERN`         | don't include implementation of reverse SPARKLE in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `SPARKLE_FWD_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
+|           | `alzette` |           | `SPARKLE_REV_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
+|           |           |           |                              |                                                                                                                | 
+|           | `alzette` | `rv32`    | `ALZETTE_RV32B`              | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_ELL`           | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_RCON`          | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE1`         | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE2`         | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE3`         | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE4`         | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
+|           |           |           |                              |                                                                                                                | 
+|           | `alzette` | `rv64`    | `ALZETTE_RV64B`              | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_ELL`           | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_RCON`          | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE1`         | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE2`         | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE3`         | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE4`         | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE5`         | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
 
 <!--- -------------------------------------------------------------------- --->
 
-## `${ARCH} = "rv32"`
+## `${IMP} = "rv32"`
 
 - The (optional) BitManip-like ISE:
 
   ```
-  alz.rori          rd, rs1,      imm => ROR32( GPR[rs1], imm )
+  alzette.rori          rd, rs1,      imm => GPR[rd] <- ROR32( GPR[rs1], imm )
   ```
 
 - The (optional) ISE for `\ell` function:
 
   ```
-  alz.ell           rd, rs1, rs2      => x    <- GPR[rs1] ^ GPR[rs2]
-                                         r    <- ELL( x  )
-                                         GPR[rd] <- r
+  alzette.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
+                                             r       <- ELL( x  )
+                                             GPR[rd] <- r
   ```
 
 - The (optional) ISE for round constant look-up and XOR:
 
   ```
-  alz.rcon          rd, rs1,      imm => x    <- GPR[rs1]
-                                         r    <- x  ^ RCON[imm]
-                                         GPR[rd] <- r 
+  alzette.rcon          rd, rs1,      imm => x       <- GPR[rs1]
+                                             r       <- x  ^ RCON[imm]
+                                             GPR[rd] <- r 
   ```
 
-- `RV32_TYPE1`: base ISA.
+- `ALZETTE_RV32_TYPE1`: base ISA.
 
-- `RV32_TYPE2`: base ISA plus custom   ISE.
-
-  ```
-  alz.addrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], imm )
-  alz.subrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], imm )
-  alz.xorrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], imm )
-  ```
-
-- `RV32_TYPE3`: base ISA plus custom   ISE.
+- `ALZETTE_RV32_TYPE2`: base ISA plus custom   ISE.
 
   ```
-  alz.addror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 31 )
-  alz.addror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 17 )
-  alz.addror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 24 )
-  alz.subror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 31 )
-  alz.subror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 17 )
-  alz.subror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 24 )
-  alz.xorror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 31 )
-  alz.xorror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 17 )
-  alz.xorror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 24 )
-  alz.xorror.16     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 16 )
+  alzette.addrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], imm )
+  alzette.subrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], imm )
+  alzette.xorrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], imm )
+  ```
+
+- `ALZETTE_RV32_TYPE3`: base ISA plus custom   ISE.
+
+  ```
+  alzette.addror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 31 )
+  alzette.addror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 17 )
+  alzette.addror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 24 )
+  alzette.subror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 31 )
+  alzette.subror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 17 )
+  alzette.subror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 24 )
+  alzette.xorror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 31 )
+  alzette.xorror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 17 )
+  alzette.xorror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 24 )
+  alzette.xorror.16     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 16 )
   ```
      
-- `RV32_TYPE4`: base ISA plus custom   ISE.
+- `ALZETTE_RV32_TYPE4`: base ISA plus custom   ISE.
    
   ```
-  alz.whole.enci.x  rd, rs1, rs2, imm => xi <- GPR[rs1]
-                                         yi <- GPR[rs2]
-                                         ci <- RCON[imm]
-                                         xi <- xi + ROR32( yi, 31 )
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 17 )
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi,  0 )
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 24 )
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- xi
+  alzette.whole.enci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
+                                             yi      <- GPR[rs2]
+                                             ci      <- RCON[imm]
+                                             xi      <- xi + ROR32( yi, 31 )
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi, 17 )
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi,  0 )
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi, 24 )
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- xi
 
-  alz.whole.enci.y  rd, rs1, rs2, imm => xi <- GPR[rs1]
-                                         yi <- GPR[rs2]
-                                         ci <- RCON[imm]
-                                         xi <- xi + ROR32( yi, 31 )
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 17 )
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi,  0 )
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 24 )
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- yi
+  alzette.whole.enci.y  rd, rs1, rs2, imm => xi      <- GPR[rs1]
+                                             yi      <- GPR[rs2]
+                                             ci      <- RCON[imm]
+                                             xi      <- xi + ROR32( yi, 31 )
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi, 17 )
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi,  0 )
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi, 24 )
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- yi
 
-  alz.whole.deci.x  rd, rs1, rs2, imm => xi <- GPR[rs1]
-                                         yi <- GPR[rs2]
-                                         ci <- RCON[imm]
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi - ROR32( yi, 24 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi - ROR32( yi,  0 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi - ROR32( yi, 17 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi - ROR32( yi, 31 )
-                                         GPR[rd] <- xi
+  alzette.whole.deci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
+                                             yi      <- GPR[rs2]
+                                             ci      <- RCON[imm]
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi - ROR32( yi, 24 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi - ROR32( yi,  0 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi - ROR32( yi, 17 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi - ROR32( yi, 31 )
+                                             GPR[rd] <- xi
 
-  alz.whole.deci.y  rd, rs1, rs2, imm => xi <- GPR[rs1]
-                                         yi <- GPR[rs2]
-                                         ci <- RCON[imm]
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi - ROR32( yi, 24 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi - ROR32( yi,  0 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi - ROR32( yi, 17 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi - ROR32( yi, 31 )
-                                         GPR[rd] <- yi
+  alzette.whole.deci.y  rd, rs1, rs2, imm => xi      <- GPR[rs1]
+                                             yi      <- GPR[rs2]
+                                             ci      <- RCON[imm]
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi - ROR32( yi, 24 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi - ROR32( yi,  0 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi - ROR32( yi, 17 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi - ROR32( yi, 31 )
+                                             GPR[rd] <- yi
     ```
 
 <!--- -------------------------------------------------------------------- --->
 
-## `${ARCH} = "rv64"`
+## `${IMP} = "rv64"`
 
 - The (optional) BitManip-like ISE:
 
   ```
-  alz.rori          rd, rs1,      imm => GPR[rd] <- ROR64( GPR[rs1], imm )
-  alz.roriw         rd, rs1,      imm => GPR[rd] <- ROR32( GPR[rs1], imm )
+  alzette.rori          rd, rs1,      imm => GPR[rd] <- ROR64( GPR[rs1], imm )
+  alzette.roriw         rd, rs1,      imm => GPR[rd] <- ROR32( GPR[rs1], imm )
 
-  alz.pack          rd, rs1, rs2      => hi <-   GPR[rs2] << 32
-                                         lo <- ( GPR[rs1] << 32 ) >> 32
-                                         GPR[rd] <- hi || lo
+  alzette.pack          rd, rs1, rs2      => hi      <-   GPR[rs2] << 32
+                                             lo      <- ( GPR[rs1] << 32 ) >> 32
+                                             GPR[rd] <- hi || lo
 
-  alz.packu         rd, rs1, rs2      => hi <- ( GPR[rs2] >> 32 ) << 32
-                                         lo <-   GPR[rs1] >> 32
-                                         GPR[rd] <- hi || lo
+  alzette.packu         rd, rs1, rs2      => hi      <- ( GPR[rs2] >> 32 ) << 32
+                                             lo      <-   GPR[rs1] >> 32
+                                             GPR[rd] <- hi || lo
   ```
 
 - The (optional) ISE for `\ell` function:
 
   ```
-  alz.ell           rd, rs1, rs2      => x    <- GPR[rs1] ^ GPR[rs2]
-                                         xh   <- x_{63..32}
-                                         xl   <- x_{31.. 0}
-                                         rh   <- ELL( xh )
-                                         rl   <- ELL( xl )
-                                         GPR[rd] <- rh || rl
+  alzette.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
+                                             xh      <- x_{63..32}
+                                             xl      <- x_{31.. 0}
+                                             rh      <- ELL( xh )
+                                             rl      <- ELL( xl )
+                                             GPR[rd] <- rh || rl
 
-  alz.ellrev        rd, rs1, rs2      => x    <- GPR[rs1] ^ GPR[rs2]
-                                         xh   <- x_{63..32}
-                                         xl   <- x_{31.. 0}
-                                         rh   <- ROR32( xh ^ ( xh << 16 ), 16 )
-                                         rl   <- ROR32( xl ^ ( xl << 16 ), 16 )
-                                         GPR[rd] <- rl || rh
+  alzette.ellrev        rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
+                                             xh      <- x_{63..32}
+                                             xl      <- x_{31.. 0}
+                                             rh      <- ROR32( xh ^ ( xh << 16 ), 16 )
+                                             rl      <- ROR32( xl ^ ( xl << 16 ), 16 )
+                                             GPR[rd] <- rl || rh
   ```
 
 - The (optional) ISE for round constant look-up and XOR:
 
   ```
-  alz.rcon          rd, rs1,      imm => xh   <- GPR[rs1]_{63..32}
-                                         xl   <- GPR[rs1]_{31.. 0}
-                                         rh   <- xl ^ RCON[imm]
-                                         rl   <- xl ^ RCON[imm]
-                                         GPR[rd] <- rh || rl 
+  alzette.rcon          rd, rs1,      imm => xh      <- GPR[rs1]_{63..32}
+                                             xl      <- GPR[rs1]_{31.. 0}
+                                             rh      <- xl ^ RCON[imm]
+                                             rl      <- xl ^ RCON[imm]
+                                             GPR[rd] <- rh || rl 
 
-  alz.rconw         rd, rs1,      imm => xl   <- GPR[rs1]_{31.. 0}
-                                         rl   <- xl ^ RCON[imm]
-                                         GPR[rd] <- rh || rl
+  alzette.rconw         rd, rs1,      imm => xl      <- GPR[rs1]_{31.. 0}
+                                             rl      <- xl ^ RCON[imm]
+                                             GPR[rd] <- rh || rl
   ```
 
-- `RV64_TYPE1`: base ISA.
+- `ALZETTE_RV64_TYPE1`: base ISA.
 
-- `RV64_TYPE2`: base ISA plus custom   ISE.
-
-  ```
-  alz.block.enci    rd, rs1, rs2, imm => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ROR32( yi, ROT_X[imm] )
-                                         yi <- yi ^ ROR32( xi, ROT_Y[imm] )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- xi || yi
-
-  alz.block.deci    rd, rs1, rs2, imm => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^   ci
-                                         yi <- yi ^ ROR32( xi, ROT_Y[imm] )
-                                         xi <- xi - ROR32( yi, ROT_X[imm] )
-                                         GPR[rd] <- xi || yi
-  ```
-
-- `RV64_TYPE3`: base ISA plus custom   ISE.
+- `ALZETTE_RV64_TYPE2`: base ISA plus custom   ISE.
 
   ```
-  alz.block.enc.0   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ROR32( yi, 31 )
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- yi || xi
+  alzette.block.enci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi + ROR32( yi, ROT_X[imm] )
+                                             yi      <- yi ^ ROR32( xi, ROT_Y[imm] )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- xi || yi
+    
+  alzette.block.deci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi ^   ci
+                                             yi      <- yi ^ ROR32( xi, ROT_Y[imm] )
+                                             xi      <- xi - ROR32( yi, ROT_X[imm] )
+                                             GPR[rd] <- xi || yi
+  ```
 
-  alz.block.enc.1   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ROR32( yi, 17 )
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- yi || xi
+- `ALZETTE_RV64_TYPE3`: base ISA plus custom   ISE.
 
-  alz.block.enc.2   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ROR32( yi,  0 )
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- yi || xi
+  ```
+  alzette.block.enc.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi + ROR32( yi, 31 )
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- yi || xi
 
-  alz.block.enc.3   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ROR32( yi, 24 )
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- yi || xi
+  alzette.block.enc.1   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi + ROR32( yi, 17 )
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- yi || xi
 
-  alz.block.dec.0   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi - ROR32( yi, 31 )
-                                         GPR[rd] <- yi || xi
+  alzette.block.enc.2   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi + ROR32( yi,  0 )
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- yi || xi
 
-  alz.block.dec.1   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi - ROR32( yi, 17 )
-                                         GPR[rd] <- yi || xi
+  alzette.block.enc.3   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi + ROR32( yi, 24 )
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- yi || xi
 
-  alz.block.dec.2   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi - ROR32( yi,  0 )
-                                         GPR[rd] <- yi || xi
+  alzette.block.dec.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi - ROR32( yi, 31 )
+                                             GPR[rd] <- yi || xi
 
-  alz.block.dec.3   rd, rs1, rs2      => yi <- GPR[rs1]_{63..32}
-                                         xi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi - ROR32( yi, 24 )
-                                         GPR[rd] <- yi || xi
+  alzette.block.dec.1   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi - ROR32( yi, 17 )
+                                             GPR[rd] <- yi || xi
+    
+  alzette.block.dec.2   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi - ROR32( yi,  0 )
+                                             GPR[rd] <- yi || xi
+
+  alzette.block.dec.3   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+                                             xi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi - ROR32( yi, 24 )
+                                             GPR[rd] <- yi || xi
     ```
 
-- `RV64_TYPE4`: base ISA plus custom   ISE.
+- `ALZETTE_RV64_TYPE4`: base ISA plus custom   ISE.
 
   ```
-  alz.whole.enci    rd, rs1,      imm => xi <- GPR[rs1]_{63..32}
-                                         yi <- GPR[rs1]_{31.. 0}
-                                         ci <- RCON[imm]
-                                         xi <- xi + ROR32( yi, 31 )
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 17 )
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi,  0 )
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 24 )
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- yi || xi
+  alzette.whole.enci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
+                                             yi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- RCON[imm]
+                                             xi      <- xi + ROR32( yi, 31 )
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi, 17 )
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi,  0 )
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi, 24 )
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- yi || xi
 
-  alz.whole.deci    rd, rs1,      imm => xi <- GPR[rs1]_{63..32}
-                                         yi <- GPR[rs1]_{31.. 0}
-                                         ci <- RCON[imm]
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi - ROR32( yi, 24 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi - ROR32( yi,  0 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi - ROR32( yi, 17 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi - ROR32( yi, 31 )
-                                         GPR[rd] <- yi || xi
+  alzette.whole.deci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
+                                             yi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- RCON[imm]
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi - ROR32( yi, 24 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi - ROR32( yi,  0 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi - ROR32( yi, 17 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi - ROR32( yi, 31 )
+                                             GPR[rd] <- yi || xi
   ```
 
-- `RV64_TYPE5`: base ISA plus custom   ISE.
+- `ALZETTE_RV64_TYPE5`: base ISA plus custom   ISE.
 
   ```
-  alz.whole.enc     rd, rs1, rs2      => xi <- GPR[rs1]_{63..32}
-                                         yi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi + ROR32( yi, 31 )
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 17 )
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi,  0 )
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi ^        ci
-                                         xi <- xi + ROR32( yi, 24 )
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi ^        ci
-                                         GPR[rd] <- yi || xi
+  alzette.whole.enc     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
+                                             yi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi + ROR32( yi, 31 )
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi, 17 )
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi,  0 )
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi ^        ci
+                                             xi      <- xi + ROR32( yi, 24 )
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi ^        ci
+                                             GPR[rd] <- yi || xi
 
-  alz.whole.dec     rd, rs1, rs2      => xi <- GPR[rs1]_{63..32}
-                                         yi <- GPR[rs1]_{31.. 0}
-                                         ci <- GPR[rs2]_{31.. 0}
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 16 )
-                                         xi <- xi - ROR32( yi, 24 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 31 )
-                                         xi <- xi - ROR32( yi,  0 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 17 )
-                                         xi <- xi - ROR32( yi, 17 )
-                                         xi <- xi ^        ci
-                                         yi <- yi ^ ROR32( xi, 24 )
-                                         xi <- xi - ROR32( yi, 31 )
-                                         GPR[rd] <- yi || xi
+  alzette.whole.dec     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
+                                             yi      <- GPR[rs1]_{31.. 0}
+                                             ci      <- GPR[rs2]_{31.. 0}
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 16 )
+                                             xi      <- xi - ROR32( yi, 24 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 31 )
+                                             xi      <- xi - ROR32( yi,  0 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 17 )
+                                             xi      <- xi - ROR32( yi, 17 )
+                                             xi      <- xi ^        ci
+                                             yi      <- yi ^ ROR32( xi, 24 )
+                                             xi      <- xi - ROR32( yi, 31 )
+                                             GPR[rd] <- yi || xi
   ```
 
 <!--- -------------------------------------------------------------------- --->

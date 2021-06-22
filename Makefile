@@ -15,20 +15,27 @@ endif
 
 export ALG  ?= alzette
 
-export ARCH ?= rv32
-export IMP  ?= rv32
+export ARCH ?= generic
+export IMP  ?= generic
 export CONF ?=
 
 # -----------------------------------------------------------------------------
 
-toolchain :
+toolchain-build :
 	@make --directory="${REPO_HOME}/src/toolchain" clone 
 	@make --directory="${REPO_HOME}/src/toolchain" apply 
 	@make --directory="${REPO_HOME}/src/toolchain" build
+toolchain-clean :
+	@make --directory="${REPO_HOME}/src/toolchain" clean
 
-software  :
-	@make --directory="${REPO_HOME}/src//software" build
-	@make --directory="${REPO_HOME}/src//software" run
+ software-build :
+	@make --directory="${REPO_HOME}/src/software"  build
+ software-run   :
+	@make --directory="${REPO_HOME}/src/software"  run
+ software-scan  :
+	@make --directory="${REPO_HOME}/src/software"  scan
+ software-clean :
+	@make --directory="${REPO_HOME}/src/software"  clean
 
 clean     :
 	@rm --force --recursive ${REPO_HOME}/build/*

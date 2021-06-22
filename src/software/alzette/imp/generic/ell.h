@@ -5,12 +5,9 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#ifndef __CRAXS10_IMP_H
-#define __CRAXS10_IMP_H
+#ifndef __ELL_H
+#define __ELL_H
 
-#include "share.h"
-
-#include "alzette.h"
-#include     "ell.h"
+#define ELL(x) ( ROR32( ( (x) ^ ( (x) << 16 ) ), 16 ) )
 
 #endif

@@ -1,204 +1,204 @@
-+=============+==================+==========+=======+======+=====================+=========+=============+
-| class       | instruction      | format   | rot   | RCON | f7                  | f3      | custom      |
-+=============+==================+==========+=======+======+=====================+=========+=============+
-|             |                  |          |       |      |                     |         |             |
-| RV32B       | alz.rori         | 1R+I->1R | imm5  |      | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
-| RV64B       | alz.rori         | 1R+I->1R | imm5  |      | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
-| RV64B       | alz.roriw        | 1R+I->1R | imm5  |      | 01 : imm5           | 6 = 110 | 0 = 0001011 |
-|             |                  |          |       |      |                     |         |             |
-+=============+==================+==========+=======+======+=====================+=========+=============+
++=====================+======================+==========+=======+======+=====================+=========+=============+
+| class               | instruction          | format   | rot   | RCON | f7                  | f3      | custom      |
++=====================+======================+==========+=======+======+=====================+=========+=============+
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV32B       | alzette.rori         | 1R+I->1R | imm5  |      | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
+| ALZETTE_RV64B       | alzette.rori         | 1R+I->1R | imm5  |      | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
+| ALZETTE_RV64B       | alzette.roriw        | 1R+I->1R | imm5  |      | 01 : imm5           | 6 = 110 | 0 = 0001011 |
+|                     |                      |          |       |      |                     |         |             |
++=====================+======================+==========+=======+======+=====================+=========+=============+
 
-.macro alz.rori         rd, rs1,      imm          // alz.rori         => 00ii iii0 0000 rrrr r110 rrrr r000 1011
-.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0 //                  => #define MATCH_ALZ_RORI         0x0000600B
-.endm                                              //                  => #define  MASK_ALZ_RORI         0xC000707F
-.macro alz.roriw        rd, rs1,      imm          // alz.roriw        => 01ii iii0 0000 rrrr r110 rrrr r000 1011
-.insn r CUSTOM_0, 6, \imm+( 1*32), \rd, \rs1,   x0 //                  => #define MATCH_ALZ_RORIW        0x4000600B
-.endm                                              //                  => #define  MASK_ALZ_RORIW        0xC000707F
+.macro alzette.rori         rd, rs1,      imm      // alzette.rori         => 00ii iii0 0000 rrrr r110 rrrr r000 1011
+.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0 //                      => #define MATCH_ALZETTE_RORI         0x0000600B
+.endm                                              //                      => #define  MASK_ALZETTE_RORI         0xC000707F
+.macro alzette.roriw        rd, rs1,      imm      // alzette.roriw        => 01ii iii0 0000 rrrr r110 rrrr r000 1011
+.insn r CUSTOM_0, 6, \imm+( 1*32), \rd, \rs1,   x0 //                      => #define MATCH_ALZETTE_RORIW        0x4000600B
+.endm                                              //                      => #define  MASK_ALZETTE_RORIW        0xC000707F
 
-+=============+==================+==========+=======+======+=====================+=========+=============+
-| class       | instruction      | format   | rot   | RCON | f7                  | f3      | custom      |
-+=============+==================+==========+=======+======+=====================+=========+=============+
-|             |                  |          |       |      |                     |         |             |
-| RV32_TYPE2  | alz.addrori      | 2R+I->1R | imm5  |      | 00 : imm5           | 7 = 111 | 1 = 0101011 |
-| RV32_TYPE2  | alz.subrori      | 2R+I->1R | imm5  |      | 01 : imm5           | 7 = 111 | 1 = 0101011 |
-| RV32_TYPE2  | alz.xorrori      | 2R+I->1R | imm5  |      | 10 : imm5           | 7 = 111 | 1 = 0101011 |
-|             |                  |          |       |      |                     |         |             |
-+=============+==================+==========+=======+======+=====================+=========+============+=
++=====================+======================+==========+=======+======+=====================+=========+=============+
+| class               | instruction          | format   | rot   | RCON | f7                  | f3      | custom      |
++=====================+======================+==========+=======+======+=====================+=========+=============+
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV32_TYPE2  | alzette.addrori      | 2R+I->1R | imm5  |      | 00 : imm5           | 7 = 111 | 1 = 0101011 |
+| ALZETTE_RV32_TYPE2  | alzette.subrori      | 2R+I->1R | imm5  |      | 01 : imm5           | 7 = 111 | 1 = 0101011 |
+| ALZETTE_RV32_TYPE2  | alzette.xorrori      | 2R+I->1R | imm5  |      | 10 : imm5           | 7 = 111 | 1 = 0101011 |
+|                     |                      |          |       |      |                     |         |             |
++=====================+======================+==========+=======+======+=====================+=========+=============+
 
-.macro alz.addrori      rd, rs1, rs2, imm          // alz.addrori      => 00ii iiir rrrr rrrr r111 rrrr r010 1011
-.insn r CUSTOM_1, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDRORI      0x0000702B
-.endm                                              //                  => #define  MASK_ALZ_ADDRORI      0xC000707F
-.macro alz.subrori      rd, rs1, rs2, imm          // alz.subrori      => 01ii iiir rrrr rrrr r111 rrrr r010 1011
-.insn r CUSTOM_1, 7, \imm+( 1*32), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_SUBRORI      0x4000702B
-.endm                                              //                  => #define  MASK_ALZ_SUBRORI      0xC000707F
-.macro alz.xorrori      rd, rs1, rs2, imm          // alz.xorrori      => 10ii iiir rrrr rrrr r111 rrrr r010 1011
-.insn r CUSTOM_1, 7, \imm+( 2*32), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORRORI      0x8000702B
-.endm                                              //                  => #define  MASK_ALZ_XORRORI      0xC000707F
+.macro alzette.addrori      rd, rs1, rs2, imm      // alzette.addrori      => 00ii iiir rrrr rrrr r111 rrrr r010 1011
+.insn r CUSTOM_1, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_ADDRORI      0x0000702B
+.endm                                              //                      => #define  MASK_ALZETTE_ADDRORI      0xC000707F
+.macro alzette.subrori      rd, rs1, rs2, imm      // alzette.subrori      => 01ii iiir rrrr rrrr r111 rrrr r010 1011
+.insn r CUSTOM_1, 7, \imm+( 1*32), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_SUBRORI      0x4000702B
+.endm                                              //                      => #define  MASK_ALZETTE_SUBRORI      0xC000707F
+.macro alzette.xorrori      rd, rs1, rs2, imm      // alzette.xorrori      => 10ii iiir rrrr rrrr r111 rrrr r010 1011
+.insn r CUSTOM_1, 7, \imm+( 2*32), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_XORRORI      0x8000702B
+.endm                                              //                      => #define  MASK_ALZETTE_XORRORI      0xC000707F
 
-+=============+==================+==========+=======+======+=====================+=========+=============+
-| class       | instruction      | format   | rot   | RCON | f7                  | f3      | custom      |
-+=============+==================+==========+=======+======+=====================+=========+============+=
-|             |                  |          |       |      |                     |         |             |
-| RV32_RCON   | alz.rcon         | 1R+I->1R |       | dec3 | 00 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
-| RV64_RCON   | alz.rcon         | 1R+I->1R |       | dec3 | 00 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
-| RV64_RCON   | alz.rconw        | 1R+I->1R |       | dec3 | 00 : 01     : dec3  | 6 = 110 | 2 = 1011011 |
-|             |                  |          |       |      |                     |         |             |
-| RV64_TYPE2  | alz.block.enci   | 2R+I->1R | dec2  | reg  | 01 : 00 : 0 : dec2  | 7 = 111 | 2 = 1011011 |
-| RV64_TYPE2  | alz.block.deci   | 2R+I->1R | dec2  | reg  | 01 : 01 : 0 : dec2  | 7 = 111 | 2 = 1011011 |
-|             |                  |          |       |      |                     |         |             |
-| RV32_TYPE4  | alz.whole.enci.x | 2R+I->1R | const | dec3 | 10 : 00     : dec3  | 7 = 111 | 2 = 1011011 |
-| RV32_TYPE4  | alz.whole.enci.y | 2R+I->1R | const | dec3 | 10 : 01     : dec3  | 7 = 111 | 2 = 1011011 |
-| RV32_TYPE4  | alz.whole.deci.x | 2R+I->1R | const | dec3 | 10 : 10     : dec3  | 7 = 111 | 2 = 1011011 |
-| RV32_TYPE4  | alz.whole.deci.y | 2R+I->1R | const | dec3 | 10 : 11     : dec3  | 7 = 111 | 2 = 1011011 |
-|             |                  |          |       |      |                     |         |             |
-| RV64_TYPE4  | alz.whole.enci   | 1R+I->1R | const | dec3 | 11 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
-| RV64_TYPE4  | alz.whole.deci   | 1R+I->1R | const | dec3 | 11 : 01     : dec3  | 6 = 110 | 2 = 1011011 |
-|             |                  |          |       |      |                     |         |             |
-+=============+==================+==========+=======+===========+========+=======+=======================+
++=====================+======================+==========+=======+======+=====================+=========+=============+
+| class               | instruction          | format   | rot   | RCON | f7                  | f3      | custom      |
++=====================+======================+==========+=======+======+=====================+=========+=============+
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV32_RCON   | alzette.rcon         | 1R+I->1R |       | dec3 | 00 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
+| ALZETTE_RV64_RCON   | alzette.rcon         | 1R+I->1R |       | dec3 | 00 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
+| ALZETTE_RV64_RCON   | alzette.rconw        | 1R+I->1R |       | dec3 | 00 : 01     : dec3  | 6 = 110 | 2 = 1011011 |
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV64_TYPE2  | alzette.block.enci   | 2R+I->1R | dec2  | reg  | 01 : 00 : 0 : dec2  | 7 = 111 | 2 = 1011011 |
+| ALZETTE_RV64_TYPE2  | alzette.block.deci   | 2R+I->1R | dec2  | reg  | 01 : 01 : 0 : dec2  | 7 = 111 | 2 = 1011011 |
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV32_TYPE4  | alzette.whole.enci.x | 2R+I->1R | const | dec3 | 10 : 00     : dec3  | 7 = 111 | 2 = 1011011 |
+| ALZETTE_RV32_TYPE4  | alzette.whole.enci.y | 2R+I->1R | const | dec3 | 10 : 01     : dec3  | 7 = 111 | 2 = 1011011 |
+| ALZETTE_RV32_TYPE4  | alzette.whole.deci.x | 2R+I->1R | const | dec3 | 10 : 10     : dec3  | 7 = 111 | 2 = 1011011 |
+| ALZETTE_RV32_TYPE4  | alzette.whole.deci.y | 2R+I->1R | const | dec3 | 10 : 11     : dec3  | 7 = 111 | 2 = 1011011 |
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV64_TYPE4  | alzette.whole.enci   | 1R+I->1R | const | dec3 | 11 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
+| ALZETTE_RV64_TYPE4  | alzette.whole.deci   | 1R+I->1R | const | dec3 | 11 : 01     : dec3  | 6 = 110 | 2 = 1011011 |
+|                     |                      |          |       |      |                     |         |             |
++=====================+======================+==========+=======+======+=====================+=========+=============+
 
-.macro alz.rcon         rd, rs1,      imm          // alz.rcon         => 0000 iiir rrrr rrrr r110 rrrr r101 1011
-.insn r CUSTOM_2, 6, \imm+( 0* 8), \rd, \rs1,   x0 //                  => #define MATCH_ALZ_RCON         0x0000605B
-.endm                                              //                  => #define  MASK_ALZ_RCON         0xF000707F
-.macro alz.rconw        rd, rs1,      imm          // alz.rconw        => 0001 iiir rrrr rrrr r110 rrrr r101 1011
-.insn r CUSTOM_2, 6, \imm+( 1* 8), \rd, \rs1,   x0 //                  => #define MATCH_ALZ_RCONW        0x1000605B
-.endm                                              //                  => #define  MASK_ALZ_RCONW        0xF000707F
+.macro alzette.rcon         rd, rs1,      imm      // alzette.rcon         => 0000 iiir rrrr rrrr r110 rrrr r101 1011
+.insn r CUSTOM_2, 6, \imm+( 0* 8), \rd, \rs1,   x0 //                      => #define MATCH_ALZETTE_RCON         0x0000605B
+.endm                                              //                      => #define  MASK_ALZETTE_RCON         0xF000707F
+.macro alzette.rconw        rd, rs1,      imm      // alzette.rconw        => 0001 iiir rrrr rrrr r110 rrrr r101 1011
+.insn r CUSTOM_2, 6, \imm+( 1* 8), \rd, \rs1,   x0 //                      => #define MATCH_ALZETTE_RCONW        0x1000605B
+.endm                                              //                      => #define  MASK_ALZETTE_RCONW        0xF000707F
 
-.macro alz.block.enci   rd, rs1, rs2, imm          // alz.block.enci   => 0100 0iir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 4* 8), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENCI   0x4000705B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_ENCI   0xF000707F
-.macro alz.block.deci   rd, rs1, rs2, imm          // alz.block.deci   => 0101 0iir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 5* 8), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DECI   0x5000705B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_DECI   0xF000707F
+.macro alzette.block.enci   rd, rs1, rs2, imm      // alzette.block.enci   => 0100 0iir rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+( 4* 8), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_ENCI   0x4000705B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_ENCI   0xF000707F
+.macro alzette.block.deci   rd, rs1, rs2, imm      // alzette.block.deci   => 0101 0iir rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+( 5* 8), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_DECI   0x5000705B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_DECI   0xF000707F
 
-.macro alz.whole.enci.x rd, rs1, rs2, imm          // alz.whole.enci.x => 1000 iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 8* 8), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_ENCI_X 0x8000705B
-.endm                                              //                  => #define  MASK_ALZ_WHOLE_ENCI_X 0xF000707F
-.macro alz.whole.enci.y rd, rs1, rs2, imm          // alz.whole.enci.y => 1001 iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 9* 8), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_ENCI_Y 0x9000705B
-.endm                                              //                  => #define  MASK_ALZ_WHOLE_ENCI_Y 0xF000707F
-.macro alz.whole.deci.x rd, rs1, rs2, imm          // alz.whole.deci.x => 1010 iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+(10* 8), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_DECI_X 0xA000705B
-.endm                                              //                  => #define  MASK_ALZ_WHOLE_DECI_X 0xF000707F
-.macro alz.whole.deci.y rd, rs1, rs2, imm          // alz.whole.deci.y => 1011 iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+(11* 8), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_DECI_Y 0xB000705B
-.endm                                              //                  => #define  MASK_ALZ_WHOLE_DECI_Y 0xF000707F
+.macro alzette.whole.enci.x rd, rs1, rs2, imm      // alzette.whole.enci.x => 1000 iiir rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+( 8* 8), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_WHOLE_ENCI_X 0x8000705B
+.endm                                              //                      => #define  MASK_ALZETTE_WHOLE_ENCI_X 0xF000707F
+.macro alzette.whole.enci.y rd, rs1, rs2, imm      // alzette.whole.enci.y => 1001 iiir rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+( 9* 8), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_WHOLE_ENCI_Y 0x9000705B
+.endm                                              //                      => #define  MASK_ALZETTE_WHOLE_ENCI_Y 0xF000707F
+.macro alzette.whole.deci.x rd, rs1, rs2, imm      // alzette.whole.deci.x => 1010 iiir rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+(10* 8), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_WHOLE_DECI_X 0xA000705B
+.endm                                              //                      => #define  MASK_ALZETTE_WHOLE_DECI_X 0xF000707F
+.macro alzette.whole.deci.y rd, rs1, rs2, imm      // alzette.whole.deci.y => 1011 iiir rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+(11* 8), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_WHOLE_DECI_Y 0xB000705B
+.endm                                              //                      => #define  MASK_ALZETTE_WHOLE_DECI_Y 0xF000707F
 
-.macro alz.whole.enci   rd, rs1,      imm          // alz.whole.enci   => 1100 iii0 0000 rrrr r110 rrrr r101 1011
-.insn r CUSTOM_2, 6, \imm+(12* 8), \rd, \rs1,   x0 //                  => #define MATCH_ALZ_WHOLE_ENCI   0xC000605B
-.endm                                              //                  => #define  MASK_ALZ_WHOLE_ENCI   0xF000707F
-.macro alz.whole.deci   rd, rs1,      imm          // alz.whole.deci   => 1101 iii0 0000 rrrr r110 rrrr r101 1011
-.insn r CUSTOM_2, 6, \imm+(13* 8), \rd, \rs1,   x0 //                  => #define MATCH_ALZ_WHOLE_DECI   0xD000605B
-.endm                                              //                  => #define  MASK_ALZ_WHOLE_DECI   0xF000707F
+.macro alzette.whole.enci   rd, rs1,      imm      // alzette.whole.enci   => 1100 iii0 0000 rrrr r110 rrrr r101 1011
+.insn r CUSTOM_2, 6, \imm+(12* 8), \rd, \rs1,   x0 //                      => #define MATCH_ALZETTE_WHOLE_ENCI   0xC000605B
+.endm                                              //                      => #define  MASK_ALZETTE_WHOLE_ENCI   0xF000707F
+.macro alzette.whole.deci   rd, rs1,      imm      // alzette.whole.deci   => 1101 iii0 0000 rrrr r110 rrrr r101 1011
+.insn r CUSTOM_2, 6, \imm+(13* 8), \rd, \rs1,   x0 //                      => #define MATCH_ALZETTE_WHOLE_DECI   0xD000605B
+.endm                                              //                      => #define  MASK_ALZETTE_WHOLE_DECI   0xF000707F
 
-+=============+==================+==========+=======+======+=====================+=========+=============+
-| class       | instruction      | format   | rot   | RCON | f7                  | f3      | custom      |
-+=============+==================+==========+=======+======+=====================+=========+=============+
-|             |                  |          |       |      |                     |         |             |
-| RV64B       | alz.pack         | 2R  ->1R |       |      | 00 : 00000          | 7 = 111 | 3 = 1111011 |
-| RV64B       | alz.packu        | 2R  ->1R |       |      | 00 : 00001          | 7 = 111 | 3 = 1111011 |
-|             |                  |          |       |      |                     |         |             |     
-| RV32_ELL    | alz.ell          | 2R  ->1R |       |      | 00 : 00010          | 7 = 111 | 3 = 1111011 |
-| RV64_ELL    | alz.ell          | 2R  ->1R |       |      | 00 : 00010          | 7 = 111 | 3 = 1111011 |
-| RV64_ELL    | alz.ellrev       | 2R  ->1R |       |      | 00 : 00011          | 7 = 111 | 3 = 1111011 |
-|             |                  |          |       |      |                     |         |             |
-| RV32_TYPE3  | alz.addror.31    | 2R  ->1R | const |      | 01 : 00000          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.addror.17    | 2R  ->1R | const |      | 01 : 00001          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.addror.24    | 2R  ->1R | const |      | 01 : 00010          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.subror.31    | 2R  ->1R | const |      | 01 : 00011          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.subror.17    | 2R  ->1R | const |      | 01 : 00100          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.subror.24    | 2R  ->1R | const |      | 01 : 00101          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.xorror.31    | 2R  ->1R | const |      | 01 : 00110          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.xorror.17    | 2R  ->1R | const |      | 01 : 00111          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.xorror.24    | 2R  ->1R | const |      | 01 : 01000          | 7 = 111 | 3 = 1111011 |
-| RV32_TYPE3  | alz.xorror.16    | 2R  ->1R | const |      | 01 : 01001          | 7 = 111 | 3 = 1111011 |
-|             |                  |          |       |      |                     |         |             |
-| RV64_TYPE3  | alz.block.enc.0  | 2R  ->1R | const | reg  | 10 : 00000          | 7 = 111 | 3 = 1111011 |
-| RV64_TYPE3  | alz.block.enc.1  | 2R  ->1R | const | reg  | 10 : 00001          | 7 = 111 | 3 = 1111011 |
-| RV64_TYPE3  | alz.block.enc.2  | 2R  ->1R | const | reg  | 10 : 00010          | 7 = 111 | 3 = 1111011 |
-| RV64_TYPE3  | alz.block.enc.3  | 2R  ->1R | const | reg  | 10 : 00011          | 7 = 111 | 3 = 1111011 |
-| RV64_TYPE3  | alz.block.dec.0  | 2R  ->1R | const | reg  | 10 : 00100          | 7 = 111 | 3 = 1111011 |
-| RV64_TYPE3  | alz.block.dec.1  | 2R  ->1R | const | reg  | 10 : 00101          | 7 = 111 | 3 = 1111011 |
-| RV64_TYPE3  | alz.block.dec.2  | 2R  ->1R | const | reg  | 10 : 00110          | 7 = 111 | 3 = 1111011 |
-| RV64_TYPE3  | alz.block.dec.3  | 2R  ->1R | const | reg  | 10 : 00111          | 7 = 111 | 3 = 1111011 |
-|             |                  |          |       |      |                     |         |             |
-| RV64_TYPE5  | alz.whole.enc    | 2R  ->1R | const | reg  | 11 : 00000          | 7 = 111 | 3 = 1111011 |
-| RV64_TYPE5  | alz.whole.dec    | 2R  ->1R | const | reg  | 11 : 00001          | 7 = 111 | 3 = 1111011 |
-|             |                  |          |       |      |                     |         |             |
-+=============+==================+==========+=======+======+========+======================+=============+
++=====================+======================+==========+=======+======+=====================+=========+=============+
+| class               | instruction          | format   | rot   | RCON | f7                  | f3      | custom      |
++=====================+======================+==========+=======+======+=====================+=========+=============+
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV64B       | alzette.pack         | 2R  ->1R |       |      | 00 : 00000          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64B       | alzette.packu        | 2R  ->1R |       |      | 00 : 00001          | 7 = 111 | 3 = 1111011 |
+|                     |                      |          |       |      |                     |         |             |     
+| ALZETTE_RV32_ELL    | alzette.ell          | 2R  ->1R |       |      | 00 : 00010          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_ELL    | alzette.ell          | 2R  ->1R |       |      | 00 : 00010          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_ELL    | alzette.ellrev       | 2R  ->1R |       |      | 00 : 00011          | 7 = 111 | 3 = 1111011 |
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV32_TYPE3  | alzette.addror.31    | 2R  ->1R | const |      | 01 : 00000          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.addror.17    | 2R  ->1R | const |      | 01 : 00001          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.addror.24    | 2R  ->1R | const |      | 01 : 00010          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.subror.31    | 2R  ->1R | const |      | 01 : 00011          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.subror.17    | 2R  ->1R | const |      | 01 : 00100          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.subror.24    | 2R  ->1R | const |      | 01 : 00101          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.xorror.31    | 2R  ->1R | const |      | 01 : 00110          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.xorror.17    | 2R  ->1R | const |      | 01 : 00111          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.xorror.24    | 2R  ->1R | const |      | 01 : 01000          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV32_TYPE3  | alzette.xorror.16    | 2R  ->1R | const |      | 01 : 01001          | 7 = 111 | 3 = 1111011 |
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV64_TYPE3  | alzette.block.enc.0  | 2R  ->1R | const | reg  | 10 : 00000          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_TYPE3  | alzette.block.enc.1  | 2R  ->1R | const | reg  | 10 : 00001          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_TYPE3  | alzette.block.enc.2  | 2R  ->1R | const | reg  | 10 : 00010          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_TYPE3  | alzette.block.enc.3  | 2R  ->1R | const | reg  | 10 : 00011          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_TYPE3  | alzette.block.dec.0  | 2R  ->1R | const | reg  | 10 : 00100          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_TYPE3  | alzette.block.dec.1  | 2R  ->1R | const | reg  | 10 : 00101          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_TYPE3  | alzette.block.dec.2  | 2R  ->1R | const | reg  | 10 : 00110          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_TYPE3  | alzette.block.dec.3  | 2R  ->1R | const | reg  | 10 : 00111          | 7 = 111 | 3 = 1111011 |
+|                     |                      |          |       |      |                     |         |             |
+| ALZETTE_RV64_TYPE5  | alzette.whole.enc    | 2R  ->1R | const | reg  | 11 : 00000          | 7 = 111 | 3 = 1111011 |
+| ALZETTE_RV64_TYPE5  | alzette.whole.dec    | 2R  ->1R | const | reg  | 11 : 00001          | 7 = 111 | 3 = 1111011 |
+|                     |                      |          |       |      |                     |         |             |
++=====================+======================+==========+=======+======+=====================+=========+=============+
 
-.macro alz.pack         rd, rs1, rs2               // alz.pack         => 0000 000r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_PACK         0x0000707B
-.endm                                              //                  => #define  MASK_ALZ_PACK         0xFE00707F
-.macro alz.packu        rd, rs1, rs2               // alz.packu        => 0000 001r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 1* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_PACKU        0x0200707B
-.endm                                              //                  => #define  MASK_ALZ_PACKU        0xFE00707F
+.macro alzette.pack         rd, rs1, rs2           // alzette.pack         => 0000 000r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_PACK         0x0000707B
+.endm                                              //                      => #define  MASK_ALZETTE_PACK         0xFE00707F
+.macro alzette.packu        rd, rs1, rs2           // alzette.packu        => 0000 001r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      ( 1* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_PACKU        0x0200707B
+.endm                                              //                      => #define  MASK_ALZETTE_PACKU        0xFE00707F
 
-.macro alz.ell          rd, rs1, rs2               // alz.ell          => 0000 010r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ELL          0x0400707B
-.endm                                              //                  => #define  MASK_ALZ_ELL          0xFE00707F
-.macro alz.ellrev       rd, rs1, rs2               // alz.ellrev       => 0000 011r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 3* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ELLREV       0x0600707B
-.endm                                              //                  => #define  MASK_ALZ_ELLREV       0xFE00707F
+.macro alzette.ell          rd, rs1, rs2           // alzette.ell          => 0000 010r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_ELL          0x0400707B
+.endm                                              //                      => #define  MASK_ALZETTE_ELL          0xFE00707F
+.macro alzette.ellrev       rd, rs1, rs2           // alzette.ellrev       => 0000 011r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      ( 3* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_ELLREV       0x0600707B
+.endm                                              //                      => #define  MASK_ALZETTE_ELLREV       0xFE00707F
 
-.macro alz.addror.31    rd, rs1, rs2               // alz.addror.31    => 0100 000r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (32* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDROR_31    0x4000707B
-.endm                                              //                  => #define  MASK_ALZ_ADDROR_31    0xFE00707F
-.macro alz.addror.17    rd, rs1, rs2               // alz.addror.17    => 0100 001r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (33* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDROR_17    0x4200707B
-.endm                                              //                  => #define  MASK_ALZ_ADDROR_17    0xFE00707F
-.macro alz.addror.24    rd, rs1, rs2               // alz.addror.24    => 0100 010r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (34* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_ADDROR_24    0x4400707B
-.endm                                              //                  => #define  MASK_ALZ_ADDROR_24    0xFE00707F
-.macro alz.subror.31    rd, rs1, rs2               // alz.subror.31    => 0100 011r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (35* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_SUBROR_31    0x4600707B
-.endm                                              //                  => #define  MASK_ALZ_SUBROR_31    0xFE00707F
-.macro alz.subror.17    rd, rs1, rs2               // alz.subror.17    => 0100 100r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (36* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_SUBROR_17    0x4800707B
-.endm                                              //                  => #define  MASK_ALZ_SUBROR_17    0xFE00707F
-.macro alz.subror.24    rd, rs1, rs2               // alz.subror.24    => 0100 101r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (37* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_SUBROR_24    0x4A00707B
-.endm                                              //                  => #define  MASK_ALZ_SUBROR_24    0xFE00707F
-.macro alz.xorror.31    rd, rs1, rs2               // alz.xorror.31    => 0100 110r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (38* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORROR_31    0x4C00707B
-.endm                                              //                  => #define  MASK_ALZ_XORROR_31    0xFE00707F
-.macro alz.xorror.17    rd, rs1, rs2               // alz.xorror.17    => 0100 111r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (39* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORROR_17    0x4E00707B
-.endm                                              //                  => #define  MASK_ALZ_XORROR_17    0xFE00707F
-.macro alz.xorror.24    rd, rs1, rs2               // alz.xorror.24    => 0101 000r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (40* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORROR_24    0x5000707B
-.endm                                              //                  => #define  MASK_ALZ_XORROR_24    0xFE00707F
-.macro alz.xorror.16    rd, rs1, rs2               // alz.xorror.16    => 0101 001r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      (41* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_XORROR_16    0x5200707B
-.endm                                              //                  => #define  MASK_ALZ_XORROR_16    0xFE00707F
+.macro alzette.addror.31    rd, rs1, rs2           // alzette.addror.31    => 0100 000r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (32* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_ADDROR_31    0x4000707B
+.endm                                              //                      => #define  MASK_ALZETTE_ADDROR_31    0xFE00707F
+.macro alzette.addror.17    rd, rs1, rs2           // alzette.addror.17    => 0100 001r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (33* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_ADDROR_17    0x4200707B
+.endm                                              //                      => #define  MASK_ALZETTE_ADDROR_17    0xFE00707F
+.macro alzette.addror.24    rd, rs1, rs2           // alzette.addror.24    => 0100 010r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (34* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_ADDROR_24    0x4400707B
+.endm                                              //                      => #define  MASK_ALZETTE_ADDROR_24    0xFE00707F
+.macro alzette.subror.31    rd, rs1, rs2           // alzette.subror.31    => 0100 011r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (35* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_SUBROR_31    0x4600707B
+.endm                                              //                      => #define  MASK_ALZETTE_SUBROR_31    0xFE00707F
+.macro alzette.subror.17    rd, rs1, rs2           // alzette.subror.17    => 0100 100r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (36* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_SUBROR_17    0x4800707B
+.endm                                              //                      => #define  MASK_ALZETTE_SUBROR_17    0xFE00707F
+.macro alzette.subror.24    rd, rs1, rs2           // alzette.subror.24    => 0100 101r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (37* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_SUBROR_24    0x4A00707B
+.endm                                              //                      => #define  MASK_ALZETTE_SUBROR_24    0xFE00707F
+.macro alzette.xorror.31    rd, rs1, rs2           // alzette.xorror.31    => 0100 110r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (38* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_XORROR_31    0x4C00707B
+.endm                                              //                      => #define  MASK_ALZETTE_XORROR_31    0xFE00707F
+.macro alzette.xorror.17    rd, rs1, rs2           // alzette.xorror.17    => 0100 111r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (39* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_XORROR_17    0x4E00707B
+.endm                                              //                      => #define  MASK_ALZETTE_XORROR_17    0xFE00707F
+.macro alzette.xorror.24    rd, rs1, rs2           // alzette.xorror.24    => 0101 000r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (40* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_XORROR_24    0x5000707B
+.endm                                              //                      => #define  MASK_ALZETTE_XORROR_24    0xFE00707F
+.macro alzette.xorror.16    rd, rs1, rs2           // alzette.xorror.16    => 0101 001r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (41* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_XORROR_16    0x5200707B
+.endm                                              //                      => #define  MASK_ALZETTE_XORROR_16    0xFE00707F
 
-.macro alz.block.enc.0  rd, rs1, rs2               // alz.block.enc.0  => 1000 000r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (64* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENC_0  0x8000707B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_ENC_0  0xFE00707F
-.macro alz.block.enc.1  rd, rs1, rs2               // alz.block.enc.1  => 1000 001r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (65* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENC_1  0x8200707B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_ENC_1  0xFE00707F
-.macro alz.block.enc.2  rd, rs1, rs2               // alz.block.enc.2  => 1000 010r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (66* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENC_2  0x8400707B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_ENC_2  0xFE00707F
-.macro alz.block.enc.3  rd, rs1, rs2               // alz.block.enc.3  => 1000 011r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (67* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_ENC_3  0x8600707B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_ENC_3  0xFE00707F
-.macro alz.block.dec.0  rd, rs1, rs2               // alz.block.dec.0  => 1000 100r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (68* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DEC_0  0x8800707B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_DEC_0  0xFE00707F
-.macro alz.block.dec.1  rd, rs1, rs2               // alz.block.dec.1  => 1000 101r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (69* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DEC_1  0x8A00707B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_DEC_1  0xFE00707F
-.macro alz.block.dec.2  rd, rs1, rs2               // alz.block.dec.2  => 1000 110r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (70* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DEC_2  0x8C00707B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_DEC_2  0xFE00707F
-.macro alz.block.dec.3  rd, rs1, rs2               // alz.block.dec.3  => 1000 111r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (71* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_BLOCK_DEC_3  0x8E00707B
-.endm                                              //                  => #define  MASK_ALZ_BLOCK_DEC_3  0xFE00707F
+.macro alzette.block.enc.0  rd, rs1, rs2           // alzette.block.enc.0  => 1000 000r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (64* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_ENC_0  0x8000707B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_ENC_0  0xFE00707F
+.macro alzette.block.enc.1  rd, rs1, rs2           // alzette.block.enc.1  => 1000 001r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (65* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_ENC_1  0x8200707B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_ENC_1  0xFE00707F
+.macro alzette.block.enc.2  rd, rs1, rs2           // alzette.block.enc.2  => 1000 010r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (66* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_ENC_2  0x8400707B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_ENC_2  0xFE00707F
+.macro alzette.block.enc.3  rd, rs1, rs2           // alzette.block.enc.3  => 1000 011r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (67* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_ENC_3  0x8600707B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_ENC_3  0xFE00707F
+.macro alzette.block.dec.0  rd, rs1, rs2           // alzette.block.dec.0  => 1000 100r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (68* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_DEC_0  0x8800707B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_DEC_0  0xFE00707F
+.macro alzette.block.dec.1  rd, rs1, rs2           // alzette.block.dec.1  => 1000 101r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (69* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_DEC_1  0x8A00707B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_DEC_1  0xFE00707F
+.macro alzette.block.dec.2  rd, rs1, rs2           // alzette.block.dec.2  => 1000 110r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (70* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_DEC_2  0x8C00707B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_DEC_2  0xFE00707F
+.macro alzette.block.dec.3  rd, rs1, rs2           // alzette.block.dec.3  => 1000 111r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (71* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_BLOCK_DEC_3  0x8E00707B
+.endm                                              //                      => #define  MASK_ALZETTE_BLOCK_DEC_3  0xFE00707F
 
-.macro alz.whole.enc    rd, rs1, rs2               // alz.whole.enc    => 1100 000r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (96* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_ENC    0xC000707B
-.endm                                              //                  => #define  MASK_ALZ_WHOLE_ENC    0xFE00707F
-.macro alz.whole.dec    rd, rs1, rs2               // alz.whole.dec    => 1100 001r rrrr rrrr r111 rrrr r111 1011 
-.insn r CUSTOM_3, 7,      (97* 1), \rd, \rs1, \rs2 //                  => #define MATCH_ALZ_WHOLE_DEC    0xC200707B
-.endm                                              //                  => #define  MASK_ALZ_WHOLE_DEC    0xFE00707F
+.macro alzette.whole.enc    rd, rs1, rs2           // alzette.whole.enc    => 1100 000r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (96* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_WHOLE_ENC    0xC000707B
+.endm                                              //                      => #define  MASK_ALZETTE_WHOLE_ENC    0xFE00707F
+.macro alzette.whole.dec    rd, rs1, rs2           // alzette.whole.dec    => 1100 001r rrrr rrrr r111 rrrr r111 1011 
+.insn r CUSTOM_3, 7,      (97* 1), \rd, \rs1, \rs2 //                      => #define MATCH_ALZETTE_WHOLE_DEC    0xC200707B
+.endm                                              //                      => #define  MASK_ALZETTE_WHOLE_DEC    0xFE00707F

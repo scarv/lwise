@@ -10,4 +10,7 @@
 
 #include "share.h"
 
+#include "alzette.h"
+#include     "ell.h"
+
 #endif

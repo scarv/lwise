@@ -230,7 +230,7 @@
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => en/decrypt substitution
 
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 )
 .macro TRAXL17_ENC_SUBS rc, x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,  t0,  t1,  t2
               lw          \t0,     0(\rc)                 // t0 = MEM[ \rc +  0 ] => TRAXL1710_RCON[ 0/4 ]
               ALZETTE_ENC \x0, \y0,  \t0, \t1, \t2
@@ -254,34 +254,34 @@
 .endm
 #endif
 
-#if ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE4 )
 .macro TRAXL17_ENC_SUBS rc, x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,  t0,  t1,  t2
-              alz.whole.enci.x \t0, \x0, \y0,   \rc
-              alz.whole.enci.y \y0, \x0, \y0,   \rc
-              mv               \x0, \t0
-              alz.whole.enci.x \t0, \x1, \y1, 1+\rc
-              alz.whole.enci.y \y1, \x1, \y1, 1+\rc
-              mv               \x1, \t0
-              alz.whole.enci.x \t0, \x2, \y2, 2+\rc
-              alz.whole.enci.y \y2, \x2, \y2, 2+\rc
-              mv               \x2, \t0
-              alz.whole.enci.x \t0, \x3, \y3, 3+\rc
-              alz.whole.enci.y \y3, \x3, \y3, 3+\rc
-              mv               \x3, \t0
+              alzette.whole.enci.x \t0, \x0, \y0,   \rc
+              alzette.whole.enci.y \y0, \x0, \y0,   \rc
+              mv                   \x0, \t0
+              alzette.whole.enci.x \t0, \x1, \y1, 1+\rc
+              alzette.whole.enci.y \y1, \x1, \y1, 1+\rc
+              mv                   \x1, \t0
+              alzette.whole.enci.x \t0, \x2, \y2, 2+\rc
+              alzette.whole.enci.y \y2, \x2, \y2, 2+\rc
+              mv                   \x2, \t0
+              alzette.whole.enci.x \t0, \x3, \y3, 3+\rc
+              alzette.whole.enci.y \y3, \x3, \y3, 3+\rc
+              mv                   \x3, \t0
 .endm
 
 .macro TRAXL17_DEC_SUBS rc, x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,  t0,  t1,  t2
-              alz.whole.deci.x \t0, \x0, \y0,   \rc
-              alz.whole.deci.y \y0, \x0, \y0,   \rc
-              mv               \x0, \t0
-              alz.whole.deci.x \t0, \x1, \y1, 1+\rc
-              alz.whole.deci.y \y1, \x1, \y1, 1+\rc
-              mv               \x1, \t0
-              alz.whole.deci.x \t0, \x2, \y2, 2+\rc
-              alz.whole.deci.y \y2, \x2, \y2, 2+\rc
-              mv               \x2, \t0
-              alz.whole.deci.x \t0, \x3, \y3, 3+\rc
-              alz.whole.deci.y \y3, \x3, \y3, 3+\rc
+              alzette.whole.deci.x \t0, \x0, \y0,   \rc
+              alzette.whole.deci.y \y0, \x0, \y0,   \rc
+              mv                   \x0, \t0
+              alzette.whole.deci.x \t0, \x1, \y1, 1+\rc
+              alzette.whole.deci.y \y1, \x1, \y1, 1+\rc
+              mv                   \x1, \t0
+              alzette.whole.deci.x \t0, \x2, \y2, 2+\rc
+              alzette.whole.deci.y \y2, \x2, \y2, 2+\rc
+              mv                   \x2, \t0
+              alzette.whole.deci.x \t0, \x3, \y3, 3+\rc
+              alzette.whole.deci.y \y3, \x3, \y3, 3+\rc
               mv               \x3, \t0
 .endm
 #endif
@@ -289,7 +289,7 @@
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => en/decrypt step
 	
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 ) || ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 ) || ( ALZETTE_RV32_TYPE4 )
 .macro TRAXL17_ENC_STEP_EVE   sk, rc,  x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,                          t0,  t1,  t2
               TRAXL17_ADD_SUBKEY \sk, \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0
               TRAXL17_ENC_SUBS   \rc, \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0, \t1, \t2    
@@ -347,7 +347,7 @@
 
 traxl17_enc:  TRAXL17_ENC_PROLOGUE
 
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 )
               mv           t0, a2                        // t0 = &subkeys
               la           t1, TRAXL17_RCON              // t1 = &TRAXL17_RCON
               addi         a7, t1,  16                   // a7 = &TRAXL17_RCON[4]
@@ -384,7 +384,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               #endif       
 #endif
 
-#if ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE4 )
               mv           t0, a2                        // t0 = &subkeys
               //                   sk  rc  x0  x1  x2  x3  y0  y1  y2  y3 tk0 tk1  tk2  tk3  t0  t1  t2
               TRAXL17_RD_STATE             s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
@@ -409,7 +409,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               TRAXL17_ADD_SUBKEY   t0,     s3, s2, s0, s1, s7, s6, s4, s5,                   t4
 			  TRAXL17_WR_STATE             s3, s2, s0, s1, s7, s6, s4, s5
               #else	
-              #error "can't use RV32_TYPE4 without TRAXL17_ENC_UNROLL"
+              #error "can't use ALZETTE_RV32_TYPE4 without TRAXL17_ENC_UNROLL"
               #endif
 #endif
               TRAXL17_ENC_EPILOGUE
@@ -425,7 +425,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
 
 traxl17_dec:  TRAXL17_DEC_PROLOGUE
 
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 )
               addi         t0, a2,  544                  // t0 = &subkeys[17]
                        
               la           t1, TRAXL17_RCON              // t1 = &TRAXL17_RCON
@@ -463,7 +463,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               #endif
 #endif
 
-#if ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE4 )
               addi         t0, a2,  544                  // t0 = &subkeys[17]
               //                   sk  rc  x0  x1  x2  x3  y0  y1  y2  y3 tk0 tk1  tk2  tk3  t0  t1  t2
               TRAXL17_RD_STATE             s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
@@ -489,7 +489,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_DEC_STEP_EVE t0,  0, s2, s3, s1, s0, s6, s7, s5, s4,                   t4, t5, t6
               TRAXL17_WR_STATE             s2, s3, s1, s0, s6, s7, s5, s4
               #else	
-              #error "can't use RV32_TYPE4 without TRAXL17_DEC_UNROLL"
+              #error "can't use ALZETTE_RV32_TYPE4 without TRAXL17_DEC_UNROLL"
               #endif
 #endif
               TRAXL17_DEC_EPILOGUE

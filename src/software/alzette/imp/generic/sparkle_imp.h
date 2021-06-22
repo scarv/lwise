@@ -5,8 +5,8 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#ifndef __CRAXS10_IMP_H
-#define __CRAXS10_IMP_H
+#ifndef __SPARKLE_IMP_H
+#define __SPARKLE_IMP_H
 
 #include "share.h"
 

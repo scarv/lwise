@@ -19,21 +19,24 @@ export SOURCES  = $(wildcard $(addsuffix /*.c, ${INCLUDES}))
 export SOURCES += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
 export HEADERS  = $(wildcard $(addsuffix /*.h, ${INCLUDES}))
 
-export TARGET   = ${REPO_HOME}/build/driver_${ALG}
+export TARGET   = ${REPO_HOME}/build/driver-${ALG}_${ARCH}_${IMP}
 
 # -----------------------------------------------------------------------------
 
 include ./share/arch/${ARCH}/Makefile.in
 
 ${TARGET}.elf : ${SOURCES} ${HEADERS}
-	${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -Wall -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+	@${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -Wall -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 ${TARGET}.asm : ${TARGET}.elf
-	${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
+	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
 
 build : ${TARGET}.elf ${TARGET}.asm
 
 run   : ${TARGET}.run
+
+scan  : ${TARGET}.elf
+	@PYTHONPATH="./share" python3 ./${ALG}/driver.py --rv32 --rv64
 
 clean : 
 	@rm --force ${TARGET}.elf

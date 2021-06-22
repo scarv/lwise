@@ -1,12 +1,12 @@
 # `lwise`: ISEs for NIST lightweight candidates
 
-<!--- -------------------------------------------------------------------- --->
+<!--- ==================================================================== --->
 
 ## Overview
 
 ...
 
-<!--- -------------------------------------------------------------------- --->
+<!--- ==================================================================== --->
 
 ## Organisation
 
@@ -23,105 +23,138 @@
     │   ├── verilator         - source code for emulator for use with Rocket
     │   └── yosys_synth       - synthesise hardware implementation using yosys
     ├── software              - source code for software
-    │   ├── arch                - architecture-specific support
-    │   │   ├── generic           - generic, i.e., vanilla C
-    │   │   ├── rv32              - 32-bit RISC-V
-    │   │   └── rv64              - 64-bit RISC-V
-    │   └── imp                 - implementation
-    │       ├── generic           - generic, i.e., vanilla C
-    │       ├── rv32              - 32-bit RISC-V
-    │       └── rv64              - 64-bit RISC-V
+    │   ├── alzette             - source code for alzette 
+    │   │   ├── arch              -   architecture-specific resources
+    │   │   │   ├── generic         - generic, i.e., vanilla C
+    │   │   │   ├── rv32            - 32-bit RISC-V
+    │   │   │   └── rv64            - 64-bit RISC-V
+    │   │   └── imp               - implementation-specific resources
+    │   │       ├── generic         - generic, i.e., vanilla C
+    │   │       ├── rv32            - 32-bit RISC-V
+    │   │       └── rv64            - 64-bit RISC-V
+    │   └── ascon               - source code for ascon
+    │       ├── arch              -   architecture-specific resources
+    │       │   ├── generic         - generic, i.e., vanilla C
+    │       │   ├── rv32            - 32-bit RISC-V
+    │       │   └── rv64            - 64-bit RISC-V
+    │       └── imp               - implementation-specific resources
+    │           ├── generic         - generic, i.e., vanilla C
+    │           ├── rv32            - 32-bit RISC-V
+    │           └── rv64            - 64-bit RISC-V
     ├── toolchain             - source code for tool-chain
     └── toolchain-rocket      - source code for tool-chain for use with Rocket
 ```
 
-<!--- -------------------------------------------------------------------- --->
+<!--- ==================================================================== --->
 
 ## Notes
 
-### Generic
+<!--- -------------------------------------------------------------------- --->
 
-- The build system is controlled by three environment variables, namely
-  `${ARCH}`, `${IMP}`, and `${CONF}`.  The idea is that
+### Build system
 
-  - there's one set of generic driver source code located in
-    `${REPO_HOME}/src/software`,
-  - `${REPO_HOME}/src/software/arch/${ARCH}`,
-    contains any architecture-specific resources, e.g.,
-    a `Makefile.in` to support the build system, definitions allowing use of any ISEs,
-  - `${REPO_HOME}/src/software/imp/${IMP}`
-    contains any architecture-specific implementations, e.g.,
-    an implementation of `craxs10_enc`.
+- The build system is controlled by several environment variables:
 
-  Note that the separation of `${ARCH}` and `${IMP}` allows, for example, the generic
-  C implementation to be compiled and simulated on an RV32I architecture.
+  - `${ALG}`
+    - role: specifies the algorithm
+    - values: `alzette`, `ascon`
+    - default: `alzette`
 
-- `${CONF}` allows a set of options passed to GCC:
+  - `${ARCH}`
+    - role: specifies the architecture
+    - values: `generic`, `rv32`, `rv64`
+    - default: `generic`
 
-  | Symbol               | Meaning                                                                                                   |
-  | :------------------- | :-------------------------------------------------------------------------------------------------------- |
-  | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase         |
-  | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase         |
-  | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                           |
-  | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum) |
+  - `${IMP}`
+    - role: specifies the implementation
+    - values: `generic`, `rv32`, `rv64`
+    - default: `generic`
 
-- The RISC-V plus custom ISE options make use of the ISE via the
+- The idea is basically that:
+
+  - `${REPO_HOME}/src/software/${ALG}`,
+    houses anything algorithm-specific:
+
+    - `${REPO_HOME}/src/software/${ALG}/arch/${ARCH}`,
+      contains any   architecture-specific resources, 
+    - `${REPO_HOME}/src/software/${ALG}/imp/${IMP}`
+      contains any implementation-specific resources.
+
+  - `${REPO_HOME}/src/software/share`,
+    houses anything algorithm-agnostic:
+
+    - `${REPO_HOME}/src/software/share/arch/${ARCH}`,
+      contains any   architecture-specific resources, 
+    - `${REPO_HOME}/src/software/share/imp/${IMP}`
+      contains any implementation-specific resources.
+
+  Note that the separation of `${ARCH}` and `${IMP}` allows, for example, 
+  the generic C implementation to be compiled for the RV32I architecture.
+
+- The `${CONF}` environment variable allows options to be passed to GCC:
+
+  | `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol                         | Meaning                                                                                                   |
+  | :-------- | :-------- | :-------- | :----------------------------- | :-------------------------------------------------------------------------------------------------------- |
+  |           |           |           | `DRIVER_TRIALS_WARM`           | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase         |
+  |           |           |           | `DRIVER_TRIALS_REAL`           | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase         |
+  |           |           |           | `DRIVER_RANDOM`                | use `/dev/random` as a source of randomness, rather than `rand`                                           |
+  |           |           |           | `DRIVER_MEASURE`               | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum) |
+  |           | `alzette` |           |                                | see [documentation](./doc/alzette/README.md)                                                              |
+  |           | `ascon`   |           |                                | see [documentation](./doc/ascon/README.md)                                                                |
+
+- Options which use a RISC-V base ISA plus custom ISE do so via the
   [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
   directive, rather than an invasive change to `binutils` itself.
 
+<!--- -------------------------------------------------------------------- --->
+
 ### Software-specific
 
-- Build a toolchain:
+- Fix paths, e.g., 
+  
+  ```sh
+  export RISCV="/opt/riscv"
+  ```
 
-  - Fix paths, e.g., 
+- Build a multi-architecture 
+  [tool-chain](https://github.com/riscv/riscv-gnu-toolchain)
+  into `${RISCV}`:
   
-    ```sh
-    export RISCV="/opt/riscv"
-    export RISCV_ROCKET="/opt/riscv-rocket"
-    export RISCV_ALZETTE="/opt/riscv-alzette"
-    ```
-  
-  - Build a multi-architecture 
-    [tool-chain](https://github.com/riscv/riscv-gnu-toolchain)
-    into `${RISCV}`:
-  
-    ```sh
-    git clone https://github.com/riscv/riscv-gnu-toolchain.git ./riscv-gnu-toolchain
-    cd ./riscv-gnu-toolchain
-    git submodule update --init --recursive
-    ./configure --prefix="${RISCV}" --enable-multilib --with-multilib-generator="rv32gc-ilp32--;rv64gc-lp64--"
-    make
-    ```
-  - Build an ISE-enabled 
-    [`spike`](https://github.com/riscv/riscv-isa-sim)
-    and associated
-    [`pk`](https://github.com/riscv/riscv-pk) 
-    into `${RISCV_ALZETTE}`:
-  
-    ```sh
-    git clone https://github.com/scarv/alzette.git ./alzette
-    cd ./alzette
-    git submodule update --init --recursive
-    source ./bin/conf.sh
-    make -f ${REPO_HOME}/src/toolchain/Makefile clone 
-    make -f ${REPO_HOME}/src/toolchain/Makefile apply 
-    make -f ${REPO_HOME}/src/toolchain/Makefile build
-    ```
-  - Build a
-    [toolchain](https://github.com/riscv/riscv-gnu-toolchain)
-    for use with
-    [Rocket-Chip](https://github.com/chipsalliance/rocket-chip.git)
-    into `${RISCV_ROCKET}`:
+  ```sh
+  git clone https://github.com/riscv/riscv-gnu-toolchain.git ./riscv-gnu-toolchain
+  cd ./riscv-gnu-toolchain
+  git submodule update --init --recursive
+  ./configure --prefix="${RISCV}" --enable-multilib --with-multilib-generator="rv32gc-ilp32--;rv64gc-lp64--"
+  make
+  ```
 
-    ```sh
-    make -f ${REPO_HOME}/src/toolchain-rocket/Makefile clone
-    make -f ${REPO_HOME}/src/toolchain-rocket/Makefile build
-    ```
+- Clone the repo.
+
+  ```sh
+  git clone https://github.com/scarv/alzette.git ./alzette
+  cd ./alzette
+  git submodule update --init --recursive
+  source ./bin/conf.sh
+  ```
+
+- Build an ISE-enabled 
+  [`spike`](https://github.com/riscv/riscv-isa-sim)
+  and associated
+  [`pk`](https://github.com/riscv/riscv-pk) 
+  for each algorithm:
   
+  ```sh
+  make ALG="alzette" toolchain-build
+  make ALG="ascon"   toolchain-build
+  ```
+
 - Build and execute implementation, e.g.,
 
   ```sh
-  make --directory="${REPO_HOME}/src/software" ARCH="generic" IMP="generic" CONF="-DDRIVER_TRIALS_REAL='1000'" clean all run
+  make ALG="alzette"  software-build
+  make ALG="alzette"  software-run
+  make ALG="ascon"    software-build
+  make ALG="ascon"    software-run
   ```
 
   or use the test script provided
@@ -145,7 +178,21 @@
   - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
   - optionally commit and push the updated patch.
 
+<!--- -------------------------------------------------------------------- --->
+
 ### Hardware-specific
+
+
+- Build a
+  [toolchain](https://github.com/riscv/riscv-gnu-toolchain)
+  for use with
+  [Rocket-Chip](https://github.com/chipsalliance/rocket-chip.git)
+  into `${RISCV_ROCKET}`:
+
+  ```sh
+  make -f ${REPO_HOME}/src/toolchain-rocket/Makefile clone
+  make -f ${REPO_HOME}/src/toolchain-rocket/Makefile build
+  ```
 
 - The build system in
 
@@ -186,5 +233,5 @@
   make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" CONF="-DDRIVER_TRIALS_REAL='1000'" clean all emulate
   ```
 
-<!--- -------------------------------------------------------------------- --->  
+<!--- ==================================================================== --->
    

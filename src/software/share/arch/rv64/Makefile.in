@@ -25,7 +25,9 @@ export GCC_LIBS   =
 
 # -----------------------------------------------------------------------------
 
-${TARGET}.run : ${TARGET}.elf
-	@${REPO_HOME}/build/toolchain/${ALG}/bin/spike --isa='rv64gc' ${REPO_HOME}/build/toolchain/${ALG}/riscv64-unknown-elf/bin/pk ${<} | tee > ${@}
+FORCE :
+
+${TARGET}.run : ${TARGET}.elf FORCE
+	@${REPO_HOME}/build/toolchain/${ALG}/bin/spike --isa='rv64gc' ${REPO_HOME}/build/toolchain/${ALG}/riscv64-unknown-elf/bin/pk ${<} | tee ${@}
 
 # =============================================================================

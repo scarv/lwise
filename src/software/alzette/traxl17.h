@@ -10,6 +10,8 @@
 
 #include "share.h"
 
+#include "traxl17_imp.h"
+
 #define TRAXL17_NSTEPS ( 17 )
 
 extern const uint32_t TRAXL17_RCON[ 8 ];

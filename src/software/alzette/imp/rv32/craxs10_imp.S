@@ -98,7 +98,7 @@
 // ----------------------------------------------------------------------------
 // CRAXS10 implementation => en/decrypt step
 	
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 )
 .macro CRAXS10_ENC_STEP xw, yw, xk, yk, i
 #if ( CRAXS10_ENC_UNROLL )
               xori         t5, \xk, \i                   //  t5 = \xk ^ \i       =>        ( \xk ^ step )
@@ -136,7 +136,7 @@
 .endm
 #endif
 
-#if ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE4 )
 .macro CRAXS10_ENC_STEP xr, yr, xw, yw, xk, yk, i, j
               xori         t5, \xk, \i                   //  t5 = \xk ^  t2      =>        ( \xk ^ step )
               xor         \xw, \xw,  t5                  // \xw = \xw ^  t5      => \xw ^= ( \xk ^ step )
@@ -162,7 +162,7 @@
 
 craxs10_enc:  CRAXS10_ENC_PROLOGUE
 
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 )
               la           s4, CRAXS10_RCON              // s4 = &CRAXS10_RCON
 #if ( CRAXS10_ENC_UNROLL )             
               CRAXS10_ENC_STEP t0, t1, s0, s1,         0    
@@ -185,7 +185,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
               xor          t1, t1, s1                    // t1 = t1 ^ s1         => yw ^= k1
 #endif
 
-#if ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE4 )
 #if ( CRAXS10_ENC_UNROLL )
               CRAXS10_ENC_STEP t2, t3, t0, t1, s0, s1, 0, 0
               CRAXS10_ENC_STEP t0, t1, t2, t3, s2, s3, 1, 1
@@ -198,7 +198,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
               CRAXS10_ENC_STEP t2, t3, t0, t1, s0, s1, 8, 3
               CRAXS10_ENC_STEP t0, t1, t2, t3, s2, s3, 9, 4
 #else	
-#error "can't use RV32_TYPE4 without CRAXS10_ENC_UNROLL"
+#error "can't use ALZETTE_RV32_TYPE4 without CRAXS10_ENC_UNROLL"
 #endif
 1:            xor          t0, t0, s0                    // t0 = t0 ^ s0         => xw ^= k0
               xor          t1, t1, s1                    // t1 = t1 ^ s1         => yw ^= k1
@@ -217,7 +217,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
 
 craxs10_dec:  CRAXS10_DEC_PROLOGUE
 
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 )
               la           s4, CRAXS10_RCON              // s4 = &CRAXS10_RCON
 
               xor          t0, t0, s0                    // t0 = t0 ^ s0         => xw ^= k0
@@ -243,7 +243,7 @@ craxs10_dec:  CRAXS10_DEC_PROLOGUE
 #endif
 #endif
 
-#if ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE4 )
               xor          t0, t0, s0                    // t0 = t0 ^ s0         => xw ^= k0
               xor          t1, t1, s1                    // t1 = t1 ^ s1         => yw ^= k1
 #if ( CRAXS10_DEC_UNROLL )
@@ -258,7 +258,7 @@ craxs10_dec:  CRAXS10_DEC_PROLOGUE
               CRAXS10_DEC_STEP t2, t3, t0, t1, s2, s3, 1, 1
               CRAXS10_DEC_STEP t0, t1, t2, t3, s0, s1, 0, 0
 #else	
-#error "can't use RV32_TYPE4 without CRAXS10_DEC_UNROLL"
+#error "can't use ALZETTE_RV32_TYPE4 without CRAXS10_DEC_UNROLL"
 #endif
 #endif
 

@@ -10,6 +10,8 @@
 
 #include "share.h"
 
+#include "craxs10_imp.h"
+
 #define CRAXS10_NSTEPS ( 10 )
 
 extern const uint32_t CRAXS10_RCON[ 10 ];

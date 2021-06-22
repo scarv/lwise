@@ -6,15 +6,15 @@
 
 // ============================================================================
 
-#if ( RV32_ELL )
+#if ( ALZETTE_RV32_ELL )
 .macro ELL   r, x, t0, t1
-  alz.ell    \r,  \x,   x0
+  alzette.ell          \r,  \x,   x0
 .endm
 #else
 .macro ELL   r, x, t0, t1
-  slli       \t0, \x,   16
-  xor        \x,  \x,  \t0
-  ROR32      \r,  \x,   16, \t0, \t1
+  slli                 \t0, \x,   16
+  xor                  \x,  \x,  \t0
+  ROR32                \r,  \x,   16, \t0, \t1
 .endm
 #endif
 

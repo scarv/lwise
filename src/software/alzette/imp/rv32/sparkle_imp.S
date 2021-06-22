@@ -243,7 +243,7 @@ SPARKLE_RCON: .word 0xB7E15162
 
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => forward/inverse ARXBOX
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 )
 .macro SPARKLE_FWD_ARXBOX rcb, x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2 
               lw          \t0,    0(\rcb)                 // t0 = MEM[ rc +  0 ] => SPARKLE_RCON[ 0 ]
               ALZETTE_ENC \x0, \y0, \t0, \t1, \t2
@@ -275,47 +275,47 @@ SPARKLE_RCON: .word 0xB7E15162
 .endm
 #endif
 
-#if ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE4 )
 .macro SPARKLE_FWD_ARXBOX   rcb, x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2
-              alz.whole.enci.x \t0, \x0, \y0,  0
-              alz.whole.enci.y \y0, \x0, \y0,  0
-              mv               \x0, \t0
-              alz.whole.enci.x \t0, \x1, \y1,  1
-              alz.whole.enci.y \y1, \x1, \y1,  1
-              mv               \x1, \t0
-              alz.whole.enci.x \t0, \x2, \y2,  2
-              alz.whole.enci.y \y2, \x2, \y2,  2
-              mv               \x2, \t0
-              alz.whole.enci.x \t0, \x3, \y3,  3
-              alz.whole.enci.y \y3, \x3, \y3,  3
-              mv               \x3, \t0
-              alz.whole.enci.x \t0, \x4, \y4,  4
-              alz.whole.enci.y \y4, \x4, \y4,  4
-              mv               \x4, \t0
-              alz.whole.enci.x \t0, \x5, \y5,  5
-              alz.whole.enci.y \y5, \x5, \y5,  5
-              mv               \x5, \t0
+              alzette.whole.enci.x \t0, \x0, \y0,  0
+              alzette.whole.enci.y \y0, \x0, \y0,  0
+              mv                   \x0, \t0
+              alzette.whole.enci.x \t0, \x1, \y1,  1
+              alzette.whole.enci.y \y1, \x1, \y1,  1
+              mv                   \x1, \t0
+              alzette.whole.enci.x \t0, \x2, \y2,  2
+              alzette.whole.enci.y \y2, \x2, \y2,  2
+              mv                   \x2, \t0
+              alzette.whole.enci.x \t0, \x3, \y3,  3
+              alzette.whole.enci.y \y3, \x3, \y3,  3
+              mv                   \x3, \t0
+              alzette.whole.enci.x \t0, \x4, \y4,  4
+              alzette.whole.enci.y \y4, \x4, \y4,  4
+              mv                   \x4, \t0
+              alzette.whole.enci.x \t0, \x5, \y5,  5
+              alzette.whole.enci.y \y5, \x5, \y5,  5
+              mv                   \x5, \t0
 .endm
 
 .macro SPARKLE_REV_ARXBOX   rcb, x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2
-              alz.whole.deci.x \t0, \x0, \y0,  0
-              alz.whole.deci.y \y0, \x0, \y0,  0
-              mv               \x0, \t0
-              alz.whole.deci.x \t0, \x1, \y1,  1
-              alz.whole.deci.y \y1, \x1, \y1,  1
-              mv               \x1, \t0
-              alz.whole.deci.x \t0, \x2, \y2,  2
-              alz.whole.deci.y \y2, \x2, \y2,  2
-              mv               \x2, \t0
-              alz.whole.deci.x \t0, \x3, \y3,  3
-              alz.whole.deci.y \y3, \x3, \y3,  3
-              mv               \x3, \t0
-              alz.whole.deci.x \t0, \x4, \y4,  4
-              alz.whole.deci.y \y4, \x4, \y4,  4
-              mv               \x4, \t0
-              alz.whole.deci.x \t0, \x5, \y5,  5
-              alz.whole.deci.y \y5, \x5, \y5,  5
-              mv               \x5, \t0
+              alzette.whole.deci.x \t0, \x0, \y0,  0
+              alzette.whole.deci.y \y0, \x0, \y0,  0
+              mv                   \x0, \t0
+              alzette.whole.deci.x \t0, \x1, \y1,  1
+              alzette.whole.deci.y \y1, \x1, \y1,  1
+              mv                   \x1, \t0
+              alzette.whole.deci.x \t0, \x2, \y2,  2
+              alzette.whole.deci.y \y2, \x2, \y2,  2
+              mv                   \x2, \t0
+              alzette.whole.deci.x \t0, \x3, \y3,  3
+              alzette.whole.deci.y \y3, \x3, \y3,  3
+              mv                   \x3, \t0
+              alzette.whole.deci.x \t0, \x4, \y4,  4
+              alzette.whole.deci.y \y4, \x4, \y4,  4
+              mv                   \x4, \t0
+              alzette.whole.deci.x \t0, \x5, \y5,  5
+              alzette.whole.deci.y \y5, \x5, \y5,  5
+              mv                   \x5, \t0
 .endm
 #endif
 
@@ -344,7 +344,7 @@ SPARKLE_RCON: .word 0xB7E15162
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => forward/ inverse step
 	
-#if ( RV32_TYPE1 ) || ( RV32_TYPE2 ) || ( RV32_TYPE3 ) || ( RV32_TYPE4 )
+#if ( ALZETTE_RV32_TYPE1 ) || ( ALZETTE_RV32_TYPE2 ) || ( ALZETTE_RV32_TYPE3 ) || ( ALZETTE_RV32_TYPE4 )
 .macro SPARKLE_FWD_STEP           rcb,  rc,  st,  x0,  x1,  x2,  x3,  x4,  x5,  y0,  y1,  y2,  y3,  y4,  y5,  t0,  t1,  t2
 
               SPARKLE_FWD_ADDCNT       \rc, \st,                               \y0, \y1,                     \t0
@@ -392,13 +392,13 @@ sparkle_fwd:  SPARKLE_FWD_PROLOGUE
               SPARKLE_FWD_STEP  t0, t1,  6, s0, s1, s2, s3, s4, s5,  s6 , s7 , s8 , s9 , s10, s11, t4, t5, t6
               SPARKLE_WR_STATE              s4, s5, s3, s0, s1, s2,  s10, s11, s9 , s6 , s7 , s8 
 #else    
-              #if !( RV32_TYPE4 )	
+              #if !( ALZETTE_RV32_TYPE4 )	
 0:            bgeu         t2, t3, 1f                    // if i >= n, goto 1
               SPARKLE_FWD_STEP  t0, t1, t2, s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9,  s10, s11, t4, t5, t6    
               j                    0b                    //            goto 0
 1:            SPARKLE_WR_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9,  s10, s11
               #else	
-              #error "can't use RV32_TYPE4 without SPARKLE_FWD_UNROLL"
+              #error "can't use ALZETTE_RV32_TYPE4 without SPARKLE_FWD_UNROLL"
               #endif                           
 #endif
               SPARKLE_FWD_EPILOGUE
@@ -427,13 +427,13 @@ sparkle_rev:  SPARKLE_REV_PROLOGUE
               SPARKLE_REV_STEP  t0, t1,  0, s3, s4, s5, s2, s0, s1,  s9 , s10, s11, s8 , s6 , s7 , t4, t5, t6
               SPARKLE_WR_STATE              s3, s4, s5, s2, s0, s1,  s9 , s10, s11, s8 , s6 , s7 
 #else             
-              #if !( RV32_TYPE4 )	
+              #if !( ALZETTE_RV32_TYPE4 )	
 0:            blez         t2,     1f                    // if i <= 0, goto 1
               SPARKLE_REV_STEP  t0, t1, t2, s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9, s10, s11, t4, t5, t6     
               j                    0b                    //            goto 0
 1:            SPARKLE_WR_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9, s10, s11
               #else	
-              #error "can't use RV32_TYPE4 without SPARKLE_FWD_UNROLL"
+              #error "can't use ALZETTE_RV32_TYPE4 without SPARKLE_FWD_UNROLL"
               #endif  
 #endif
               SPARKLE_REV_EPILOGUE
