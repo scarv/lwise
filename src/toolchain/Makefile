@@ -35,6 +35,10 @@ define rule_revert
 $(strip ${1})-revert :
 	@$${REPO_HOME}/src/toolchain/$(strip ${1})-revert.sh
 endef
+define rule_clean
+$(strip ${1})-revert :
+	@$${REPO_HOME}/src/toolchain/$(strip ${1})-clean.sh
+endef
 
 $(foreach COMPONENT,${COMPONENTS},$(eval $(call rule_clone, ${COMPONENT})))
 $(foreach COMPONENT,${COMPONENTS},$(eval $(call rule_apply, ${COMPONENT})))
@@ -52,7 +56,6 @@ update : $(foreach COMPONENT, ${COMPONENTS}, ${COMPONENT}-update)
 
 revert : $(foreach COMPONENT, ${COMPONENTS}, ${COMPONENT}-revert)
 
-clean  :
-	@rm --force --recursive ${REPO_HOME}/build/toolchain
+clean  : $(foreach COMPONENT, ${COMPONENTS}, ${COMPONENT}-clean)
 
 # =============================================================================

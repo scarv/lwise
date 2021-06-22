@@ -9,11 +9,10 @@
 #define __DRIVER_H
 
 #include "share.h"
+#include "rdtsc.h"
 
 #include "craxs10.h"
 #include "traxl17.h"
 #include "sparkle.h"
-
-#include "rdtsc.h"
 
 #endif

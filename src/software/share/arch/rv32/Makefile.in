@@ -4,26 +4,28 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-ifndef RISCV
-  $(error "set RISCV         environment variable to point at toolchain installation")
+ifndef REPO_HOME
+  $(error "execute 'source ./bin/conf.sh' to configure environment")
 endif
-ifndef RISCV_ALZETTE
-  $(error "set RISCV_ALZETTE environment variable to point at toolchain installation")
+ifndef REPO_VERSION
+  $(error "execute 'source ./bin/conf.sh' to configure environment")
+endif
+
+ifndef RISCV
+  $(error "set RISCV environment variable to point at toolchain installation")
 endif
 
 # =============================================================================
 
 export GCC_PREFIX = ${RISCV}/bin/riscv64-unknown-elf
 
-export GCC_FLAGS  = -march='rv64gc' -mabi='lp64'
+export GCC_FLAGS  = -march='rv32gc' -mabi='ilp32'
 export GCC_PATHS  = 
 export GCC_LIBS   = 
 
 # -----------------------------------------------------------------------------
 
-run       : ${TARGET}.elf
-	@${RISCV_ALZETTE}/bin/spike    --isa='rv64gc' ${RISCV_ALZETTE}/riscv64-unknown-elf/bin/pk ${<}
-run-debug : ${TARGET}.elf
-	@${RISCV_ALZETTE}/bin/spike -d --isa='rv64gc' ${RISCV_ALZETTE}/riscv64-unknown-elf/bin/pk ${<}
+${TARGET}.run : ${TARGET}.elf
+	@${REPO_HOME}/build/toolchain/${ALG}/bin/spike --isa='rv32gc' ${REPO_HOME}/build/toolchain/${ALG}/riscv32-unknown-elf/bin/pk ${<} | tee > ${@}
 
 # =============================================================================

@@ -13,35 +13,31 @@ endif
 
 # =============================================================================
 
-ifndef ARCH
-export ARCH     = generic
-endif
-ifndef IMP
-export IMP      = generic
-endif
+export INCLUDES = ./share ./share/arch/${ARCH} ./${ALG} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP}
 
-export INCLUDES = ./ ./arch/${ARCH} ./imp/${IMP}
+export SOURCES  = $(wildcard $(addsuffix /*.c, ${INCLUDES}))
+export SOURCES += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
+export HEADERS  = $(wildcard $(addsuffix /*.h, ${INCLUDES}))
 
-export SOURCES  = $(wildcard ./*.c ./arch/${ARCH}/*.c ./imp/${IMP}/*.c)
-export SOURCES += $(wildcard ./*.S ./arch/${ARCH}/*.S ./imp/${IMP}/*.S)
-export HEADERS  = $(wildcard ./*.h ./arch/${ARCH}/*.h ./imp/${IMP}/*.h)
-
-export TARGET   = ${REPO_HOME}/build/driver
-
-include ./arch/${ARCH}/Makefile.in
+export TARGET   = ${REPO_HOME}/build/driver_${ALG}
 
 # -----------------------------------------------------------------------------
 
+include ./share/arch/${ARCH}/Makefile.in
+
 ${TARGET}.elf : ${SOURCES} ${HEADERS}
-	@${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -Wall -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+	${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -Wall -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 ${TARGET}.asm : ${TARGET}.elf
-	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
+	${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
 
-all   : ${TARGET}.elf ${TARGET}.asm
+build : ${TARGET}.elf ${TARGET}.asm
+
+run   : ${TARGET}.run
 
 clean : 
 	@rm --force ${TARGET}.elf
 	@rm --force ${TARGET}.asm
+	@rm --force ${TARGET}.run
 
 # =============================================================================
