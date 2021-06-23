@@ -80,35 +80,35 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 ## Options
 
-| `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol                       | Meaning                                                                                                        |
-| :-------- | :-------- | :-------- :----------------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `alzette` |           | `CRAXS10_ENC_EXTERN`         | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `CRAXS10_DEC_EXTERN`         | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `CRAXS10_ENC_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
-|           | `alzette` |           | `CRAXS10_DEC_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
-|           | `alzette` |           | `TRAXL17_ENC_EXTERN`         | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `TRAXL17_DEC_EXTERN`         | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `TRAXL17_ENC_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
-|           | `alzette` |           | `TRAXL17_DEC_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
-|           | `alzette` |           | `SPARKLE_FWD_EXTERN`         | don't include implementation of forward SPARKLE in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `SPARKLE_REV_EXTERN`         | don't include implementation of reverse SPARKLE in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `SPARKLE_FWD_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
-|           | `alzette` |           | `SPARKLE_REV_UNROLL`         | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32B`              | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_ELL`           | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_RCON`          | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE1`         | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE2`         | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE3`         | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE4`         | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64B`              | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_ELL`           | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_RCON`          | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE1`         | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE2`         | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE3`         | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE4`         | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE5`         | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
+| `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
+| :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
+|           | `alzette` |           | `CRAXS10_ENC_EXTERN` | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `CRAXS10_DEC_EXTERN` | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `CRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
+|           | `alzette` |           | `CRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
+|           | `alzette` |           | `TRAXL17_ENC_EXTERN` | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `TRAXL17_DEC_EXTERN` | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `TRAXL17_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
+|           | `alzette` |           | `TRAXL17_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
+|           | `alzette` |           | `SPARKLE_FWD_EXTERN` | don't include implementation of forward SPARKLE in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `SPARKLE_REV_EXTERN` | don't include implementation of reverse SPARKLE in driver, i.e., allow an architecture-specific implementation |
+|           | `alzette` |           | `SPARKLE_FWD_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
+|           | `alzette` |           | `SPARKLE_REV_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32B`      | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE1` | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE2` | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE3` | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
+|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE4` | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64B`      | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE1` | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE2` | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE3` | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE4` | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
+|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE5` | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
 
 <!--- -------------------------------------------------------------------- --->
 

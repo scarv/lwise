@@ -98,14 +98,14 @@ such as execution latency.
 
 - The `${CONF}` environment variable allows options to be passed to GCC:
 
-  | `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol                         | Meaning                                                                                                   |
-  | :-------- | :-------- | :-------- | :----------------------------- | :-------------------------------------------------------------------------------------------------------- |
-  |           |           |           | `DRIVER_TRIALS_WARM`           | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase         |
-  |           |           |           | `DRIVER_TRIALS_REAL`           | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase         |
-  |           |           |           | `DRIVER_RANDOM`                | use `/dev/random` as a source of randomness, rather than `rand`                                           |
-  |           |           |           | `DRIVER_MEASURE`               | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum) |
-  |           | `alzette` |           |                                | see [documentation](./doc/alzette/ise.md)                                                                 |
-  |           | `ascon`   |           |                                | see [documentation](./doc/ascon/ise.md)                                                                   |
+  | `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
+  | :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
+  |           |           |           | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase              |
+  |           |           |           | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase              |
+  |           |           |           | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                |
+  |           |           |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum)      |
+  |           | `alzette` |           |                      | see [documentation](./doc/alzette/ise.md)                                                                      |
+  |           | `ascon`   |           |                      | see [documentation](./doc/ascon/ise.md)                                                                        |
 
 - Options which use a RISC-V base ISA plus custom ISE do so via the
   [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
