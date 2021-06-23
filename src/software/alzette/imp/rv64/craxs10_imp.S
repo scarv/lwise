@@ -122,7 +122,7 @@
 
 #if ( ALZETTE_RV64_TYPE1 )
 .macro CRAXS10_ENC_STEP xw, yw, xk, yk, i
-#if ( ALZETTE_CRAXS10_ENC_UNROLL )
+#if ( CRAXS10_ENC_UNROLL )
               xori         t5, \xk, \i                   //  t5 = \xk ^ \i       =>        ( \xk ^ step )
 #else
               xor          t5, \xk,  t2                  //  t5 = \xk ^  t2      =>        ( \xk ^ step )
@@ -130,7 +130,7 @@
 #endif
               xor         \xw, \xw,  t5                  // \xw = \xw ^  t5      => \xw ^= ( \xk ^ step )
               xor         \yw, \yw, \yk                  // \yw = \yw ^ \yk      => \yw ^= ( \yk        )
-#if ( ALZETTE_CRAXS10_ENC_UNROLL )
+#if ( CRAXS10_ENC_UNROLL )
               lwu          t4,  4*\i(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
 #else
               lwu          t4,     0(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
@@ -140,14 +140,14 @@
 .endm          
 
 .macro CRAXS10_DEC_STEP xw, yw, xk, yk, i
-#if ( ALZETTE_CRAXS10_DEC_UNROLL )
+#if ( CRAXS10_DEC_UNROLL )
               lwu          t4,  4*\i(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
 #else
               addi         s4,  s4, -4                   //  s4 =  s4 - 4
               lwu          t4,     0(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
 #endif
               ALZETTE_DEC \xw, \yw,  t4, t5, t6              //                      => ALZETTE_DEC
-#if ( ALZETTE_CRAXS10_DEC_UNROLL )
+#if ( CRAXS10_DEC_UNROLL )
               xori         t5, \xk, \i                   //  t5 = \xk ^ \i       =>        ( \xk ^ step )
 #else
               addi         t2,  t2, -1                   //  t2 =  t2 - 1        => step--
@@ -160,14 +160,14 @@
 
 #if ( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE5 )
 .macro CRAXS10_ENC_STEP xw, xk, i
-#if ( ALZETTE_CRAXS10_ENC_UNROLL )
+#if ( CRAXS10_ENC_UNROLL )
               xori         t5, \xk, \i                   //  t5 = \xk ^ \i       =>                   ( \yk || \xk ^ step )
 #else
               xor          t5, \xk,  t2                  //  t5 = \xk ^  t2      =>                   ( \yk || \xk ^ step )
               addi         t2,  t2,  1                   //  t2 =  t2 + 1        => step++
 #endif
               xor         \xw, \xw,  t5                  // \xw = \xw ^  t5      => ( \yw || \xw ) ^= ( \yk || \xk ^ step )
-#if ( ALZETTE_CRAXS10_ENC_UNROLL )
+#if ( CRAXS10_ENC_UNROLL )
               lwu          t4,  4*\i(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
 #else
               lwu          t4,     0(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
@@ -177,14 +177,14 @@
 .endm
 
 .macro CRAXS10_DEC_STEP xw, xk, i
-#if ( ALZETTE_CRAXS10_DEC_UNROLL )
+#if ( CRAXS10_DEC_UNROLL )
               lwu          t4,  4*\i(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
 #else
               addi         s4,  s4, -4                   //  s4 =  s4 - 4
               lwu          t4,     0(s4)                 //  t4 = MEM[ s4 +  0 ] => CRAXS10_RCON[ step ]
 #endif
               ALZETTE_DEC \xw,  t4                       //                      => ALZETTE_DEC
-#if ( ALZETTE_CRAXS10_DEC_UNROLL )
+#if ( CRAXS10_DEC_UNROLL )
               xori         t5, \xk, \i                   //  t5 = \xk ^ \i       =>                   ( \yk || \xk ^ step )
 #else
               addi         t2,  t2, -1                   //  t2 =  t2 - 1        => step--
@@ -211,7 +211,7 @@
 // ----------------------------------------------------------------------------	
 // CRAXS10 implementation => encrypt
 
-#if ( ALZETTE_CRAXS10_ENC_EXTERN )
+#if ( CRAXS10_ENC_EXTERN )
 .section .text
   
 .global craxs10_enc
@@ -220,7 +220,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
 
 #if ( ALZETTE_RV64_TYPE1 )	
               la           s4, CRAXS10_RCON              // s4 = &CRAXS10_RCON
-#if ( ALZETTE_CRAXS10_ENC_UNROLL )
+#if ( CRAXS10_ENC_UNROLL )
               CRAXS10_ENC_STEP t0, t1, s0, s1, 0
               CRAXS10_ENC_STEP t0, t1, s2, s3, 1
               CRAXS10_ENC_STEP t0, t1, s0, s1, 2 
@@ -243,7 +243,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
 
 #if ( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE5 )
               la           s4, CRAXS10_RCON              // s4 = &CRAXS10_RCON
-#if ( ALZETTE_CRAXS10_ENC_UNROLL )
+#if ( CRAXS10_ENC_UNROLL )
               CRAXS10_ENC_STEP t0,     s0,     0
               CRAXS10_ENC_STEP t0,     s2,     1
               CRAXS10_ENC_STEP t0,     s0,     2
@@ -264,7 +264,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
 #endif
 
 #if ( ALZETTE_RV64_TYPE4 )
-#if ( ALZETTE_CRAXS10_ENC_UNROLL )
+#if ( CRAXS10_ENC_UNROLL )
               CRAXS10_ENC_STEP t0,     s0,     0, 0
               CRAXS10_ENC_STEP t0,     s2,     1, 1
               CRAXS10_ENC_STEP t0,     s0,     2, 2
@@ -276,7 +276,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
               CRAXS10_ENC_STEP t0,     s0,     8, 3
               CRAXS10_ENC_STEP t0,     s2,     9, 4
 #else	
-#error "can't use ALZETTE_RV64_TYPE4 without ALZETTE_CRAXS10_ENC_UNROLL"
+#error "can't use ALZETTE_RV64_TYPE4 without CRAXS10_ENC_UNROLL"
 #endif
 1:            xor          t0, t0, s0                    // t0 = t0 ^ s0         => ( yw || xw ) = ( yw || xw ) ^ ( k1 || k0 )
 #endif
@@ -287,7 +287,7 @@ craxs10_enc:  CRAXS10_ENC_PROLOGUE
 // ----------------------------------------------------------------------------	
 // CRAXS10 implementation => decrypt
 
-#if ( ALZETTE_CRAXS10_DEC_EXTERN )
+#if ( CRAXS10_DEC_EXTERN )
 .section .text
   
 .global craxs10_dec
@@ -299,7 +299,7 @@ craxs10_dec:  CRAXS10_DEC_PROLOGUE
              
               xor          t0, t0, s0                    // t0 = t0 ^ s0         => xw ^= k0
               xor          t1, t1, s1                    // t1 = t1 ^ s1         => yw ^= k1
-#if ( ALZETTE_CRAXS10_DEC_UNROLL )
+#if ( CRAXS10_DEC_UNROLL )
               CRAXS10_DEC_STEP t0, t1, s2, s3, 9
               CRAXS10_DEC_STEP t0, t1, s0, s1, 8
               CRAXS10_DEC_STEP t0, t1, s2, s3, 7
@@ -324,7 +324,7 @@ craxs10_dec:  CRAXS10_DEC_PROLOGUE
               la           s4, CRAXS10_RCON              // s4 = &CRAXS10_RCON
 
               xor          t0, t0, s0                    // t0 = t0 ^ s0         => ( yw || xw ) = ( yw || xw ) ^ ( k1 || k0 )
-#if ( ALZETTE_CRAXS10_DEC_UNROLL )
+#if ( CRAXS10_DEC_UNROLL )
               CRAXS10_DEC_STEP t0,     s2,     9
               CRAXS10_DEC_STEP t0,     s0,     8
               CRAXS10_DEC_STEP t0,     s2,     7
@@ -347,7 +347,7 @@ craxs10_dec:  CRAXS10_DEC_PROLOGUE
 
 #if ( ALZETTE_RV64_TYPE4 )
               xor          t0, t0, s0                    // t0 = t0 ^ s0         => ( yw || xw ) = ( yw || xw ) ^ ( k1 || k0 )
-#if ( ALZETTE_CRAXS10_DEC_UNROLL )
+#if ( CRAXS10_DEC_UNROLL )
               CRAXS10_DEC_STEP t0,     s2,     9, 4
               CRAXS10_DEC_STEP t0,     s0,     8, 3
               CRAXS10_DEC_STEP t0,     s2,     7, 2
@@ -359,7 +359,7 @@ craxs10_dec:  CRAXS10_DEC_PROLOGUE
               CRAXS10_DEC_STEP t0,     s2,     1, 1
               CRAXS10_DEC_STEP t0,     s0,     0, 0
 #else	
-#error "can't use ALZETTE_RV64_TYPE4 without ALZETTE_CRAXS10_DEC_UNROLL"
+#error "can't use ALZETTE_RV64_TYPE4 without CRAXS10_DEC_UNROLL"
 #endif
 #endif
 

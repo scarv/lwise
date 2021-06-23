@@ -275,7 +275,7 @@
               ELL64       \t0 , \t0 , \t1, \t2, \t3       //          t0 = tmpx || tmpy
               xor         \yx0, \yx0, \t0                 // ( y0 || x0) = ( y0 || x0) ^ (tmpx || tmpy)
               xor         \yx1, \yx1, \t0                 // ( y1 || x1) = ( y1 || x1) ^ (tmpx || tmpy)  
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               mv          \t0 , \yx0
               mv          \yx0, \yx3
               mv          \yx3, \yx1
@@ -285,7 +285,7 @@
 .endm
 
 .macro TRAXL17_DEC_LINEAR yx0,  yx1,  yx2, yx3,  t0,  t1,  t2,  t3
-              #if !( ALZETTE_TRAXL17_DEC_UNROLL )
+              #if !( TRAXL17_DEC_UNROLL )
               mv          \t0 , \yx0
               mv          \yx0, \yx2
               mv          \yx2, \yx1
@@ -412,7 +412,7 @@
               TRAXL17_ENC_LINEAR      \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0, \t1, \t2
 
               addi         \sk, \sk, 32                 //             => sk += 8
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               addi         t2, t2,  1                   // t2 = t2 + 1 => step++
               #endif
 .endm     
@@ -424,7 +424,7 @@
               TRAXL17_ENC_LINEAR      \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0, \t1, \t2
 
               addi         \sk, \sk, 32                 //             => sk += 8
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               addi         t2, t2,  1                   // t2 = t2 + 1 => step++
               #endif
 .endm   
@@ -435,7 +435,7 @@
               TRAXL17_ADD_SUBKEY \sk, \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0
 
               addi         \sk, \sk, -32                //             => sk += 8
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               addi         t2,   t2, -1                 // t2 = t2 - 1 => step++
               #endif
 .endm       
@@ -447,7 +447,7 @@
               TRAXL17_ADD_TWEAK       \x0, \x1,           \y0, \y1,           \tk0, \tk1, \tk2, \tk3
 
               addi         \sk, \sk, -32                //             => sk += 8
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               addi         t2,   t2, -1                 // t2 = t2 - 1 => step++
               #endif
 .endm   
@@ -460,7 +460,7 @@
               TRAXL17_ENC_LINEAR      \yx0, \yx1, \yx2, \yx3,             \t0, \t1, \t2, \t3
 
               addi         \sk, \sk, 32                 //             => sk += 8
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               addi         t2, t2,  1                   // t2 = t2 + 1 => step++
               #endif
 .endm     
@@ -472,7 +472,7 @@
               TRAXL17_ENC_LINEAR      \yx0, \yx1, \yx2, \yx3,             \t0, \t1, \t2, \t3
 
               addi         \sk, \sk, 32                 //             => sk += 8
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               addi         t2, t2,  1                   // t2 = t2 + 1 => step++
               #endif
 .endm   
@@ -483,7 +483,7 @@
               TRAXL17_ADD_SUBKEY \sk, \yx0, \yx1, \yx2, \yx3,             \t0
 
               addi         \sk, \sk, -32                //             => sk += 8
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               addi         t2,   t2, -1                 // t2 = t2 - 1 => step++
               #endif
 .endm       
@@ -495,7 +495,7 @@
               TRAXL17_ADD_TWEAK       \yx0, \yx1,             \tk0, \tk2
 
               addi         \sk, \sk, -32                //             => sk += 8
-              #if !( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if !( TRAXL17_ENC_UNROLL )
               addi         t2,   t2, -1                 // t2 = t2 - 1 => step++
               #endif
 .endm   
@@ -503,7 +503,7 @@
 // ----------------------------------------------------------------------------	
 // TRAXL17 implementation => encrypt
 
-#if ( ALZETTE_TRAXL17_ENC_EXTERN )
+#if ( TRAXL17_ENC_EXTERN )
 .section .text  
 .global traxl17_enc
 traxl17_enc:  TRAXL17_ENC_PROLOGUE 
@@ -514,7 +514,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               addi         a7, a6,  16                   // a7 = &TRAXL17_RCON[4]
               //                   sk  rc  x0  x1  x2  x3  y0  y1  y2  y3 tk0 tk1  tk2  tk3  t0  t1  t2
               TRAXL17_RD_STATE             s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
-              #if ( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if ( TRAXL17_ENC_UNROLL )
               TRAXL17_ENC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
               TRAXL17_ENC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
               TRAXL17_ENC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
@@ -552,7 +552,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               addi         a7, a6,  16                   // a7 = &TRAXL17_RCON[4]
               //                   sk  rc  yx0  yx1  yx2  yx3  tk0 tk1  tk2  tk3 t0  t1  t2  t3
               TRAXL17_RD_STATE              s0,  s1,  s2,  s3,  s8, s9, s10, s11
-              #if ( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if ( TRAXL17_ENC_UNROLL )
               TRAXL17_ENC_STEP_EVE t0, a6,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_ENC_STEP_ODD t0, a7,  s3,  s2,  s0,  s1,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_ENC_STEP_EVE t0, a6,  s1,  s0,  s3,  s2,                   t1, t4, t5, t6
@@ -586,7 +586,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
 #if ( ALZETTE_RV64_TYPE4 )
               mv           t0, a2                        // t0 = &subkeys
               TRAXL17_RD_STATE              s0,  s1,  s2,  s3,  s8, s9, s10, s11
-              #if ( ALZETTE_TRAXL17_ENC_UNROLL )
+              #if ( TRAXL17_ENC_UNROLL )
               TRAXL17_ENC_STEP_EVE t0,  0,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_ENC_STEP_ODD t0,  4,  s3,  s2,  s0,  s1,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_ENC_STEP_EVE t0,  0,  s1,  s0,  s3,  s2,                   t1, t4, t5, t6
@@ -607,7 +607,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               TRAXL17_ADD_SUBKEY   t0,      s3,  s2,  s0,  s1,                   t1
 			  TRAXL17_WR_STATE              s3,  s2,  s0,  s1,                   s7, s6, s4, s5
               #else	
-              #error "can't use ALZETTE_RV32_TYPE4 without ALZETTE_TRAXL17_ENC_UNROLL"
+              #error "can't use ALZETTE_RV32_TYPE4 without TRAXL17_ENC_UNROLL"
               #endif
 #endif
               TRAXL17_ENC_EPILOGUE
@@ -616,7 +616,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
 // ----------------------------------------------------------------------------	
 // TRAXL17 implementation => decrypt
 
-#if ( ALZETTE_TRAXL17_DEC_EXTERN )
+#if ( TRAXL17_DEC_EXTERN )
 .section .text  
 .global traxl17_dec
 traxl17_dec:  TRAXL17_DEC_PROLOGUE
@@ -630,7 +630,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_ADD_SUBKEY   t0,     s0, s1, s2, s3, s4, s5, s6, s7,                   t4
               addi         t0, t0, -32                // sk-=  8
               TRAXL17_DEC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
-              #if ( ALZETTE_TRAXL17_DEC_UNROLL )         
+              #if ( TRAXL17_DEC_UNROLL )         
               TRAXL17_DEC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
               TRAXL17_DEC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
@@ -665,7 +665,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_RD_STATE              s0,  s1,  s2,  s3,  s8, s9, s10, s11
               TRAXL17_ADD_SUBKEY   t0,      s0,  s1,  s2,  s3, t1
               addi         t0, t0, -32                // sk-=  8
-              #if ( ALZETTE_TRAXL17_DEC_UNROLL )         
+              #if ( TRAXL17_DEC_UNROLL )         
               TRAXL17_DEC_STEP_EVE t0, a6,  s2,  s3,  s1,  s0,                   t1, t4, t5, t6    
               TRAXL17_DEC_STEP_ODD t0, a7,  s1,  s0,  s3,  s2,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0, a6,  s3,  s2,  s0,  s1,                   t1, t4, t5, t6    
@@ -700,7 +700,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_RD_STATE              s0,  s1,  s2,  s3,  s8, s9, s10, s11
               TRAXL17_ADD_SUBKEY   t0,      s0,  s1,  s2,  s3,                   t1
               addi         t0, t0, -32                // sk-=  8
-              #if ( ALZETTE_TRAXL17_DEC_UNROLL )
+              #if ( TRAXL17_DEC_UNROLL )
               TRAXL17_DEC_STEP_EVE t0,  0,  s2,  s3,  s1,  s0,                   t1, t4, t5, t6    
               TRAXL17_DEC_STEP_ODD t0,  4,  s1,  s0,  s3,  s2,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0,  0,  s3,  s2,  s0,  s1,                   t1, t4, t5, t6    
@@ -720,7 +720,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_DEC_STEP_EVE t0,  0,  s2,  s3,  s1,  s0,                   t1, t4, t5, t6
               TRAXL17_WR_STATE              s2,  s3,  s1,  s0,                   s6, s7, s5, s4
               #else	
-              #error "can't use ALZETTE_RV32_TYPE4 without ALZETTE_TRAXL17_DEC_UNROLL"
+              #error "can't use ALZETTE_RV32_TYPE4 without TRAXL17_DEC_UNROLL"
               #endif
 #endif
               TRAXL17_DEC_EPILOGUE
