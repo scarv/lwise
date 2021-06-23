@@ -1,15 +1,17 @@
 diff --git a/riscv/arith.cc b/riscv/arith.cc
 new file mode 100644
-index 0000000..4d5092b
+index 0000000..22594b5
 --- /dev/null
 +++ b/riscv/arith.cc
-@@ -0,0 +1,6 @@
+@@ -0,0 +1,8 @@
 +#include "arith.h"
 +
++// ++ alzette
 +uint32_t RCON[] = { 0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D };
 +
 +int ROT_X[] = { 31, 17,  0, 24 };
 +int ROT_Y[] = { 24, 17, 31, 16 };
++// -- alzette
 diff --git a/riscv/arith.h b/riscv/arith.h
 index 398217e..d6129bc 100644
 --- a/riscv/arith.h
@@ -61,7 +63,7 @@ index 591e41d..dc28fd7 100644
    int64_t shamt() { return x(20, 6); }
    int64_t s_imm() { return x(7, 5) + (xs(25, 7) << 5); }
 diff --git a/riscv/encoding.h b/riscv/encoding.h
-index 881ed7d..d3569cf 100644
+index 881ed7d..07c9bd2 100644
 --- a/riscv/encoding.h
 +++ b/riscv/encoding.h
 @@ -286,6 +286,86 @@
@@ -69,84 +71,84 @@ index 881ed7d..d3569cf 100644
  #ifndef RISCV_ENCODING_H
  #define RISCV_ENCODING_H
 +// ++ alzette
-+#define MATCH_ALZ_RORI         0x0000600B
-+#define  MASK_ALZ_RORI         0xC000707F
-+#define MATCH_ALZ_RORIW        0x4000600B
-+#define  MASK_ALZ_RORIW        0xC000707F
-+#define MATCH_ALZ_ADDRORI      0x0000702B
-+#define  MASK_ALZ_ADDRORI      0xC000707F
-+#define MATCH_ALZ_SUBRORI      0x4000702B
-+#define  MASK_ALZ_SUBRORI      0xC000707F
-+#define MATCH_ALZ_XORRORI      0x8000702B
-+#define  MASK_ALZ_XORRORI      0xC000707F
-+#define MATCH_ALZ_RCON         0x0000605B
-+#define  MASK_ALZ_RCON         0xF000707F
-+#define MATCH_ALZ_RCONW        0x1000605B
-+#define  MASK_ALZ_RCONW        0xF000707F
-+#define MATCH_ALZ_BLOCK_ENCI   0x4000705B
-+#define  MASK_ALZ_BLOCK_ENCI   0xF000707F
-+#define MATCH_ALZ_BLOCK_DECI   0x5000705B
-+#define  MASK_ALZ_BLOCK_DECI   0xF000707F
-+#define MATCH_ALZ_WHOLE_ENCI_X 0x8000705B
-+#define  MASK_ALZ_WHOLE_ENCI_X 0xF000707F
-+#define MATCH_ALZ_WHOLE_ENCI_Y 0x9000705B
-+#define  MASK_ALZ_WHOLE_ENCI_Y 0xF000707F
-+#define MATCH_ALZ_WHOLE_DECI_X 0xA000705B
-+#define  MASK_ALZ_WHOLE_DECI_X 0xF000707F
-+#define MATCH_ALZ_WHOLE_DECI_Y 0xB000705B
-+#define  MASK_ALZ_WHOLE_DECI_Y 0xF000707F
-+#define MATCH_ALZ_WHOLE_ENCI   0xC000605B
-+#define  MASK_ALZ_WHOLE_ENCI   0xF000707F
-+#define MATCH_ALZ_WHOLE_DECI   0xD000605B
-+#define  MASK_ALZ_WHOLE_DECI   0xF000707F
-+#define MATCH_ALZ_PACK         0x0000707B
-+#define  MASK_ALZ_PACK         0xFE00707F
-+#define MATCH_ALZ_PACKU        0x0200707B
-+#define  MASK_ALZ_PACKU        0xFE00707F
-+#define MATCH_ALZ_ELL          0x0400707B
-+#define  MASK_ALZ_ELL          0xFE00707F
-+#define MATCH_ALZ_ELLREV       0x0600707B
-+#define  MASK_ALZ_ELLREV       0xFE00707F
-+#define MATCH_ALZ_ADDROR_31    0x4000707B
-+#define  MASK_ALZ_ADDROR_31    0xFE00707F
-+#define MATCH_ALZ_ADDROR_17    0x4200707B
-+#define  MASK_ALZ_ADDROR_17    0xFE00707F
-+#define MATCH_ALZ_ADDROR_24    0x4400707B
-+#define  MASK_ALZ_ADDROR_24    0xFE00707F
-+#define MATCH_ALZ_SUBROR_31    0x4600707B
-+#define  MASK_ALZ_SUBROR_31    0xFE00707F
-+#define MATCH_ALZ_SUBROR_17    0x4800707B
-+#define  MASK_ALZ_SUBROR_17    0xFE00707F
-+#define MATCH_ALZ_SUBROR_24    0x4A00707B
-+#define  MASK_ALZ_SUBROR_24    0xFE00707F
-+#define MATCH_ALZ_XORROR_31    0x4C00707B
-+#define  MASK_ALZ_XORROR_31    0xFE00707F
-+#define MATCH_ALZ_XORROR_17    0x4E00707B
-+#define  MASK_ALZ_XORROR_17    0xFE00707F
-+#define MATCH_ALZ_XORROR_24    0x5000707B
-+#define  MASK_ALZ_XORROR_24    0xFE00707F
-+#define MATCH_ALZ_XORROR_16    0x5200707B
-+#define  MASK_ALZ_XORROR_16    0xFE00707F
-+#define MATCH_ALZ_BLOCK_ENC_0  0x8000707B
-+#define  MASK_ALZ_BLOCK_ENC_0  0xFE00707F
-+#define MATCH_ALZ_BLOCK_ENC_1  0x8200707B
-+#define  MASK_ALZ_BLOCK_ENC_1  0xFE00707F
-+#define MATCH_ALZ_BLOCK_ENC_2  0x8400707B
-+#define  MASK_ALZ_BLOCK_ENC_2  0xFE00707F
-+#define MATCH_ALZ_BLOCK_ENC_3  0x8600707B
-+#define  MASK_ALZ_BLOCK_ENC_3  0xFE00707F
-+#define MATCH_ALZ_BLOCK_DEC_0  0x8800707B
-+#define  MASK_ALZ_BLOCK_DEC_0  0xFE00707F
-+#define MATCH_ALZ_BLOCK_DEC_1  0x8A00707B
-+#define  MASK_ALZ_BLOCK_DEC_1  0xFE00707F
-+#define MATCH_ALZ_BLOCK_DEC_2  0x8C00707B
-+#define  MASK_ALZ_BLOCK_DEC_2  0xFE00707F
-+#define MATCH_ALZ_BLOCK_DEC_3  0x8E00707B
-+#define  MASK_ALZ_BLOCK_DEC_3  0xFE00707F
-+#define MATCH_ALZ_WHOLE_ENC    0xC000707B
-+#define  MASK_ALZ_WHOLE_ENC    0xFE00707F
-+#define MATCH_ALZ_WHOLE_DEC    0xC200707B
-+#define  MASK_ALZ_WHOLE_DEC    0xFE00707F
++#define MATCH_ALZETTE_RORI         0x0000600B
++#define  MASK_ALZETTE_RORI         0xC000707F
++#define MATCH_ALZETTE_RORIW        0x4000600B
++#define  MASK_ALZETTE_RORIW        0xC000707F
++#define MATCH_ALZETTE_ADDRORI      0x0000702B
++#define  MASK_ALZETTE_ADDRORI      0xC000707F
++#define MATCH_ALZETTE_SUBRORI      0x4000702B
++#define  MASK_ALZETTE_SUBRORI      0xC000707F
++#define MATCH_ALZETTE_XORRORI      0x8000702B
++#define  MASK_ALZETTE_XORRORI      0xC000707F
++#define MATCH_ALZETTE_RCON         0x0000605B
++#define  MASK_ALZETTE_RCON         0xF000707F
++#define MATCH_ALZETTE_RCONW        0x1000605B
++#define  MASK_ALZETTE_RCONW        0xF000707F
++#define MATCH_ALZETTE_BLOCK_ENCI   0x4000705B
++#define  MASK_ALZETTE_BLOCK_ENCI   0xF000707F
++#define MATCH_ALZETTE_BLOCK_DECI   0x5000705B
++#define  MASK_ALZETTE_BLOCK_DECI   0xF000707F
++#define MATCH_ALZETTE_WHOLE_ENCI_X 0x8000705B
++#define  MASK_ALZETTE_WHOLE_ENCI_X 0xF000707F
++#define MATCH_ALZETTE_WHOLE_ENCI_Y 0x9000705B
++#define  MASK_ALZETTE_WHOLE_ENCI_Y 0xF000707F
++#define MATCH_ALZETTE_WHOLE_DECI_X 0xA000705B
++#define  MASK_ALZETTE_WHOLE_DECI_X 0xF000707F
++#define MATCH_ALZETTE_WHOLE_DECI_Y 0xB000705B
++#define  MASK_ALZETTE_WHOLE_DECI_Y 0xF000707F
++#define MATCH_ALZETTE_WHOLE_ENCI   0xC000605B
++#define  MASK_ALZETTE_WHOLE_ENCI   0xF000707F
++#define MATCH_ALZETTE_WHOLE_DECI   0xD000605B
++#define  MASK_ALZETTE_WHOLE_DECI   0xF000707F
++#define MATCH_ALZETTE_PACK         0x0000707B
++#define  MASK_ALZETTE_PACK         0xFE00707F
++#define MATCH_ALZETTE_PACKU        0x0200707B
++#define  MASK_ALZETTE_PACKU        0xFE00707F
++#define MATCH_ALZETTE_ELL          0x0400707B
++#define  MASK_ALZETTE_ELL          0xFE00707F
++#define MATCH_ALZETTE_ELLREV       0x0600707B
++#define  MASK_ALZETTE_ELLREV       0xFE00707F
++#define MATCH_ALZETTE_ADDROR_31    0x4000707B
++#define  MASK_ALZETTE_ADDROR_31    0xFE00707F
++#define MATCH_ALZETTE_ADDROR_17    0x4200707B
++#define  MASK_ALZETTE_ADDROR_17    0xFE00707F
++#define MATCH_ALZETTE_ADDROR_24    0x4400707B
++#define  MASK_ALZETTE_ADDROR_24    0xFE00707F
++#define MATCH_ALZETTE_SUBROR_31    0x4600707B
++#define  MASK_ALZETTE_SUBROR_31    0xFE00707F
++#define MATCH_ALZETTE_SUBROR_17    0x4800707B
++#define  MASK_ALZETTE_SUBROR_17    0xFE00707F
++#define MATCH_ALZETTE_SUBROR_24    0x4A00707B
++#define  MASK_ALZETTE_SUBROR_24    0xFE00707F
++#define MATCH_ALZETTE_XORROR_31    0x4C00707B
++#define  MASK_ALZETTE_XORROR_31    0xFE00707F
++#define MATCH_ALZETTE_XORROR_17    0x4E00707B
++#define  MASK_ALZETTE_XORROR_17    0xFE00707F
++#define MATCH_ALZETTE_XORROR_24    0x5000707B
++#define  MASK_ALZETTE_XORROR_24    0xFE00707F
++#define MATCH_ALZETTE_XORROR_16    0x5200707B
++#define  MASK_ALZETTE_XORROR_16    0xFE00707F
++#define MATCH_ALZETTE_BLOCK_ENC_0  0x8000707B
++#define  MASK_ALZETTE_BLOCK_ENC_0  0xFE00707F
++#define MATCH_ALZETTE_BLOCK_ENC_1  0x8200707B
++#define  MASK_ALZETTE_BLOCK_ENC_1  0xFE00707F
++#define MATCH_ALZETTE_BLOCK_ENC_2  0x8400707B
++#define  MASK_ALZETTE_BLOCK_ENC_2  0xFE00707F
++#define MATCH_ALZETTE_BLOCK_ENC_3  0x8600707B
++#define  MASK_ALZETTE_BLOCK_ENC_3  0xFE00707F
++#define MATCH_ALZETTE_BLOCK_DEC_0  0x8800707B
++#define  MASK_ALZETTE_BLOCK_DEC_0  0xFE00707F
++#define MATCH_ALZETTE_BLOCK_DEC_1  0x8A00707B
++#define  MASK_ALZETTE_BLOCK_DEC_1  0xFE00707F
++#define MATCH_ALZETTE_BLOCK_DEC_2  0x8C00707B
++#define  MASK_ALZETTE_BLOCK_DEC_2  0xFE00707F
++#define MATCH_ALZETTE_BLOCK_DEC_3  0x8E00707B
++#define  MASK_ALZETTE_BLOCK_DEC_3  0xFE00707F
++#define MATCH_ALZETTE_WHOLE_ENC    0xC000707B
++#define  MASK_ALZETTE_WHOLE_ENC    0xFE00707F
++#define MATCH_ALZETTE_WHOLE_DEC    0xC200707B
++#define  MASK_ALZETTE_WHOLE_DEC    0xFE00707F
 +// -- alzette
  #define MATCH_SLLI_RV32 0x1013
  #define MASK_SLLI_RV32  0xfe00707f
@@ -156,54 +158,54 @@ index 881ed7d..d3569cf 100644
  #endif
  #ifdef DECLARE_INSN
 +// ++ alzette
-+DECLARE_INSN(alz_rori,         MATCH_ALZ_RORI,         MASK_ALZ_RORI)
-+DECLARE_INSN(alz_roriw,        MATCH_ALZ_RORIW,        MASK_ALZ_RORIW)
-+DECLARE_INSN(alz_pack,         MATCH_ALZ_PACK,         MASK_ALZ_PACK)
-+DECLARE_INSN(alz_packu,        MATCH_ALZ_PACKU,        MASK_ALZ_PACKU)
-+DECLARE_INSN(alz_ell,          MATCH_ALZ_ELL,          MASK_ALZ_ELL)
-+DECLARE_INSN(alz_ellrev,       MATCH_ALZ_ELLREV,       MASK_ALZ_ELLREV)
-+DECLARE_INSN(alz_rcon,         MATCH_ALZ_RCON,         MASK_ALZ_RCON)
-+DECLARE_INSN(alz_rconw,        MATCH_ALZ_RCONW,        MASK_ALZ_RCONW)
-+DECLARE_INSN(alz_addrori,      MATCH_ALZ_ADDRORI,      MASK_ALZ_ADDRORI)
-+DECLARE_INSN(alz_subrori,      MATCH_ALZ_SUBRORI,      MASK_ALZ_SUBRORI)
-+DECLARE_INSN(alz_xorrori,      MATCH_ALZ_XORRORI,      MASK_ALZ_XORRORI)
-+DECLARE_INSN(alz_addror_31,    MATCH_ALZ_ADDROR_31,    MASK_ALZ_ADDROR_31)
-+DECLARE_INSN(alz_addror_17,    MATCH_ALZ_ADDROR_17,    MASK_ALZ_ADDROR_17)
-+DECLARE_INSN(alz_addror_24,    MATCH_ALZ_ADDROR_24,    MASK_ALZ_ADDROR_24)
-+DECLARE_INSN(alz_subror_31,    MATCH_ALZ_SUBROR_31,    MASK_ALZ_SUBROR_31)
-+DECLARE_INSN(alz_subror_17,    MATCH_ALZ_SUBROR_17,    MASK_ALZ_SUBROR_17)
-+DECLARE_INSN(alz_subror_24,    MATCH_ALZ_SUBROR_24,    MASK_ALZ_SUBROR_24)
-+DECLARE_INSN(alz_xorror_31,    MATCH_ALZ_XORROR_31,    MASK_ALZ_XORROR_31)
-+DECLARE_INSN(alz_xorror_17,    MATCH_ALZ_XORROR_17,    MASK_ALZ_XORROR_17)
-+DECLARE_INSN(alz_xorror_24,    MATCH_ALZ_XORROR_24,    MASK_ALZ_XORROR_24)
-+DECLARE_INSN(alz_xorror_16,    MATCH_ALZ_XORROR_16,    MASK_ALZ_XORROR_16)
-+DECLARE_INSN(alz_whole_enci_x, MATCH_ALZ_WHOLE_ENCI_X, MASK_ALZ_WHOLE_ENCI_X)
-+DECLARE_INSN(alz_whole_enci_y, MATCH_ALZ_WHOLE_ENCI_Y, MASK_ALZ_WHOLE_ENCI_Y)
-+DECLARE_INSN(alz_whole_deci_x, MATCH_ALZ_WHOLE_DECI_X, MASK_ALZ_WHOLE_DECI_X)
-+DECLARE_INSN(alz_whole_deci_y, MATCH_ALZ_WHOLE_DECI_Y, MASK_ALZ_WHOLE_DECI_Y)
-+DECLARE_INSN(alz_block_enci,   MATCH_ALZ_BLOCK_ENCI,   MASK_ALZ_BLOCK_ENCI)
-+DECLARE_INSN(alz_block_deci,   MATCH_ALZ_BLOCK_DECI,   MASK_ALZ_BLOCK_DECI)
-+DECLARE_INSN(alz_block_enc_0,  MATCH_ALZ_BLOCK_ENC_0,  MASK_ALZ_BLOCK_ENC_0)
-+DECLARE_INSN(alz_block_enc_1,  MATCH_ALZ_BLOCK_ENC_1,  MASK_ALZ_BLOCK_ENC_1)
-+DECLARE_INSN(alz_block_enc_2,  MATCH_ALZ_BLOCK_ENC_2,  MASK_ALZ_BLOCK_ENC_2)
-+DECLARE_INSN(alz_block_enc_3,  MATCH_ALZ_BLOCK_ENC_3,  MASK_ALZ_BLOCK_ENC_3)
-+DECLARE_INSN(alz_block_dec_0,  MATCH_ALZ_BLOCK_DEC_0,  MASK_ALZ_BLOCK_DEC_0)
-+DECLARE_INSN(alz_block_dec_1,  MATCH_ALZ_BLOCK_DEC_1,  MASK_ALZ_BLOCK_DEC_1)
-+DECLARE_INSN(alz_block_dec_2,  MATCH_ALZ_BLOCK_DEC_2,  MASK_ALZ_BLOCK_DEC_2)
-+DECLARE_INSN(alz_block_dec_3,  MATCH_ALZ_BLOCK_DEC_3,  MASK_ALZ_BLOCK_DEC_3)
-+DECLARE_INSN(alz_whole_enci,   MATCH_ALZ_WHOLE_ENCI,   MASK_ALZ_WHOLE_ENCI)
-+DECLARE_INSN(alz_whole_deci,   MATCH_ALZ_WHOLE_DECI,   MASK_ALZ_WHOLE_DECI)
-+DECLARE_INSN(alz_whole_enc,    MATCH_ALZ_WHOLE_ENC,    MASK_ALZ_WHOLE_ENC)
-+DECLARE_INSN(alz_whole_dec,    MATCH_ALZ_WHOLE_DEC,    MASK_ALZ_WHOLE_DEC)
++DECLARE_INSN(alzette_rori,         MATCH_ALZETTE_RORI,         MASK_ALZETTE_RORI)
++DECLARE_INSN(alzette_roriw,        MATCH_ALZETTE_RORIW,        MASK_ALZETTE_RORIW)
++DECLARE_INSN(alzette_pack,         MATCH_ALZETTE_PACK,         MASK_ALZETTE_PACK)
++DECLARE_INSN(alzette_packu,        MATCH_ALZETTE_PACKU,        MASK_ALZETTE_PACKU)
++DECLARE_INSN(alzette_ell,          MATCH_ALZETTE_ELL,          MASK_ALZETTE_ELL)
++DECLARE_INSN(alzette_ellrev,       MATCH_ALZETTE_ELLREV,       MASK_ALZETTE_ELLREV)
++DECLARE_INSN(alzette_rcon,         MATCH_ALZETTE_RCON,         MASK_ALZETTE_RCON)
++DECLARE_INSN(alzette_rconw,        MATCH_ALZETTE_RCONW,        MASK_ALZETTE_RCONW)
++DECLARE_INSN(alzette_addrori,      MATCH_ALZETTE_ADDRORI,      MASK_ALZETTE_ADDRORI)
++DECLARE_INSN(alzette_subrori,      MATCH_ALZETTE_SUBRORI,      MASK_ALZETTE_SUBRORI)
++DECLARE_INSN(alzette_xorrori,      MATCH_ALZETTE_XORRORI,      MASK_ALZETTE_XORRORI)
++DECLARE_INSN(alzette_addror_31,    MATCH_ALZETTE_ADDROR_31,    MASK_ALZETTE_ADDROR_31)
++DECLARE_INSN(alzette_addror_17,    MATCH_ALZETTE_ADDROR_17,    MASK_ALZETTE_ADDROR_17)
++DECLARE_INSN(alzette_addror_24,    MATCH_ALZETTE_ADDROR_24,    MASK_ALZETTE_ADDROR_24)
++DECLARE_INSN(alzette_subror_31,    MATCH_ALZETTE_SUBROR_31,    MASK_ALZETTE_SUBROR_31)
++DECLARE_INSN(alzette_subror_17,    MATCH_ALZETTE_SUBROR_17,    MASK_ALZETTE_SUBROR_17)
++DECLARE_INSN(alzette_subror_24,    MATCH_ALZETTE_SUBROR_24,    MASK_ALZETTE_SUBROR_24)
++DECLARE_INSN(alzette_xorror_31,    MATCH_ALZETTE_XORROR_31,    MASK_ALZETTE_XORROR_31)
++DECLARE_INSN(alzette_xorror_17,    MATCH_ALZETTE_XORROR_17,    MASK_ALZETTE_XORROR_17)
++DECLARE_INSN(alzette_xorror_24,    MATCH_ALZETTE_XORROR_24,    MASK_ALZETTE_XORROR_24)
++DECLARE_INSN(alzette_xorror_16,    MATCH_ALZETTE_XORROR_16,    MASK_ALZETTE_XORROR_16)
++DECLARE_INSN(alzette_whole_enci_x, MATCH_ALZETTE_WHOLE_ENCI_X, MASK_ALZETTE_WHOLE_ENCI_X)
++DECLARE_INSN(alzette_whole_enci_y, MATCH_ALZETTE_WHOLE_ENCI_Y, MASK_ALZETTE_WHOLE_ENCI_Y)
++DECLARE_INSN(alzette_whole_deci_x, MATCH_ALZETTE_WHOLE_DECI_X, MASK_ALZETTE_WHOLE_DECI_X)
++DECLARE_INSN(alzette_whole_deci_y, MATCH_ALZETTE_WHOLE_DECI_Y, MASK_ALZETTE_WHOLE_DECI_Y)
++DECLARE_INSN(alzette_block_enci,   MATCH_ALZETTE_BLOCK_ENCI,   MASK_ALZETTE_BLOCK_ENCI)
++DECLARE_INSN(alzette_block_deci,   MATCH_ALZETTE_BLOCK_DECI,   MASK_ALZETTE_BLOCK_DECI)
++DECLARE_INSN(alzette_block_enc_0,  MATCH_ALZETTE_BLOCK_ENC_0,  MASK_ALZETTE_BLOCK_ENC_0)
++DECLARE_INSN(alzette_block_enc_1,  MATCH_ALZETTE_BLOCK_ENC_1,  MASK_ALZETTE_BLOCK_ENC_1)
++DECLARE_INSN(alzette_block_enc_2,  MATCH_ALZETTE_BLOCK_ENC_2,  MASK_ALZETTE_BLOCK_ENC_2)
++DECLARE_INSN(alzette_block_enc_3,  MATCH_ALZETTE_BLOCK_ENC_3,  MASK_ALZETTE_BLOCK_ENC_3)
++DECLARE_INSN(alzette_block_dec_0,  MATCH_ALZETTE_BLOCK_DEC_0,  MASK_ALZETTE_BLOCK_DEC_0)
++DECLARE_INSN(alzette_block_dec_1,  MATCH_ALZETTE_BLOCK_DEC_1,  MASK_ALZETTE_BLOCK_DEC_1)
++DECLARE_INSN(alzette_block_dec_2,  MATCH_ALZETTE_BLOCK_DEC_2,  MASK_ALZETTE_BLOCK_DEC_2)
++DECLARE_INSN(alzette_block_dec_3,  MATCH_ALZETTE_BLOCK_DEC_3,  MASK_ALZETTE_BLOCK_DEC_3)
++DECLARE_INSN(alzette_whole_enci,   MATCH_ALZETTE_WHOLE_ENCI,   MASK_ALZETTE_WHOLE_ENCI)
++DECLARE_INSN(alzette_whole_deci,   MATCH_ALZETTE_WHOLE_DECI,   MASK_ALZETTE_WHOLE_DECI)
++DECLARE_INSN(alzette_whole_enc,    MATCH_ALZETTE_WHOLE_ENC,    MASK_ALZETTE_WHOLE_ENC)
++DECLARE_INSN(alzette_whole_dec,    MATCH_ALZETTE_WHOLE_DEC,    MASK_ALZETTE_WHOLE_DEC)
 +// -- alzette
  DECLARE_INSN(slli_rv32, MATCH_SLLI_RV32, MASK_SLLI_RV32)
  DECLARE_INSN(srli_rv32, MATCH_SRLI_RV32, MASK_SRLI_RV32)
  DECLARE_INSN(srai_rv32, MATCH_SRAI_RV32, MASK_SRAI_RV32)
-diff --git a/riscv/insns/alz_addror_17.h b/riscv/insns/alz_addror_17.h
+diff --git a/riscv/insns/alzette_addror_17.h b/riscv/insns/alzette_addror_17.h
 new file mode 100644
 index 0000000..9eab086
 --- /dev/null
-+++ b/riscv/insns/alz_addror_17.h
++++ b/riscv/insns/alzette_addror_17.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -211,11 +213,11 @@ index 0000000..9eab086
 +uint32_t r = x + ROR32( y, 17 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_addror_24.h b/riscv/insns/alz_addror_24.h
+diff --git a/riscv/insns/alzette_addror_24.h b/riscv/insns/alzette_addror_24.h
 new file mode 100644
 index 0000000..fb2b95b
 --- /dev/null
-+++ b/riscv/insns/alz_addror_24.h
++++ b/riscv/insns/alzette_addror_24.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -223,11 +225,11 @@ index 0000000..fb2b95b
 +uint32_t r = x + ROR32( y, 24 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_addror_31.h b/riscv/insns/alz_addror_31.h
+diff --git a/riscv/insns/alzette_addror_31.h b/riscv/insns/alzette_addror_31.h
 new file mode 100644
 index 0000000..512f713
 --- /dev/null
-+++ b/riscv/insns/alz_addror_31.h
++++ b/riscv/insns/alzette_addror_31.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -235,11 +237,11 @@ index 0000000..512f713
 +uint32_t r = x + ROR32( y, 31 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_addrori.h b/riscv/insns/alz_addrori.h
+diff --git a/riscv/insns/alzette_addrori.h b/riscv/insns/alzette_addrori.h
 new file mode 100644
 index 0000000..65a0818
 --- /dev/null
-+++ b/riscv/insns/alz_addrori.h
++++ b/riscv/insns/alzette_addrori.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -247,11 +249,11 @@ index 0000000..65a0818
 +uint32_t r = x + ROR32( y, insn.funct7() & 0x1F );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_block_dec_0.h b/riscv/insns/alz_block_dec_0.h
+diff --git a/riscv/insns/alzette_block_dec_0.h b/riscv/insns/alzette_block_dec_0.h
 new file mode 100644
 index 0000000..5568dfb
 --- /dev/null
-+++ b/riscv/insns/alz_block_dec_0.h
++++ b/riscv/insns/alzette_block_dec_0.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -262,11 +264,11 @@ index 0000000..5568dfb
 +         xi = xi - ROR32( yi, 31 );
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_dec_1.h b/riscv/insns/alz_block_dec_1.h
+diff --git a/riscv/insns/alzette_block_dec_1.h b/riscv/insns/alzette_block_dec_1.h
 new file mode 100644
 index 0000000..88f668a
 --- /dev/null
-+++ b/riscv/insns/alz_block_dec_1.h
++++ b/riscv/insns/alzette_block_dec_1.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -277,11 +279,11 @@ index 0000000..88f668a
 +         xi = xi - ROR32( yi, 17 );
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_dec_2.h b/riscv/insns/alz_block_dec_2.h
+diff --git a/riscv/insns/alzette_block_dec_2.h b/riscv/insns/alzette_block_dec_2.h
 new file mode 100644
 index 0000000..8cbe2ba
 --- /dev/null
-+++ b/riscv/insns/alz_block_dec_2.h
++++ b/riscv/insns/alzette_block_dec_2.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -292,11 +294,11 @@ index 0000000..8cbe2ba
 +         xi = xi - ROR32( yi,  0 );
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_dec_3.h b/riscv/insns/alz_block_dec_3.h
+diff --git a/riscv/insns/alzette_block_dec_3.h b/riscv/insns/alzette_block_dec_3.h
 new file mode 100644
 index 0000000..a814a79
 --- /dev/null
-+++ b/riscv/insns/alz_block_dec_3.h
++++ b/riscv/insns/alzette_block_dec_3.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -307,11 +309,11 @@ index 0000000..a814a79
 +         xi = xi - ROR32( yi, 24 );
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_deci.h b/riscv/insns/alz_block_deci.h
+diff --git a/riscv/insns/alzette_block_deci.h b/riscv/insns/alzette_block_deci.h
 new file mode 100644
 index 0000000..6750063
 --- /dev/null
-+++ b/riscv/insns/alz_block_deci.h
++++ b/riscv/insns/alzette_block_deci.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -322,11 +324,11 @@ index 0000000..6750063
 +         xi = xi - ROR32( yi, ROT_X[ insn.funct7() & 0x3 ] );
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_enc_0.h b/riscv/insns/alz_block_enc_0.h
+diff --git a/riscv/insns/alzette_block_enc_0.h b/riscv/insns/alzette_block_enc_0.h
 new file mode 100644
 index 0000000..079575e
 --- /dev/null
-+++ b/riscv/insns/alz_block_enc_0.h
++++ b/riscv/insns/alzette_block_enc_0.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -337,11 +339,11 @@ index 0000000..079575e
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_enc_1.h b/riscv/insns/alz_block_enc_1.h
+diff --git a/riscv/insns/alzette_block_enc_1.h b/riscv/insns/alzette_block_enc_1.h
 new file mode 100644
 index 0000000..1095c85
 --- /dev/null
-+++ b/riscv/insns/alz_block_enc_1.h
++++ b/riscv/insns/alzette_block_enc_1.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -352,11 +354,11 @@ index 0000000..1095c85
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_enc_2.h b/riscv/insns/alz_block_enc_2.h
+diff --git a/riscv/insns/alzette_block_enc_2.h b/riscv/insns/alzette_block_enc_2.h
 new file mode 100644
 index 0000000..a85b4a3
 --- /dev/null
-+++ b/riscv/insns/alz_block_enc_2.h
++++ b/riscv/insns/alzette_block_enc_2.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -367,11 +369,11 @@ index 0000000..a85b4a3
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_enc_3.h b/riscv/insns/alz_block_enc_3.h
+diff --git a/riscv/insns/alzette_block_enc_3.h b/riscv/insns/alzette_block_enc_3.h
 new file mode 100644
 index 0000000..baed111
 --- /dev/null
-+++ b/riscv/insns/alz_block_enc_3.h
++++ b/riscv/insns/alzette_block_enc_3.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -382,11 +384,11 @@ index 0000000..baed111
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_block_enci.h b/riscv/insns/alz_block_enci.h
+diff --git a/riscv/insns/alzette_block_enci.h b/riscv/insns/alzette_block_enci.h
 new file mode 100644
 index 0000000..9f9380c
 --- /dev/null
-+++ b/riscv/insns/alz_block_enci.h
++++ b/riscv/insns/alzette_block_enci.h
 @@ -0,0 +1,9 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -397,11 +399,11 @@ index 0000000..9f9380c
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_ell.h b/riscv/insns/alz_ell.h
+diff --git a/riscv/insns/alzette_ell.h b/riscv/insns/alzette_ell.h
 new file mode 100644
 index 0000000..c0051fe
 --- /dev/null
-+++ b/riscv/insns/alz_ell.h
++++ b/riscv/insns/alzette_ell.h
 @@ -0,0 +1,20 @@
 +if     ( xlen == 32 ) {
 +  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
@@ -423,11 +425,11 @@ index 0000000..c0051fe
 +  WRITE_REG( insn.rd(), ( ( uint64_t )( r_lo ) << 0 ) | ( ( uint64_t )( r_hi ) << 32 ) );
 +}
 +
-diff --git a/riscv/insns/alz_ellrev.h b/riscv/insns/alz_ellrev.h
+diff --git a/riscv/insns/alzette_ellrev.h b/riscv/insns/alzette_ellrev.h
 new file mode 100644
 index 0000000..b30f2d7
 --- /dev/null
-+++ b/riscv/insns/alz_ellrev.h
++++ b/riscv/insns/alzette_ellrev.h
 @@ -0,0 +1,12 @@
 +if     ( xlen == 64 ) {
 +  uint32_t x_hi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -441,11 +443,11 @@ index 0000000..b30f2d7
 +  WRITE_REG( insn.rd(), ( ( uint64_t )( r_hi ) << 0 ) | ( ( uint64_t )( r_lo ) << 32 ) );
 +}
 +
-diff --git a/riscv/insns/alz_pack.h b/riscv/insns/alz_pack.h
+diff --git a/riscv/insns/alzette_pack.h b/riscv/insns/alzette_pack.h
 new file mode 100644
 index 0000000..e1f4b89
 --- /dev/null
-+++ b/riscv/insns/alz_pack.h
++++ b/riscv/insns/alzette_pack.h
 @@ -0,0 +1,9 @@
 +if     ( xlen == 64 ) {
 +  uint64_t x  = READ_REG( insn.rs1() );
@@ -456,11 +458,11 @@ index 0000000..e1f4b89
 +
 +  WRITE_REG( insn.rd(), lo | hi );
 +}
-diff --git a/riscv/insns/alz_packu.h b/riscv/insns/alz_packu.h
+diff --git a/riscv/insns/alzette_packu.h b/riscv/insns/alzette_packu.h
 new file mode 100644
 index 0000000..c5be6a4
 --- /dev/null
-+++ b/riscv/insns/alz_packu.h
++++ b/riscv/insns/alzette_packu.h
 @@ -0,0 +1,9 @@
 +if     ( xlen == 64 ) {
 +  uint64_t x  = READ_REG( insn.rs1() );
@@ -471,11 +473,11 @@ index 0000000..c5be6a4
 +
 +  WRITE_REG( insn.rd(), lo | hi );
 +}
-diff --git a/riscv/insns/alz_rcon.h b/riscv/insns/alz_rcon.h
+diff --git a/riscv/insns/alzette_rcon.h b/riscv/insns/alzette_rcon.h
 new file mode 100644
 index 0000000..903d79d
 --- /dev/null
-+++ b/riscv/insns/alz_rcon.h
++++ b/riscv/insns/alzette_rcon.h
 @@ -0,0 +1,16 @@
 +if     ( xlen == 32 ) {
 +  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
@@ -493,11 +495,11 @@ index 0000000..903d79d
 +
 +  WRITE_REG( insn.rd(), ( ( uint64_t )( r_lo ) << 0 ) | ( ( uint64_t )( r_hi ) << 32 ) );
 +}
-diff --git a/riscv/insns/alz_rconw.h b/riscv/insns/alz_rconw.h
+diff --git a/riscv/insns/alzette_rconw.h b/riscv/insns/alzette_rconw.h
 new file mode 100644
 index 0000000..74c6c42
 --- /dev/null
-+++ b/riscv/insns/alz_rconw.h
++++ b/riscv/insns/alzette_rconw.h
 @@ -0,0 +1,7 @@
 +if     ( xlen == 64 ) {
 +  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
@@ -506,11 +508,11 @@ index 0000000..74c6c42
 +
 +  WRITE_REG( insn.rd(), ( ( uint32_t )( r_lo ) << 0 )                                  );
 +}
-diff --git a/riscv/insns/alz_rori.h b/riscv/insns/alz_rori.h
+diff --git a/riscv/insns/alzette_rori.h b/riscv/insns/alzette_rori.h
 new file mode 100644
 index 0000000..79b34a2
 --- /dev/null
-+++ b/riscv/insns/alz_rori.h
++++ b/riscv/insns/alzette_rori.h
 @@ -0,0 +1,15 @@
 +if     ( xlen == 32 ) {
 +  uint32_t x = READ_REG( insn.rs1() );
@@ -527,11 +529,11 @@ index 0000000..79b34a2
 +  WRITE_REG( insn.rd(), r );
 +}
 +
-diff --git a/riscv/insns/alz_roriw.h b/riscv/insns/alz_roriw.h
+diff --git a/riscv/insns/alzette_roriw.h b/riscv/insns/alzette_roriw.h
 new file mode 100644
 index 0000000..948c321
 --- /dev/null
-+++ b/riscv/insns/alz_roriw.h
++++ b/riscv/insns/alzette_roriw.h
 @@ -0,0 +1,7 @@
 +if     ( xlen == 64 ) {
 +  uint32_t x = READ_REG( insn.rs1() );
@@ -540,11 +542,11 @@ index 0000000..948c321
 +
 +  WRITE_REG( insn.rd(), r );
 +}
-diff --git a/riscv/insns/alz_subror_17.h b/riscv/insns/alz_subror_17.h
+diff --git a/riscv/insns/alzette_subror_17.h b/riscv/insns/alzette_subror_17.h
 new file mode 100644
 index 0000000..6b82f7f
 --- /dev/null
-+++ b/riscv/insns/alz_subror_17.h
++++ b/riscv/insns/alzette_subror_17.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -552,11 +554,11 @@ index 0000000..6b82f7f
 +uint32_t r = x - ROR32( y, 17 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_subror_24.h b/riscv/insns/alz_subror_24.h
+diff --git a/riscv/insns/alzette_subror_24.h b/riscv/insns/alzette_subror_24.h
 new file mode 100644
 index 0000000..a737d0a
 --- /dev/null
-+++ b/riscv/insns/alz_subror_24.h
++++ b/riscv/insns/alzette_subror_24.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -564,11 +566,11 @@ index 0000000..a737d0a
 +uint32_t r = x - ROR32( y, 24 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_subror_31.h b/riscv/insns/alz_subror_31.h
+diff --git a/riscv/insns/alzette_subror_31.h b/riscv/insns/alzette_subror_31.h
 new file mode 100644
 index 0000000..d6d2739
 --- /dev/null
-+++ b/riscv/insns/alz_subror_31.h
++++ b/riscv/insns/alzette_subror_31.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -576,11 +578,11 @@ index 0000000..d6d2739
 +uint32_t r = x - ROR32( y, 31 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_subrori.h b/riscv/insns/alz_subrori.h
+diff --git a/riscv/insns/alzette_subrori.h b/riscv/insns/alzette_subrori.h
 new file mode 100644
 index 0000000..2e2eb0c
 --- /dev/null
-+++ b/riscv/insns/alz_subrori.h
++++ b/riscv/insns/alzette_subrori.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -588,11 +590,11 @@ index 0000000..2e2eb0c
 +uint32_t r = x - ROR32( y, insn.funct7() & 0x1F );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_whole_dec.h b/riscv/insns/alz_whole_dec.h
+diff --git a/riscv/insns/alzette_whole_dec.h b/riscv/insns/alzette_whole_dec.h
 new file mode 100644
 index 0000000..5126500
 --- /dev/null
-+++ b/riscv/insns/alz_whole_dec.h
++++ b/riscv/insns/alzette_whole_dec.h
 @@ -0,0 +1,18 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -612,11 +614,11 @@ index 0000000..5126500
 +         xi = xi - ROR32( yi, 31 );
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_whole_deci.h b/riscv/insns/alz_whole_deci.h
+diff --git a/riscv/insns/alzette_whole_deci.h b/riscv/insns/alzette_whole_deci.h
 new file mode 100644
 index 0000000..19a54b4
 --- /dev/null
-+++ b/riscv/insns/alz_whole_deci.h
++++ b/riscv/insns/alzette_whole_deci.h
 @@ -0,0 +1,18 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -636,11 +638,11 @@ index 0000000..19a54b4
 +         xi = xi - ROR32( yi, 31 );
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_whole_deci_x.h b/riscv/insns/alz_whole_deci_x.h
+diff --git a/riscv/insns/alzette_whole_deci_x.h b/riscv/insns/alzette_whole_deci_x.h
 new file mode 100644
 index 0000000..bc52850
 --- /dev/null
-+++ b/riscv/insns/alz_whole_deci_x.h
++++ b/riscv/insns/alzette_whole_deci_x.h
 @@ -0,0 +1,18 @@
 +uint32_t xi = READ_REG( insn.rs1() );
 +uint32_t yi = READ_REG( insn.rs2() );
@@ -660,11 +662,11 @@ index 0000000..bc52850
 +         xi = xi - ROR32( yi, 31 );
 +
 +WRITE_REG( insn.rd(), xi );
-diff --git a/riscv/insns/alz_whole_deci_y.h b/riscv/insns/alz_whole_deci_y.h
+diff --git a/riscv/insns/alzette_whole_deci_y.h b/riscv/insns/alzette_whole_deci_y.h
 new file mode 100644
 index 0000000..f502bc7
 --- /dev/null
-+++ b/riscv/insns/alz_whole_deci_y.h
++++ b/riscv/insns/alzette_whole_deci_y.h
 @@ -0,0 +1,18 @@
 +uint32_t xi = READ_REG( insn.rs1() );
 +uint32_t yi = READ_REG( insn.rs2() );
@@ -684,11 +686,11 @@ index 0000000..f502bc7
 +         xi = xi - ROR32( yi, 31 );
 +
 +WRITE_REG( insn.rd(), yi );
-diff --git a/riscv/insns/alz_whole_enc.h b/riscv/insns/alz_whole_enc.h
+diff --git a/riscv/insns/alzette_whole_enc.h b/riscv/insns/alzette_whole_enc.h
 new file mode 100644
 index 0000000..139aeab
 --- /dev/null
-+++ b/riscv/insns/alz_whole_enc.h
++++ b/riscv/insns/alzette_whole_enc.h
 @@ -0,0 +1,18 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -708,11 +710,11 @@ index 0000000..139aeab
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_whole_enci.h b/riscv/insns/alz_whole_enci.h
+diff --git a/riscv/insns/alzette_whole_enci.h b/riscv/insns/alzette_whole_enci.h
 new file mode 100644
 index 0000000..3996dac
 --- /dev/null
-+++ b/riscv/insns/alz_whole_enci.h
++++ b/riscv/insns/alzette_whole_enci.h
 @@ -0,0 +1,18 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -732,11 +734,11 @@ index 0000000..3996dac
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
-diff --git a/riscv/insns/alz_whole_enci_x.h b/riscv/insns/alz_whole_enci_x.h
+diff --git a/riscv/insns/alzette_whole_enci_x.h b/riscv/insns/alzette_whole_enci_x.h
 new file mode 100644
 index 0000000..689b632
 --- /dev/null
-+++ b/riscv/insns/alz_whole_enci_x.h
++++ b/riscv/insns/alzette_whole_enci_x.h
 @@ -0,0 +1,18 @@
 +uint32_t xi = READ_REG( insn.rs1() );
 +uint32_t yi = READ_REG( insn.rs2() );
@@ -756,11 +758,11 @@ index 0000000..689b632
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), xi );
-diff --git a/riscv/insns/alz_whole_enci_y.h b/riscv/insns/alz_whole_enci_y.h
+diff --git a/riscv/insns/alzette_whole_enci_y.h b/riscv/insns/alzette_whole_enci_y.h
 new file mode 100644
 index 0000000..5e4df3e
 --- /dev/null
-+++ b/riscv/insns/alz_whole_enci_y.h
++++ b/riscv/insns/alzette_whole_enci_y.h
 @@ -0,0 +1,18 @@
 +uint32_t xi = READ_REG( insn.rs1() );
 +uint32_t yi = READ_REG( insn.rs2() );
@@ -780,11 +782,11 @@ index 0000000..5e4df3e
 +         xi = xi ^        ci;
 +
 +WRITE_REG( insn.rd(), yi );
-diff --git a/riscv/insns/alz_xorror_16.h b/riscv/insns/alz_xorror_16.h
+diff --git a/riscv/insns/alzette_xorror_16.h b/riscv/insns/alzette_xorror_16.h
 new file mode 100644
 index 0000000..77d62b9
 --- /dev/null
-+++ b/riscv/insns/alz_xorror_16.h
++++ b/riscv/insns/alzette_xorror_16.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -792,11 +794,11 @@ index 0000000..77d62b9
 +uint32_t r = x ^ ROR32( y, 16 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_xorror_17.h b/riscv/insns/alz_xorror_17.h
+diff --git a/riscv/insns/alzette_xorror_17.h b/riscv/insns/alzette_xorror_17.h
 new file mode 100644
 index 0000000..dbd7d67
 --- /dev/null
-+++ b/riscv/insns/alz_xorror_17.h
++++ b/riscv/insns/alzette_xorror_17.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -804,11 +806,11 @@ index 0000000..dbd7d67
 +uint32_t r = x ^ ROR32( y, 17 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_xorror_24.h b/riscv/insns/alz_xorror_24.h
+diff --git a/riscv/insns/alzette_xorror_24.h b/riscv/insns/alzette_xorror_24.h
 new file mode 100644
 index 0000000..45e0ae2
 --- /dev/null
-+++ b/riscv/insns/alz_xorror_24.h
++++ b/riscv/insns/alzette_xorror_24.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -816,11 +818,11 @@ index 0000000..45e0ae2
 +uint32_t r = x ^ ROR32( y, 24 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_xorror_31.h b/riscv/insns/alz_xorror_31.h
+diff --git a/riscv/insns/alzette_xorror_31.h b/riscv/insns/alzette_xorror_31.h
 new file mode 100644
 index 0000000..073fa11
 --- /dev/null
-+++ b/riscv/insns/alz_xorror_31.h
++++ b/riscv/insns/alzette_xorror_31.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -828,11 +830,11 @@ index 0000000..073fa11
 +uint32_t r = x ^ ROR32( y, 31 );
 +
 +WRITE_REG( insn.rd(), r );
-diff --git a/riscv/insns/alz_xorrori.h b/riscv/insns/alz_xorrori.h
+diff --git a/riscv/insns/alzette_xorrori.h b/riscv/insns/alzette_xorrori.h
 new file mode 100644
 index 0000000..b4827c0
 --- /dev/null
-+++ b/riscv/insns/alz_xorrori.h
++++ b/riscv/insns/alzette_xorrori.h
 @@ -0,0 +1,6 @@
 +uint32_t x = READ_REG( insn.rs1() );
 +uint32_t y = READ_REG( insn.rs2() );
@@ -841,7 +843,7 @@ index 0000000..b4827c0
 +
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/riscv.mk.in b/riscv/riscv.mk.in
-index d4422fe..6da9a38 100644
+index d4422fe..24b0c97 100644
 --- a/riscv/riscv.mk.in
 +++ b/riscv/riscv.mk.in
 @@ -40,6 +40,7 @@ riscv_precompiled_hdrs = \
@@ -857,7 +859,7 @@ index d4422fe..6da9a38 100644
  	wfi \
  
 +# ++ alzette
-+riscv_insn_alz = alz_addror_17 alz_addror_24 alz_addror_31 alz_addrori alz_block_dec_0 alz_block_dec_1 alz_block_dec_2 alz_block_dec_3 alz_block_deci alz_ell alz_ellrev alz_block_enc_0 alz_block_enc_1 alz_block_enc_2 alz_block_enc_3 alz_block_enci alz_pack alz_packu alz_rcon alz_rconw alz_rori alz_roriw alz_subror_17 alz_subror_24 alz_subror_31 alz_subrori alz_whole_dec alz_whole_deci alz_whole_deci_x alz_whole_deci_y alz_whole_enc alz_whole_enci alz_whole_enci_x alz_whole_enci_y alz_xorror_16 alz_xorror_17 alz_xorror_24 alz_xorror_31 alz_xorrori
++riscv_insn_alzette = alzette_addror_17 alzette_addror_24 alzette_addror_31 alzette_addrori alzette_block_dec_0 alzette_block_dec_1 alzette_block_dec_2 alzette_block_dec_3 alzette_block_deci alzette_ell alzette_ellrev alzette_block_enc_0 alzette_block_enc_1 alzette_block_enc_2 alzette_block_enc_3 alzette_block_enci alzette_pack alzette_packu alzette_rcon alzette_rconw alzette_rori alzette_roriw alzette_subror_17 alzette_subror_24 alzette_subror_31 alzette_subrori alzette_whole_dec alzette_whole_deci alzette_whole_deci_x alzette_whole_deci_y alzette_whole_enc alzette_whole_enci alzette_whole_enci_x alzette_whole_enci_y alzette_xorror_16 alzette_xorror_17 alzette_xorror_24 alzette_xorror_31 alzette_xorrori
 +# -- alzette
  
  riscv_insn_list = \
@@ -866,7 +868,7 @@ index d4422fe..6da9a38 100644
  	$(if $(HAVE_INT128),$(riscv_insn_ext_v),) \
  	$(riscv_insn_ext_h) \
  	$(riscv_insn_priv) \
-+	$(riscv_insn_alz) \
++	$(riscv_insn_alzette) \
  
  riscv_gen_srcs = \
  	$(addsuffix .cc,$(riscv_insn_list))
