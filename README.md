@@ -4,7 +4,34 @@
 
 ## Overview
 
-...
+The NIST
+[lightweight cryptography process](https://csrc.nist.gov/projects/lightweight-cryptography)
+is an attempt to
+"solicit, evaluate, and standardize lightweight cryptographic algorithms that are suitable for use in constrained environments",
+e.g., where even 
+[AES](https://en.wikipedia.org/wiki/Advanced_)
+might be deemed (too) heavyweight.  From an initial 57 submissions, the 10 
+[final-round candidates](https://csrc.nist.gov/Projects/lightweight-cryptography/finalists) 
+are
+
+1. [ASCON](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf)
+1. [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf)
+1. [GIFT-COFB](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf)
+1. [Grain128-AEAD](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/grain-128aead-spec-final.pdf)
+1. [ISAP](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/isap-spec-final.pdf)
+1. [Photon-Beetle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/photon-beetle-spec-final.pdf)
+1. [Romulus](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf)
+1. [Sparkle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)
+1. [TinyJambu](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/tinyjambu-spec-final.pdf)
+1. [Xoodyak](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/xoodyak-spec-final.pdf)
+
+This repo. captures an exploration of 
+Instruction Set Extensions (ISEs)
+for (a subset of) these candidates, based on the use of 
+[RISC-V](https://en.wikipedia.org/wiki/RISC-V)
+as a base ISA: the goal is to add understanding to and so inform selection 
+of any resulting standard, with respect to implementation-related criteria
+such as execution latency.
 
 <!--- ==================================================================== --->
 
@@ -23,7 +50,7 @@
     │   ├── verilator         - source code for emulator for use with Rocket
     │   └── yosys_synth       - synthesise hardware implementation using yosys
     ├── software              - source code for software
-    │   ├── alzette             - source code for alzette 
+    │   ├── ${ALG}              - anything algorithm-specific
     │   │   ├── arch              -   architecture-specific resources
     │   │   │   ├── generic         - generic, i.e., vanilla C
     │   │   │   ├── rv32            - 32-bit RISC-V
@@ -32,12 +59,8 @@
     │   │       ├── generic         - generic, i.e., vanilla C
     │   │       ├── rv32            - 32-bit RISC-V
     │   │       └── rv64            - 64-bit RISC-V
-    │   └── ascon               - source code for ascon
-    │       ├── arch              -   architecture-specific resources
-    │       │   ├── generic         - generic, i.e., vanilla C
-    │       │   ├── rv32            - 32-bit RISC-V
-    │       │   └── rv64            - 64-bit RISC-V
-    │       └── imp               - implementation-specific resources
+    │   └── share               - anything algorithm-agnostic
+    │       └── arch              -   architecture-specific resources
     │           ├── generic         - generic, i.e., vanilla C
     │           ├── rv32            - 32-bit RISC-V
     │           └── rv64            - 64-bit RISC-V
@@ -56,37 +79,19 @@
 - The build system is controlled by several environment variables:
 
   - `${ALG}`
-    - role: specifies the algorithm
+    - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/software/${ALG}`
     - values: `alzette`, `ascon`
     - default: `alzette`
 
   - `${ARCH}`
-    - role: specifies the architecture
+    - role: specifies the   architecture, i.e., select `${REPO_HOME}/src/software/${ALG}/arch/${ARCH}`
     - values: `generic`, `rv32`, `rv64`
     - default: `generic`
 
   - `${IMP}`
-    - role: specifies the implementation
+    - role: specifies the implementation, i.e., select `${REPO_HOME}/src/software/${ALG}/imp/${IMP}`
     - values: `generic`, `rv32`, `rv64`
     - default: `generic`
-
-- The idea is basically that:
-
-  - `${REPO_HOME}/src/software/${ALG}`,
-    houses anything algorithm-specific:
-
-    - `${REPO_HOME}/src/software/${ALG}/arch/${ARCH}`,
-      contains any   architecture-specific resources, 
-    - `${REPO_HOME}/src/software/${ALG}/imp/${IMP}`
-      contains any implementation-specific resources.
-
-  - `${REPO_HOME}/src/software/share`,
-    houses anything algorithm-agnostic:
-
-    - `${REPO_HOME}/src/software/share/arch/${ARCH}`,
-      contains any   architecture-specific resources, 
-    - `${REPO_HOME}/src/software/share/imp/${IMP}`
-      contains any implementation-specific resources.
 
   Note that the separation of `${ARCH}` and `${IMP}` allows, for example, 
   the generic C implementation to be compiled for the RV32I architecture.
@@ -108,7 +113,23 @@
 
 <!--- -------------------------------------------------------------------- --->
 
-### Software-specific
+### Toolchain
+
+- Since the RISC-V tool-chain is 
+  [patch](https://savannah.gnu.org/projects/patch)-based,
+  making changes to it is somewhat tricky.  The idea, for each component,
+  (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
+
+  - perform a fresh clone of the component repository,
+  - apply the existing patch to the cloned component repository,
+  - implement the change in the cloned component repository,
+  - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
+  - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
+  - optionally commit and push the updated patch.
+
+<!--- -------------------------------------------------------------------- --->
+
+### Software
 
 - Fix paths, e.g., 
   
@@ -157,30 +178,19 @@
   make ALG="ascon"    software-run
   ```
 
-  or use the test script provided
+  or use the script provided
 
   ```sh
-  python3 ${REPO_HOME}/bin/test.py --rv32 --rv64 --trials=10
+  make ALG="alzette"  software-scan
+  make ALG="ascon"    software-scan
   ```
 
   to automatically scan through various different configurations, e.g., 
   ISEs, unrolling strategies, etc.
 
-- Note that since the RISC-V tool-chain is 
-  [patch](https://savannah.gnu.org/projects/patch)-based,
-  making changes to it is somewhat tricky.  The idea, for each component,
-  (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
-
-  - perform a fresh clone of the component repository,
-  - apply the existing patch to the cloned component repository,
-  - implement the change in the cloned component repository,
-  - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
-  - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
-  - optionally commit and push the updated patch.
-
 <!--- -------------------------------------------------------------------- --->
 
-### Hardware-specific
+### Hardware
 
 
 - Build a
