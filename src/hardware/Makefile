@@ -15,6 +15,17 @@ ifndef RISCV_ROCKET
   $(error "set RISCV_ROCKET environment variable to point at Rocket Chip toolchain installation")
 endif
 
+ifndef ARCH
+export ARCH     = rv32
+endif
+ifndef IMP
+export IMP      = rv32
+endif
+
+ifndef ISE
+export ISE      = xalu
+endif
+
 # =============================================================================
 
 include ${REPO_HOME}/src/hardware/rocketchip/Makefile.in
@@ -22,13 +33,6 @@ include ${REPO_HOME}/src/hardware/verilator/Makefile.in
 include ${REPO_HOME}/src/hardware/yosys_synth/Makefile.in
 
 # =============================================================================
-
-ifndef ARCH
-export ARCH     = rv64
-endif
-ifndef IMP
-export IMP      = rv64
-endif
 
 export EMU_HAL  = ${REPO_HOME}/src/hardware/verilator/hal
 export SOFTWARE = ${REPO_HOME}/src/software
@@ -44,7 +48,6 @@ GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T  $(EMU_HAL)/test.ld
 GCC_PATHS += -I${EMU_HAL}
 GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
 
-export EMULATOR = ${REPO_HOME}/build/emulator$(subst rv,,$(ARCH))
 export TARGET   = ${REPO_HOME}/build/driver_emu
 # -----------------------------------------------------------------------------
 
@@ -57,7 +60,7 @@ ${TARGET}.asm : ${TARGET}.elf
 emulate: ${EMULATOR} ${TARGET}.elf
 	${EMULATOR} -c -m 2100000 ${TARGET}.elf
 emulate-debug : ${EMULATOR} ${TARGET}.elf
-	${EMULATOR} -c -x 50000 -v ${REPO_HOME}/build/emu32_eval.vcd -m 2100000 ${<}
+	${EMULATOR} -c -x 700000 -v ${REPO_HOME}/build/emu32_eval.vcd -m 2100000 ${<}
 
 all   : ${TARGET}.elf ${TARGET}.asm
 

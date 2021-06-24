@@ -14,23 +14,169 @@ index dffa41713..9defc4d32 100644
  emu = emulator-$(PROJECT)-$(CONFIG)
  emu_debug = emulator-$(PROJECT)-$(CONFIG)-debug
 diff --git a/emulator/Makefrag-verilator b/emulator/Makefrag-verilator
-index d6423ada0..5f9539d41 100644
+index d6423ada0..5dc835e7b 100644
 --- a/emulator/Makefrag-verilator
 +++ b/emulator/Makefrag-verilator
 @@ -5,6 +5,7 @@ firrtl = $(generated_dir)/$(long_name).fir
  verilog = \
    $(generated_dir)/$(long_name).v \
    $(generated_dir)/$(long_name).behav_srams.v \
-+  $(wildcard $(COP_RTL)/*.v) \
++  $(wildcard $(ISE_RTL)/*.v) \
  
  .SECONDARY: $(firrtl) $(verilog)
  
+diff --git a/src/main/scala/rocket/ALU.scala b/src/main/scala/rocket/ALU.scala
+index 537ffa511..4dd883575 100644
+--- a/src/main/scala/rocket/ALU.scala
++++ b/src/main/scala/rocket/ALU.scala
+@@ -5,12 +5,12 @@ package freechips.rocketchip.rocket
+ 
+ import Chisel._
+ import freechips.rocketchip.config.Parameters
+-import freechips.rocketchip.tile.CoreModule
++import freechips.rocketchip.tile.{CoreModule, cop_ise}
+ 
+ object ALU
+ {
+-  val SZ_ALU_FN = 4
+-  def FN_X    = BitPat("b????")
++  val SZ_ALU_FN = 5
++  def FN_X    = BitPat("b?????")
+   def FN_ADD  = UInt(0)
+   def FN_SL   = UInt(1)
+   def FN_SEQ  = UInt(2)
+@@ -36,6 +36,11 @@ object ALU
+   def FN_MULHSU = FN_SEQ
+   def FN_MULHU  = FN_SNE
+ 
++  def FN_XALU0 = UInt(16)
++  def FN_XALU1 = UInt(17)
++  def FN_XALU2 = UInt(18)
++  def FN_XALU3 = UInt(19)
++
+   def isMulFN(fn: UInt, cmp: UInt) = fn(1,0) === cmp(1,0)
+   def isSub(cmd: UInt) = cmd(3)
+   def isCmp(cmd: UInt) = cmd >= FN_SLT
+@@ -97,3 +102,16 @@ class ALU(implicit p: Parameters) extends CoreModule()(p) {
+     when (io.dw === DW_32) { io.out := Cat(Fill(32, out(31)), out(31,0)) }
+   }
+ }
++
++class xalu_ise(xLen:Int) extends BlackBox {
++  val io = new Bundle() {
++    val ise_clk   = Clock(INPUT)
++    val ise_rst   = Bool(INPUT)
++    val ise_fn    = Bits(INPUT, SZ_ALU_FN)
++    val ise_imm   = Bits(INPUT ,width = 7.W)
++    val ise_in1   = Bits(INPUT ,width = xLen)
++    val ise_in2   = Bits(INPUT ,width = xLen)
++    val ise_val   = Bool(INPUT)
++    val ise_out   = Bits(OUTPUT,width = xLen)
++    val ise_oval  = Bool(OUTPUT) }
++}
+\ No newline at end of file
+diff --git a/src/main/scala/rocket/IDecode.scala b/src/main/scala/rocket/IDecode.scala
+index 94594aec2..e8bb9e9bb 100644
+--- a/src/main/scala/rocket/IDecode.scala
++++ b/src/main/scala/rocket/IDecode.scala
+@@ -365,3 +365,34 @@ class RoCCDecode(implicit val p: Parameters) extends DecodeConstants
+     CUSTOM3_RD_RS1->    List(Y,N,Y,N,N,N,N,Y,N,A2_ZERO,A1_RS1, IMM_X, DW_XPR,FN_ADD,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
+     CUSTOM3_RD_RS1_RS2->List(Y,N,Y,N,N,N,Y,Y,N,A2_ZERO,A1_RS1, IMM_X, DW_XPR,FN_ADD,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N))
+ }
++
++//ISE_ALU Decode
++class XALUDecode(implicit val p: Parameters) extends DecodeConstants
++{
++  val table: Array[(BitPat, List[BitPat])] = Array(
++    CUSTOM0->           List(Y,N,N,N,N,N,N,N,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU0,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM0_RS1->       List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU0,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM0_RS1_RS2->   List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU0,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM0_RD->        List(Y,N,N,N,N,N,N,N,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU0,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM0_RD_RS1->    List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU0,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM0_RD_RS1_RS2->List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU0,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM1->           List(Y,N,N,N,N,N,N,N,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU1,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM1_RS1->       List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU1,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM1_RS1_RS2->   List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU1,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM1_RD->        List(Y,N,N,N,N,N,N,N,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU1,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM1_RD_RS1->    List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU1,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM1_RD_RS1_RS2->List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU1,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM2->           List(Y,N,N,N,N,N,N,N,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU2,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM2_RS1->       List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU2,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM2_RS1_RS2->   List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU2,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM2_RD->        List(Y,N,N,N,N,N,N,N,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU2,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM2_RD_RS1->    List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU2,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM2_RD_RS1_RS2->List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU2,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM3->           List(Y,N,N,N,N,N,N,N,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU3,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM3_RS1->       List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU3,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM3_RS1_RS2->   List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU3,   N,M_X,        N,N,N,N,N,N,N,CSR.N,N,N,N,N),
++    CUSTOM3_RD->        List(Y,N,N,N,N,N,N,N,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU3,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM3_RD_RS1->    List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU3,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    CUSTOM3_RD_RS1_RS2->List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU3,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N))
++}
++
+diff --git a/src/main/scala/rocket/RocketCore.scala b/src/main/scala/rocket/RocketCore.scala
+index abdbdf93e..ba27a5b5c 100644
+--- a/src/main/scala/rocket/RocketCore.scala
++++ b/src/main/scala/rocket/RocketCore.scala
+@@ -42,7 +42,8 @@ case class RocketCoreParams(
+   mvendorid: Int = 0, // 0 means non-commercial implementation
+   mimpid: Int = 0x20181004, // release date in BCD
+   mulDiv: Option[MulDivParams] = Some(MulDivParams()),
+-  fpu: Option[FPUParams] = Some(FPUParams())
++  fpu: Option[FPUParams] = Some(FPUParams()),
++  useXALU: Boolean = false  // configure to use XALU for ISE
+ ) extends CoreParams {
+   val lgPauseCycles = 5
+   val haveFSDirty = false
+@@ -169,6 +170,7 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
+     (if (fLen >= 32) new FDecode +: (xLen > 32).option(new F64Decode).toSeq else Nil) ++:
+     (if (fLen >= 64) new DDecode +: (xLen > 32).option(new D64Decode).toSeq else Nil) ++:
+     (usingRoCC.option(new RoCCDecode)) ++:
++    (usingXALU.option(new XALUDecode)) ++:
+     (rocketParams.useSCIE.option(new SCIEDecode)) ++:
+     (if (xLen == 32) new I32Decode else new I64Decode) +:
+     (usingVM.option(new SDecode)) ++:
+@@ -377,6 +379,25 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
+   alu.io.in2 := ex_op2.asUInt
+   alu.io.in1 := ex_op1.asUInt
+ 
++  val xalu_ise_valid = Wire(Bool())
++  val xalu_ise_out = Wire(Bits(width = xLen))
++  if (usingXALU == true) {
++    val ise_bb = Module(new xalu_ise(xLen))
++    ise_bb.io.ise_clk := clock
++    ise_bb.io.ise_rst := reset
++    ise_bb.io.ise_val := ex_ctrl.alu_fn(4)
++    ise_bb.io.ise_fn := ex_ctrl.alu_fn
++    ise_bb.io.ise_imm := ex_reg_inst(31, 25)
++    ise_bb.io.ise_in1 := ex_op1.asUInt
++    ise_bb.io.ise_in2 := ex_op2.asUInt
++    xalu_ise_valid := ise_bb.io.ise_oval
++    xalu_ise_out := ise_bb.io.ise_out
++  }
++  else{
++    xalu_ise_valid := false
++    xalu_ise_out := 0
++  }
++
+   val ex_scie_unpipelined_wdata = if (!rocketParams.useSCIE) 0.U else {
+     val u = Module(new SCIEUnpipelined(xLen))
+     u.io.insn := ex_reg_inst
+@@ -538,7 +559,7 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
+     mem_reg_raw_inst := ex_reg_raw_inst
+     mem_reg_mem_size := ex_reg_mem_size
+     mem_reg_pc := ex_reg_pc
+-    mem_reg_wdata := Mux(ex_scie_unpipelined, ex_scie_unpipelined_wdata, alu.io.out)
++    mem_reg_wdata := Mux(ex_scie_unpipelined, ex_scie_unpipelined_wdata, Mux(xalu_ise_valid,xalu_ise_out,alu.io.out))
+     mem_br_taken := alu.io.cmp_out
+ 
+     when (ex_ctrl.rxs2 && (ex_ctrl.mem || ex_ctrl.rocc || ex_sfence)) {
 diff --git a/src/main/scala/system/SCARVRocketCoPConfig.scala b/src/main/scala/system/SCARVRocketCoPConfig.scala
 new file mode 100644
-index 000000000..91ac38e77
+index 000000000..4dbbb4f98
 --- /dev/null
 +++ b/src/main/scala/system/SCARVRocketCoPConfig.scala
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,47 @@
 +// See LICENSE.SiFive for license details.
 +// See LICENSE.Berkeley for license details.
 +
@@ -51,21 +197,36 @@ index 000000000..91ac38e77
 +    })
 +})
 +
-+class SCARVRocketCoPConfig64 extends Config(
++class WithXALU extends Config((site, here, up) => {
++	case RocketTilesKey => up(RocketTilesKey, site) map { r =>
++		r.copy(core = r.core.copy(useXALU = true))
++	}
++})
++
++class SCARVRocketCoPConf64 extends Config(
 +	new WithISERoCC ++
 +	new WithNBigCores(1) ++
 +	new BaseConfig)
 +
-+class SCARVRocketCoPConfig32 extends Config(
++class SCARVRocketCoPConf32 extends Config(
 +	new WithISERoCC ++
 +	new DefaultRV32Config ++
 +	new BaseConfig)
 +
++class SCARVRocketXALUConf32 extends Config(
++	new WithXALU ++
++	new DefaultRV32Config ++
++	new BaseConfig)
++
++class SCARVRocketXALUConf64 extends Config(
++	new WithXALU ++
++	new WithNBigCores(1) ++
++	new BaseConfig)
 +
 +
 diff --git a/src/main/scala/system/SCARVRocketSystem.scala b/src/main/scala/system/SCARVRocketSystem.scala
 new file mode 100644
-index 000000000..195b4c7e9
+index 000000000..a15b83fce
 --- /dev/null
 +++ b/src/main/scala/system/SCARVRocketSystem.scala
 @@ -0,0 +1,30 @@
@@ -83,7 +244,7 @@ index 000000000..195b4c7e9
 +/** Example Top with periphery devices and ports, and a Rocket subsystem */
 +class SCARVRocketSystem(implicit p: Parameters) extends RocketSubsystem
 +    with HasHierarchicalBusTopology
-+	with HasAsyncExtInterrupts
++	  with HasAsyncExtInterrupts
 +    with CanHaveMasterAXI4MemPort
 +    with CanHaveMasterAXI4MMIOPort
 +    with CanHaveSlaveAXI4Port
@@ -133,6 +294,27 @@ index 000000000..0c01c85f0
 +  ldut.l2_frontend_bus_axi4.foreach(_.tieoff)
 +  Debug.connectDebug(dut.debug, dut.psd, clock, reset, io.success)
 +}
+diff --git a/src/main/scala/tile/Core.scala b/src/main/scala/tile/Core.scala
+index 0e82e7dd8..bd881ac1c 100644
+--- a/src/main/scala/tile/Core.scala
++++ b/src/main/scala/tile/Core.scala
+@@ -20,6 +20,7 @@ trait CoreParams {
+   val useAtomicsOnlyForIO: Boolean
+   val useCompressed: Boolean
+   val useVector: Boolean = false
++  val useXALU: Boolean
+   val useSCIE: Boolean
+   val useRVE: Boolean
+   val mulDiv: Option[MulDivParams]
+@@ -68,6 +69,8 @@ trait HasCoreParameters extends HasTileParameters {
+   val usingCompressed = coreParams.useCompressed
+   val usingVector = coreParams.useVector
+   val usingSCIE = coreParams.useSCIE
++  val usingXALU = coreParams.useXALU
++
+ 
+   val retireWidth = coreParams.retireWidth
+   val fetchWidth = coreParams.fetchWidth
 diff --git a/src/main/scala/tile/scarv_rocc.scala b/src/main/scala/tile/scarv_rocc.scala
 new file mode 100644
 index 000000000..80ca67391

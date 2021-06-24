@@ -60,6 +60,7 @@ wire   op_ell     = (funct[6:0] == 7'b0000010) && (cop_insn[6:0] == CUSTOM_3);
 assign rv32ell_sel = op_ell;
 rv32ell_ise rv32ell_ins(
     .rs1(cop_rs1),
+    .rs2(cop_rs2),
     .rd (rv32ell_rd ),
     .op_ell(op_ell)
 );
@@ -140,10 +141,10 @@ wire        v04_sel;
 wire [31:0] v04_rd;  
 generate 
     if (ISE_V[4] == 1'b1) begin : ISE_V4
-wire   op_enc_x     = (funct[6:3] == 4'b0100) && (cop_insn[6:0] == CUSTOM_2);  
-wire   op_enc_y     = (funct[6:3] == 4'b0101) && (cop_insn[6:0] == CUSTOM_2);  
-wire   op_dec_x     = (funct[6:3] == 4'b0110) && (cop_insn[6:0] == CUSTOM_2);  
-wire   op_dec_y     = (funct[6:3] == 4'b0111) && (cop_insn[6:0] == CUSTOM_2); 
+wire   op_enc_x     = (funct[6:3] == 4'b1000) && (cop_insn[6:0] == CUSTOM_2);  
+wire   op_enc_y     = (funct[6:3] == 4'b1001) && (cop_insn[6:0] == CUSTOM_2);  
+wire   op_dec_x     = (funct[6:3] == 4'b1010) && (cop_insn[6:0] == CUSTOM_2);  
+wire   op_dec_y     = (funct[6:3] == 4'b1011) && (cop_insn[6:0] == CUSTOM_2); 
 
 wire   op_x_v4      = op_enc_x | op_dec_x ;
 wire   op_enc_v4    = op_enc_x | op_enc_y ;

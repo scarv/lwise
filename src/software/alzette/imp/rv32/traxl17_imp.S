@@ -157,13 +157,11 @@
 // TRAXL17 implementation => en/decrypt linear layer
 
 .macro TRAXL17_ENC_LINEAR  x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,  t0,  t1,  t2
-              xor         \t0, \x2, \x3
-              ELL         \t0, \t0, \t1, \t2
+              ELL         \t0, \x2, \x3, \t1, \t2
               xor         \y0, \y0, \t0 
               xor         \y1, \y1, \t0 
 
-              xor         \t0, \y2, \y3
-              ELL         \t0, \t0, \t1, \t2
+              ELL         \t0, \y2, \y3, \t1, \t2
               xor         \x0, \x0, \t0 
               xor         \x1, \x1, \t0 
               #if !( TRAXL17_ENC_UNROLL )
@@ -195,13 +193,11 @@
               mv          \y1, \y3
               mv          \y3, \t0
               #endif
-              xor         \t0, \x2, \x3
-              ELL         \t0, \t0, \t1, \t2
+              ELL         \t0, \x2, \x3, \t1, \t2
               xor         \y0, \y0, \t0 
               xor         \y1, \y1, \t0 
 
-              xor         \t0, \y2, \y3
-              ELL         \t0, \t0, \t1, \t2
+              ELL         \t0, \y2, \y3, \t1, \t2
               xor         \x0, \x0, \t0 
               xor         \x1, \x1, \t0 
 .endm

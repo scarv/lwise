@@ -169,17 +169,17 @@ SPARKLE_RCON: .word 0xB7E15162
 // SPARKLE    implementation => forward/inverse linear layer
 
 .macro SPARKLE_FWD_LINEAR  x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2 
-              XOR3        \t0, \x0, \x1, \x2             //  t0  = x0 ^ x1 ^ x2
-              ELL         \t0, \t0, \t1, \t2             // tmpx = ELL(t0)
-              XOR3        \y3, \y3, \y0, \t0             //  y3 ^= y0 ^ tmpx 
-              XOR3        \y4, \y4, \y1, \t0             //  y4 ^= y1 ^ tmpx
-              XOR3        \y5, \y5, \y2, \t0             //  y5 ^= y2 ^ tmpx
+              xor         \t0, \x1, \x2                  //  t0  = x1 ^ x2
+              ELL         \t0, \t0, \x0, \t1, \t2        // tmpx = ELL( x0 ^ t0 )
+              XOR3        \y3, \y3, \y0, \t0, \t1        //  y3 ^= y0 ^ tmpx 
+              XOR3        \y4, \y4, \y1, \t0, \t1        //  y4 ^= y1 ^ tmpx
+              XOR3        \y5, \y5, \y2, \t0, \t1        //  y5 ^= y2 ^ tmpx
 
-              XOR3        \t0, \y0, \y1, \y2             //  t0  = y0 ^ y1 ^ y2
-              ELL         \t0, \t0, \t1, \t2             // tmpy = ELL(t0)
-              XOR3        \x3, \x3, \x0, \t0             //  x3 ^= x0 ^ tmpy 
-              XOR3        \x4, \x4, \x1, \t0             //  x4 ^= x1 ^ tmpy
-              XOR3        \x5, \x5, \x2, \t0             //  x5 ^= x2 ^ tmpy
+              xor         \t0, \y1, \y2                  //  t0  = y0 ^ y1 ^ y2
+              ELL         \t0, \t0, \y0, \t1, \t2        // tmpy = ELL( y0 ^ t0 )
+              XOR3        \x3, \x3, \x0, \t0, \t1        //  x3 ^= x0 ^ tmpy 
+              XOR3        \x4, \x4, \x1, \t0, \t1        //  x4 ^= x1 ^ tmpy
+              XOR3        \x5, \x5, \x2, \t0, \t1        //  x5 ^= x2 ^ tmpy
               #if !( SPARKLE_FWD_UNROLL )
               // 0 1 2  3 4 5
               // 4 5 3  0 1 2
@@ -223,22 +223,22 @@ SPARKLE_RCON: .word 0xB7E15162
               mv          \y0, \y3
               mv          \y3, \t0
               #endif
-              XOR3        \t0, \y0, \y1, \y2             //  t0  = y0 ^ y1 ^ y2
-              ELL         \t0, \t0, \t1, \t2             // tmpy = ELL(t0)
-              XOR3        \x3, \x3, \x0, \t0             //  x3 ^= x0 ^ tmpy 
-              XOR3        \x4, \x4, \x1, \t0             //  x4 ^= x1 ^ tmpy
-              XOR3        \x5, \x5, \x2, \t0             //  x5 ^= x2 ^ tmpy
+              xor         \t0, \y1, \y2                  //  t0  = y1 ^ y2
+              ELL         \t0, \t0, \y0, \t1, \t2        // tmpy = ELL( y0 ^ t0)
+              XOR3        \x3, \x3, \x0, \t0, \t1        //  x3 ^= x0 ^ tmpy 
+              XOR3        \x4, \x4, \x1, \t0, \t1        //  x4 ^= x1 ^ tmpy
+              XOR3        \x5, \x5, \x2, \t0, \t1        //  x5 ^= x2 ^ tmpy
 
-              XOR3        \t0, \x0, \x1, \x2             //  t0  = x0 ^ x1 ^ x2
-              ELL         \t0, \t0, \t1, \t2             // tmpx = ELL(t0)
-              XOR3        \y3, \y3, \y0, \t0             //  y3 ^= y0 ^ tmpx 
-              XOR3        \y4, \y4, \y1, \t0             //  y4 ^= y1 ^ tmpx
-              XOR3        \y5, \y5, \y2, \t0             //  y5 ^= y2 ^ tmpx
+              xor         \t0, \x1, \x2                  //  t0  = x1 ^ x2
+              ELL         \t0, \t0, \x0, \t1, \t2        // tmpx = ELL( x0 ^ t0 )
+              XOR3        \y3, \y3, \y0, \t0, \t1        //  y3 ^= y0 ^ tmpx 
+              XOR3        \y4, \y4, \y1, \t0, \t1        //  y4 ^= y1 ^ tmpx
+              XOR3        \y5, \y5, \y2, \t0, \t1        //  y5 ^= y2 ^ tmpx
 .endm
 
-.macro XOR3 rd, x0, x1, x2
-              xor          t6, \x1, \x2 
-              xor         \rd, \x0,  t6
+.macro XOR3 rd, x0, x1, x2, t0
+              xor         \t0, \x1, \x2 
+              xor         \rd, \x0, \t0
 .endm
 
 // ----------------------------------------------------------------------------

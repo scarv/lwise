@@ -221,13 +221,11 @@
 
 #if ( ALZETTE_RV64_TYPE1 )
 .macro TRAXL17_ENC_LINEAR  x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,  t0,  t1,  t2
-              xor         \t0, \x2, \x3
-              ELL32       \t0, \t0, \t1, \t2
+              ELL32       \t0, \x2, \x3, \t1, \t2
               xor         \y0, \y0, \t0 
               xor         \y1, \y1, \t0 
 
-              xor         \t0, \y2, \y3
-              ELL32       \t0, \t0, \t1, \t2
+              ELL32       \t0, \y2, \y3, \t1, \t2
               xor         \x0, \x0, \t0 
               xor         \x1, \x1, \t0 
 
@@ -257,13 +255,11 @@
               mv          \y1, \y3
               mv          \y3, \t0
 
-              xor         \t0, \x2, \x3
-              ELL32       \t0, \t0, \t1, \t2
+              ELL32       \t0, \x2, \x3, \t1, \t2
               xor         \y0, \y0, \t0 
               xor         \y1, \y1, \t0 
 
-              xor         \t0, \y2, \y3
-              ELL32       \t0, \t0, \t1, \t2
+              ELL32       \t0, \y2, \y3, \t1, \t2
               xor         \x0, \x0, \t0 
               xor         \x1, \x1, \t0 
 .endm	
@@ -271,8 +267,7 @@
 
 #if ( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
 .macro TRAXL17_ENC_LINEAR yx0,  yx1,  yx2, yx3,  t0,  t1,  t2,  t3
-              xor         \t0 , \yx2, \yx3                //          t0 = ( y2 || x2) ^ (  y3 || x3  )
-              ELL64       \t0 , \t0 , \t1, \t2, \t3       //          t0 = tmpx || tmpy
+              ELL64       \t0 , \yx2, \yx3, \t1, \t2, \t3 //          t0 = tmpx || tmpy
               xor         \yx0, \yx0, \t0                 // ( y0 || x0) = ( y0 || x0) ^ (tmpx || tmpy)
               xor         \yx1, \yx1, \t0                 // ( y1 || x1) = ( y1 || x1) ^ (tmpx || tmpy)  
               #if !( TRAXL17_ENC_UNROLL )
@@ -292,8 +287,7 @@
               mv          \yx1, \yx3
               mv          \yx3, \t0
               #endif	
-              xor         \t0 , \yx2, \yx3                //          t0 = ( y2 || x2) ^ (  y3 || x3  )
-              ELL64       \t0 , \t0 , \t1, \t2, \t3       //          t0 = tmpx || tmpy
+              ELL64       \t0 , \yx2, \yx3, \t1, \t2, \t3 //          t0 = tmpx || tmpy
               xor         \yx0, \yx0, \t0                 // ( y0 || x0) = ( y0 || x0) ^ (tmpx || tmpy)
               xor         \yx1, \yx1, \t0                 // ( y1 || x1) = ( y1 || x1) ^ (tmpx || tmpy)  
 .endm	

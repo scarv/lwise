@@ -15,6 +15,7 @@ endif
 RTL32 =$(REPO_HOME)/src/hardware/rtl/rv32/
 rtl32_src= \
         $(REPO_HOME)/src/hardware/rtl/rv32/cop_ise.v \
+        $(REPO_HOME)/src/hardware/rtl/rv32/xalu_ise.v \
         $(REPO_HOME)/src/hardware/rtl/rv32/rv32b_ise.v \
         $(REPO_HOME)/src/hardware/rtl/rv32/rv32ell_ise.v \
         $(REPO_HOME)/src/hardware/rtl/rv32/alzette_ise_v2.v \

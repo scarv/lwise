@@ -127,7 +127,16 @@ such as execution latency.
   - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
   - optionally commit and push the updated patch.
 
-<!--- -------------------------------------------------------------------- --->
+- ISE supporting hardware is implemented in Verilog and integrated into a Rocket Chip. 
+  The build hardware system is controlled by two environment variables, 
+  namely `${ARCH}` and `${ISE}`.
+
+  - The base Rocket Chip can be configured with a 32-bit or 64-bit architecture (i.e., `ARCH=rv32` or `ARCH=rv64`, respectively).
+    `${ARCH}` is consistent with the build software system. 
+  - The ISE supporting hardware can be integrated into the base processor 
+    as a co-processor via a RoCC interface or 
+    as a functional module, i.e., extended ALU, inside the processor pipeline 
+    by configuring `ISE=cop` or `ISE=xalu`, respectively. 
 
 ### Software
 
@@ -192,7 +201,6 @@ such as execution latency.
 
 ### Hardware
 
-
 - Build a
   [toolchain](https://github.com/riscv/riscv-gnu-toolchain)
   for use with
@@ -203,6 +211,18 @@ such as execution latency.
   make -f ${REPO_HOME}/src/toolchain-rocket/Makefile clone
   make -f ${REPO_HOME}/src/toolchain-rocket/Makefile build
   ```
+
+  making changes to it is somewhat tricky.  The idea, for each component,
+  (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
+
+  - perform a fresh clone of the component repository,
+  - apply the existing patch to the cloned component repository,
+  - implement the change in the cloned component repository,
+  - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
+  - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
+  - optionally commit and push the updated patch.
+
+### Hardware-specific
 
 - The build system in
 
@@ -224,24 +244,24 @@ such as execution latency.
   make -f ${REPO_HOME}/src/hardware/Makefile rocketchip-apply
   ```
 - Build the emulator of the implementation using 
-  [verilator](https://www.veripool.org/verilator)
+  [verilator](https://www.veripool.org/verilator),
+  e.g.,
 
   ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile emulator32
-  make -f ${REPO_HOME}/src/hardware/Makefile emulator64
+  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" emulator
   ```
 - Run hardware synthesis flow using
-  [yosys](https://github.com/YosysHQ/yosys)
+  [yosys](https://github.com/YosysHQ/yosys),
+  e.g.,
 
   ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH=rv32
-  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH=rv64
+  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH="rv32" ISE="xalu"
   ```
 - Build and execute software on the emulator of the hardware implementation, e.g.,
 
   ```sh
-  make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" CONF="-DDRIVER_TRIALS_REAL='1000'" clean all emulate
+  make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" ISE="xalu" CONF="-DDRIVER_TRIALS_REAL='10'" clean all emulate
   ```
 
-<!--- ==================================================================== --->
+<!--- -------------------------------------------------------------------- --->
    

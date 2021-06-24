@@ -68,6 +68,7 @@ wire   op_ellrev   = (funct[6:0] == 7'b0000011) && (cop_insn[6:0] == CUSTOM_3);
 assign rv64ell_sel = op_ell | op_ellrev;
 rv64ell_ise rv64ell_ins(
     .rs1(       cop_rs1   ),
+    .rs2(       cop_rs2   ),
     .rd (      rv64ell_rd ),
     .op_ell(    op_ell    ),
     .op_ellrev( op_ellrev )
@@ -83,8 +84,8 @@ wire        v02_sel;
 wire [63:0] v02_rd;  
 generate 
     if (ISE_V[2] == 1'b1) begin : ISE_V2
-wire   op_enc_v2 = (funct[6:2] == 5'b00000) && (cop_insn[6:0] == CUSTOM_2);
-wire   op_dec_v2 = (funct[6:2] == 5'b00010) && (cop_insn[6:0] == CUSTOM_2);
+wire   op_enc_v2 = (funct[6:2] == 5'b01000) && (cop_insn[6:0] == CUSTOM_2);
+wire   op_dec_v2 = (funct[6:2] == 5'b01010) && (cop_insn[6:0] == CUSTOM_2);
 assign v02_sel   = op_enc_v2  | op_dec_v2;
 
 alzette_ise_v2 alzetteise_ins2(
@@ -125,8 +126,8 @@ wire        v04_sel;
 wire [63:0] v04_rd;  
 generate 
     if (ISE_V[4] == 1'b1) begin : ISE_V4
-wire   op_enc_v4 = (funct[6:3] == 4'b1000) && (cop_insn[6:0] == CUSTOM_2);
-wire   op_dec_v4 = (funct[6:3] == 4'b1001) && (cop_insn[6:0] == CUSTOM_2);
+wire   op_enc_v4 = (funct[6:3] == 4'b1100) && (cop_insn[6:0] == CUSTOM_2);
+wire   op_dec_v4 = (funct[6:3] == 4'b1101) && (cop_insn[6:0] == CUSTOM_2);
 assign v04_sel   = op_enc_v4  | op_dec_v4;
 
 alzette_ise_v4 alzetteise_ins4(

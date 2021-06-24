@@ -16,41 +16,71 @@ GENERATED       = $(ROCKETCHIP_REPO)/vsim/generated-src
 # Generate Verilog for a Rocket Core with RoCC
 #--------------------------------------------------------------------
 ROCKET = freechips.rocketchip.system
-MODEL  = SCARVRocketTest
-CONFIG = $(ARCH:rv%=SCARVRocketCoPConfig%)
-ARCH  ?= rv64
-MODULE?= RoCC_ISE
+MODEL  = SCARVRocketSystem
+CONFIG = SCARVRocket$(ISE)Conf$(ARCH:rv%=%)
+
+COP_CONF64 = SCARVRocketCoPConf64
+COP_CONF32 = SCARVRocketCoPConf32
+
+XALU_CONF32 = SCARVRocketXALUConf32
+XALU_CONF64 = SCARVRocketXALUConf64
+
+MODULE?= $(ISE)_ise
 
 #--------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------
 
-rocket_verilog = $(GENERATED)/$(ROCKET).$(CONFIG).v
+rocket_gen = $(SYNTH)/rocket_$(ISE)_$(ARCH).v
+srams_gen  = $(SYNTH)/srams_$(ISE)_$(ARCH).v
+
 sys_vsrc = plusarg_reader.v AsyncResetReg.v EICG_wrapper.v
 
 export rtl_src  = $(addprefix $(ROCKETCHIP_REPO)/src/main/resources/vsrc/, $(sys_vsrc))
-export rtl_src += $(rocket_verilog) 
-export rtl_src += $(GENERATED)/$(ROCKET).$(CONFIG).behav_srams.v
+export rtl_src += $(rocket_gen)
+export rtl_src += $(srams_gen) 
 export rtl_src += $(REPO_HOME)/src/hardware/rtl/$(ARCH)/*.v
 
 #--------------------------------------------------------------------
 # Targets
 #--------------------------------------------------------------------
 export SYNTH      = ${REPO_HOME}/build/yosys_synth
-export RV_ARCH    = $(ARCH)
+export RV_ARCH    = $(ISE)_$(ARCH)
 export SYN_MODULE = $(MODULE)
 
 SYNTH_SCRIPT      = $(REPO_HOME)/src/hardware/yosys_synth/yosys_synth.tcl
 SYNTH_LOG_OUT     = $(SYNTH)/synth.log
 
-$(rocket_verilog): 
-	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog CONFIG=$(CONFIG) MODEL=$(MODEL)
+$(GENERATED)/$(ROCKET).$(XALU_CONF32).v :
+	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog CONFIG=$(XALU_CONF32) MODEL=$(MODEL)
+$(GENERATED)/$(ROCKET).$(XALU_CONF64).v :
+	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog CONFIG=$(XALU_CONF64) MODEL=$(MODEL)
+$(GENERATED)/$(ROCKET).$(COP_CONF32).v :
+	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog CONFIG=$(COP_CONF32) MODEL=$(MODEL)
+$(GENERATED)/$(ROCKET).$(COP_CONF64).v :
+	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog CONFIG=$(COP_CONF64) MODEL=$(MODEL)
 
-synth_verilog   = $(SYNTH)/synth-$(CONFIG).v
+$(SYNTH)/rocket_xalu_rv32.v : $(GENERATED)/$(ROCKET).$(XALU_CONF32).v 
+	cp -f $(GENERATED)/$(ROCKET).$(XALU_CONF32).v $(rocket_gen)
+	cp -f $(GENERATED)/$(ROCKET).$(XALU_CONF32).behav_srams.v $(srams_gen)
+
+$(SYNTH)/rocket_xalu_rv64.v : $(GENERATED)/$(ROCKET).$(XALU_CONF64).v
+	cp -f $(GENERATED)/$(ROCKET).$(XALU_CONF64).v $(rocket_gen)
+	cp -f $(GENERATED)/$(ROCKET).$(XALU_CONF64).behav_srams.v $(srams_gen)
+
+$(SYNTH)/rocket_cop_rv32.v :  $(GENERATED)/$(ROCKET).$(COP_CONF32).v
+	cp -f $(GENERATED)/$(ROCKET).$(COP_CONF32).v $(rocket_gen)
+	cp -f $(GENERATED)/$(ROCKET).$(COP_CONF32).behav_srams.v $(srams_gen)
+
+$(SYNTH)/rocket_cop_rv64.v :  $(GENERATED)/$(ROCKET).$(COP_CONF64).v
+	cp -f $(GENERATED)/$(ROCKET).$(COP_CONF64).v $(rocket_gen)
+	cp -f $(GENERATED)/$(ROCKET).$(COP_CONF64).behav_srams.v $(srams_gen)
+
+synth_verilog   = $(SYNTH)/synth-$(RV_ARCH)-$(SYN_MODULE).v
 $(synth_verilog): $(SYNTH_SCRIPT) $(rtl_src) 
 	@mkdir -p         $(SYNTH)
-	@mkdir -p         $(SYNTH)/$(ARCH)_rtl_sources
-	cp -f $(rtl_src)  $(SYNTH)/$(ARCH)_rtl_sources/
+	@mkdir -p         $(SYNTH)/$(ISE)_$(ARCH)_rtl_sources
+	cp -f $(rtl_src)  $(SYNTH)/$(ISE)_$(ARCH)_rtl_sources/
 	yosys -QT -l $(SYNTH_LOG_OUT) $(SYNTH_SCRIPT)
 
 synthesise: $(synth_verilog)

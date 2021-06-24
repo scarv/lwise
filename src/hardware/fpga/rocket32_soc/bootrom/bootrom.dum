@@ -1,0 +1,63 @@
+
+bootrom.elf:     file format elf32-littleriscv
+
+SYMBOL TABLE:
+00010000 l    d  .text.start	00000000 .text.start
+00010040 l    d  .text.hang	00000000 .text.hang
+00010080 l    d  .rodata.dtb	00000000 .rodata.dtb
+00000000 l    d  .riscv.attributes	00000000 .riscv.attributes
+00010080 g       .rodata.dtb	00000000 _dtb
+00010000 g       *ABS*	00000000 ROM_BASE
+00010040 g       .text.hang	00000000 _start
+00010000 g       .text.start	00000000 _hang
+
+
+
+Disassembly of section .text.start:
+
+00010000 <_hang>:
+   10000:	f1402573          	csrr	a0,mhartid
+   10004:	00000597          	auipc	a1,0x0
+   10008:	07c58593          	addi	a1,a1,124 # 10080 <_dtb>
+   1000c:	10500073          	wfi
+   10010:	bff5                	j	1000c <_hang+0xc>
+
+Disassembly of section .text.hang:
+
+00010040 <_start>:
+   10040:	60000437          	lui	s0,0x60000
+   10044:	f1402573          	csrr	a0,mhartid
+   10048:	00000597          	auipc	a1,0x0
+   1004c:	03858593          	addi	a1,a1,56 # 10080 <_dtb>
+   10050:	8402                	jr	s0
+
+Disassembly of section .rodata.dtb:
+
+00010080 <_dtb>:
+   10080:	5444                	lw	s1,44(s0)
+   10082:	2042                	fld	ft0,16(sp)
+   10084:	73656f67          	0x73656f67
+   10088:	6820                	flw	fs0,80(s0)
+   1008a:	7265                	lui	tp,0xffff9
+   1008c:	65              	Address 0x000000000001008c is out of bounds.
+
+
+Disassembly of section .riscv.attributes:
+
+00000000 <.riscv.attributes>:
+   0:	2d41                	jal	690 <ROM_BASE-0xf970>
+   2:	0000                	unimp
+   4:	7200                	flw	fs0,32(a2)
+   6:	7369                	lui	t1,0xffffa
+   8:	01007663          	bgeu	zero,a6,14 <ROM_BASE-0xffec>
+   c:	00000023          	sb	zero,0(zero) # 0 <ROM_BASE-0x10000>
+  10:	7205                	lui	tp,0xfffe1
+  12:	3376                	fld	ft6,376(sp)
+  14:	6932                	flw	fs2,12(sp)
+  16:	7032                	flw	ft0,44(sp)
+  18:	5f30                	lw	a2,120(a4)
+  1a:	326d                	jal	fffff9c4 <_dtb+0xfffef944>
+  1c:	3070                	fld	fa2,224(s0)
+  1e:	615f 7032 5f30      	0x5f307032615f
+  24:	30703263          	0x30703263
+  28:	625f 7032 0030      	0x307032625f

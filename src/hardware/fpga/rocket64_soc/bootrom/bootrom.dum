@@ -1,0 +1,67 @@
+
+bootrom.elf:     file format elf64-littleriscv
+
+SYMBOL TABLE:
+0000000000010000 l    d  .text.start	0000000000000000 .text.start
+0000000000010040 l    d  .text.hang	0000000000000000 .text.hang
+0000000000010080 l    d  .rodata.dtb	0000000000000000 .rodata.dtb
+0000000000000000 l    d  .riscv.attributes	0000000000000000 .riscv.attributes
+0000000000010080 g       .rodata.dtb	0000000000000000 _dtb
+0000000000010000 g       *ABS*	0000000000000000 ROM_BASE
+0000000000010040 g       .text.hang	0000000000000000 _start
+0000000000010000 g       .text.start	0000000000000000 _hang
+
+
+
+Disassembly of section .text.start:
+
+0000000000010000 <_hang>:
+   10000:	f1402573          	csrr	a0,mhartid
+   10004:	00000597          	auipc	a1,0x0
+   10008:	07c58593          	addi	a1,a1,124 # 10080 <_dtb>
+   1000c:	10500073          	wfi
+   10010:	bff5                	j	1000c <_hang+0xc>
+
+Disassembly of section .text.hang:
+
+0000000000010040 <_start>:
+   10040:	60000437          	lui	s0,0x60000
+   10044:	f1402573          	csrr	a0,mhartid
+   10048:	00000597          	auipc	a1,0x0
+   1004c:	03858593          	addi	a1,a1,56 # 10080 <_dtb>
+   10050:	8402                	jr	s0
+
+Disassembly of section .rodata.dtb:
+
+0000000000010080 <_dtb>:
+   10080:	5444                	lw	s1,44(s0)
+   10082:	2042                	fld	ft0,16(sp)
+   10084:	73656f67          	0x73656f67
+   10088:	6820                	ld	s0,80(s0)
+   1008a:	7265                	lui	tp,0xffff9
+   1008c:	65              	Address 0x000000000001008c is out of bounds.
+
+
+Disassembly of section .riscv.attributes:
+
+0000000000000000 <.riscv.attributes>:
+   0:	3241                	addiw	tp,tp,-16
+   2:	0000                	unimp
+   4:	7200                	ld	s0,32(a2)
+   6:	7369                	lui	t1,0xffffa
+   8:	01007663          	bgeu	zero,a6,14 <ROM_BASE-0xffec>
+   c:	0028                	addi	a0,sp,8
+   e:	0000                	unimp
+  10:	7205                	lui	tp,0xfffe1
+  12:	3676                	fld	fa2,376(sp)
+  14:	6934                	ld	a3,80(a0)
+  16:	7032                	0x7032
+  18:	5f30                	lw	a2,120(a4)
+  1a:	326d                	addiw	tp,tp,-5
+  1c:	3070                	fld	fa2,224(s0)
+  1e:	615f 7032 5f30      	0x5f307032615f
+  24:	3266                	fld	ft4,120(sp)
+  26:	3070                	fld	fa2,224(s0)
+  28:	645f 7032 5f30      	0x5f307032645f
+  2e:	30703263          	0x30703263
+	...

@@ -15,6 +15,7 @@ endif
 RTL64 = $(REPO_HOME)/src/hardware/rtl/rv64
 rtl64_src = \
         $(REPO_HOME)/src/hardware/rtl/rv64/cop_ise.v \
+        $(REPO_HOME)/src/hardware/rtl/rv64/xalu_ise.v \
         $(REPO_HOME)/src/hardware/rtl/rv64/rv64b_ise.v \
         $(REPO_HOME)/src/hardware/rtl/rv64/rv64ell_ise.v \
         $(REPO_HOME)/src/hardware/rtl/rv64/alzette_ise_v2.v \

@@ -178,14 +178,14 @@
 
 #if ( ALZETTE_RV64_TYPE1 )
 .macro SPARKLE_FWD_LINEAR  x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2 
-              XOR3        \t0, \x0, \x1, \x2             //  t0  = x0 ^ x1 ^ x2
-              ELL32       \t0, \t0, \t1, \t2             // tmpx = ELL(t0)
+              xor         \t0, \x1, \x2                  //  t0  = x1 ^ x2
+              ELL32       \t0, \x0, \t0, \t1, \t2        // tmpx = ELL( x0 ^ t0 )
               XOR3        \y3, \y3, \y0, \t0             //  y3 ^= y0 ^ tmpx 
               XOR3        \y4, \y4, \y1, \t0             //  y4 ^= y1 ^ tmpx
               XOR3        \y5, \y5, \y2, \t0             //  y5 ^= y2 ^ tmpx
 
-              XOR3        \t0, \y0, \y1, \y2             //  t0  = y0 ^ y1 ^ y2
-              ELL32       \t0, \t0, \t1, \t2             // tmpy = ELL(t0)
+              xor         \t0, \y1, \y2                  //  t0  = y1 ^ y2
+              ELL32       \t0, \y0, \t0, \t1, \t2        // tmpy = ELL( y0 ^ t0 )
               XOR3        \x3, \x3, \x0, \t0             //  x3 ^= x0 ^ tmpy 
               XOR3        \x4, \x4, \x1, \t0             //  x4 ^= x1 ^ tmpy
               XOR3        \x5, \x5, \x2, \t0             //  x5 ^= x2 ^ tmpy
@@ -230,14 +230,14 @@
               mv          \y0, \y3
               mv          \y3, \t0
 
-              XOR3        \t0, \y0, \y1, \y2             //  t0  = y0 ^ y1 ^ y2
-              ELL32       \t0, \t0, \t1, \t2             // tmpy = ELL(t0)
+              xor         \t0, \y1, \y2                  //  t0  = y1 ^ y2
+              ELL32       \t0, \y0, \t0, \t1, \t2        // tmpy = ELL( y0 ^ t0 )
               XOR3        \x3, \x3, \x0, \t0             //  x3 ^= x0 ^ tmpy 
               XOR3        \x4, \x4, \x1, \t0             //  x4 ^= x1 ^ tmpy
               XOR3        \x5, \x5, \x2, \t0             //  x5 ^= x2 ^ tmpy
 
-              XOR3        \t0, \x0, \x1, \x2             //  t0  = x0 ^ x1 ^ x2
-              ELL32       \t0, \t0, \t1, \t2             // tmpx = ELL(t0)
+              xor         \t0, \x1, \x2                  //  t0  = x1 ^ x2
+              ELL32       \t0, \x0, \t0, \t1, \t2        // tmpx = ELL( x0 ^ t0 )
               XOR3        \y3, \y3, \y0, \t0             //  y3 ^= y0 ^ tmpx 
               XOR3        \y4, \y4, \y1, \t0             //  y4 ^= y1 ^ tmpx
               XOR3        \y5, \y5, \y2, \t0             //  y5 ^= y2 ^ tmpx
@@ -246,8 +246,8 @@
 
 #if	( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
 .macro SPARKLE_FWD_LINEAR  p0,  p1,  p2,  p3,  p4,  p5,  t0,  t1,  t2,  t3
-              XOR3        \t0, \p0, \p1, \p2             //  t0  = (y0 || x0) ^ (y1 || x1) ^ (y2 || x2)
-              ELL64       \t0, \t0, \t1, \t2, \t3        //  ELL(t0)     = (tmpx || tmpy)
+              xor         \t0, \p1, \p2                  //       t0 = (y1 || x1) ^ (y2 || x2)
+              ELL64       \t0, \p0, \t0, \t1, \t2, \t3   //  ELL( t0 ^ (y0 || x0) )   = (tmpx || tmpy)
               XOR3        \p3, \p3, \p0, \t0             //  (y3 || x3) ^= (y0 || x0) ^ (tmpx || tmpy) 
               XOR3        \p4, \p4, \p1, \t0             //  (y4 || x4) ^= (y1 || x1) ^ (tmpx || tmpy)
               XOR3        \p5, \p5, \p2, \t0             //  (y5 || x5) ^= (y2 || x2) ^ (tmpx || tmpy)
@@ -278,8 +278,8 @@
               mv          \p0, \p3
               mv          \p3, \t0
               #endif
-              XOR3        \t0, \p0, \p1, \p2             //  t0  = (y0 || x0) ^ (y1 || x1) ^ (y2 || x2)
-              ELL64       \t0, \t0, \t1, \t2, \t3        //  ELL(t0)     = (tmpx || tmpy)
+              xor         \t0, \p1, \p2                  //       t0 = (y1 || x1) ^ (y2 || x2)
+              ELL64       \t0, \p0, \t0, \t1, \t2, \t3   //  ELL( t0 ^ (y0 || x0))    = (tmpx || tmpy)
               XOR3        \p3, \p3, \p0, \t0             //  (y3 || x3) ^= (y0 || x0) ^ (tmpx || tmpy) 
               XOR3        \p4, \p4, \p1, \t0             //  (y4 || x4) ^= (y1 || x1) ^ (tmpx || tmpy)
               XOR3        \p5, \p5, \p2, \t0             //  (y5 || x5) ^= (y2 || x2) ^ (tmpx || tmpy)
