@@ -8,7 +8,7 @@
 
 #if ( ALZETTE_RV32_ELL )
 .macro ELL   r, x0, x1, t0, t1
-  alz.ell              \r,  \x0, \x1
+  alzette.ell          \r,  \x0, \x1
 .endm
 #else
 .macro ELL   r, x0, x1, t0, t1

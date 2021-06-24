@@ -8,7 +8,7 @@
 
 #if ( ALZETTE_RV64_ELL )
 .macro ELL32 r, x0, x1, t0, t1
-  alz.ell              \r,  \x0, \x1
+  alzette.ell          \r,  \x0, \x1
 .endm
 #else
 .macro ELL32 r, x0, x1, t0, t1
@@ -21,7 +21,7 @@
 
 #if ( ALZETTE_RV64_ELL )
 .macro ELL64 r, x0, x1, t0, t1, t2
-  alz.ellrev           \r,  \x0, \x1
+  alzette.ellrev       \r,  \x0, \x1
 .endm
 #else
 .macro ELL64 r, x0, x1, t0, t1, t2
