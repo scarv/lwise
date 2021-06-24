@@ -107,13 +107,13 @@ such as execution latency.
   |           | `alzette` |           |                      | see [documentation](./doc/alzette/ise.md)                                                                      |
   |           | `ascon`   |           |                      | see [documentation](./doc/ascon/ise.md)                                                                        |
 
-- Options which use a RISC-V base ISA plus custom ISE do so via the
-  [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
-  directive, rather than an invasive change to `binutils` itself.
-
 <!--- -------------------------------------------------------------------- --->
 
 ### Toolchain
+
+- Options which use a RISC-V base ISA plus custom ISE do so via the
+  [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
+  directive, rather than an invasive change to `binutils` itself.
 
 - Since the RISC-V tool-chain is 
   [patch](https://savannah.gnu.org/projects/patch)-based,
