@@ -6,8 +6,8 @@
 set project_name [lindex $argv 0]
 set orig_dir 	 [lindex $argv 1]
 set work_dir 	 [lindex $argv 2]
-set part		 [lindex $argv 3]
-set target		 [lindex $argv 4]
+set board		 [lindex $argv 3]
+set part		 [lindex $argv 4]
 
 
 # Set the directory path for the original project from where this script was exported
@@ -32,15 +32,11 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 }
 
 # Set 'sources_1' fileset object
-set files [list \
-			[file normalize $work_dir/$project_name/rtl_sources/system_top_wrapper.v] \
-			[file normalize $work_dir/$project_name/rtl_sources/plusarg_reader.v] \
-			[file normalize $work_dir/$project_name/rtl_sources/AsyncResetReg.v] \
-			[file normalize $work_dir/$project_name/rtl_sources/EICG_wrapper.v] \
-			[file normalize $work_dir/$project_name/rtl_sources/rocketcore.v] \
-			[file normalize $work_dir/$project_name/rtl_sources/memcore.v] \
-			[file normalize $work_dir/$project_name/rtl_sources/cop_ise.v] \
-              ]
+set files [list]
+set vfiles [glob -directory $work_dir/$project_name/rtl_sources/ *.v]
+foreach item $vfiles {
+	lappend files [file normalize $item]
+}
 add_files -norecurse -fileset [get_filesets sources_1] $files
 
 set_property verilog_define [list FPGA Differential_clock_capable_pin] [get_filesets sources_1] 
@@ -95,7 +91,7 @@ set_property -dict [list \
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_0/axi_crossbar_0.xci]
 
 #BRAM Controller
-create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.0 -module_name axi_bram_ctrl_0
+create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.1 -module_name axi_bram_ctrl_0
 set_property -dict [list \
                         CONFIG.DATA_WIDTH {32} \
 						CONFIG.MEM_DEPTH {8192} \
@@ -140,7 +136,7 @@ if {[string equal [get_filesets -quiet constrs_1] ""]} {
 set obj [get_filesets constrs_1]
 
 # Add/Import constrs file and set constrs file properties
-set file "[file normalize "$work_dir/../board/$target/constraint/$target.xdc"]"
+set file "[file normalize "$orig_dir/board/$board/constraint/ioportmap.xdc"]"
 set file_added [add_files -norecurse -fileset $obj $file]
 
 # generate all IP source code

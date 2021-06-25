@@ -13,13 +13,21 @@ endif
 # Sources
 #--------------------------------------------------------------------
 RTL32 =$(REPO_HOME)/src/hardware/rtl/rv32/
-rtl32_src= \
-        $(REPO_HOME)/src/hardware/rtl/rv32/cop_ise.v \
-        $(REPO_HOME)/src/hardware/rtl/rv32/xalu_ise.v \
+
+export rtl32_ise_src= \
         $(REPO_HOME)/src/hardware/rtl/rv32/rv32b_ise.v \
         $(REPO_HOME)/src/hardware/rtl/rv32/rv32ell_ise.v \
         $(REPO_HOME)/src/hardware/rtl/rv32/alzette_ise_v2.v \
         $(REPO_HOME)/src/hardware/rtl/rv32/alzette_ise_v3.v \
         $(REPO_HOME)/src/hardware/rtl/rv32/alzette_ise_v4.v 
+
+export rtl32_cop_src = $(REPO_HOME)/src/hardware/rtl/rv32/cop_ise.v 
+export rtl32_xalu_src= $(REPO_HOME)/src/hardware/rtl/rv32/xalu_ise.v 
+
+rtl32_src= \
+        $(rtl32_ise_src) \
+        $(rtl32_cop_src) \
+        $(rtl32_xalu_src) 
+         
 
 
