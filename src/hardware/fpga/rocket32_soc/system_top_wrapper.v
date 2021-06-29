@@ -232,7 +232,7 @@ wire [1:0] mem_axi_bresp, mem_axi_rresp;
    .m_axi_rready(    mem_axi_rready)      // output wire m_axi_rready
  );
  
-SCARVRocketSystem RocketSystem_Ins ( // @[SaseboRocketTest.scala 14:19:freechips.rocketchip.system.SaseboRocketConfig.fir@156658.4]
+SCARVRocketFPGASystem RocketSystem_Ins ( // @[SaseboRocketTest.scala 14:19:freechips.rocketchip.system.SaseboRocketConfig.fir@156658.4]
       .clock(clk_50M),
       .reset(~sys_rstn),
       .debug_systemjtag_jtag_TCK( 1'b0),         // input

@@ -8,7 +8,6 @@
 
 # =============================================================================
 
-export ROCKETCHIP_REPO="${REPO_HOME}/build/rocketchip"
 export ROCKETCHIP_COMMIT="985cc286633ec8591ae7a1b02110d347c9fbf30a"
 export ROCKETCHIP_PATCH="${REPO_HOME}/src/hardware/rocketchip/rocketchip.patch"
 
