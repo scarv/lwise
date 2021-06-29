@@ -1,6 +1,6 @@
 diff --git a/riscv/arith.cc b/riscv/arith.cc
 new file mode 100644
-index 0000000..22594b5
+index 0000000..02f306a
 --- /dev/null
 +++ b/riscv/arith.cc
 @@ -0,0 +1,8 @@
@@ -9,11 +9,11 @@ index 0000000..22594b5
 +// ++ alzette
 +uint32_t RCON[] = { 0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D };
 +
-+int ROT_X[] = { 31, 17,  0, 24 };
-+int ROT_Y[] = { 24, 17, 31, 16 };
++int ROT_0[] = { 31, 17,  0, 24 };
++int ROT_1[] = { 24, 17, 31, 16 };
 +// -- alzette
 diff --git a/riscv/arith.h b/riscv/arith.h
-index 398217e..d6129bc 100644
+index 398217e..c47416a 100644
 --- a/riscv/arith.h
 +++ b/riscv/arith.h
 @@ -8,6 +8,30 @@
@@ -40,8 +40,8 @@ index 398217e..d6129bc 100644
 +
 +extern uint32_t RCON[];
 +
-+extern int ROT_X[];
-+extern int ROT_Y[];
++extern int ROT_0[];
++extern int ROT_1[];
 +// -- alzette
 +
  inline uint64_t mulhu(uint64_t a, uint64_t b)
@@ -251,10 +251,10 @@ index 0000000..65a0818
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_dec_0.h b/riscv/insns/alzette_block_dec_0.h
 new file mode 100644
-index 0000000..5568dfb
+index 0000000..0915960
 --- /dev/null
 +++ b/riscv/insns/alzette_block_dec_0.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -263,13 +263,16 @@ index 0000000..5568dfb
 +         yi = yi ^ ROR32( xi, 24 );
 +         xi = xi - ROR32( yi, 31 );
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_dec_1.h b/riscv/insns/alzette_block_dec_1.h
 new file mode 100644
-index 0000000..88f668a
+index 0000000..ab69e69
 --- /dev/null
 +++ b/riscv/insns/alzette_block_dec_1.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -278,13 +281,16 @@ index 0000000..88f668a
 +         yi = yi ^ ROR32( xi, 17 );
 +         xi = xi - ROR32( yi, 17 );
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_dec_2.h b/riscv/insns/alzette_block_dec_2.h
 new file mode 100644
-index 0000000..8cbe2ba
+index 0000000..8eafcec
 --- /dev/null
 +++ b/riscv/insns/alzette_block_dec_2.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -293,13 +299,16 @@ index 0000000..8cbe2ba
 +         yi = yi ^ ROR32( xi, 31 );
 +         xi = xi - ROR32( yi,  0 );
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_dec_3.h b/riscv/insns/alzette_block_dec_3.h
 new file mode 100644
-index 0000000..a814a79
+index 0000000..375aeac
 --- /dev/null
 +++ b/riscv/insns/alzette_block_dec_3.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -308,28 +317,34 @@ index 0000000..a814a79
 +         yi = yi ^ ROR32( xi, 16 );
 +         xi = xi - ROR32( yi, 24 );
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_deci.h b/riscv/insns/alzette_block_deci.h
 new file mode 100644
-index 0000000..6750063
+index 0000000..97114ea
 --- /dev/null
 +++ b/riscv/insns/alzette_block_deci.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
 +
 +         xi = xi ^        ci;
-+         yi = yi ^ ROR32( xi, ROT_Y[ insn.funct7() & 0x3 ] );
-+         xi = xi - ROR32( yi, ROT_X[ insn.funct7() & 0x3 ] );
++         yi = yi ^ ROR32( xi, ROT_1[ insn.funct7() & 0x3 ] );
++         xi = xi - ROR32( yi, ROT_0[ insn.funct7() & 0x3 ] );
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_enc_0.h b/riscv/insns/alzette_block_enc_0.h
 new file mode 100644
-index 0000000..079575e
+index 0000000..9d90c3a
 --- /dev/null
 +++ b/riscv/insns/alzette_block_enc_0.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -338,13 +353,16 @@ index 0000000..079575e
 +         yi = yi ^ ROR32( xi, 24 );
 +         xi = xi ^        ci;
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_enc_1.h b/riscv/insns/alzette_block_enc_1.h
 new file mode 100644
-index 0000000..1095c85
+index 0000000..8d0004b
 --- /dev/null
 +++ b/riscv/insns/alzette_block_enc_1.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -353,13 +371,16 @@ index 0000000..1095c85
 +         yi = yi ^ ROR32( xi, 17 );
 +         xi = xi ^        ci;
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_enc_2.h b/riscv/insns/alzette_block_enc_2.h
 new file mode 100644
-index 0000000..a85b4a3
+index 0000000..05fa865
 --- /dev/null
 +++ b/riscv/insns/alzette_block_enc_2.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -368,13 +389,16 @@ index 0000000..a85b4a3
 +         yi = yi ^ ROR32( xi, 31 );
 +         xi = xi ^        ci;
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_enc_3.h b/riscv/insns/alzette_block_enc_3.h
 new file mode 100644
-index 0000000..baed111
+index 0000000..57274e7
 --- /dev/null
 +++ b/riscv/insns/alzette_block_enc_3.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -383,35 +407,41 @@ index 0000000..baed111
 +         yi = yi ^ ROR32( xi, 16 );
 +         xi = xi ^        ci;
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_block_enci.h b/riscv/insns/alzette_block_enci.h
 new file mode 100644
-index 0000000..9f9380c
+index 0000000..873c1c9
 --- /dev/null
 +++ b/riscv/insns/alzette_block_enci.h
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
 +
-+         xi = xi + ROR32( yi, ROT_X[ insn.funct7() & 0x3 ] );
-+         yi = yi ^ ROR32( xi, ROT_Y[ insn.funct7() & 0x3 ] );
++         xi = xi + ROR32( yi, ROT_0[ insn.funct7() & 0x3 ] );
++         yi = yi ^ ROR32( xi, ROT_1[ insn.funct7() & 0x3 ] );
 +         xi = xi ^        ci;
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) |
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_ell.h b/riscv/insns/alzette_ell.h
 new file mode 100644
-index 0000000..c0051fe
+index 0000000..5815b14
 --- /dev/null
 +++ b/riscv/insns/alzette_ell.h
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,23 @@
 +if     ( xlen == 32 ) {
-+  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
-+  uint32_t y_lo = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
++  uint32_t x    = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
++  uint32_t y    = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
 +
-+  uint32_t r_lo = ELL( x_lo ^ y_lo );
++  uint32_t r    = ELL( x    ^ y    );
 +
-+  WRITE_REG( insn.rd(), ( ( uint32_t )( r_lo ) << 0 )                                  );
++  WRITE_REG( insn.rd(), r );
 +}
 +else if( xlen == 64 ) {
 +  uint32_t x_hi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -422,16 +452,19 @@ index 0000000..c0051fe
 +  uint32_t r_hi = ELL( x_hi ^ y_hi );
 +  uint32_t r_lo = ELL( x_lo ^ y_lo );
 +
-+  WRITE_REG( insn.rd(), ( ( uint64_t )( r_lo ) << 0 ) | ( ( uint64_t )( r_hi ) << 32 ) );
++  uint64_t r    = ( ( uint64_t )( r_hi ) << 32 ) | 
++                  ( ( uint64_t )( r_lo ) <<  0 ) ;
++
++  WRITE_REG( insn.rd(), r );
 +}
 +
 diff --git a/riscv/insns/alzette_ellrev.h b/riscv/insns/alzette_ellrev.h
 new file mode 100644
-index 0000000..b30f2d7
+index 0000000..48e219e
 --- /dev/null
 +++ b/riscv/insns/alzette_ellrev.h
-@@ -0,0 +1,12 @@
-+if     ( xlen == 64 ) {
+@@ -0,0 +1,15 @@
++if( xlen == 64 ) {
 +  uint32_t x_hi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +  uint32_t y_hi = ( READ_REG( insn.rs2() ) >> 32 ) & 0xFFFFFFFF;
@@ -440,51 +473,54 @@ index 0000000..b30f2d7
 +  uint32_t r_hi = ELL( x_hi ^ y_hi );
 +  uint32_t r_lo = ELL( x_lo ^ y_lo );
 +
-+  WRITE_REG( insn.rd(), ( ( uint64_t )( r_hi ) << 0 ) | ( ( uint64_t )( r_lo ) << 32 ) );
++  uint64_t r    = ( ( uint64_t )( r_hi ) <<  0 ) | 
++                  ( ( uint64_t )( r_lo ) << 32 ) ;
++
++  WRITE_REG( insn.rd(), r );
 +}
 +
 diff --git a/riscv/insns/alzette_pack.h b/riscv/insns/alzette_pack.h
 new file mode 100644
-index 0000000..e1f4b89
+index 0000000..90f4e66
 --- /dev/null
 +++ b/riscv/insns/alzette_pack.h
 @@ -0,0 +1,9 @@
-+if     ( xlen == 64 ) {
-+  uint64_t x  = READ_REG( insn.rs1() );
-+  uint64_t y  = READ_REG( insn.rs2() );
++if( xlen == 64 ) {
++  uint64_t x    = READ_REG( insn.rs1() );
++  uint64_t y    = READ_REG( insn.rs2() );
 +
-+  uint64_t hi = ( y << 32 ) >>  0;
-+  uint64_t lo = ( x << 32 ) >> 32;
++  uint64_t r_hi = ( y << 32 ) >>  0;
++  uint64_t r_lo = ( x << 32 ) >> 32;
 +
-+  WRITE_REG( insn.rd(), lo | hi );
++  WRITE_REG( insn.rd(), r_hi | r_lo );
 +}
 diff --git a/riscv/insns/alzette_packu.h b/riscv/insns/alzette_packu.h
 new file mode 100644
-index 0000000..c5be6a4
+index 0000000..ee29e7e
 --- /dev/null
 +++ b/riscv/insns/alzette_packu.h
 @@ -0,0 +1,9 @@
-+if     ( xlen == 64 ) {
-+  uint64_t x  = READ_REG( insn.rs1() );
-+  uint64_t y  = READ_REG( insn.rs2() );
++if( xlen == 64 ) {
++  uint64_t x    = READ_REG( insn.rs1() );
++  uint64_t y    = READ_REG( insn.rs2() );
 +
-+  uint64_t hi = ( y >> 32 ) << 32;
-+  uint64_t lo = ( x >> 32 ) <<  0;
++  uint64_t r_hi = ( y >> 32 ) << 32;
++  uint64_t r_lo = ( x >> 32 ) <<  0;
 +
-+  WRITE_REG( insn.rd(), lo | hi );
++  WRITE_REG( insn.rd(), r_hi | r_lo );
 +}
 diff --git a/riscv/insns/alzette_rcon.h b/riscv/insns/alzette_rcon.h
 new file mode 100644
-index 0000000..903d79d
+index 0000000..4dbb52e
 --- /dev/null
 +++ b/riscv/insns/alzette_rcon.h
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,19 @@
 +if     ( xlen == 32 ) {
-+  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
++  uint32_t x    = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +
-+  uint32_t r_lo = x_lo ^ RCON[ insn.funct7() & 0x7 ];
++  uint32_t r    = x    ^ RCON[ insn.funct7() & 0x7 ];
 +
-+  WRITE_REG( insn.rd(), ( ( uint32_t )( r_lo ) << 0 )                                  );
++  WRITE_REG( insn.rd(), r );
 +}
 +else if( xlen == 64 ) {
 +  uint32_t x_hi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
@@ -493,20 +529,23 @@ index 0000000..903d79d
 +  uint32_t r_hi = x_hi ^ RCON[ insn.funct7() & 0x7 ];
 +  uint32_t r_lo = x_lo ^ RCON[ insn.funct7() & 0x7 ];
 +
-+  WRITE_REG( insn.rd(), ( ( uint64_t )( r_lo ) << 0 ) | ( ( uint64_t )( r_hi ) << 32 ) );
++  uint64_t r    = ( ( uint64_t )( r_hi ) << 32 ) |
++                  ( ( uint64_t )( r_lo ) <<  0 ) ;
++                  
++  WRITE_REG( insn.rd(), r );
 +}
 diff --git a/riscv/insns/alzette_rconw.h b/riscv/insns/alzette_rconw.h
 new file mode 100644
-index 0000000..74c6c42
+index 0000000..7c315c4
 --- /dev/null
 +++ b/riscv/insns/alzette_rconw.h
 @@ -0,0 +1,7 @@
-+if     ( xlen == 64 ) {
-+  uint32_t x_lo = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
++if( xlen == 64 ) {
++  uint32_t x    = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +
-+  uint32_t r_lo = x_lo ^ RCON[ insn.funct7() & 0x7 ];
++  uint32_t r    = x    ^ RCON[ insn.funct7() & 0x7 ];
 +
-+  WRITE_REG( insn.rd(), ( ( uint32_t )( r_lo ) << 0 )                                  );
++  WRITE_REG( insn.rd(), r );
 +}
 diff --git a/riscv/insns/alzette_rori.h b/riscv/insns/alzette_rori.h
 new file mode 100644
@@ -531,11 +570,11 @@ index 0000000..79b34a2
 +
 diff --git a/riscv/insns/alzette_roriw.h b/riscv/insns/alzette_roriw.h
 new file mode 100644
-index 0000000..948c321
+index 0000000..e02ca00
 --- /dev/null
 +++ b/riscv/insns/alzette_roriw.h
 @@ -0,0 +1,7 @@
-+if     ( xlen == 64 ) {
++if( xlen == 64 ) {
 +  uint32_t x = READ_REG( insn.rs1() );
 +
 +  uint32_t r = ROR32( x, insn.funct7() & 0x1F );
@@ -592,10 +631,10 @@ index 0000000..2e2eb0c
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_whole_dec.h b/riscv/insns/alzette_whole_dec.h
 new file mode 100644
-index 0000000..5126500
+index 0000000..0b0d781
 --- /dev/null
 +++ b/riscv/insns/alzette_whole_dec.h
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,21 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -613,13 +652,16 @@ index 0000000..5126500
 +         yi = yi ^ ROR32( xi, 24 );
 +         xi = xi - ROR32( yi, 31 );
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) | 
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_whole_deci.h b/riscv/insns/alzette_whole_deci.h
 new file mode 100644
-index 0000000..19a54b4
+index 0000000..a023f80
 --- /dev/null
 +++ b/riscv/insns/alzette_whole_deci.h
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,21 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = RCON[ insn.funct7() & 0x7 ];
@@ -637,7 +679,10 @@ index 0000000..19a54b4
 +         yi = yi ^ ROR32( xi, 24 );
 +         xi = xi - ROR32( yi, 31 );
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) | 
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_whole_deci_x.h b/riscv/insns/alzette_whole_deci_x.h
 new file mode 100644
 index 0000000..bc52850
@@ -688,10 +733,10 @@ index 0000000..f502bc7
 +WRITE_REG( insn.rd(), yi );
 diff --git a/riscv/insns/alzette_whole_enc.h b/riscv/insns/alzette_whole_enc.h
 new file mode 100644
-index 0000000..139aeab
+index 0000000..f586ea2
 --- /dev/null
 +++ b/riscv/insns/alzette_whole_enc.h
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,21 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = ( READ_REG( insn.rs2() ) >>  0 ) & 0xFFFFFFFF;
@@ -709,13 +754,16 @@ index 0000000..139aeab
 +         yi = yi ^ ROR32( xi, 16 );
 +         xi = xi ^        ci;
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) | 
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_whole_enci.h b/riscv/insns/alzette_whole_enci.h
 new file mode 100644
-index 0000000..3996dac
+index 0000000..8be2915
 --- /dev/null
 +++ b/riscv/insns/alzette_whole_enci.h
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,21 @@
 +uint32_t xi = ( READ_REG( insn.rs1() ) >>  0 ) & 0xFFFFFFFF;
 +uint32_t yi = ( READ_REG( insn.rs1() ) >> 32 ) & 0xFFFFFFFF;
 +uint32_t ci = RCON[ insn.funct7() & 0x7 ];
@@ -733,7 +781,10 @@ index 0000000..3996dac
 +         yi = yi ^ ROR32( xi, 16 );
 +         xi = xi ^        ci;
 +
-+WRITE_REG( insn.rd(), ( ( uint64_t )( xi ) << 0 ) | ( ( uint64_t )( yi ) << 32 ) );
++uint64_t r  = ( ( uint64_t )( yi ) << 32 ) | 
++              ( ( uint64_t )( xi ) <<  0 ) ;
++
++WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/alzette_whole_enci_x.h b/riscv/insns/alzette_whole_enci_x.h
 new file mode 100644
 index 0000000..689b632

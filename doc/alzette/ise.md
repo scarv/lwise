@@ -1,31 +1,26 @@
 # `${ALG} = "alzette"`
 
-Constructions based on Alzette [1], e.g., CRAXS10 [1], TRAXL17 [1], and SPARKLE [2].
-
 <!--- -------------------------------------------------------------------- --->
 
 ## Notation
 
 Throughout the following, we
 
+- use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
 - use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate,
+- define various look-up tables:
+
+  ```
+  ROT_0 = { 31, 17,  0, 24 }
+  ROT_1 = { 24, 17, 31, 16 }
+
+  RCON  = { 0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D }
+  ```
+
 - define 
  
   ```
   ELL( x ) = ROR32( x ^ ( x << 16 ), 16 )
-  ```
-
-- define a look-up table such that
-
-  ```
-  RCON  = { 0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D }
-  ```
-
-- define a look-up table such that
-
-  ```
-  ROT_X = { 31, 17,  0, 24 }
-  ROT_Y = { 24, 17, 31, 16 }
   ```
 
 <!--- -------------------------------------------------------------------- --->
@@ -117,7 +112,9 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) BitManip-like ISE:
 
   ```
-  alzette.rori          rd, rs1,      imm => GPR[rd] <- ROR32( GPR[rs1], imm )
+  alzette.rori          rd, rs1,      imm => x       <- GPR[rs1]
+                                             r       <- ROR32( x, imm )
+                                             GPR[rd] <- r
   ```
 
 - The (optional) ISE for `\ell` function:
@@ -141,24 +138,74 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - `ALZETTE_RV32_TYPE2`: base ISA plus custom   ISE.
 
   ```
-  alzette.addrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], imm )
-  alzette.subrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], imm )
-  alzette.xorrori       rd, rs1, rs2, imm => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], imm )
+  alzette.addrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x + ROR32( y, imm )
+                                             GPR[rd] <- r
+
+  alzette.subrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x - ROR32( y, imm )
+                                             GPR[rd] <- r
+
+  alzette.xorrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x ^ ROR32( y, imm )
+                                             GPR[rd] <- r
   ```
 
 - `ALZETTE_RV32_TYPE3`: base ISA plus custom   ISE.
 
   ```
-  alzette.addror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 31 )
-  alzette.addror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 17 )
-  alzette.addror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] + ROR32( GPR[rs2], 24 )
-  alzette.subror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 31 )
-  alzette.subror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 17 )
-  alzette.subror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] - ROR32( GPR[rs2], 24 )
-  alzette.xorror.31     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 31 )
-  alzette.xorror.17     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 17 )
-  alzette.xorror.24     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 24 )
-  alzette.xorror.16     rd, rs1, rs2      => GPR[rd] <- GPR[rs1] ^ ROR32( GPR[rs2], 16 )
+  alzette.addror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x + ROR32( y, 31 )
+                                             GPR[rd] <- r
+
+  alzette.addror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x + ROR32( y, 17 )
+                                             GPR[rd] <- r
+
+  alzette.addror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x + ROR32( y, 24 )
+                                             GPR[rd] <- r
+
+  alzette.subror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x - ROR32( y, 31 )
+                                             GPR[rd] <- r
+
+  alzette.subror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x - ROR32( y, 17 )
+                                             GPR[rd] <- r
+
+  alzette.subror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x - ROR32( y, 24 )
+                                             GPR[rd] <- r
+
+  alzette.xorror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x ^ ROR32( y, 31 )
+                                             GPR[rd] <- r
+
+  alzette.xorror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x ^ ROR32( y, 17 )
+                                             GPR[rd] <- r
+
+  alzette.xorror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x ^ ROR32( y, 24 )
+                                             GPR[rd] <- r
+
+  alzette.xorror.16     rd, rs1, rs2      => x       <-  GPR[rs1]
+                                             y       <-  GPR[rs2]
+                                             r       <- x ^ ROR32( y, 16 )
+                                             GPR[rd] <- r
   ```
      
 - `ALZETTE_RV32_TYPE4`: base ISA plus custom   ISE.
@@ -240,48 +287,62 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) BitManip-like ISE:
 
   ```
-  alzette.rori          rd, rs1,      imm => GPR[rd] <- ROR64( GPR[rs1], imm )
-  alzette.roriw         rd, rs1,      imm => GPR[rd] <- ROR32( GPR[rs1], imm )
+  alzette.rori          rd, rs1,      imm => x       <- GPR[rs1]_{63.. 0}
+                                             r       <- ROR64( x, imm )
+                                             GPR[rd] <- r
 
-  alzette.pack          rd, rs1, rs2      => hi      <-   GPR[rs2] << 32
-                                             lo      <- ( GPR[rs1] << 32 ) >> 32
-                                             GPR[rd] <- hi || lo
+  alzette.roriw         rd, rs1,      imm => x       <- GPR[rs1]_{31.. 0}
+                                             r       <- ROR32( x, imm )
+                                             GPR[rd] <- r
 
-  alzette.packu         rd, rs1, rs2      => hi      <- ( GPR[rs2] >> 32 ) << 32
-                                             lo      <-   GPR[rs1] >> 32
-                                             GPR[rd] <- hi || lo
+  alzette.pack          rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
+                                             r_hi    <-   y << 32
+                                             r_lo    <- ( x << 32 ) >> 32
+                                             r       <- r_hi | r_lo
+                                             GPR[rd] <- r
+
+  alzette.packu         rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
+                                             r_hi    <- ( y >> 32 ) << 32
+                                             r_lo    <-   x >> 32
+                                             r       <- r_hi | r_lo
+                                             GPR[rd] <- r
   ```
 
 - The (optional) ISE for `\ell` function:
 
   ```
   alzette.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
-                                             xh      <- x_{63..32}
-                                             xl      <- x_{31.. 0}
-                                             rh      <- ELL( xh )
-                                             rl      <- ELL( xl )
-                                             GPR[rd] <- rh || rl
+                                             x_hi    <- x_{63..32}
+                                             x_lo    <- x_{31.. 0}
+                                             r_hi    <- ELL( x_hi )
+                                             r_lo    <- ELL( x_lo )
+                                             r       <- r_hi || r_lo
+                                             GPR[rd] <- r
 
   alzette.ellrev        rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
-                                             xh      <- x_{63..32}
-                                             xl      <- x_{31.. 0}
-                                             rh      <- ROR32( xh ^ ( xh << 16 ), 16 )
-                                             rl      <- ROR32( xl ^ ( xl << 16 ), 16 )
-                                             GPR[rd] <- rl || rh
+                                             x_hi    <- x_{63..32}
+                                             x_lo    <- x_{31.. 0}
+                                             r_hi    <- ELL( x_hi )
+                                             r_lo    <- ELL( x_lo )
+                                             r       <- r_lo || r_hi
+                                             GPR[rd] <- r
   ```
 
 - The (optional) ISE for round constant look-up and XOR:
 
   ```
-  alzette.rcon          rd, rs1,      imm => xh      <- GPR[rs1]_{63..32}
-                                             xl      <- GPR[rs1]_{31.. 0}
-                                             rh      <- xl ^ RCON[imm]
-                                             rl      <- xl ^ RCON[imm]
-                                             GPR[rd] <- rh || rl 
+  alzette.rcon          rd, rs1,      imm => x_hi    <- GPR[rs1]_{63..32}
+                                             x_lo    <- GPR[rs1]_{31.. 0}
+                                             r_hi    <- x_hi ^ RCON[imm]
+                                             r_lo    <- x_lo ^ RCON[imm]
+                                             r       <- r_hi || r_lo
+                                             GPR[rd] <- r
 
-  alzette.rconw         rd, rs1,      imm => xl      <- GPR[rs1]_{31.. 0}
-                                             rl      <- xl ^ RCON[imm]
-                                             GPR[rd] <- rh || rl
+  alzette.rconw         rd, rs1,      imm => x       <- GPR[rs1]_{31.. 0}
+                                             r       <- x    ^ RCON[imm]
+                                             GPR[rd] <- r
   ```
 
 - `ALZETTE_RV64_TYPE1`: base ISA.
@@ -292,18 +353,18 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   alzette.block.enci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi + ROR32( yi, ROT_X[imm] )
-                                             yi      <- yi ^ ROR32( xi, ROT_Y[imm] )
+                                             xi      <- xi + ROR32( yi, ROT_0[imm] )
+                                             yi      <- yi ^ ROR32( xi, ROT_1[imm] )
                                              xi      <- xi ^        ci
-                                             GPR[rd] <- xi || yi
+                                             GPR[rd] <- yi || xi
     
   alzette.block.deci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi ^   ci
-                                             yi      <- yi ^ ROR32( xi, ROT_Y[imm] )
-                                             xi      <- xi - ROR32( yi, ROT_X[imm] )
-                                             GPR[rd] <- xi || yi
+                                             yi      <- yi ^ ROR32( xi, ROT_1[imm] )
+                                             xi      <- xi - ROR32( yi, ROT_0[imm] )
+                                             GPR[rd] <- yi || xi
   ```
 
 - `ALZETTE_RV64_TYPE3`: base ISA plus custom   ISE.
@@ -462,5 +523,9 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 [2] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
     [Lightweight AEAD and Hashing using the Sparkle Permutation Family](https://tosc.iacr.org/index.php/ToSC/article/view/8627)
     IACR Transactions on Symmetric Cryptology, 2020(S1), 208--261, 2020.
+
+[3] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, A. Moradi, L. Perrin, A.R. Shahmirzadi, A. Udovenko, V. Velichkov, and Q. Wang.
+    [Schwaemm and Esch: Lightweight Authenticated Encryption and Hashing using the Sparkle Permutation Family](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)
+    Submission to NIST (Version 1.2), 2021.
 
 <!--- -------------------------------------------------------------------- --->
