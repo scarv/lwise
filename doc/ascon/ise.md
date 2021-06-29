@@ -49,21 +49,21 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 - The (optional) BitManip-like ISE:
 
   ```
-  alzette.rori.lo       rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
+  ascon.rori.lo         rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
                                              x_lo    <- GPR[rs1]
                                              x       <- x_hi || x_lo
                                              r       <- ROR64( x, imm )
                                              GPR[rd] <- r_{31.. 0}
-  alzette.rori.hi       rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
+  ascon.rori.hi         rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
                                              x_lo    <- GPR[rs1]
                                              x       <- x_hi || x_lo
                                              r       <- ROR64( x, imm )
                                              GPR[rd] <- r_{63..32}
   ```
 
-- `ALZETTE_RV32_TYPE1`: base ISA.
+- `ASCON_RV32_TYPE1`: base ISA.
 
-- `ALZETTE_RV32_TYPE2`: base ISA plus custom   ISE.
+- `ASCON_RV32_TYPE2`: base ISA plus custom   ISE.
 
   ```
   ascon.sigma.lo        rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
@@ -83,14 +83,14 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 - The (optional) BitManip-like ISE:
 
   ```
-  alzette.rori          rd, rs1,      imm => x       <- GPR[rs1]
+  ascon.rori            rd, rs1,      imm => x       <- GPR[rs1]
                                              r       <- ROR64( x, imm )
                                              GPR[rd] <- r
   ```
 
-- `ALZETTE_RV32_TYPE1`: base ISA.
+- `ASCON_RV32_TYPE1`: base ISA.
 
-- `ALZETTE_RV32_TYPE2`: base ISA plus custom   ISE.
+- `ASCON_RV32_TYPE2`: base ISA plus custom   ISE.
 
   ```
   ascon.sigma           rd, rs1,      imm => x       <- GPR[rs1]
