@@ -7,7 +7,7 @@
 Throughout the following, we
 
 - use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
-- use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate.
+- use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate,
 - define various look-up tables:
 
   ```
@@ -54,6 +54,7 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
                                              x       <- x_hi || x_lo
                                              r       <- ROR64( x, imm )
                                              GPR[rd] <- r_{31.. 0}
+
   ascon.rori.hi         rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
                                              x_lo    <- GPR[rs1]
                                              x       <- x_hi || x_lo
@@ -71,6 +72,7 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
                                              x       <- x_hi || x_lo
                                              r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
                                              GPR[rd] <- r_{31.. 0}
+
   ascon.sigma.hi        rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
                                              x_lo    <- GPR[rs1]
                                              x       <- x_hi || x_lo
