@@ -6,10 +6,10 @@
 
 export LD_LIBRARY_PATH = $(RISCV_ROCKET)/lib
 export FPGA_BUILD = $(REPO_HOME)/build/fpga
-export FPGA = $(REPO_HOME)/src/hardware/fpga
+export FPGA    = $(REPO_HOME)/src/hardware/fpga
+export BOARD  ?= sakura-x
+export SOC	   = $(IMP)-rocket
 
-BOARD         ?= sakura-x
-SOC	          ?= rocket32_soc
 VIVADO_PROJECT = $(SOC)-$(ISE)-imp
 prog_mem       = $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin/prog.mem
 
@@ -23,30 +23,28 @@ include ${REPO_HOME}/src/hardware/rtl/rv64/Makefile.in
 # Systems
 #--------------------------------------------------------------------
 include $(FPGA)/board/$(BOARD)/script/bsp
-include ${REPO_HOME}/src/hardware/fpga/$(SOC)/Makefile.in
-
-
+include $(FPGA)/soc/$(SOC)/Makefile.in
 
 #--------------------------------------------------------------------
 # compiling programs to run on FPGA
 #--------------------------------------------------------------------
 helloworld:
-	$(MAKE) -C $(REPO_HOME)/csrc/helloworld all CORE=$(SOC) hal_dir=$(FPGA)/$(SOC)/hal work_dir=$(FPGA_BUILD)/helloworld
+	$(MAKE) -C $(FPGA)/examples/helloworld all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/helloworld
 	{ echo '@00000000'; cat $(FPGA_BUILD)/helloworld/helloworld-$(SOC).hex;} >$(prog_mem)
 led-flash:
-	$(MAKE) -C $(REPO_HOME)/csrc/led_flash all CORE=$(SOC) hal_dir=$(FPGA)/$(SOC)/hal work_dir=$(FPGA_BUILD)/led_flash
+	$(MAKE) -C $(REPO_HOME)/csrc/led_flash all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/led_flash
 	{ echo '@00000000'; cat $(FPGA_BUILD)/led_flash/led_flash-$(SOC).hex;} >$(prog_mem)
 
 run_verify:
-	$(MAKE) -C $(REPO_HOME)/csrc/run_verify all CORE=$(SOC) hal_dir=$(FPGA)/$(SOC)/hal work_dir=$(FPGA_BUILD)/run_verify
+	$(MAKE) -C $(REPO_HOME)/csrc/run_verify all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/run_verify
 	{ echo '@00000000'; cat $(FPGA_BUILD)/run_verify/run_verify-$(SOC).hex;} >$(prog_mem)
 
 run_eval:
-	$(MAKE) -C $(REPO_HOME)/csrc/run_eval all CORE=$(SOC) hal_dir=$(FPGA)/$(SOC)/hal work_dir=$(FPGA_BUILD)/run_eval
+	$(MAKE) -C $(REPO_HOME)/csrc/run_eval all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/run_eval
 	{ echo '@00000000'; cat $(FPGA_BUILD)/run_eval/run_eval-$(SOC).hex;} >$(prog_mem)
 
 run32_eval:
-	$(MAKE) -C $(REPO_HOME)/csrc/run32_eval all CORE=$(SOC) hal_dir=$(FPGA)/$(SOC)/hal work_dir=$(FPGA_BUILD)/run32_eval
+	$(MAKE) -C $(REPO_HOME)/csrc/run32_eval all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/run32_eval
 	{ echo '@00000000'; cat $(FPGA_BUILD)/run32_eval/run32_eval-$(SOC).hex;} >$(prog_mem)
 
 .PHONY: helloworld led-flash 
