@@ -1,4 +1,3 @@
-
 # Copyright (C) 2021 SCARV project <info@scarv.org>
 #
 # Use of this source code is restricted per the MIT license, a copy of which 
@@ -12,17 +11,17 @@ endif
 #--------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------
-RTL32 =$(REPO_HOME)/src/hardware/rtl/rv32/
+RTL32 =$(REPO_HOME)/src/hardware/rtl/rv32
 
-export rtl32_ise_src= \
-        $(REPO_HOME)/src/hardware/rtl/rv32/rv32b_ise.v \
-        $(REPO_HOME)/src/hardware/rtl/rv32/rv32ell_ise.v \
-        $(REPO_HOME)/src/hardware/rtl/rv32/alzette_ise_v2.v \
-        $(REPO_HOME)/src/hardware/rtl/rv32/alzette_ise_v3.v \
-        $(REPO_HOME)/src/hardware/rtl/rv32/alzette_ise_v4.v 
+rtl32_ise_src= \
+        $(RTL32)/rv32b_ise.v \
+        $(RTL32)/rv32ell_ise.v \
+        $(RTL32)/alzette_ise_v2.v \
+        $(RTL32)/alzette_ise_v3.v \
+        $(RTL32)/alzette_ise_v4.v 
 
-export rtl32_cop_src = $(REPO_HOME)/src/hardware/rtl/rv32/cop_ise.v 
-export rtl32_xalu_src= $(REPO_HOME)/src/hardware/rtl/rv32/xalu_ise.v 
+rtl32_cop_src = $(RTL32)/cop_ise.v 
+rtl32_xalu_src= $(RTL32)/xalu_ise.v 
 
 rtl32_src= \
         $(rtl32_ise_src) \

@@ -4,11 +4,10 @@
 #   Generate a vivado project for the rocketchip SoC on sakura X board
 
 set project_name [lindex $argv 0]
-set orig_dir 	 [lindex $argv 1]
+set bsp_dir 	 [lindex $argv 1]
 set work_dir 	 [lindex $argv 2]
 set board		 [lindex $argv 3]
 set part		 [lindex $argv 4]
-
 
 # Set the directory path for the original project from where this script was exported
 set orig_proj_dir [file normalize $work_dir/$project_name]
@@ -22,7 +21,6 @@ set proj_dir [get_property directory [current_project]]
 # Set project properties
 set obj [get_projects $project_name]
 set_property "default_lib" "xil_defaultlib" $obj
-#set_property "board_part" "Sasebo" $obj
 set_property "PART" $part $obj 
 set_property "simulator_language" "Mixed" $obj
 
@@ -124,9 +122,6 @@ set_property -dict [list \
 	[get_ips axi_uartlite_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_uartlite_0/axi_uartlite_0.xci]
 
-
-
-
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
   create_fileset -constrset constrs_1
@@ -136,7 +131,7 @@ if {[string equal [get_filesets -quiet constrs_1] ""]} {
 set obj [get_filesets constrs_1]
 
 # Add/Import constrs file and set constrs file properties
-set file "[file normalize "$orig_dir/board/$board/constraint/ioportmap.xdc"]"
+set file "[file normalize "$bsp_dir/board/$board/constraint/ioportmap.xdc"]"
 set file_added [add_files -norecurse -fileset $obj $file]
 
 # generate all IP source code

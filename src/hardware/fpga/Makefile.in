@@ -13,6 +13,9 @@ export SOC	   = $(IMP)-rocket
 VIVADO_PROJECT = $(SOC)-$(ISE)-imp
 prog_mem       = $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin/prog.mem
 
+VIVADO = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && vivado
+UPDMEM = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && updatemem
+
 #--------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------

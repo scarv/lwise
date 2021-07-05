@@ -8,11 +8,13 @@ ifndef REPO_HOME
   $(error "execute 'source ./bin/conf.sh' to configure environment")
 endif
 
-VIVADO = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && vivado
-UPDMEM = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && updatemem
+ROCKET          = freechips.rocketchip.system
+FPGAMODEL       = SCARVRocketFPGASystem
+COP_FPGACONFIG  = SCARVRocketFPGACoPConf32
+XALU_FPGACONFIG = SCARVRocketFPGAXALUConf32
 
 #--------------------------------------------------------------------
-# Sources-
+# Sources
 #--------------------------------------------------------------------
 rocketchip_support_src = \
     $(ROCKETCHIP_REPO)/src/main/resources/vsrc/plusarg_reader.v \
@@ -29,12 +31,6 @@ rtl_sources = $(widecard $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/*.v)
 #--------------------------------------------------------------------
 # Build Verilog
 #--------------------------------------------------------------------
-ROCKET = freechips.rocketchip.system
-FPGAMODEL  = SCARVRocketFPGASystem
-
-COP_FPGACONFIG  = SCARVRocketFPGACoPConf32
-XALU_FPGACONFIG = SCARVRocketFPGAXALUConf32
-
 fpga-rocketchip-cop-verilog = $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(COP_FPGACONFIG).v
 $(fpga-rocketchip-cop-verilog) : 
 	cp -f $(FPGA)/soc/$(SOC)/bootrom/bootrom.img             $(ROCKETCHIP_REPO)/bootrom/bootrom.img
@@ -72,9 +68,6 @@ fpga_verilog: $(ISE)_verilog
 #--------------------------------------------------------------------
 # Project generation
 #--------------------------------------------------------------------
-default: vivado_project_file
-.PHONY: default
-
 vivado_project_file = $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).xpr
 fpga_project: fpga_verilog | $(vivado_project_file)
 $(vivado_project_file): 
@@ -91,14 +84,13 @@ $(bitstream): $(rtl_sources)  $(vivado_project_file)
 program: $(bitstream)
 	$(VIVADO) -mode batch -source $(FPGA)/script/program.tcl -tclargs $(device) $(bitstream)
 
-
 vivado: $(vivado_project_file)
 	$(VIVADO) $(vivado_project_file) &
 
 .PHONY: fpga_project bitstream program vivado 
 
 #--------------------------------------------------------------------
-# Debug helper
+# Update Program helper
 #--------------------------------------------------------------------
 search-ramb: $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi
 $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi: $(bitstream)
