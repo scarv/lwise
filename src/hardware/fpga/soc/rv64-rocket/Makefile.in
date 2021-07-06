@@ -1,0 +1,107 @@
+# Copyright (C) 2021 SCARV project <info@scarv.org>
+#
+# Use of this source code is restricted per the MIT license, a copy of which 
+# can be found at https://opensource.org/licenses/MIT (or should be included 
+# as LICENSE.txt within the associated archive or repository).
+
+ifndef REPO_HOME
+  $(error "execute 'source ./bin/conf.sh' to configure environment")
+endif
+
+ROCKET          = freechips.rocketchip.system
+FPGAMODEL       = SCARVRocketFPGASystem
+COP_FPGACONFIG  = SCARVRocketFPGACoPConf64
+XALU_FPGACONFIG = SCARVRocketFPGAXALUConf64
+
+#--------------------------------------------------------------------
+# Sources
+#--------------------------------------------------------------------
+rocketchip_support_src = \
+    $(ROCKETCHIP_REPO)/src/main/resources/vsrc/plusarg_reader.v \
+    $(ROCKETCHIP_REPO)/src/main/resources/vsrc/EICG_wrapper.v
+
+rocketchip_cop_ram_src =\
+    $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(COP_FPGACONFIG).behav_srams.v
+
+rocketchip_xalu_ram_src =\
+    $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(XALU_FPGACONFIG).behav_srams.v
+
+rtl_sources = $(widecard $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/*.v)
+
+#--------------------------------------------------------------------
+# Build Verilog
+#--------------------------------------------------------------------
+fpga-rocketchip-cop-verilog = $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(COP_FPGACONFIG).v
+$(fpga-rocketchip-cop-verilog) : 
+	cp -f $(FPGA)/soc/$(SOC)/bootrom/bootrom.img             $(ROCKETCHIP_REPO)/bootrom/bootrom.img
+	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog MODEL=$(FPGAMODEL) CONFIG=$(COP_FPGACONFIG)
+
+fpga-rocketchip-xalu-verilog = $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(XALU_FPGACONFIG).v
+$(fpga-rocketchip-xalu-verilog) : 
+	cp -f $(FPGA)/soc/$(SOC)/bootrom/bootrom.img             $(ROCKETCHIP_REPO)/bootrom/bootrom.img
+	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog MODEL=$(FPGAMODEL) CONFIG=$(XALU_FPGACONFIG)
+
+cop_verilog: $(fpga-rocketchip-cop-verilog) $(FPGA)/soc/$(SOC)/system_top_wrapper.v $(rtl64_cop_src) $(rtl64_ise_src)
+	mkdir -p $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources
+	mkdir -p $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin
+	cp -f $(FPGA)/soc/$(SOC)/system_top_wrapper.v $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/system_top_wrapper.v
+	cp -f $(fpga-rocketchip-cop-verilog)            $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/rocketcore.v
+	cp -f $(rocketchip_cop_ram_src)                 $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/memcore.v
+	cp -f $(rocketchip_support_src)                 $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
+	cp -f $(rtl64_cop_src)                          $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
+	cp -f $(rtl64_ise_src)                          $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
+
+xalu_verilog: $(fpga-rocketchip-xalu-verilog) $(FPGA)/soc/$(SOC)/system_top_wrapper.v $(rtl64_xalu_src) $(rtl64_ise_src)
+	mkdir -p $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources
+	mkdir -p $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin
+	cp -f $(FPGA)/soc/$(SOC)/system_top_wrapper.v $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/system_top_wrapper.v
+	cp -f $(fpga-rocketchip-xalu-verilog)           $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/rocketcore.v
+	cp -f $(rocketchip_xalu_ram_src)                $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/memcore.v
+	cp -f $(rocketchip_support_src)                 $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
+	cp -f $(rtl64_xalu_src)                         $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
+	cp -f $(rtl64_ise_src)                          $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
+
+fpga_verilog: $(ISE)_verilog
+
+.PHONY: fpga_verilog
+
+#--------------------------------------------------------------------
+# Project generation
+#--------------------------------------------------------------------
+vivado_project_file = $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).xpr
+fpga_project: fpga_verilog | $(vivado_project_file)
+$(vivado_project_file): 
+	$(shell sed -i 's/CONFIG.PRIM_SOURCE.*/''CONFIG.PRIM_SOURCE {$(clktype)} \\''/g' $(FPGA)/soc/$(SOC)/script/make_project.tcl)
+	$(shell sed -i 's/CONFIG.PRIM_IN_FREQ.*/''CONFIG.PRIM_IN_FREQ {$(inclock)} \\''/g' $(FPGA)/soc/$(SOC)/script/make_project.tcl)
+	$(shell sed -i 's/set_property verilog_define.*/''set_property verilog_define \[list FPGA $(clktype)\] \[get_filesets sources_1\] ''/g' $(FPGA)/soc/$(SOC)/script/make_project.tcl)
+	$(VIVADO) -mode batch -source $(FPGA)/soc/$(SOC)/script/make_project.tcl -tclargs $(VIVADO_PROJECT) $(FPGA) $(FPGA_BUILD) $(BOARD) $(part)  
+
+bitstream = $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.bit
+bitstream: $(bitstream) 
+$(bitstream): $(rtl_sources)  $(vivado_project_file)
+	$(VIVADO) -mode batch -source $(FPGA)/script/make_bitstream.tcl -tclargs $(VIVADO_PROJECT) $(FPGA_BUILD)
+
+program: $(bitstream)
+	$(VIVADO) -mode batch -source $(FPGA)/script/program.tcl -tclargs $(device) $(bitstream)
+
+vivado: $(vivado_project_file)
+	$(VIVADO) $(vivado_project_file) &
+
+.PHONY: fpga_project bitstream program vivado 
+
+#--------------------------------------------------------------------
+# Update Program helper
+#--------------------------------------------------------------------
+search-ramb: $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi
+$(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi: $(bitstream)
+	$(VIVADO) -mode batch -source $(FPGA)/script/search_ramb.tcl -tclargs $(VIVADO_PROJECT) $(FPGA_BUILD) > $(FPGA_BUILD)/$(VIVADO_PROJECT)/search-ramb.info
+	python $(FPGA)/script/mmi_gen.py $(FPGA_BUILD)/$(VIVADO_PROJECT)/search-ramb.info $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi 64 32768 $(part)
+
+bit-update: $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
+$(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit: $(bitstream) $(prog_mem) $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi
+	$(UPDMEM) -force -meminfo $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi -data $(prog_mem) -bit $(bitstream) -proc dummy -out $@
+
+program-updated: $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
+	$(VIVADO) -mode batch -source $(FPGA)/script/program.tcl -tclargs $(device) $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
+
+.PHONY: bit-update program-updated
