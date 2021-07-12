@@ -115,7 +115,7 @@ index 881ed7d..dec362a 100644
  DECLARE_INSN(srai_rv32, MATCH_SRAI_RV32, MASK_SRAI_RV32)
 diff --git a/riscv/insns/jambu_block_0.h b/riscv/insns/jambu_block_0.h
 new file mode 100644
-index 0000000..d034cb5
+index 0000000..57c74ce
 --- /dev/null
 +++ b/riscv/insns/jambu_block_0.h
 @@ -0,0 +1,15 @@
@@ -130,13 +130,13 @@ index 0000000..d034cb5
 +  uint32_t t_2  = ROR64( ( ( uint64_t )( s_3 ) << 32 ) | ( ( uint64_t )( s_2 ) << 0 ), 21 );
 +  uint32_t t_3  = ROR64( ( ( uint64_t )( s_3 ) << 32 ) | ( ( uint64_t )( s_2 ) << 0 ), 27 );
 +
-+  uint32_t r    = t0 ^ ~( t1 & t2 ) ^ t3;
++  uint32_t r    = t_0 ^ ~( t_1 & t_2 ) ^ t_3;
 +
 +  WRITE_REG( insn.rd(), r );
 +}
 diff --git a/riscv/insns/jambu_block_1.h b/riscv/insns/jambu_block_1.h
 new file mode 100644
-index 0000000..a549db8
+index 0000000..51f979a
 --- /dev/null
 +++ b/riscv/insns/jambu_block_1.h
 @@ -0,0 +1,15 @@
@@ -151,13 +151,13 @@ index 0000000..a549db8
 +  uint32_t t_2  = ROR64( ( ( uint64_t )( s_0 ) << 32 ) | ( ( uint64_t )( s_3 ) << 0 ), 21 );
 +  uint32_t t_3  = ROR64( ( ( uint64_t )( s_0 ) << 32 ) | ( ( uint64_t )( s_3 ) << 0 ), 27 );
 +
-+  uint32_t r    = t0 ^ ~( t1 & t2 ) ^ t3;
++  uint32_t r    = t_0 ^ ~( t_1 & t_2 ) ^ t_3;
 +
 +  WRITE_REG( insn.rd(), r );
 +}
 diff --git a/riscv/insns/jambu_block_2.h b/riscv/insns/jambu_block_2.h
 new file mode 100644
-index 0000000..2773c98
+index 0000000..5e2ea62
 --- /dev/null
 +++ b/riscv/insns/jambu_block_2.h
 @@ -0,0 +1,15 @@
@@ -172,13 +172,13 @@ index 0000000..2773c98
 +  uint32_t t_2  = ROR64( ( ( uint64_t )( s_1 ) << 32 ) | ( ( uint64_t )( s_0 ) << 0 ), 21 );
 +  uint32_t t_3  = ROR64( ( ( uint64_t )( s_1 ) << 32 ) | ( ( uint64_t )( s_0 ) << 0 ), 27 );
 +
-+  uint32_t r    = t0 ^ ~( t1 & t2 ) ^ t3;
++  uint32_t r    = t_0 ^ ~( t_1 & t_2 ) ^ t_3;
 +
 +  WRITE_REG( insn.rd(), r );
 +}
 diff --git a/riscv/insns/jambu_block_3.h b/riscv/insns/jambu_block_3.h
 new file mode 100644
-index 0000000..896c225
+index 0000000..e50a695
 --- /dev/null
 +++ b/riscv/insns/jambu_block_3.h
 @@ -0,0 +1,15 @@
@@ -193,7 +193,7 @@ index 0000000..896c225
 +  uint32_t t_2  = ROR64( ( ( uint64_t )( s_2 ) << 32 ) | ( ( uint64_t )( s_1 ) << 0 ), 21 );
 +  uint32_t t_3  = ROR64( ( ( uint64_t )( s_2 ) << 32 ) | ( ( uint64_t )( s_1 ) << 0 ), 27 );
 +
-+  uint32_t r    = t0 ^ ~( t1 & t2 ) ^ t3;
++  uint32_t r    = t_0 ^ ~( t_1 & t_2 ) ^ t_3;
 +
 +  WRITE_REG( insn.rd(), r );
 +}
