@@ -49,6 +49,16 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 - The (optional) BitManip-like ISE:
 
   ```
+  ascon.orn             rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
+                                             r       <- x | ~y
+                                             GPR[rd] <- r
+
+  ascon.andn            rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
+                                             r       <- x & ~y
+                                             GPR[rd] <- r
+
   ascon.rori.lo         rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
                                              x_lo    <- GPR[rs1]
                                              x       <- x_hi || x_lo
@@ -82,17 +92,29 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 
 <!--- -------------------------------------------------------------------- --->
 
+## `${IMP} = "rv64"`
+
 - The (optional) BitManip-like ISE:
 
   ```
+  ascon.orn             rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
+                                             r       <- x | ~y
+                                             GPR[rd] <- r
+
+  ascon.andn            rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
+                                             r       <- x & ~y
+                                             GPR[rd] <- r
+
   ascon.rori            rd, rs1,      imm => x       <- GPR[rs1]
                                              r       <- ROR64( x, imm )
                                              GPR[rd] <- r
   ```
 
-- `ASCON_RV32_TYPE1`: base ISA.
+- `ASCON_RV64_TYPE1`: base ISA.
 
-- `ASCON_RV32_TYPE2`: base ISA plus custom   ISE.
+- `ASCON_RV64_TYPE2`: base ISA plus custom   ISE.
 
   ```
   ascon.sigma           rd, rs1,      imm => x       <- GPR[rs1]
@@ -106,6 +128,6 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 
 [1] C. Dobraunig, M. Eichlseder, F. Mendel, and M. Schläffer.
     [Ascon](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf).
-    Submission to NIST (Version 1.2), 2021.
+    Submission to NIST (version 1.2), 2021.
 
 <!--- -------------------------------------------------------------------- --->

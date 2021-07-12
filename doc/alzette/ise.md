@@ -526,6 +526,6 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 [3] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, A. Moradi, L. Perrin, A.R. Shahmirzadi, A. Udovenko, V. Velichkov, and Q. Wang.
     [Schwaemm and Esch: Lightweight Authenticated Encryption and Hashing using the Sparkle Permutation Family](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)
-    Submission to NIST (Version 1.2), 2021.
+    Submission to NIST (version 1.2), 2021.
 
 <!--- -------------------------------------------------------------------- --->

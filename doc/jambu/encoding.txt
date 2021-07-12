@@ -1,0 +1,93 @@
++=====================+======================+==========+=====================+=========+=============+
+| class               | instruction          | format   | f7                  | f3      | custom      |
++=====================+======================+==========+=====================+=========+=============+
+|                     |                      |          |                     |         |             |
+| JAMBU_RV32B         | jambu.rori           | 1R+I->1R | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
+| JAMBU_RV64B         | jambu.rori           | 1R+I->1R | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
+| JAMBU_RV64B         | jambu.roriw          | 1R+I->1R | 01 : imm5           | 6 = 110 | 0 = 0001011 |
+|                     |                      |          |                     |         |             |
++=====================+======================+==========+=====================+=========+=============+
+
+.macro jambu.rori           rd, rs1,      imm      // jambu.rori              => 00ii iii0 0000 rrrr r110 rrrr r000 1011
+.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0 //                         => #define MATCH_JAMBU_RORI    0x0000600B
+.endm                                              //                         => #define  MASK_JAMBU_RORI    0xC000707F
+.macro jambu.roriw          rd, rs1,      imm      // jambu.roriw             => 01ii iii0 0000 rrrr r110 rrrr r000 1011
+.insn r CUSTOM_0, 6, \imm+( 1*32), \rd, \rs1,   x0 //                         => #define MATCH_JAMBU_RORIW   0x4000600B
+.endm                                              //                         => #define  MASK_JAMBU_RORIW   0xC000707F
+
++=====================+======================+==========+=====================+=========+=============+
+| class               | instruction          | format   | f7                  | f3      | custom      |
++=====================+======================+==========+=====================+=========+=============+
+|                     |                      |          |                     |         |             |
+| JAMBU_RV32_TYPE2    | jambu.fsri           | 2R+I->1R | 00 : imm5           | 7 = 111 | 1 = 0101011 |
+|                     |                      |          |                     |         |             |
++=====================+======================+==========+=====================+=========+=============+
+
+.macro jambu.fsri           rd, rs1, rs2, imm      // jambu.fsri              => 00ii iiir rrrr rrrr r111 rrrr r010 1011
+.insn r CUSTOM_1, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSRI    0x0000702B
+.endm                                              //                         => #define  MASK_JAMBU_FSRI    0xC000707F
+
++=====================+======================+==========+=====================+=========+=============+
+| class               | instruction          | format   | f7                  | f3      | custom      |
++=====================+======================+==========+=====================+=========+=============+
+|                     |                      |          |                     |         |             |
+| JAMBU_RV32B         | jambu.xnor           | 2R  ->1R | 00 : 00000          | 7 = 111 | 2 = 1011011 |
+| JAMBU_RV64B         | jambu.xnor           | 2R  ->1R | 00 : 00000          | 7 = 111 | 2 = 1011011 |
+|                     |                      |          |                     |         |             |
+| JAMBU_RV64B         | jambu.pack           | 2R  ->1R | 00 : 00001          | 7 = 111 | 2 = 1011011 |
+| JAMBU_RV64B         | jambu.packu          | 2R  ->1R | 00 : 00010          | 7 = 111 | 2 = 1011011 |
+|                     |                      |          |                     |         |             |
++=====================+======================+==========+=====================+=========+=============+
+
+.macro jambu.xnor           rd, rs1, rs2           // jambu.xnor              => 0000 000r rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_XNOR    0x0000705B
+.endm                                              //                         => #define  MASK_JAMBU_XNOR    0xFE00707F
+
+.macro jambu.pack           rd, rs1, rs2           // jambu.pack              => 0000 000r rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_3, 7,      ( 1* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_PACK    0x0000705B
+.endm                                              //                         => #define  MASK_JAMBU_PACK    0xFE00707F
+.macro jambu.packu          rd, rs1, rs2           // jambu.packu             => 0000 001r rrrr rrrr r111 rrrr r101 1011
+.insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_PACKU   0x0200705B
+.endm                                              //                         => #define  MASK_JAMBU_PACKU   0xFE00707F
+
++=====================+======================+==========+=====================+=========+=============+
+| class               | instruction          | format   | f7                  | f3      | custom      |
++=====================+======================+==========+=====================+=========+=============+
+|                     |                      |          |                     |         |             |
+| JAMBU_RV32_TYPE3    | jambu.fsr.15         | 2R  ->1R | 00 : 00000          | 7 = 111 | 3 = 1111011 |
+| JAMBU_RV32_TYPE3    | jambu.fsr.6          | 2R  ->1R | 00 : 00001          | 7 = 111 | 3 = 1111011 |
+| JAMBU_RV32_TYPE3    | jambu.fsr.21         | 2R  ->1R | 00 : 00010          | 7 = 111 | 3 = 1111011 |
+| JAMBU_RV32_TYPE3    | jambu.fsr.27         | 2R  ->1R | 00 : 00011          | 7 = 111 | 3 = 1111011 |
+|                     |                      |          |                     |         |             |
+| JAMBU_RV64_TYPE2    | jambu.block.0        | 2R  ->1R | 01 : 00000          | 7 = 111 | 3 = 1111011 |
+| JAMBU_RV64_TYPE2    | jambu.block.1        | 2R  ->1R | 01 : 00001          | 7 = 111 | 3 = 1111011 |
+| JAMBU_RV64_TYPE2    | jambu.block.2        | 2R  ->1R | 01 : 00010          | 7 = 111 | 3 = 1111011 |
+| JAMBU_RV64_TYPE2    | jambu.block.3        | 2R  ->1R | 01 : 00011          | 7 = 111 | 3 = 1111011 |
+|                     |                      |          |                     |         |             |
++=====================+======================+==========+=====================+=========+=============+     
+
+.macro jambu.fsr.15         rd, rs1, rs2           // jambu.fsr.15            => 0000 000r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_15  0x0000707B
+.endm                                              //                         => #define  MASK_JAMBU_FSR_15  0xFE00707F
+.macro jambu.fsr.6          rd, rs1, rs2           // jambu.fsr.6             => 0000 001r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_6   0x0200707B
+.endm                                              //                         => #define  MASK_JAMBU_FSR_6   0xFE00707F
+.macro jambu.fsr.21         rd, rs1, rs2           // jambu.fsr.21            => 0000 010r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_21  0x0400707B
+.endm                                              //                         => #define  MASK_JAMBU_FSR_21  0xFE00707F
+.macro jambu.fsr.27         rd, rs1, rs2           // jambu.fsr.27            => 0000 011r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_27  0x0600707B
+.endm                                              //                         => #define  MASK_JAMBU_FSR_27  0xFE00707F
+
+.macro jambu.block.0        rd, rs1, rs2           // jambu.block.0           => 0100 000r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (32* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_BLOCK_0 0x4000707B
+.endm                                              //                         => #define  MASK_JAMBU_BLOCK_0 0xFE00707F
+.macro jambu.block.1        rd, rs1, rs2           // jambu.block.1           => 0100 001r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (33* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_BLOCK_1 0x4200707B
+.endm                                              //                         => #define  MASK_JAMBU_BLOCK_1 0xFE00707F
+.macro jambu.block.2        rd, rs1, rs2           // jambu.block.2           => 0100 010r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (34* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_BLOCK_2 0x4400707B
+.endm                                              //                         => #define  MASK_JAMBU_BLOCK_2 0xFE00707F
+.macro jambu.block.3        rd, rs1, rs2           // jambu.block.3           => 0100 011r rrrr rrrr r111 rrrr r111 1011
+.insn r CUSTOM_3, 7,      (35* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_BLOCK_3 0x4600707B
+.endm                                              //                         => #define  MASK_JAMBU_BLOCK_3 0xFE00707F

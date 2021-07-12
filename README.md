@@ -14,7 +14,7 @@ might be deemed (too) heavyweight.  From an initial 57 submissions, the 10
 [final-round candidates](https://csrc.nist.gov/Projects/lightweight-cryptography/finalists) 
 are
 
-1. [ASCON](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf)
+1. [Ascon](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf)
 1. [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf)
 1. [GIFT-COFB](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf)
 1. [Grain128-AEAD](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/grain-128aead-spec-final.pdf)
@@ -80,7 +80,7 @@ such as execution latency.
 
   - `${ALG}`
     - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/software/${ALG}`
-    - values: `alzette`, `ascon`
+    - values: `alzette`, `ascon`, `jambu`
     - default: `alzette`
 
   - `${ARCH}`
@@ -106,6 +106,7 @@ such as execution latency.
   |           |           |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum)      |
   |           | `alzette` |           |                      | see [documentation](./doc/alzette/ise.md)                                                                      |
   |           | `ascon`   |           |                      | see [documentation](./doc/ascon/ise.md)                                                                        |
+  |           | `jambu`   |           |                      | see [documentation](./doc/jambu/ise.md)                                                                        |
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -171,11 +172,10 @@ such as execution latency.
   [`spike`](https://github.com/riscv/riscv-isa-sim)
   and associated
   [`pk`](https://github.com/riscv/riscv-pk) 
-  for each algorithm:
+  for each algorithm, e.g.,
   
   ```sh
   make ALG="alzette" toolchain-build
-  make ALG="ascon"   toolchain-build
   ```
 
 - Build and execute implementation, e.g.,
@@ -183,8 +183,6 @@ such as execution latency.
   ```sh
   make ALG="alzette"  software-build
   make ALG="alzette"  software-run
-  make ALG="ascon"    software-build
-  make ALG="ascon"    software-run
   ```
 
   or use the script provided

@@ -6,7 +6,13 @@
 
 // ============================================================================
 
-#if ( ALZETTE_RV32B )
+#if ( ASCON_RV32B )
+.macro ascon.orn            rd, rs1, rs2
+.insn r CUSTOM_2, 7,      ( 0* 1), \rd, \rs1, \rs2
+.endm
+.macro ascon.andn           rd, rs1, rs2
+.insn r CUSTOM_2, 7,      ( 1* 1), \rd, \rs1, \rs2
+.endm
 .macro ascon.rori.lo        rd, rs1, rs2, imm
 .insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2
 .endm
@@ -17,7 +23,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if ( ALZETTE_RV32_TYPE2 )
+#if ( ASCON_RV32_TYPE2 )
 .macro ascon.sigma.lo       rd, rs1, rs2, imm
 .insn r CUSTOM_1, 7, \imm+( 0*32), \rd, \rs1, \rs2
 .endm
