@@ -4,11 +4,10 @@
 #   Generate a vivado project for the rocketchip SoC on sakura X board
 
 set project_name [lindex $argv 0]
-set orig_dir 	 [lindex $argv 1]
+set bsp_dir 	 [lindex $argv 1]
 set work_dir 	 [lindex $argv 2]
 set board		 [lindex $argv 3]
 set part		 [lindex $argv 4]
-
 
 # Set the directory path for the original project from where this script was exported
 set orig_proj_dir [file normalize $work_dir/$project_name]
@@ -22,7 +21,6 @@ set proj_dir [get_property directory [current_project]]
 # Set project properties
 set obj [get_projects $project_name]
 set_property "default_lib" "xil_defaultlib" $obj
-#set_property "board_part" "Sasebo" $obj
 set_property "PART" $part $obj 
 set_property "simulator_language" "Mixed" $obj
 
@@ -65,8 +63,8 @@ set_property -dict [list \
                         CONFIG.SI_PROTOCOL {AXI4} \
 						CONFIG.MI_PROTOCOL {AXI4LITE} \
 						CONFIG.ADDR_WIDTH {31} \
-                        CONFIG.DATA_WIDTH {32} \
-						CONFIG.ID_WIDTH {4} \
+                        CONFIG.DATA_WIDTH {64} \
+						CONFIG.ID_WIDTH {0} \
                         CONFIG.READ_WRITE_MODE {READ_WRITE} \
                         CONFIG.TRANSLATION_MODE {2}] \
     [get_ips axi_protocol_converter_0]
@@ -77,9 +75,11 @@ create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module
 set_property -dict [list \
                         CONFIG.NUM_SI {1} \
                         CONFIG.NUM_MI {3} \
-                        CONFIG.PROTOCOL {AXI4LITE} \
-						CONFIG.ADDR_WIDTH {32} \
-                        CONFIG.DATA_WIDTH {32} \
+                        CONFIG.PROTOCOL {AXI4} \
+						CONFIG.ADDR_WIDTH {31} \
+                        CONFIG.DATA_WIDTH {64} \
+						CONFIG.ID_WIDTH {4} \
+						CONFIG.CONNECTIVITY_MODE {SASD} \
                         CONFIG.ADDR_RANGES {1} \
 						CONFIG.M00_A00_BASE_ADDR {0x0000000060000000} \
                         CONFIG.M00_A00_ADDR_WIDTH {15} \
@@ -91,11 +91,11 @@ set_property -dict [list \
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_0/axi_crossbar_0.xci]
 
 #BRAM Controller
-create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.1 -module_name axi_bram_ctrl_0
+create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.0 -module_name axi_bram_ctrl_0
 set_property -dict [list \
-                        CONFIG.DATA_WIDTH {32} \
-						CONFIG.MEM_DEPTH {8192} \
-                        CONFIG.PROTOCOL {AXI4LITE} \
+                        CONFIG.DATA_WIDTH {64} \
+						CONFIG.MEM_DEPTH {4096} \
+                        CONFIG.PROTOCOL {AXI4} \
                         CONFIG.BMG_INSTANCE {EXTERNAL} \
                         CONFIG.SINGLE_PORT_BRAM {1} \
                         CONFIG.SUPPORTS_NARROW_BURST {0} \
@@ -124,9 +124,6 @@ set_property -dict [list \
 	[get_ips axi_uartlite_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_uartlite_0/axi_uartlite_0.xci]
 
-
-
-
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
   create_fileset -constrset constrs_1
@@ -136,7 +133,7 @@ if {[string equal [get_filesets -quiet constrs_1] ""]} {
 set obj [get_filesets constrs_1]
 
 # Add/Import constrs file and set constrs file properties
-set file "[file normalize "$orig_dir/board/$board/constraint/ioportmap.xdc"]"
+set file "[file normalize "$bsp_dir/board/$board/constraint/ioportmap.xdc"]"
 set file_added [add_files -norecurse -fileset $obj $file]
 
 # generate all IP source code

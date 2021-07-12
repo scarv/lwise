@@ -24,21 +24,17 @@ export ALG  ?= alzette
 
 export ARCH ?= rv32
 export IMP  ?= rv32
-export CONF ?=
-
 export ISE  ?= cop
-
+export CONF ?=
 
 # =============================================================================
 include ${REPO_HOME}/src/hardware/fpga/Makefile.in
 include ${REPO_HOME}/src/hardware/rocketchip/Makefile.in
 include ${REPO_HOME}/src/hardware/verilator/Makefile.in
 include ${REPO_HOME}/src/hardware/yosys_synth/Makefile.in
-
 # =============================================================================
 
 export EMU_HAL  = ${REPO_HOME}/src/hardware/verilator/hal
-#export ALZETTE  = ${REPO_HOME}/src/software/alzette
 export SOFTWARE = ${REPO_HOME}/src/software
 export INCLUDES = ${SOFTWARE}/share ${SOFTWARE}/share/arch/${ARCH} ${SOFTWARE}/${ALG} ${SOFTWARE}/${ALG}/arch/${ARCH} ${SOFTWARE}/${ALG}/imp/${IMP} ${EMU_HAL}
 
@@ -46,14 +42,9 @@ export SOURCES  = $(wildcard $(addsuffix /*.c, ${INCLUDES}))
 export SOURCES += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
 export HEADERS  = $(wildcard $(addsuffix /*.h, ${INCLUDES}))
 
-#export SOURCES += $(wildcard ${ALZETTE}/*.c ${ALZETTE}/arch/${ARCH}/*.c ${ALZETTE}/imp/${IMP}/*.c ${EMU_HAL}/*.c)
-#export SOURCES += $(wildcard ${ALZETTE}/*.S ${ALZETTE}/arch/${ARCH}/*.S ${ALZETTE}/imp/${IMP}/*.S ${EMU_HAL}/*.S)
-#export HEADERS += $(wildcard ${ALZETTE}/*.h ${ALZETTE}/arch/${ARCH}/*.h ${ALZETTE}/imp/${IMP}/*.h)
-
 MABI       = $(findstring i,$(ARCH:rv32=i))lp$(ARCH:rv%=%)
 GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany
 GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T  $(EMU_HAL)/test.ld
-#GCC_PATHS += -I${EMU_HAL}
 GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
 
 export TARGET   = ${REPO_HOME}/build/driver_emu
