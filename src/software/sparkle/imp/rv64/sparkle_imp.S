@@ -114,7 +114,7 @@
 
 // ----------------------------------------------------------------------------
 // SPARKLE implementation => SPARKLE_RD_STATE
-#if ( ALZETTE_RV64_TYPE1 ) 
+#if ( SPARKLE_RV64_TYPE1 ) 
 .macro  SPARKLE_RD_STATE   x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5        
               lwu         \x0,   0(a0)                    // x0 = MEM[ a0 +  0 ]  => x0 = state[  0 ]
               lwu         \x1,   8(a0)                    // x1 = MEM[ a0 +  8 ]  => x1 = state[  2 ]
@@ -131,7 +131,7 @@
 .endm
 #endif
 
-#if	( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
+#if	( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE4 ) || ( SPARKLE_RV64_TYPE5 )
 .macro  SPARKLE_RD_STATE   p0, p1, p2, p3, p4, p5        
               ld          \p0,  0(a0)                    // p0 = MEM[ a0 +  0 ]  => p0 = {y0 || x0} = state[  0 ]
               ld          \p1,  8(a0)                    // p1 = MEM[ a0 +  8 ]  => p1 = {y1 || x1} = state[  2 ]
@@ -144,7 +144,7 @@
 
 // ----------------------------------------------------------------------------
 // SPARKLE implementation => SPARKLE_WR_STATE
-#if ( ALZETTE_RV64_TYPE1 ) 
+#if ( SPARKLE_RV64_TYPE1 ) 
 .macro  SPARKLE_WR_STATE   x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5        
               sw          \x0,   0(a0)                    // x0 ->MEM[ a0 +  0 ]  => x0 ->state[  0 ]
               sw          \x1,   8(a0)                    // x1 ->MEM[ a0 +  8 ]  => x1 ->state[  2 ]
@@ -162,7 +162,7 @@
 .endm
 #endif
 
-#if	( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
+#if	( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE4 ) || ( SPARKLE_RV64_TYPE5 )
 .macro  SPARKLE_WR_STATE   p0, p1, p2, p3, p4, p5         
               sd          \p0,   0(a0)                    // p0 ->MEM[ a0 +  0 ]  => {y0 || x0} ->state[  0 ]
               sd          \p1,   8(a0)                    // p1 ->MEM[ a0 +  8 ]  => {y1 || x1} ->state[  2 ]
@@ -176,7 +176,7 @@
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => forward/inverse linear layer
 
-#if ( ALZETTE_RV64_TYPE1 )
+#if ( SPARKLE_RV64_TYPE1 )
 .macro SPARKLE_FWD_LINEAR  x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2 
               xor         \t0, \x1, \x2                  //  t0  = x1 ^ x2
               ELL32       \t0, \x0, \t0, \t1, \t2        // tmpx = ELL( x0 ^ t0 )
@@ -244,7 +244,7 @@
 .endm
 #endif
 
-#if	( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
+#if	( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE4 ) || ( SPARKLE_RV64_TYPE5 )
 .macro SPARKLE_FWD_LINEAR  p0,  p1,  p2,  p3,  p4,  p5,  t0,  t1,  t2,  t3
               xor         \t0, \p1, \p2                  //       t0 = (y1 || x1) ^ (y2 || x2)
               ELL64       \t0, \p0, \t0, \t1, \t2, \t3   //  ELL( t0 ^ (y0 || x0) )   = (tmpx || tmpy)
@@ -293,7 +293,7 @@
 
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => forward/inverse ARXBOX
-#if ( ALZETTE_RV64_TYPE1 )
+#if ( SPARKLE_RV64_TYPE1 )
 .macro SPARKLE_FWD_ARXBOX rcb,  x0,  x1,  x2,  x3,  x4,  x5,  y0,  y1,  y2,  y3,  y4,  y5,  t0,  t1,  t2
               lwu         \t0,    0(\rcb)                // t0 = MEM[ rc +  0 ] => SPARKLE_RCON[ 0 ]
               ALZETTE_ENC \x0, \y0, \t0, \t1, \t2
@@ -325,7 +325,7 @@
 .endm
 #endif
 
-#if ( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE5 )
+#if ( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE5 )
 .macro SPARKLE_FWD_ARXBOX rcb,  p0,  p1,  p2,  p3,  p4,  p5,  t0
               lwu         \t0,    0(\rcb)                // t0 = MEM[ rc +  0 ] => SPARKLE_RCON[ 0 ]
               ALZETTE_ENC \p0,      \t0
@@ -357,29 +357,29 @@
 .endm
 #endif
 
-#if ( ALZETTE_RV64_TYPE4 )
+#if ( SPARKLE_RV64_TYPE4 )
 .macro SPARKLE_FWD_ARXBOX rcb, p0,  p1,  p2,  p3,  p4,  p5,  t0 
-              alzette.whole.enci  \p0, \p0, 0
-              alzette.whole.enci  \p1, \p1, 1
-              alzette.whole.enci  \p2, \p2, 2
-              alzette.whole.enci  \p3, \p3, 3
-              alzette.whole.enci  \p4, \p4, 4
-              alzette.whole.enci  \p5, \p5, 5
+              sparkle.whole.enci  \p0, \p0, 0
+              sparkle.whole.enci  \p1, \p1, 1
+              sparkle.whole.enci  \p2, \p2, 2
+              sparkle.whole.enci  \p3, \p3, 3
+              sparkle.whole.enci  \p4, \p4, 4
+              sparkle.whole.enci  \p5, \p5, 5
 .endm
 
 .macro SPARKLE_REV_ARXBOX rcb, p0,  p1,  p2,  p3,  p4,  p5,  t0
-              alzette.whole.deci  \p0, \p0, 0
-              alzette.whole.deci  \p1, \p1, 1
-              alzette.whole.deci  \p2, \p2, 2
-              alzette.whole.deci  \p3, \p3, 3
-              alzette.whole.deci  \p4, \p4, 4
-              alzette.whole.deci  \p5, \p5, 5
+              sparkle.whole.deci  \p0, \p0, 0
+              sparkle.whole.deci  \p1, \p1, 1
+              sparkle.whole.deci  \p2, \p2, 2
+              sparkle.whole.deci  \p3, \p3, 3
+              sparkle.whole.deci  \p4, \p4, 4
+              sparkle.whole.deci  \p5, \p5, 5
 .endm
 #endif
 
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => add step counter
-#if ( ALZETTE_RV64_TYPE1 ) 
+#if ( SPARKLE_RV64_TYPE1 ) 
 .macro SPARKLE_FWD_ADDCNT rc, st, y0, y1, t0
               lw          \t0,    0(\rc)
               xor         \y0, \y0, \t0                  // y0 ^= rc
@@ -401,7 +401,7 @@
 .endm
 #endif
 
-#if	( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
+#if	( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE4 ) || ( SPARKLE_RV64_TYPE5 )
 .macro SPARKLE_FWD_ADDCNT rc, st, p0, p1, t0
               lwu         \t0,    0(\rc)
               slli        \t0, \t0,  32
@@ -433,7 +433,7 @@
 
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => forward/ inverse step
-#if ( ALZETTE_RV64_TYPE1 ) 
+#if ( SPARKLE_RV64_TYPE1 ) 
 .macro SPARKLE_FWD_STEP           rcb,  rc,  st,  x0,  x1,  x2,  x3,  x4,  x5,  y0,  y1,  y2,  y3,  y4,  y5,  t0,  t1,  t2
 
               SPARKLE_FWD_ADDCNT       \rc, \st,                               \y0, \y1,                     \t0
@@ -457,7 +457,7 @@
 .endm
 #endif
 
-#if	( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
+#if	( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE4 ) || ( SPARKLE_RV64_TYPE5 )
 .macro SPARKLE_FWD_STEP           rcb,  rc,  st,  p0,  p1,  p2,  p3,  p4,  p5,  t0,  t1,  t2,  t3
 
               SPARKLE_FWD_ADDCNT       \rc, \st, \p0, \p1,                     \t0
@@ -489,7 +489,7 @@
 sparkle_fwd:  SPARKLE_FWD_PROLOGUE
               la           t0, SPARKLE_RCON              // t0 = &SPARKLE_RCON_POINTER
               mv           t1, t0                        // t1 = &SPARKLE_RCON_INDEX
-#if ( ALZETTE_RV64_TYPE1 )
+#if ( SPARKLE_RV64_TYPE1 )
               SPARKLE_RD_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9,  s10, s11
     #if ( SPARKLE_FWD_UNROLL )          
               SPARKLE_FWD_STEP  t0, t1,  0, s0, s1, s2, s3, s4, s5,  s6 , s7 , s8 , s9 , s10, s11, t4, t5, t6    
@@ -508,7 +508,7 @@ sparkle_fwd:  SPARKLE_FWD_PROLOGUE
     #endif                           
 #endif
 
-#if ( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
+#if ( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE4 ) || ( SPARKLE_RV64_TYPE5 )
               SPARKLE_RD_STATE              s0, s1, s2, s3, s4, s5  
     #if ( SPARKLE_FWD_UNROLL )          
               //                             0   1   2   3   4   5
@@ -522,13 +522,13 @@ sparkle_fwd:  SPARKLE_FWD_PROLOGUE
               SPARKLE_FWD_STEP  t0, t1,  6, s0, s1, s2, s3, s4, s5, t4, t5, t6, a7
               SPARKLE_WR_STATE              s4, s5, s3, s0, s1, s2, 
     #else    
-              #if !( ALZETTE_RV64_TYPE4 )	
+              #if !( SPARKLE_RV64_TYPE4 )	
 0:            bgeu         t2, t3, 1f                    // if i >= n, goto 1
               SPARKLE_FWD_STEP  t0, t1, t2, s0, s1, s2, s3, s4, s5, t4, t5, t6, a7    
               j                    0b                    //            goto 0
 1:            SPARKLE_WR_STATE              s0, s1, s2, s3, s4, s5, 
               #else	
-              #error "can't use ALZETTE_RV64_TYPE4 without SPARKLE_FWD_UNROLL"
+              #error "can't use SPARKLE_RV64_TYPE4 without SPARKLE_FWD_UNROLL"
               #endif                           
     #endif
 #endif
@@ -544,7 +544,7 @@ sparkle_fwd:  SPARKLE_FWD_PROLOGUE
 sparkle_rev:  SPARKLE_REV_PROLOGUE                      
               la           t0, SPARKLE_RCON              // t0 = &SPARKLE_RCON_POINTER
               addi         t1, t0, 4*6                   // t1 = &SPARKLE_RCON_INDEX
-#if ( ALZETTE_RV64_TYPE1 )
+#if ( SPARKLE_RV64_TYPE1 )
               SPARKLE_RD_STATE              s0, s1, s2, s3, s4, s5,  s6 , s7 , s8 , s9 , s10, s11
     #if ( SPARKLE_REV_UNROLL )         
               SPARKLE_REV_STEP  t0, t1,  6, s0, s1, s2, s3, s4, s5,  s6 , s7 , s8 , s9 , s10, s11, t4, t5, t6
@@ -563,7 +563,7 @@ sparkle_rev:  SPARKLE_REV_PROLOGUE
     #endif
 #endif
 
-#if ( ALZETTE_RV64_TYPE2 ) || ( ALZETTE_RV64_TYPE3 ) || ( ALZETTE_RV64_TYPE4 ) || ( ALZETTE_RV64_TYPE5 )
+#if ( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE4 ) || ( SPARKLE_RV64_TYPE5 )
               SPARKLE_RD_STATE              s0, s1, s2, s3, s4, s5
     #if ( SPARKLE_REV_UNROLL )
               //                             0   1   2   3   4   5
@@ -577,13 +577,13 @@ sparkle_rev:  SPARKLE_REV_PROLOGUE
               SPARKLE_REV_STEP  t0, t1,  0, s3, s4, s5, s2, s0, s1, t4, t5, t6, a7
               SPARKLE_WR_STATE              s3, s4, s5, s2, s0, s1 
     #else             
-              #if !( ALZETTE_RV64_TYPE4 )	
+              #if !( SPARKLE_RV64_TYPE4 )	
 0:            blez         t2,     1f                    // if i <= 0, goto 1
               SPARKLE_REV_STEP  t0, t1, t2, s0, s1, s2, s3, s4, s5, t4, t5, t6, a7     
               j                    0b                    //            goto 0
 1:            SPARKLE_WR_STATE              s0, s1, s2, s3, s4, s5
               #else	
-              #error "can't use ALZETTE_RV64_TYPE4 without SPARKLE_FWD_UNROLL"
+              #error "can't use SPARKLE_RV64_TYPE4 without SPARKLE_FWD_UNROLL"
               #endif  
     #endif
 #endif

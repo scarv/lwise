@@ -6,9 +6,9 @@
 
 // ============================================================================
 
-#if ( ALZETTE_RV32_ELL )
+#if ( SPARKLE_RV32_ELL )
 .macro ELL   r, x0, x1, t0, t1
-  alzette.ell          \r,  \x0, \x1
+  sparkle.ell          \r,  \x0, \x1
 .endm
 #else
 .macro ELL   r, x0, x1, t0, t1

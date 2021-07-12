@@ -6,9 +6,9 @@
 
 // ============================================================================
 
-#if ( ALZETTE_RV64_ELL )
+#if ( SPARKLE_RV64_ELL )
 .macro ELL32 r, x0, x1, t0, t1
-  alzette.ell          \r,  \x0, \x1
+  sparkle.ell          \r,  \x0, \x1
 .endm
 #else
 .macro ELL32 r, x0, x1, t0, t1
@@ -19,14 +19,14 @@
 .endm
 #endif
 
-#if ( ALZETTE_RV64_ELL )
+#if ( SPARKLE_RV64_ELL )
 .macro ELL64 r, x0, x1, t0, t1, t2
-  alzette.ellrev       \r,  \x0, \x1
+  sparkle.ellrev       \r,  \x0, \x1
 .endm
 #else
 .macro ELL64 r, x0, x1, t0, t1, t2
   xor                  \t0, \x0, \x1 
-#if ( ALZETTE_RV64B )
+#if ( SPARKLE_RV64B )
   slliw                \t1, \t0,  16 // t0 <= tmpx 
   xor                  \t2, \t0, \t1
 #else
@@ -41,7 +41,7 @@
   mv                   \r,  \t2
   ROR32                \r,  \r,   16, \t0, \t2
   ROR32                \t1, \t1,  16, \t0, \t2
-#if ( ALZETTE_RV64B )
+#if ( SPARKLE_RV64B )
   PACK                 \r,  \t1, \r
 #else
   slli                 \t1, \t1,  32                  

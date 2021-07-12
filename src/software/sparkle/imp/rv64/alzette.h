@@ -6,7 +6,7 @@
 
 // ============================================================================
 
-#if ( ALZETTE_RV64_TYPE1 )
+#if ( SPARKLE_RV64_TYPE1 )
 .macro ALZETTE_ENC xi, yi, ci, t0, t1
   ROR32                \t0, \yi, 31, \t0, \t1 // \t0 = ROR32( \yi, 31 ) =>             yi >>> 31
   addw                 \xi, \xi, \t0          // \xi = \xi + \t0        => xi = xi + ( yi >>> 31 )
@@ -60,61 +60,61 @@
 
 // ----------------------------------------------------------------------------
 
-#if ( ALZETTE_RV64_TYPE2 )
+#if ( SPARKLE_RV64_TYPE2 )
 .macro ALZETTE_ENC xi, ci
-  alzette.block.enci   \xi, \xi, \ci, 0
-  alzette.block.enci   \xi, \xi, \ci, 1
-  alzette.block.enci   \xi, \xi, \ci, 2
-  alzette.block.enci   \xi, \xi, \ci, 3
+  sparkle.block.enci   \xi, \xi, \ci, 0
+  sparkle.block.enci   \xi, \xi, \ci, 1
+  sparkle.block.enci   \xi, \xi, \ci, 2
+  sparkle.block.enci   \xi, \xi, \ci, 3
 .endm
 
 .macro ALZETTE_DEC xi, ci
-  alzette.block.deci   \xi, \xi, \ci, 3
-  alzette.block.deci   \xi, \xi, \ci, 2
-  alzette.block.deci   \xi, \xi, \ci, 1
-  alzette.block.deci   \xi, \xi, \ci, 0
+  sparkle.block.deci   \xi, \xi, \ci, 3
+  sparkle.block.deci   \xi, \xi, \ci, 2
+  sparkle.block.deci   \xi, \xi, \ci, 1
+  sparkle.block.deci   \xi, \xi, \ci, 0
 .endm
 #endif
 
 // ----------------------------------------------------------------------------
 
-#if ( ALZETTE_RV64_TYPE3 )
+#if ( SPARKLE_RV64_TYPE3 )
 .macro ALZETTE_ENC xi, ci
-  alzette.block.enc.0  \xi, \xi, \ci
-  alzette.block.enc.1  \xi, \xi, \ci
-  alzette.block.enc.2  \xi, \xi, \ci
-  alzette.block.enc.3  \xi, \xi, \ci
+  sparkle.block.enc.0  \xi, \xi, \ci
+  sparkle.block.enc.1  \xi, \xi, \ci
+  sparkle.block.enc.2  \xi, \xi, \ci
+  sparkle.block.enc.3  \xi, \xi, \ci
 .endm
 
 .macro ALZETTE_DEC xi, ci
-  alzette.block.dec.3  \xi, \xi, \ci
-  alzette.block.dec.2  \xi, \xi, \ci
-  alzette.block.dec.1  \xi, \xi, \ci
-  alzette.block.dec.0  \xi, \xi, \ci
+  sparkle.block.dec.3  \xi, \xi, \ci
+  sparkle.block.dec.2  \xi, \xi, \ci
+  sparkle.block.dec.1  \xi, \xi, \ci
+  sparkle.block.dec.0  \xi, \xi, \ci
 .endm
 #endif
 
 // ----------------------------------------------------------------------------
 
-#if ( ALZETTE_RV64_TYPE4 )
+#if ( SPARKLE_RV64_TYPE4 )
 .macro ALZETTE_ENC xi, ci, i
-  alzette.whole.enci   \xi, \xi, \i
+  sparkle.whole.enci   \xi, \xi, \i
 .endm
 
 .macro ALZETTE_DEC xi, ci, i
-  alzette.whole.deci   \xi, \xi, \i
+  sparkle.whole.deci   \xi, \xi, \i
 .endm
 #endif
 
 // ----------------------------------------------------------------------------
 
-#if ( ALZETTE_RV64_TYPE5 )
+#if ( SPARKLE_RV64_TYPE5 )
 .macro ALZETTE_ENC xi, ci
-  alzette.whole.enc    \xi, \xi, \ci
+  sparkle.whole.enc    \xi, \xi, \ci
 .endm
 
 .macro ALZETTE_DEC xi, ci
-  alzette.whole.dec    \xi, \xi, \ci
+  sparkle.whole.dec    \xi, \xi, \ci
 .endm
 #endif
 

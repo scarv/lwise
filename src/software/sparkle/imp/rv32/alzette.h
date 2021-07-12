@@ -6,7 +6,7 @@
 
 // ============================================================================
 	
-#if ( ALZETTE_RV32_TYPE1 )
+#if ( SPARKLE_RV32_TYPE1 )
 .macro ALZETTE_ENC xi, yi, ci, t0, t1
   ROR32                \t0, \yi, 31, \t0, \t1 // \t0 = ROR32( \yi, 31 ) =>             yi >>> 31
   add                  \xi, \xi, \t0          // \xi = \xi + \t0        => xi = xi + ( yi >>> 31 )
@@ -60,83 +60,83 @@
 
 // ----------------------------------------------------------------------------
 
-#if ( ALZETTE_RV32_TYPE2 )
+#if ( SPARKLE_RV32_TYPE2 )
 .macro ALZETTE_ENC xi, yi, ci, t0, t1
-  alzette.addrori      \xi, \xi, \yi, 31
-  alzette.xorrori      \yi, \yi, \xi, 24
+  sparkle.addrori      \xi, \xi, \yi, 31
+  sparkle.xorrori      \yi, \yi, \xi, 24
   xor                  \xi, \xi, \ci    
-  alzette.addrori      \xi, \xi, \yi, 17
-  alzette.xorrori      \yi, \yi, \xi, 17
+  sparkle.addrori      \xi, \xi, \yi, 17
+  sparkle.xorrori      \yi, \yi, \xi, 17
   xor                  \xi, \xi, \ci    
   add                  \xi, \xi, \yi    
-  alzette.xorrori      \yi, \yi, \xi, 31
+  sparkle.xorrori      \yi, \yi, \xi, 31
   xor                  \xi, \xi, \ci    
-  alzette.addrori      \xi, \xi, \yi, 24
-  alzette.xorrori      \yi, \yi, \xi, 16
+  sparkle.addrori      \xi, \xi, \yi, 24
+  sparkle.xorrori      \yi, \yi, \xi, 16
   xor                  \xi, \xi, \ci    
 .endm
 
 .macro ALZETTE_DEC xi, yi, ci, t0, t1
   xor                  \xi, \xi, \ci    
-  alzette.xorrori      \yi, \yi, \xi, 16
-  alzette.subrori      \xi, \xi, \yi, 24
+  sparkle.xorrori      \yi, \yi, \xi, 16
+  sparkle.subrori      \xi, \xi, \yi, 24
   xor                  \xi, \xi, \ci    
-  alzette.xorrori      \yi, \yi, \xi, 31
+  sparkle.xorrori      \yi, \yi, \xi, 31
   sub                  \xi, \xi, \yi    
   xor                  \xi, \xi, \ci    
-  alzette.xorrori      \yi, \yi, \xi, 17
-  alzette.subrori      \xi, \xi, \yi, 17
+  sparkle.xorrori      \yi, \yi, \xi, 17
+  sparkle.subrori      \xi, \xi, \yi, 17
   xor                  \xi, \xi, \ci    
-  alzette.xorrori      \yi, \yi, \xi, 24
-  alzette.subrori      \xi, \xi, \yi, 31
+  sparkle.xorrori      \yi, \yi, \xi, 24
+  sparkle.subrori      \xi, \xi, \yi, 31
 .endm
 #endif
 
 // ----------------------------------------------------------------------------
 
-#if ( ALZETTE_RV32_TYPE3 )
+#if ( SPARKLE_RV32_TYPE3 )
 .macro ALZETTE_ENC xi, yi, ci, t0, t1
-  alzette.addror.31    \xi, \xi, \yi
-  alzette.xorror.24    \yi, \yi, \xi
+  sparkle.addror.31    \xi, \xi, \yi
+  sparkle.xorror.24    \yi, \yi, \xi
   xor                  \xi, \xi, \ci
-  alzette.addror.17    \xi, \xi, \yi
-  alzette.xorror.17    \yi, \yi, \xi
+  sparkle.addror.17    \xi, \xi, \yi
+  sparkle.xorror.17    \yi, \yi, \xi
   xor                  \xi, \xi, \ci
   add                  \xi, \xi, \yi
-  alzette.xorror.31    \yi, \yi, \xi
+  sparkle.xorror.31    \yi, \yi, \xi
   xor                  \xi, \xi, \ci
-  alzette.addror.24    \xi, \xi, \yi
-  alzette.xorror.16    \yi, \yi, \xi
+  sparkle.addror.24    \xi, \xi, \yi
+  sparkle.xorror.16    \yi, \yi, \xi
   xor                  \xi, \xi, \ci
 .endm
 
 .macro ALZETTE_DEC xi, yi, ci, t0, t1
   xor                  \xi, \xi, \ci    
-  alzette.xorror.16    \yi, \yi, \xi
-  alzette.subror.24    \xi, \xi, \yi
+  sparkle.xorror.16    \yi, \yi, \xi
+  sparkle.subror.24    \xi, \xi, \yi
   xor                  \xi, \xi, \ci    
-  alzette.xorror.31    \yi, \yi, \xi
+  sparkle.xorror.31    \yi, \yi, \xi
   sub                  \xi, \xi, \yi    
   xor                  \xi, \xi, \ci    
-  alzette.xorror.17    \yi, \yi, \xi
-  alzette.subror.17    \xi, \xi, \yi
+  sparkle.xorror.17    \yi, \yi, \xi
+  sparkle.subror.17    \xi, \xi, \yi
   xor                  \xi, \xi, \ci    
-  alzette.xorror.24    \yi, \yi, \xi
-  alzette.subror.31    \xi, \xi, \yi
+  sparkle.xorror.24    \yi, \yi, \xi
+  sparkle.subror.31    \xi, \xi, \yi
 .endm
 #endif
 
 // ----------------------------------------------------------------------------
 	
-#if ( ALZETTE_RV32_TYPE4 )
+#if ( SPARKLE_RV32_TYPE4 )
 .macro ALZETTE_ENC xr, yr, xi, yi, i
-  alzette.whole.enci.x \xr, \xi, \yi, \i
-  alzette.whole.enci.y \yr, \xi, \yi, \i
+  sparkle.whole.enci.x \xr, \xi, \yi, \i
+  sparkle.whole.enci.y \yr, \xi, \yi, \i
 .endm
 
 .macro ALZETTE_DEC xr, yr, xi, yi, i
-  alzette.whole.deci.x \xr, \xi, \yi, \i
-  alzette.whole.deci.y \yr, \xi, \yi, \i
+  sparkle.whole.deci.x \xr, \xi, \yi, \i
+  sparkle.whole.deci.y \yr, \xi, \yi, \i
 .endm
 #endif
 

@@ -80,8 +80,8 @@ such as execution latency.
 
   - `${ALG}`
     - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/software/${ALG}`
-    - values: `alzette`, `ascon`, `jambu`
-    - default: `alzette`
+    - values: `ascon`, `jambu`, `sparkle`
+    - default: `sparkle`
 
   - `${ARCH}`
     - role: specifies the   architecture, i.e., select `${REPO_HOME}/src/software/${ALG}/arch/${ARCH}`
@@ -104,9 +104,9 @@ such as execution latency.
   |           |           |           | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase              |
   |           |           |           | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                |
   |           |           |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum)      |
-  |           | `alzette` |           |                      | see [documentation](./doc/alzette/ise.md)                                                                      |
   |           | `ascon`   |           |                      | see [documentation](./doc/ascon/ise.md)                                                                        |
   |           | `jambu`   |           |                      | see [documentation](./doc/jambu/ise.md)                                                                        |
+  |           | `sparkle` |           |                      | see [documentation](./doc/sparkle/ise.md)                                                                      |
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -172,28 +172,30 @@ such as execution latency.
   [`spike`](https://github.com/riscv/riscv-isa-sim)
   and associated
   [`pk`](https://github.com/riscv/riscv-pk) 
-  for each algorithm, e.g.,
+  for each algorithm, 
+  e.g.,
   
   ```sh
-  make ALG="alzette" toolchain-build
+  make ALG="sparkle" toolchain-build
   ```
 
-- Build and execute implementation, e.g.,
+- Build and execute implementation, 
+  e.g.,
 
   ```sh
-  make ALG="alzette"  software-build
-  make ALG="alzette"  software-run
+  make ALG="sparkle"  software-build
+  make ALG="sparkle"  software-run
   ```
 
-  or use the script provided
+  or use the script provided, 
+  e.g.,
 
   ```sh
-  make ALG="alzette"  software-scan
-  make ALG="ascon"    software-scan
+  make ALG="sparkle"  software-scan
   ```
 
-  to automatically scan through various different configurations, e.g., 
-  ISEs, unrolling strategies, etc.
+  to automatically scan through various different configurations
+  (such as those with respect to ISEs options, unrolling strategies, and so on).
 
 <!--- -------------------------------------------------------------------- --->
 

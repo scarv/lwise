@@ -1,4 +1,4 @@
-# `${ALG} = "alzette"`
+# `${ALG} = "sparkle"`
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -77,33 +77,33 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 | `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
 | :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `alzette` |           | `CRAXS10_ENC_EXTERN` | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `CRAXS10_DEC_EXTERN` | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `CRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
-|           | `alzette` |           | `CRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
-|           | `alzette` |           | `TRAXL17_ENC_EXTERN` | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `TRAXL17_DEC_EXTERN` | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `TRAXL17_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
-|           | `alzette` |           | `TRAXL17_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
-|           | `alzette` |           | `SPARKLE_FWD_EXTERN` | don't include implementation of forward SPARKLE in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `SPARKLE_REV_EXTERN` | don't include implementation of reverse SPARKLE in driver, i.e., allow an architecture-specific implementation |
-|           | `alzette` |           | `SPARKLE_FWD_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
-|           | `alzette` |           | `SPARKLE_REV_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32B`      | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE1` | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE2` | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE3` | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-|           | `alzette` | `rv32`    | `ALZETTE_RV32_TYPE4` | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64B`      | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE1` | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE2` | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE3` | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE4` | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-|           | `alzette` | `rv64`    | `ALZETTE_RV64_TYPE5` | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
+|           | `sparkle` |           | `CRAXS10_ENC_EXTERN` | don't include implementation of CRAX encryption in driver, i.e., allow an architecture-specific implementation |
+|           | `sparkle` |           | `CRAXS10_DEC_EXTERN` | don't include implementation of CRAX decryption in driver, i.e., allow an architecture-specific implementation |
+|           | `sparkle` |           | `CRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
+|           | `sparkle` |           | `CRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
+|           | `sparkle` |           | `TRAXL17_ENC_EXTERN` | don't include implementation of TRAX encryption in driver, i.e., allow an architecture-specific implementation |
+|           | `sparkle` |           | `TRAXL17_DEC_EXTERN` | don't include implementation of TRAX decryption in driver, i.e., allow an architecture-specific implementation |
+|           | `sparkle` |           | `TRAXL17_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
+|           | `sparkle` |           | `TRAXL17_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
+|           | `sparkle` |           | `SPARKLE_FWD_EXTERN` | don't include implementation of forward SPARKLE in driver, i.e., allow an architecture-specific implementation |
+|           | `sparkle` |           | `SPARKLE_REV_EXTERN` | don't include implementation of reverse SPARKLE in driver, i.e., allow an architecture-specific implementation |
+|           | `sparkle` |           | `SPARKLE_FWD_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
+|           | `sparkle` |           | `SPARKLE_REV_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32B`      | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE1` | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE2` | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE3` | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE4` | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64B`      | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE1` | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE2` | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE3` | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE4` | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE5` | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -112,7 +112,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) BitManip-like ISE:
 
   ```
-  alzette.rori          rd, rs1,      imm => x       <- GPR[rs1]
+  sparkle.rori          rd, rs1,      imm => x       <- GPR[rs1]
                                              r       <- ROR32( x, imm )
                                              GPR[rd] <- r
   ```
@@ -120,7 +120,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) ISE for `\ell` function:
 
   ```
-  alzette.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
+  sparkle.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
                                              r       <- ELL( x  )
                                              GPR[rd] <- r
   ```
@@ -128,90 +128,90 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) ISE for round constant look-up and XOR:
 
   ```
-  alzette.rcon          rd, rs1,      imm => x       <- GPR[rs1]
+  sparkle.rcon          rd, rs1,      imm => x       <- GPR[rs1]
                                              r       <- x  ^ RCON[imm]
                                              GPR[rd] <- r 
   ```
 
-- `ALZETTE_RV32_TYPE1`: base ISA.
+- `SPARKLE_RV32_TYPE1`: base ISA.
 
-- `ALZETTE_RV32_TYPE2`: base ISA plus custom   ISE.
+- `SPARKLE_RV32_TYPE2`: base ISA plus custom   ISE.
 
   ```
-  alzette.addrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
+  sparkle.addrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x + ROR32( y, imm )
                                              GPR[rd] <- r
 
-  alzette.subrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
+  sparkle.subrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x - ROR32( y, imm )
                                              GPR[rd] <- r
 
-  alzette.xorrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
+  sparkle.xorrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x ^ ROR32( y, imm )
                                              GPR[rd] <- r
   ```
 
-- `ALZETTE_RV32_TYPE3`: base ISA plus custom   ISE.
+- `SPARKLE_RV32_TYPE3`: base ISA plus custom   ISE.
 
   ```
-  alzette.addror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.addror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x + ROR32( y, 31 )
                                              GPR[rd] <- r
 
-  alzette.addror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.addror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x + ROR32( y, 17 )
                                              GPR[rd] <- r
 
-  alzette.addror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.addror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x + ROR32( y, 24 )
                                              GPR[rd] <- r
 
-  alzette.subror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.subror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x - ROR32( y, 31 )
                                              GPR[rd] <- r
 
-  alzette.subror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.subror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x - ROR32( y, 17 )
                                              GPR[rd] <- r
 
-  alzette.subror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.subror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x - ROR32( y, 24 )
                                              GPR[rd] <- r
 
-  alzette.xorror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.xorror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x ^ ROR32( y, 31 )
                                              GPR[rd] <- r
 
-  alzette.xorror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.xorror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x ^ ROR32( y, 17 )
                                              GPR[rd] <- r
 
-  alzette.xorror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.xorror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x ^ ROR32( y, 24 )
                                              GPR[rd] <- r
 
-  alzette.xorror.16     rd, rs1, rs2      => x       <-  GPR[rs1]
+  sparkle.xorror.16     rd, rs1, rs2      => x       <-  GPR[rs1]
                                              y       <-  GPR[rs2]
                                              r       <- x ^ ROR32( y, 16 )
                                              GPR[rd] <- r
   ```
      
-- `ALZETTE_RV32_TYPE4`: base ISA plus custom   ISE.
+- `SPARKLE_RV32_TYPE4`: base ISA plus custom   ISE.
    
   ```
-  alzette.whole.enci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
+  sparkle.whole.enci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
                                              yi      <- GPR[rs2]
                                              ci      <- RCON[imm]
                                              xi      <- xi + ROR32( yi, 31 )
@@ -228,7 +228,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- xi
 
-  alzette.whole.enci.y  rd, rs1, rs2, imm => xi      <- GPR[rs1]
+  sparkle.whole.enci.y  rd, rs1, rs2, imm => xi      <- GPR[rs1]
                                              yi      <- GPR[rs2]
                                              ci      <- RCON[imm]
                                              xi      <- xi + ROR32( yi, 31 )
@@ -245,7 +245,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- yi
 
-  alzette.whole.deci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
+  sparkle.whole.deci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
                                              yi      <- GPR[rs2]
                                              ci      <- RCON[imm]
                                              xi      <- xi ^        ci
@@ -262,7 +262,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi - ROR32( yi, 31 )
                                              GPR[rd] <- xi
 
-  alzette.whole.deci.y  rd, rs1, rs2, imm => xi      <- GPR[rs1]
+  sparkle.whole.deci.y  rd, rs1, rs2, imm => xi      <- GPR[rs1]
                                              yi      <- GPR[rs2]
                                              ci      <- RCON[imm]
                                              xi      <- xi ^        ci
@@ -287,22 +287,22 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) BitManip-like ISE:
 
   ```
-  alzette.rori          rd, rs1,      imm => x       <- GPR[rs1]_{63.. 0}
+  sparkle.rori          rd, rs1,      imm => x       <- GPR[rs1]_{63.. 0}
                                              r       <- ROR64( x, imm )
                                              GPR[rd] <- r
 
-  alzette.roriw         rd, rs1,      imm => x       <- GPR[rs1]_{31.. 0}
+  sparkle.roriw         rd, rs1,      imm => x       <- GPR[rs1]_{31.. 0}
                                              r       <- ROR32( x, imm )
                                              GPR[rd] <- r
 
-  alzette.pack          rd, rs1, rs2      => x       <- GPR[rs1]
+  sparkle.pack          rd, rs1, rs2      => x       <- GPR[rs1]
                                              y       <- GPR[rs2]
                                              r_hi    <-   y << 32
                                              r_lo    <- ( x << 32 ) >> 32
                                              r       <- r_hi | r_lo
                                              GPR[rd] <- r
 
-  alzette.packu         rd, rs1, rs2      => x       <- GPR[rs1]
+  sparkle.packu         rd, rs1, rs2      => x       <- GPR[rs1]
                                              y       <- GPR[rs2]
                                              r_hi    <- ( y >> 32 ) << 32
                                              r_lo    <-   x >> 32
@@ -313,7 +313,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) ISE for `\ell` function:
 
   ```
-  alzette.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
+  sparkle.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
                                              x_hi    <- x_{63..32}
                                              x_lo    <- x_{31.. 0}
                                              r_hi    <- ELL( x_hi )
@@ -321,7 +321,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              r       <- r_hi || r_lo
                                              GPR[rd] <- r
 
-  alzette.ellrev        rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
+  sparkle.ellrev        rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
                                              x_hi    <- x_{63..32}
                                              x_lo    <- x_{31.. 0}
                                              r_hi    <- ELL( x_hi )
@@ -333,24 +333,24 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) ISE for round constant look-up and XOR:
 
   ```
-  alzette.rcon          rd, rs1,      imm => x_hi    <- GPR[rs1]_{63..32}
+  sparkle.rcon          rd, rs1,      imm => x_hi    <- GPR[rs1]_{63..32}
                                              x_lo    <- GPR[rs1]_{31.. 0}
                                              r_hi    <- x_hi ^ RCON[imm]
                                              r_lo    <- x_lo ^ RCON[imm]
                                              r       <- r_hi || r_lo
                                              GPR[rd] <- r
 
-  alzette.rconw         rd, rs1,      imm => x       <- GPR[rs1]_{31.. 0}
+  sparkle.rconw         rd, rs1,      imm => x       <- GPR[rs1]_{31.. 0}
                                              r       <- x    ^ RCON[imm]
                                              GPR[rd] <- r
   ```
 
-- `ALZETTE_RV64_TYPE1`: base ISA.
+- `SPARKLE_RV64_TYPE1`: base ISA.
 
-- `ALZETTE_RV64_TYPE2`: base ISA plus custom   ISE.
+- `SPARKLE_RV64_TYPE2`: base ISA plus custom   ISE.
 
   ```
-  alzette.block.enci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.enci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi + ROR32( yi, ROT_0[imm] )
@@ -358,7 +358,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- yi || xi
     
-  alzette.block.deci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.deci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi ^   ci
@@ -367,10 +367,10 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- yi || xi
   ```
 
-- `ALZETTE_RV64_TYPE3`: base ISA plus custom   ISE.
+- `SPARKLE_RV64_TYPE3`: base ISA plus custom   ISE.
 
   ```
-  alzette.block.enc.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.enc.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi + ROR32( yi, 31 )
@@ -378,7 +378,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- yi || xi
 
-  alzette.block.enc.1   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.enc.1   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi + ROR32( yi, 17 )
@@ -386,7 +386,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- yi || xi
 
-  alzette.block.enc.2   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.enc.2   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi + ROR32( yi,  0 )
@@ -394,7 +394,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- yi || xi
 
-  alzette.block.enc.3   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.enc.3   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi + ROR32( yi, 24 )
@@ -402,7 +402,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- yi || xi
 
-  alzette.block.dec.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.dec.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi ^        ci
@@ -410,7 +410,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi - ROR32( yi, 31 )
                                              GPR[rd] <- yi || xi
 
-  alzette.block.dec.1   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.dec.1   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi ^        ci
@@ -418,7 +418,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi - ROR32( yi, 17 )
                                              GPR[rd] <- yi || xi
     
-  alzette.block.dec.2   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.dec.2   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi ^        ci
@@ -426,7 +426,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi - ROR32( yi,  0 )
                                              GPR[rd] <- yi || xi
 
-  alzette.block.dec.3   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
+  sparkle.block.dec.3   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
                                              xi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi ^        ci
@@ -435,10 +435,10 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- yi || xi
     ```
 
-- `ALZETTE_RV64_TYPE4`: base ISA plus custom   ISE.
+- `SPARKLE_RV64_TYPE4`: base ISA plus custom   ISE.
 
   ```
-  alzette.whole.enci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
+  sparkle.whole.enci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
                                              yi      <- GPR[rs1]_{31.. 0}
                                              ci      <- RCON[imm]
                                              xi      <- xi + ROR32( yi, 31 )
@@ -455,7 +455,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- yi || xi
 
-  alzette.whole.deci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
+  sparkle.whole.deci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
                                              yi      <- GPR[rs1]_{31.. 0}
                                              ci      <- RCON[imm]
                                              xi      <- xi ^        ci
@@ -473,10 +473,10 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- yi || xi
   ```
 
-- `ALZETTE_RV64_TYPE5`: base ISA plus custom   ISE.
+- `SPARKLE_RV64_TYPE5`: base ISA plus custom   ISE.
 
   ```
-  alzette.whole.enc     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
+  sparkle.whole.enc     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
                                              yi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi + ROR32( yi, 31 )
@@ -493,7 +493,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              xi      <- xi ^        ci
                                              GPR[rd] <- yi || xi
 
-  alzette.whole.dec     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
+  sparkle.whole.dec     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
                                              yi      <- GPR[rs1]_{31.. 0}
                                              ci      <- GPR[rs2]_{31.. 0}
                                              xi      <- xi ^        ci
