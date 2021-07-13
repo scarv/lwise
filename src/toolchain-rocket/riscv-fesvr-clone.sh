@@ -11,7 +11,7 @@ source ${REPO_HOME}/src/toolchain-rocket/share.sh
 # =============================================================================
 
 if [ ! -d ${ROCKET_FESVR_REPO} ] ; then
-  git clone https://github.com/riscv/riscv-gnu-toolchain.git ${ROCKET_FESVR_REPO}
+  git clone https://github.com/riscvarchive/riscv-fesvr.git ${ROCKET_FESVR_REPO}
 fi
 
 cd ${ROCKET_FESVR_REPO}
