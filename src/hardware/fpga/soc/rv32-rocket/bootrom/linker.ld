@@ -1,3 +1,5 @@
+/* Valid physical memory regions which can be used by the linker */
+
 SECTIONS
 {
     ROM_BASE = 0x10000; /* ... but actually position independent */
@@ -6,6 +8,6 @@ SECTIONS
     .text.start : { *(.text.hang) }
     . = ROM_BASE + 0x40;
     .text.hang : { *(.text.start) }
-    . = ROM_BASE + 0x80;
+    . = ROM_BASE + 0x400;
     .rodata.dtb : { *(.rodata.dtb) }
 }

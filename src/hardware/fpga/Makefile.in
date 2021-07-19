@@ -8,7 +8,7 @@ export LD_LIBRARY_PATH = $(RISCV_ROCKET)/lib
 export FPGA_BUILD      = $(REPO_HOME)/build/fpga
 export FPGA            = $(REPO_HOME)/src/hardware/fpga
 export BOARD          ?= sakura-x
-export SOC	           = $(IMP)-rocket
+export SOC	           = $(ARCH)-rocket
 
 VIVADO_PROJECT = $(SOC)-$(ISE)-imp
 prog_mem       = $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin/prog.mem
@@ -19,7 +19,7 @@ UPDMEM = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && updatemem
 #--------------------------------------------------------------------
 # ISE Implementation
 #--------------------------------------------------------------------
-include ${REPO_HOME}/src/hardware/rtl/$(IMP)/Makefile.in
+include ${REPO_HOME}/src/hardware/rtl/$(ARCH)/Makefile.in
 
 #--------------------------------------------------------------------
 # Systems
@@ -40,7 +40,7 @@ rocketchip_cop_ram_src =\
 rocketchip_xalu_ram_src =\
     $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(XALU_FPGACONFIG).behav_srams.v
 
-rtl_sources = $(widecard $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/*.v)
+rtl_sources = $(wildcard $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/*.v)
 
 #--------------------------------------------------------------------
 # Gathering Verilogs for FPGA Project
@@ -62,7 +62,7 @@ $(vivado_project_file):
 
 bitstream = $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.bit
 bitstream: $(bitstream) 
-$(bitstream): $(rtl_sources)  $(vivado_project_file)
+$(bitstream) : $(rtl_sources)  $(vivado_project_file)
 	$(VIVADO) -mode batch -source $(FPGA)/script/make_bitstream.tcl -tclargs $(VIVADO_PROJECT) $(FPGA_BUILD)
 
 program: $(bitstream)
@@ -71,7 +71,7 @@ program: $(bitstream)
 vivado: $(vivado_project_file)
 	$(VIVADO) $(vivado_project_file) &
 
-.PHONY: fpga_project bitstream program vivado 
+.PHONY: fpga_project vivado 
 
 #--------------------------------------------------------------------
 # Update Program helper
@@ -80,33 +80,15 @@ bit-update: $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system
 $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit: $(bitstream) $(prog_mem) $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi
 	$(UPDMEM) -force -meminfo $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi -data $(prog_mem) -bit $(bitstream) -proc dummy -out $@
 
-program-updated: $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
+download-software: $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
 	$(VIVADO) -mode batch -source $(FPGA)/script/program.tcl -tclargs $(device) $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
 
-.PHONY: bit-update program-updated
+.PHONY: bit-update download-software
 
 #--------------------------------------------------------------------
-# compiling programs to run on FPGA
+# Sofware Support
 #--------------------------------------------------------------------
-helloworld:
-	$(MAKE) -C $(FPGA)/examples/helloworld all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/helloworld
-	{ echo '@00000000'; cat $(FPGA_BUILD)/helloworld/helloworld-$(SOC).hex;} >$(prog_mem)
-led-flash:
-	$(MAKE) -C $(REPO_HOME)/csrc/led_flash all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/led_flash
-	{ echo '@00000000'; cat $(FPGA_BUILD)/led_flash/led_flash-$(SOC).hex;} >$(prog_mem)
+include ${REPO_HOME}/src/hardware/fpga/software/Makefile.in
 
-run_verify:
-	$(MAKE) -C $(REPO_HOME)/csrc/run_verify all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/run_verify
-	{ echo '@00000000'; cat $(FPGA_BUILD)/run_verify/run_verify-$(SOC).hex;} >$(prog_mem)
-
-run_eval:
-	$(MAKE) -C $(REPO_HOME)/csrc/run_eval all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/run_eval
-	{ echo '@00000000'; cat $(FPGA_BUILD)/run_eval/run_eval-$(SOC).hex;} >$(prog_mem)
-
-run32_eval:
-	$(MAKE) -C $(REPO_HOME)/csrc/run32_eval all CORE=$(SOC) hal_dir=$(FPGA)/soc/$(SOC)/hal work_dir=$(FPGA_BUILD)/run32_eval
-	{ echo '@00000000'; cat $(FPGA_BUILD)/run32_eval/run32_eval-$(SOC).hex;} >$(prog_mem)
-
-.PHONY: helloworld led-flash 
 
 

@@ -1,0 +1,56 @@
+# Copyright (C) 2021 SCARV project <info@scarv.org>
+#
+# Use of this source code is restricted per the MIT license, a copy of which 
+# can be found at https://opensource.org/licenses/MIT (or should be included 
+# as LICENSE.txt within the associated archive or repository).
+
+#--------------------------------------------------------------------
+# Build software
+#--------------------------------------------------------------------
+DEF_CONF  = -DSPARKLE_RV32_TYPE3
+DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=20 -DDRIVER_MEASURE=1 
+DEF_CONF += -DCRAXS10_ENC_EXTERN -DTRAXL17_ENC_EXTERN -DSPARKLE_FWD_EXTERN 
+DEF_CONF += -DCRAXS10_DEC_EXTERN -DTRAXL17_DEC_EXTERN -DSPARKLE_REV_EXTERN
+
+export CONF = $(DEF_CONF)
+
+export SOC_HAL  = ${REPO_HOME}/src/hardware/fpga/soc/${SOC}/hal
+export SOFTWARE = ${REPO_HOME}/src/software
+export FPGA_INCLUDES = ${SOFTWARE}/share ${SOFTWARE}/${ALG} ${SOFTWARE}/${ALG}/arch/${ARCH} ${SOFTWARE}/${ALG}/imp/${IMP} ${FPGA}/software/rdtsc/${ARCH} ${SOC_HAL}
+
+export FPGA_SOURCES  = $(wildcard $(addsuffix /*.c, ${FPGA_INCLUDES}))
+export FPGA_SOURCES += $(wildcard $(addsuffix /*.S, ${FPGA_INCLUDES}))
+export FPGA_HEADERS  = $(wildcard $(addsuffix /*.h, ${FPGA_INCLUDES}))
+
+MABI       = $(findstring i,$(ARCH:rv32=i))lp$(ARCH:rv%=%)
+FPGA_GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany
+FPGA_GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T$(SOC_HAL)/lscript.ld
+GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
+
+FPGA_TARGET   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.elf
+FPGA_OUTHEX   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.hex
+FPGA_OUTBIN   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.bin
+
+# -----------------------------------------------------------------------------
+
+${FPGA_TARGET} : ${FPGA_SOURCES} ${FPGA_HEADERS}
+	${GCC_PREFIX}-gcc ${CONF} ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+
+$(FPGA_OUTBIN) : $(FPGA_TARGET)
+	${GCC_PREFIX}-objcopy -O binary $< $@
+
+$(FPGA_OUTHEX) : $(FPGA_OUTBIN) 
+	od -t x4 -An -w4 -v $< > $@	
+
+${FPGA_TARGET}.asm : ${FPGA_TARGET}
+	${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
+
+fpga-run-software : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
+	@$(FPGA)/script/upload.py --port $(PORT) --baud 57600 upload $(FPGA_OUTBIN) --stdout
+
+#all   : ${TARGET}.elf ${TARGET}.asm
+#clean : 
+#	@rm --force ${TARGET}.elf
+#	@rm --force ${TARGET}.asm
+
+# =============================================================================

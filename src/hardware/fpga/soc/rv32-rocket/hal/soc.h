@@ -17,7 +17,7 @@
 #define BRAM_BASE  	  0x60000000
 
 void uart_init();
-int  putchar(char c);
+int  putchar(int c);
 void putstr(char * str);
 void puthex(unsigned int tp);
 void puthex64(unsigned long long int tp);

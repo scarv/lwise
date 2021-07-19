@@ -23,7 +23,7 @@ module system_top_wrapper
     gpio_tri_o,
     gpio_led);
 localparam MEM_DATA_WIDTH = 32;
-localparam BRAM_ADDR_WIDTH = 15;     // 32 KB
+localparam BRAM_ADDR_WIDTH = 17;     // 32 KB
 localparam BRAM_LINE = 2 ** BRAM_ADDR_WIDTH  * 8 / MEM_DATA_WIDTH;
 localparam BRAM_LINE_OFFSET = $clog2(MEM_DATA_WIDTH/8);
 
@@ -69,21 +69,13 @@ clk_wiz_0 clk_gen
 	.clk_in1(k_clk_osc0_clk));   // input clk_in1_p
 `endif  
     
-wire            bram_clk;  
-wire            bram_ena;
-wire    [3:0]   bram_wea;
-wire    [14:0]  bram_addra;
-wire    [31:0]  bram_dina;
-wire    [31:0]  bram_douta;
-/*blk_mem_gen_0 mem_gen_ins (
-    .clka( bram_clk),           // input wire clka
-    .ena(  bram_ena),           // input wire ena
-    .wea(  bram_wea),           // input wire [3 : 0] wea
-    .addra(bram_addra[14:2]),   // input wire [12 : 0] addra
-    .dina( bram_dina),          // input wire [31 : 0] dina
-    .douta(bram_douta));        // output wire [31 : 0] douta*/
-// the inferred BRAMs
-reg [MEM_DATA_WIDTH-1:0] ram [0 : BRAM_LINE-1];
+wire                       bram_clk;  
+wire                       bram_ena;
+wire [                3:0] bram_wea;
+wire [BRAM_ADDR_WIDTH-1:0] bram_addra;
+wire [               31:0] bram_dina;
+wire [               31:0] bram_douta;
+reg  [ MEM_DATA_WIDTH-1:0] ram [0 : BRAM_LINE-1];
 initial $readmemh("prog.mem", ram);
 reg [BRAM_ADDR_WIDTH-1:BRAM_LINE_OFFSET] ram_addr_dly;
 
@@ -352,7 +344,7 @@ axi_crossbar_0 axi_crossbar_ins (
 axi_bram_ctrl_0 bram_ctrl_ins (
   .s_axi_aclk(   clk_50M),              // input wire s_axi_aclk
   .s_axi_aresetn(locked),               // input wire s_axi_aresetn
-  .s_axi_awaddr( m00_axi_awaddr[14:0]), // input wire [14 : 0] s_axi_awaddr
+  .s_axi_awaddr( m00_axi_awaddr[16:0]), // input wire [14 : 0] s_axi_awaddr
   .s_axi_awprot( m00_axi_awprot),       // input wire [2 : 0] s_axi_awprot
   .s_axi_awvalid(m00_axi_awvalid),      // input wire s_axi_awvalid
   .s_axi_awready(m00_axi_awready),      // output wire s_axi_awready
@@ -363,7 +355,7 @@ axi_bram_ctrl_0 bram_ctrl_ins (
   .s_axi_bresp(  m00_axi_bresp),        // output wire [1 : 0] s_axi_bresp
   .s_axi_bvalid( m00_axi_bvalid),       // output wire s_axi_bvalid
   .s_axi_bready( m00_axi_bready),       // input wire s_axi_bready
-  .s_axi_araddr( m00_axi_araddr[14:0]), // input wire [14 : 0] s_axi_araddr
+  .s_axi_araddr( m00_axi_araddr[16:0]), // input wire [14 : 0] s_axi_araddr
   .s_axi_arprot( m00_axi_arprot),       // input wire [2 : 0] s_axi_arprot
   .s_axi_arvalid(m00_axi_arvalid),      // input wire s_axi_arvalid
   .s_axi_arready(m00_axi_arready),      // output wire s_axi_arready

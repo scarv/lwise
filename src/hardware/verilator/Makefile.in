@@ -7,14 +7,13 @@
 #--------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------
-include ${REPO_HOME}/src/hardware/rtl/rv32/Makefile.in
-include ${REPO_HOME}/src/hardware/rtl/rv64/Makefile.in
+include ${REPO_HOME}/src/hardware/rtl/$(ARCH)/Makefile.in
 
 #--------------------------------------------------------------------
 # Build emulator
 #--------------------------------------------------------------------
 ROCKET = freechips.rocketchip.system
-MODEL  = SCARVRocketTest 
+EMULATORMODEL = SCARVRocketTest 
 COP_CONF64 = SCARVRocketCoPConf64
 COP_CONF32 = SCARVRocketCoPConf32
 
@@ -29,21 +28,63 @@ export EMULATOR = ${REPO_HOME}/build/$(ISE)_emulator$(subst rv,,$(ARCH))
 emulator : $(EMULATOR)
 
 ${REPO_HOME}/build/cop_emulator64 : $(rtl64_src)
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF64) MODEL=$(MODEL) ISE_RTL=$(RTL64) debug
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF64) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL64) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(COP_CONF64)-debug  $@
 
 ${REPO_HOME}/build/cop_emulator32 : $(rtl32_src)
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF32) MODEL=$(MODEL) ISE_RTL=$(RTL32) debug
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF32) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL32) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(COP_CONF32)-debug  $@
 
 ${REPO_HOME}/build/xalu_emulator32 : $(rtl32_src)
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF32) MODEL=$(MODEL) ISE_RTL=$(RTL32) debug
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF32) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL32) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(XALU_CONF32)-debug  $@
 
 ${REPO_HOME}/build/xalu_emulator64 : $(rtl64_src)
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF64) MODEL=$(MODEL) ISE_RTL=$(RTL64) debug
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF64) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL64) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(XALU_CONF64)-debug  $@
 
   
+#--------------------------------------------------------------------
+# Build software
+#--------------------------------------------------------------------
+#DEF_CONF  = -DSPARKLE_RV32_TYPE1 
+#DEF_CONF += -DDRIVER_TRIALS_WARM=1 -DDRIVER_TRIALS_REAL=2 -DDRIVER_MEASURE=1 
+#DEF_CONF += -DCRAXS10_ENC_EXTERN -DTRAXL17_ENC_EXTERN -DSPARKLE_FWD_EXTERN 
+#DEF_CONF += -DCRAXS10_DEC_EXTERN -DTRAXL17_DEC_EXTERN -DSPARKLE_REV_EXTERN
 
+#export CONF ?= ${DEF_CONF}
 
+export EMU_HAL  = ${REPO_HOME}/src/hardware/verilator/hal
+export SOFTWARE = ${REPO_HOME}/src/software
+export INCLUDES = ${SOFTWARE}/share ${SOFTWARE}/share/arch/${ARCH} ${SOFTWARE}/${ALG} ${SOFTWARE}/${ALG}/arch/${ARCH} ${SOFTWARE}/${ALG}/imp/${IMP} ${EMU_HAL}
+
+export SOURCES  = $(wildcard $(addsuffix /*.c, ${INCLUDES}))
+export SOURCES += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
+export HEADERS  = $(wildcard $(addsuffix /*.h, ${INCLUDES}))
+
+MABI       = $(findstring i,$(ARCH:rv32=i))lp$(ARCH:rv%=%)
+GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany
+GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T  $(EMU_HAL)/test.ld
+GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
+
+export TARGET   = ${REPO_HOME}/build/driver_emu
+# -----------------------------------------------------------------------------
+
+${TARGET}.elf : ${SOURCES} ${HEADERS}
+	${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+
+${TARGET}.asm : ${TARGET}.elf
+	${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
+
+emulate: ${EMULATOR} ${TARGET}.elf
+	${EMULATOR} -c -m 7100000 ${TARGET}.elf
+emulate-debug : ${EMULATOR} ${TARGET}.elf
+	${EMULATOR} -c -x 700000 -v ${REPO_HOME}/build/emu32_eval.vcd -m 2100000 ${<}
+
+all   : ${TARGET}.elf ${TARGET}.asm
+
+clean : 
+	@rm --force ${TARGET}.elf
+	@rm --force ${TARGET}.asm
+
+# =============================================================================

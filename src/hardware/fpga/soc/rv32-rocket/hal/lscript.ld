@@ -1,6 +1,6 @@
 
 /* Entry point / "main" function for the target program */
-ENTRY(riscv_main)
+ENTRY(main)
 
 /* Valid physical memory regions which can be used by the linker */
 MEMORY {
@@ -8,7 +8,7 @@ MEMORY {
        - Readable
        - Writable
        - Executable */
-    PL_BRAM (wx) : ORIGIN = 0x60000000, LENGTH = 32K
+    PL_BRAM (wx) : ORIGIN = 0x60000000, LENGTH = 128K
 }
 
 SECTIONS {

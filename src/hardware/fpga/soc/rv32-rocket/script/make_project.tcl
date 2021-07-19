@@ -80,7 +80,7 @@ set_property -dict [list \
                         CONFIG.DATA_WIDTH {32} \
                         CONFIG.ADDR_RANGES {1} \
 						CONFIG.M00_A00_BASE_ADDR {0x0000000060000000} \
-                        CONFIG.M00_A00_ADDR_WIDTH {15} \
+                        CONFIG.M00_A00_ADDR_WIDTH {17} \
                         CONFIG.M01_A00_BASE_ADDR {0x0000000070000000} \
 						CONFIG.M01_A00_ADDR_WIDTH {16} \
                         CONFIG.M02_A00_BASE_ADDR {0x0000000070600000} \
@@ -92,7 +92,7 @@ generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs
 create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.0 -module_name axi_bram_ctrl_0
 set_property -dict [list \
                         CONFIG.DATA_WIDTH {32} \
-						CONFIG.MEM_DEPTH {8192} \
+						CONFIG.MEM_DEPTH {32768} \
                         CONFIG.PROTOCOL {AXI4LITE} \
                         CONFIG.BMG_INSTANCE {EXTERNAL} \
                         CONFIG.SINGLE_PORT_BRAM {1} \
