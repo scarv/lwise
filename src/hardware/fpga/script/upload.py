@@ -7,11 +7,13 @@ A python3 script for downloading binaries to a soft RISC-V core running on a FPG
 import sys
 import argparse
 import logging as log
-
+import time
 import serial
 
-CMD_UPLOAD      = bytes([0x1])
-REP_DONE        = bytes([0x4])
+CMD_LOAD = bytes([0x1])
+CMD_RUN  = bytes([0x2])
+CMD_READ = bytes([0x3])
+REP_DONE = bytes([0x4])
 
 def parse_args():
     """
@@ -38,7 +40,8 @@ def parse_args():
 
     p_stdout = subs.add_parser("stdout",
         help="Continually print STDOUT from the RISC-V core to the terminal")
-
+    p_stdout.add_argument("file", type=argparse.FileType("rb"),
+        help="The file sent to the target")
     return parser.parse_args()
 
 
@@ -51,12 +54,22 @@ def upload(args,port):
     data_length = len(data_tosend).to_bytes(4, byteorder='little')
     
     sent = 0
-    print("-- Sending %d bytes to %s" % (len(data_tosend),port.port))
-    sent += port.write(CMD_UPLOAD)
+#    print("-- Sending %d bytes to %s" % (len(data_tosend),port.port))
+    sent += port.write(CMD_LOAD)
+    time.sleep(0.1)
     sent += port.write(data_length)
-    sent += port.write(data_tosend)
-    
-    print("-- Sent %d bytes in total" % sent)
+    port.flush()
+    hp = int(len(data_tosend)/2)
+
+    sent += port.write(data_tosend[:hp])
+    port.flush()
+    time.sleep(0.1)
+    sent += port.write(data_tosend[hp:])
+    port.flush()
+#    print("-- Sent %d bytes in total" % sent)
+    time.sleep(2)
+    sent += port.write(CMD_RUN)
+    port.flush()
 
     if(args.stdout):
         read_stdout(args,port)
@@ -88,7 +101,6 @@ def read_stdout(args,port):
     except KeyboardInterrupt:
         print()
         pass
-
     port.close()
     sys.exit(0)
 
@@ -117,6 +129,10 @@ def main():
         upload(args,port)
 
     elif(args.cmd == "stdout"):
+        data_tosend = args.file.read()
+        data_length = len(data_tosend).to_bytes(4, byteorder='little')
+        port.write(CMD_READ)
+        port.write(data_length)
         read_stdout(args,port)
 
     else:

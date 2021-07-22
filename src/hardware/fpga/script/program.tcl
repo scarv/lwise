@@ -12,19 +12,9 @@ puts "DEVICE: $device"
 open_hw
 connect_hw_server
 set board ""
-#foreach { target } [get_hw_targets] {
-#    current_hw_target $target
-open_hw_target
-#    if { [get_hw_devices] == $device } {
-#        set board [current_hw_target]
-#        break
-#    }
 
-#}
-#if { $board == "" } {
-#    puts "Did not find board"
-#    exit 1
-#}
+open_hw_target
+
 current_hw_device $device
 set_property PROGRAM.FILE $bit [current_hw_device]
 program_hw_devices [current_hw_device]

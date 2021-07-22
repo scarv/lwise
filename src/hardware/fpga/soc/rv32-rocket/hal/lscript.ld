@@ -8,15 +8,15 @@ MEMORY {
        - Readable
        - Writable
        - Executable */
-    PL_BRAM (wx) : ORIGIN = 0x60000000, LENGTH = 128K
+    PL_BRAM (wx) : ORIGIN = 0x80000000, LENGTH = 128K
 }
 
 SECTIONS {
     /* Trampoline for getting to the reset handler */
-    .text 0x60000000 : { *(.text.riscv_reset) } > PL_BRAM
+    .text 0x80000000 : { *(.text.riscv_reset) } > PL_BRAM
 
     /* Trampoline for getting to the interrupt handler */
-    .text 0x60000010 : { *(.text.riscv_irq_handler) } > PL_BRAM
+    .text 0x80000010 : { *(.text.riscv_irq_handler) } > PL_BRAM
 
     /* The rest of the program code goes here */
     .text : { *(.text) } > PL_BRAM

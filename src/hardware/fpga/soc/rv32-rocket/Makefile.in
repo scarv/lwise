@@ -42,10 +42,4 @@ xalu_verilog: $(fpga-rocketchip-xalu-verilog) $(FPGA)/soc/$(SOC)/system_top_wrap
 	cp -f $(rtl32_xalu_src)                         $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
 	cp -f $(rtl32_ise_src)                          $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
 
-#--------------------------------------------------------------------
-# Update Program helper
-#--------------------------------------------------------------------
-search-ramb: $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi
-$(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi: $(bitstream)
-	$(VIVADO) -mode batch -source $(FPGA)/script/search_ramb.tcl -tclargs $(VIVADO_PROJECT) $(FPGA_BUILD) > $(FPGA_BUILD)/$(VIVADO_PROJECT)/search-ramb.info
-	python $(FPGA)/script/mmi_gen.py $(FPGA_BUILD)/$(VIVADO_PROJECT)/search-ramb.info $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi 32 131072 $(part)
+

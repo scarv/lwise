@@ -8,6 +8,6 @@ SECTIONS
     .text.start : { *(.text.hang) }
     . = ROM_BASE + 0x40;
     .text.hang : { *(.text.start) }
-    . = ROM_BASE + 0x400;
+    . = ROM_BASE + 0x500;
     .rodata.dtb : { *(.rodata.dtb) }
 }

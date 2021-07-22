@@ -74,17 +74,15 @@ generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -version 2.1 -module_name axi_crossbar_0
 set_property -dict [list \
                         CONFIG.NUM_SI {1} \
-                        CONFIG.NUM_MI {3} \
+                        CONFIG.NUM_MI {2} \
                         CONFIG.PROTOCOL {AXI4LITE} \
 						CONFIG.ADDR_WIDTH {32} \
                         CONFIG.DATA_WIDTH {32} \
                         CONFIG.ADDR_RANGES {1} \
-						CONFIG.M00_A00_BASE_ADDR {0x0000000060000000} \
-                        CONFIG.M00_A00_ADDR_WIDTH {17} \
-                        CONFIG.M01_A00_BASE_ADDR {0x0000000070000000} \
-						CONFIG.M01_A00_ADDR_WIDTH {16} \
-                        CONFIG.M02_A00_BASE_ADDR {0x0000000070600000} \
-                        CONFIG.M02_A00_ADDR_WIDTH {16}] \
+						CONFIG.M00_A00_BASE_ADDR {0x0000000070000000} \
+                        CONFIG.M00_A00_ADDR_WIDTH {16} \
+                        CONFIG.M01_A00_BASE_ADDR {0x0000000070600000} \
+						CONFIG.M01_A00_ADDR_WIDTH {16}] \
     [get_ips axi_crossbar_0]
 generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs/sources_1/ip/axi_crossbar_0/axi_crossbar_0.xci]
 
@@ -92,9 +90,10 @@ generate_target {instantiation_template} [get_files $proj_dir/$project_name.srcs
 create_ip -name axi_bram_ctrl -vendor xilinx.com -library ip -version 4.0 -module_name axi_bram_ctrl_0
 set_property -dict [list \
                         CONFIG.DATA_WIDTH {32} \
+                        CONFIG.ID_WIDTH {4} \
 						CONFIG.MEM_DEPTH {32768} \
-                        CONFIG.PROTOCOL {AXI4LITE} \
-                        CONFIG.BMG_INSTANCE {EXTERNAL} \
+                        CONFIG.PROTOCOL {AXI4} \
+                        CONFIG.BMG_INSTANCE {INTERNAL} \
                         CONFIG.SINGLE_PORT_BRAM {1} \
                         CONFIG.SUPPORTS_NARROW_BURST {0} \
                         CONFIG.ECC_TYPE {0}] \
@@ -106,7 +105,7 @@ create_ip -name axi_gpio -vendor xilinx.com -library ip -version 2.0 -module_nam
 set_property -dict [list \
                         CONFIG.C_ALL_INPUTS {0} \
                         CONFIG.C_ALL_OUTPUTS {1} \
-						CONFIG.C_GPIO_WIDTH {1} \
+						CONFIG.C_GPIO_WIDTH {2} \
 						CONFIG.C_IS_DUAL {0} \
 						CONFIG.C_INTERRUPT_PRESENT {0}] \
 	[get_ips axi_gpio_0]

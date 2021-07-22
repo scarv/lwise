@@ -74,18 +74,6 @@ vivado: $(vivado_project_file)
 .PHONY: fpga_project vivado 
 
 #--------------------------------------------------------------------
-# Update Program helper
-#--------------------------------------------------------------------
-bit-update: $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
-$(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit: $(bitstream) $(prog_mem) $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi
-	$(UPDMEM) -force -meminfo $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog.mmi -data $(prog_mem) -bit $(bitstream) -proc dummy -out $@
-
-download-software: $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
-	$(VIVADO) -mode batch -source $(FPGA)/script/program.tcl -tclargs $(device) $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.new.bit
-
-.PHONY: bit-update download-software
-
-#--------------------------------------------------------------------
 # Sofware Support
 #--------------------------------------------------------------------
 include ${REPO_HOME}/src/hardware/fpga/software/Makefile.in

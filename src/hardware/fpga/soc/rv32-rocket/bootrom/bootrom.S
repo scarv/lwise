@@ -35,8 +35,14 @@ _start:
   mv  x29, x0
   mv  x30, x0
   mv  x31, x0
+
+  #enable co-processor interface    
+  #li t0, 0x0000C000;   
+  li  t0, 0x00018000 
+  csrs mstatus, t0
+
   // Setup the stack pointer to the top of the shared memory.
-  li   sp, 0x60018000
+  li   sp, 0x80018000
   la   s0, bootloader
   csrr a0, mhartid
   la   a1, _dtb

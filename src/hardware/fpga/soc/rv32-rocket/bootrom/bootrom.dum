@@ -4,31 +4,36 @@ bootrom.elf:     file format elf32-littleriscv
 SYMBOL TABLE:
 00010000 l    d  .text.start	00000000 .text.start
 00010040 l    d  .text.hang	00000000 .text.hang
-000100d6 l    d  .text	00000000 .text
-00010400 l    d  .rodata.dtb	00000000 .rodata.dtb
-00010410 l    d  .rodata	00000000 .rodata
-00010474 l    d  .sdata	00000000 .sdata
+000100dc l    d  .text	00000000 .text
+00010500 l    d  .rodata.dtb	00000000 .rodata.dtb
+00010510 l    d  .rodata	00000000 .rodata
+00010524 l    d  .data	00000000 .data
+00010534 l    d  .sdata	00000000 .sdata
 00000000 l    d  .riscv.attributes	00000000 .riscv.attributes
 00000000 l    d  .comment	00000000 .comment
 00000000 l    df *ABS*	00000000 bootloader.c
-00010474 l     O .sdata	00000004 uart_rx
-00010478 l     O .sdata	00000004 uart_tx
-0001047c l     O .sdata	00000004 uart_stat
-00010480 l     O .sdata	00000004 uart_ctrl
-00010400 g       .rodata.dtb	00000000 _dtb
-0001048c g     O .sdata	00000004 startpro
-0001026e g     F .text	000000d2 bootloader
+00010534 l     O .sdata	00000004 uart_rx
+00010538 l     O .sdata	00000004 uart_tx
+0001053c l     O .sdata	00000004 uart_stat
+00010540 l     O .sdata	00000004 uart_ctrl
+00010544 l     O .sdata	00000004 gpio_data
+00010548 l     O .sdata	00000004 gpio_ctrl
+00010524 l     O .data	00000010 hexchar
+00010550 l     O .sdata	00000004 pro_vec
+000102b4 g     F .text	0000005c cmd_read_mem
+00010500 g       .rodata.dtb	00000000 _dtb
+00010554 g     O .sdata	00000004 startpro
+0001016a g     F .text	0000005a puthex
+00010310 g     F .text	00000124 bootloader
 00010000 g       *ABS*	00000000 ROM_BASE
-000100d6 g     F .text	00000018 uart_init
 00010040 g       .text.hang	00000000 _start
-000100ee g     F .text	00000042 recv_byte_from_host
-00010130 g     F .text	0000004c send_byte_to_host
-0001021a g     F .text	00000054 cmd_load_binary
-00010484 g     O .sdata	00000004 uart_base_ptr
+000100dc g     F .text	00000042 recv_byte_from_host
+0001011e g     F .text	0000004c send_byte_to_host
+00010262 g     F .text	00000052 cmd_load_binary
+0001054c g     O .sdata	00000004 uart_base_ptr
 00010000 g       .text.start	00000000 _hang
-0001017c g     F .text	0000004a txstr
-00010488 g     O .sdata	00000004 pro_vec
-000101c6 g     F .text	00000054 uart_read_int
+000101c4 g     F .text	0000004a txstr
+0001020e g     F .text	00000054 uart_read_int
 
 
 
@@ -37,7 +42,7 @@ Disassembly of section .text.start:
 00010000 <_hang>:
    10000:	f1402573          	csrr	a0,mhartid
    10004:	00000597          	auipc	a1,0x0
-   10008:	3fc58593          	addi	a1,a1,1020 # 10400 <_dtb>
+   10008:	4fc58593          	addi	a1,a1,1276 # 10500 <_dtb>
    1000c:	10500073          	wfi
    10010:	bff5                	j	1000c <_hang+0xc>
 
@@ -75,335 +80,408 @@ Disassembly of section .text.hang:
    100b0:	00000e93          	li	t4,0
    100b4:	00000f13          	li	t5,0
    100b8:	00000f93          	li	t6,0
-   100bc:	60018137          	lui	sp,0x60018
-   100c0:	00000417          	auipc	s0,0x0
-   100c4:	1ae40413          	addi	s0,s0,430 # 1026e <bootloader>
-   100c8:	f1402573          	csrr	a0,mhartid
-   100cc:	00000597          	auipc	a1,0x0
-   100d0:	33458593          	addi	a1,a1,820 # 10400 <_dtb>
-   100d4:	8402                	jr	s0
+   100bc:	62e1                	lui	t0,0x18
+   100be:	3002a073          	csrs	mstatus,t0
+   100c2:	80018137          	lui	sp,0x80018
+   100c6:	00000417          	auipc	s0,0x0
+   100ca:	24a40413          	addi	s0,s0,586 # 10310 <bootloader>
+   100ce:	f1402573          	csrr	a0,mhartid
+   100d2:	00000597          	auipc	a1,0x0
+   100d6:	42e58593          	addi	a1,a1,1070 # 10500 <_dtb>
+   100da:	8402                	jr	s0
 
 Disassembly of section .text:
 
-000100d6 <uart_init>:
-   100d6:	1141                	addi	sp,sp,-16
-   100d8:	c622                	sw	s0,12(sp)
-   100da:	0800                	addi	s0,sp,16
-   100dc:	67c1                	lui	a5,0x10
-   100de:	4807a783          	lw	a5,1152(a5) # 10480 <uart_ctrl>
-   100e2:	470d                	li	a4,3
-   100e4:	c398                	sw	a4,0(a5)
-   100e6:	0001                	nop
-   100e8:	4432                	lw	s0,12(sp)
-   100ea:	0141                	addi	sp,sp,16
-   100ec:	8082                	ret
+000100dc <recv_byte_from_host>:
+   100dc:	1101                	addi	sp,sp,-32
+   100de:	ce22                	sw	s0,28(sp)
+   100e0:	1000                	addi	s0,sp,32
+   100e2:	67c1                	lui	a5,0x10
+   100e4:	53c7a783          	lw	a5,1340(a5) # 1053c <uart_stat>
+   100e8:	439c                	lw	a5,0(a5)
+   100ea:	8b85                	andi	a5,a5,1
+   100ec:	fef42623          	sw	a5,-20(s0)
+   100f0:	a801                	j	10100 <recv_byte_from_host+0x24>
+   100f2:	67c1                	lui	a5,0x10
+   100f4:	53c7a783          	lw	a5,1340(a5) # 1053c <uart_stat>
+   100f8:	439c                	lw	a5,0(a5)
+   100fa:	8b85                	andi	a5,a5,1
+   100fc:	fef42623          	sw	a5,-20(s0)
+   10100:	fec42783          	lw	a5,-20(s0)
+   10104:	d7fd                	beqz	a5,100f2 <recv_byte_from_host+0x16>
+   10106:	67c1                	lui	a5,0x10
+   10108:	5347a783          	lw	a5,1332(a5) # 10534 <uart_rx>
+   1010c:	439c                	lw	a5,0(a5)
+   1010e:	fef405a3          	sb	a5,-21(s0)
+   10112:	feb44783          	lbu	a5,-21(s0)
+   10116:	853e                	mv	a0,a5
+   10118:	4472                	lw	s0,28(sp)
+   1011a:	6105                	addi	sp,sp,32
+   1011c:	8082                	ret
 
-000100ee <recv_byte_from_host>:
-   100ee:	1101                	addi	sp,sp,-32
-   100f0:	ce22                	sw	s0,28(sp)
-   100f2:	1000                	addi	s0,sp,32
-   100f4:	67c1                	lui	a5,0x10
-   100f6:	47c7a783          	lw	a5,1148(a5) # 1047c <uart_stat>
-   100fa:	439c                	lw	a5,0(a5)
-   100fc:	8b85                	andi	a5,a5,1
-   100fe:	fef42623          	sw	a5,-20(s0)
-   10102:	a801                	j	10112 <recv_byte_from_host+0x24>
-   10104:	67c1                	lui	a5,0x10
-   10106:	47c7a783          	lw	a5,1148(a5) # 1047c <uart_stat>
-   1010a:	439c                	lw	a5,0(a5)
-   1010c:	8b85                	andi	a5,a5,1
-   1010e:	fef42623          	sw	a5,-20(s0)
-   10112:	fec42783          	lw	a5,-20(s0)
-   10116:	d7fd                	beqz	a5,10104 <recv_byte_from_host+0x16>
-   10118:	67c1                	lui	a5,0x10
-   1011a:	4747a783          	lw	a5,1140(a5) # 10474 <uart_rx>
-   1011e:	439c                	lw	a5,0(a5)
-   10120:	fef405a3          	sb	a5,-21(s0)
-   10124:	feb44783          	lbu	a5,-21(s0)
-   10128:	853e                	mv	a0,a5
-   1012a:	4472                	lw	s0,28(sp)
-   1012c:	6105                	addi	sp,sp,32
-   1012e:	8082                	ret
+0001011e <send_byte_to_host>:
+   1011e:	7179                	addi	sp,sp,-48
+   10120:	d622                	sw	s0,44(sp)
+   10122:	1800                	addi	s0,sp,48
+   10124:	87aa                	mv	a5,a0
+   10126:	fcf40fa3          	sb	a5,-33(s0)
+   1012a:	67c1                	lui	a5,0x10
+   1012c:	53c7a783          	lw	a5,1340(a5) # 1053c <uart_stat>
+   10130:	439c                	lw	a5,0(a5)
+   10132:	8ba1                	andi	a5,a5,8
+   10134:	fef42623          	sw	a5,-20(s0)
+   10138:	a801                	j	10148 <send_byte_to_host+0x2a>
+   1013a:	67c1                	lui	a5,0x10
+   1013c:	53c7a783          	lw	a5,1340(a5) # 1053c <uart_stat>
+   10140:	439c                	lw	a5,0(a5)
+   10142:	8ba1                	andi	a5,a5,8
+   10144:	fef42623          	sw	a5,-20(s0)
+   10148:	fec42783          	lw	a5,-20(s0)
+   1014c:	f7fd                	bnez	a5,1013a <send_byte_to_host+0x1c>
+   1014e:	fdf44783          	lbu	a5,-33(s0)
+   10152:	fef42423          	sw	a5,-24(s0)
+   10156:	67c1                	lui	a5,0x10
+   10158:	5387a783          	lw	a5,1336(a5) # 10538 <uart_tx>
+   1015c:	fe842703          	lw	a4,-24(s0)
+   10160:	c398                	sw	a4,0(a5)
+   10162:	0001                	nop
+   10164:	5432                	lw	s0,44(sp)
+   10166:	6145                	addi	sp,sp,48
+   10168:	8082                	ret
 
-00010130 <send_byte_to_host>:
-   10130:	7179                	addi	sp,sp,-48
-   10132:	d622                	sw	s0,44(sp)
-   10134:	1800                	addi	s0,sp,48
-   10136:	87aa                	mv	a5,a0
-   10138:	fcf40fa3          	sb	a5,-33(s0)
-   1013c:	67c1                	lui	a5,0x10
-   1013e:	47c7a783          	lw	a5,1148(a5) # 1047c <uart_stat>
-   10142:	439c                	lw	a5,0(a5)
-   10144:	8ba1                	andi	a5,a5,8
-   10146:	fef42623          	sw	a5,-20(s0)
-   1014a:	a801                	j	1015a <send_byte_to_host+0x2a>
-   1014c:	67c1                	lui	a5,0x10
-   1014e:	47c7a783          	lw	a5,1148(a5) # 1047c <uart_stat>
-   10152:	439c                	lw	a5,0(a5)
-   10154:	8ba1                	andi	a5,a5,8
-   10156:	fef42623          	sw	a5,-20(s0)
-   1015a:	fec42783          	lw	a5,-20(s0)
-   1015e:	f7fd                	bnez	a5,1014c <send_byte_to_host+0x1c>
-   10160:	fdf44783          	lbu	a5,-33(s0)
-   10164:	fef42423          	sw	a5,-24(s0)
-   10168:	67c1                	lui	a5,0x10
-   1016a:	4787a783          	lw	a5,1144(a5) # 10478 <uart_tx>
-   1016e:	fe842703          	lw	a4,-24(s0)
-   10172:	c398                	sw	a4,0(a5)
-   10174:	0001                	nop
-   10176:	5432                	lw	s0,44(sp)
-   10178:	6145                	addi	sp,sp,48
-   1017a:	8082                	ret
-
-0001017c <txstr>:
-   1017c:	7179                	addi	sp,sp,-48
-   1017e:	d606                	sw	ra,44(sp)
-   10180:	d422                	sw	s0,40(sp)
-   10182:	1800                	addi	s0,sp,48
-   10184:	fca42e23          	sw	a0,-36(s0)
-   10188:	fcb42c23          	sw	a1,-40(s0)
-   1018c:	fe042623          	sw	zero,-20(s0)
-   10190:	a839                	j	101ae <txstr+0x32>
-   10192:	fdc42703          	lw	a4,-36(s0)
-   10196:	fec42783          	lw	a5,-20(s0)
-   1019a:	97ba                	add	a5,a5,a4
-   1019c:	0007c783          	lbu	a5,0(a5)
-   101a0:	853e                	mv	a0,a5
-   101a2:	3779                	jal	10130 <send_byte_to_host>
+0001016a <puthex>:
+   1016a:	7179                	addi	sp,sp,-48
+   1016c:	d606                	sw	ra,44(sp)
+   1016e:	d422                	sw	s0,40(sp)
+   10170:	1800                	addi	s0,sp,48
+   10172:	fca42e23          	sw	a0,-36(s0)
+   10176:	fe042623          	sw	zero,-20(s0)
+   1017a:	a815                	j	101ae <puthex+0x44>
+   1017c:	fdc42783          	lw	a5,-36(s0)
+   10180:	83f1                	srli	a5,a5,0x1c
+   10182:	6741                	lui	a4,0x10
+   10184:	52470713          	addi	a4,a4,1316 # 10524 <hexchar>
+   10188:	97ba                	add	a5,a5,a4
+   1018a:	0007c783          	lbu	a5,0(a5)
+   1018e:	fef405a3          	sb	a5,-21(s0)
+   10192:	feb44783          	lbu	a5,-21(s0)
+   10196:	853e                	mv	a0,a5
+   10198:	3759                	jal	1011e <send_byte_to_host>
+   1019a:	fdc42783          	lw	a5,-36(s0)
+   1019e:	0792                	slli	a5,a5,0x4
+   101a0:	fcf42e23          	sw	a5,-36(s0)
    101a4:	fec42783          	lw	a5,-20(s0)
    101a8:	0785                	addi	a5,a5,1
    101aa:	fef42623          	sw	a5,-20(s0)
    101ae:	fec42703          	lw	a4,-20(s0)
-   101b2:	fd842783          	lw	a5,-40(s0)
-   101b6:	fcf76ee3          	bltu	a4,a5,10192 <txstr+0x16>
+   101b2:	479d                	li	a5,7
+   101b4:	fce7d4e3          	bge	a5,a4,1017c <puthex+0x12>
+   101b8:	0001                	nop
    101ba:	0001                	nop
-   101bc:	0001                	nop
-   101be:	50b2                	lw	ra,44(sp)
-   101c0:	5422                	lw	s0,40(sp)
-   101c2:	6145                	addi	sp,sp,48
-   101c4:	8082                	ret
+   101bc:	50b2                	lw	ra,44(sp)
+   101be:	5422                	lw	s0,40(sp)
+   101c0:	6145                	addi	sp,sp,48
+   101c2:	8082                	ret
 
-000101c6 <uart_read_int>:
-   101c6:	7179                	addi	sp,sp,-48
-   101c8:	d606                	sw	ra,44(sp)
-   101ca:	d422                	sw	s0,40(sp)
-   101cc:	1800                	addi	s0,sp,48
-   101ce:	fe042623          	sw	zero,-20(s0)
-   101d2:	3f31                	jal	100ee <recv_byte_from_host>
-   101d4:	fea42423          	sw	a0,-24(s0)
-   101d8:	3f19                	jal	100ee <recv_byte_from_host>
-   101da:	fea42223          	sw	a0,-28(s0)
-   101de:	3f01                	jal	100ee <recv_byte_from_host>
-   101e0:	fea42023          	sw	a0,-32(s0)
-   101e4:	3729                	jal	100ee <recv_byte_from_host>
-   101e6:	fca42e23          	sw	a0,-36(s0)
-   101ea:	fe442783          	lw	a5,-28(s0)
-   101ee:	00879713          	slli	a4,a5,0x8
-   101f2:	fe842783          	lw	a5,-24(s0)
-   101f6:	8f5d                	or	a4,a4,a5
-   101f8:	fe042783          	lw	a5,-32(s0)
-   101fc:	07c2                	slli	a5,a5,0x10
-   101fe:	8f5d                	or	a4,a4,a5
-   10200:	fdc42783          	lw	a5,-36(s0)
-   10204:	07e2                	slli	a5,a5,0x18
-   10206:	8fd9                	or	a5,a5,a4
-   10208:	fef42623          	sw	a5,-20(s0)
-   1020c:	fec42783          	lw	a5,-20(s0)
-   10210:	853e                	mv	a0,a5
-   10212:	50b2                	lw	ra,44(sp)
-   10214:	5422                	lw	s0,40(sp)
-   10216:	6145                	addi	sp,sp,48
-   10218:	8082                	ret
+000101c4 <txstr>:
+   101c4:	7179                	addi	sp,sp,-48
+   101c6:	d606                	sw	ra,44(sp)
+   101c8:	d422                	sw	s0,40(sp)
+   101ca:	1800                	addi	s0,sp,48
+   101cc:	fca42e23          	sw	a0,-36(s0)
+   101d0:	fcb42c23          	sw	a1,-40(s0)
+   101d4:	fe042623          	sw	zero,-20(s0)
+   101d8:	a839                	j	101f6 <txstr+0x32>
+   101da:	fdc42703          	lw	a4,-36(s0)
+   101de:	fec42783          	lw	a5,-20(s0)
+   101e2:	97ba                	add	a5,a5,a4
+   101e4:	0007c783          	lbu	a5,0(a5)
+   101e8:	853e                	mv	a0,a5
+   101ea:	3f15                	jal	1011e <send_byte_to_host>
+   101ec:	fec42783          	lw	a5,-20(s0)
+   101f0:	0785                	addi	a5,a5,1
+   101f2:	fef42623          	sw	a5,-20(s0)
+   101f6:	fec42703          	lw	a4,-20(s0)
+   101fa:	fd842783          	lw	a5,-40(s0)
+   101fe:	fcf76ee3          	bltu	a4,a5,101da <txstr+0x16>
+   10202:	0001                	nop
+   10204:	0001                	nop
+   10206:	50b2                	lw	ra,44(sp)
+   10208:	5422                	lw	s0,40(sp)
+   1020a:	6145                	addi	sp,sp,48
+   1020c:	8082                	ret
 
-0001021a <cmd_load_binary>:
-   1021a:	1101                	addi	sp,sp,-32
-   1021c:	ce06                	sw	ra,28(sp)
-   1021e:	cc22                	sw	s0,24(sp)
-   10220:	ca26                	sw	s1,20(sp)
-   10222:	1000                	addi	s0,sp,32
-   10224:	374d                	jal	101c6 <uart_read_int>
-   10226:	fea42423          	sw	a0,-24(s0)
-   1022a:	fe042623          	sw	zero,-20(s0)
-   1022e:	a00d                	j	10250 <cmd_load_binary+0x36>
-   10230:	67c1                	lui	a5,0x10
-   10232:	4887a703          	lw	a4,1160(a5) # 10488 <pro_vec>
-   10236:	fec42783          	lw	a5,-20(s0)
-   1023a:	078a                	slli	a5,a5,0x2
-   1023c:	00f704b3          	add	s1,a4,a5
-   10240:	3759                	jal	101c6 <uart_read_int>
-   10242:	87aa                	mv	a5,a0
-   10244:	c09c                	sw	a5,0(s1)
-   10246:	fec42783          	lw	a5,-20(s0)
-   1024a:	0785                	addi	a5,a5,1
-   1024c:	fef42623          	sw	a5,-20(s0)
-   10250:	fe842783          	lw	a5,-24(s0)
-   10254:	0027d713          	srli	a4,a5,0x2
-   10258:	fec42783          	lw	a5,-20(s0)
-   1025c:	fce7eae3          	bltu	a5,a4,10230 <cmd_load_binary+0x16>
-   10260:	0001                	nop
-   10262:	0001                	nop
-   10264:	40f2                	lw	ra,28(sp)
-   10266:	4462                	lw	s0,24(sp)
-   10268:	44d2                	lw	s1,20(sp)
-   1026a:	6105                	addi	sp,sp,32
-   1026c:	8082                	ret
+0001020e <uart_read_int>:
+   1020e:	7179                	addi	sp,sp,-48
+   10210:	d606                	sw	ra,44(sp)
+   10212:	d422                	sw	s0,40(sp)
+   10214:	1800                	addi	s0,sp,48
+   10216:	fe042623          	sw	zero,-20(s0)
+   1021a:	35c9                	jal	100dc <recv_byte_from_host>
+   1021c:	fea42423          	sw	a0,-24(s0)
+   10220:	3d75                	jal	100dc <recv_byte_from_host>
+   10222:	fea42223          	sw	a0,-28(s0)
+   10226:	3d5d                	jal	100dc <recv_byte_from_host>
+   10228:	fea42023          	sw	a0,-32(s0)
+   1022c:	3d45                	jal	100dc <recv_byte_from_host>
+   1022e:	fca42e23          	sw	a0,-36(s0)
+   10232:	fe442783          	lw	a5,-28(s0)
+   10236:	00879713          	slli	a4,a5,0x8
+   1023a:	fe842783          	lw	a5,-24(s0)
+   1023e:	8f5d                	or	a4,a4,a5
+   10240:	fe042783          	lw	a5,-32(s0)
+   10244:	07c2                	slli	a5,a5,0x10
+   10246:	8f5d                	or	a4,a4,a5
+   10248:	fdc42783          	lw	a5,-36(s0)
+   1024c:	07e2                	slli	a5,a5,0x18
+   1024e:	8fd9                	or	a5,a5,a4
+   10250:	fef42623          	sw	a5,-20(s0)
+   10254:	fec42783          	lw	a5,-20(s0)
+   10258:	853e                	mv	a0,a5
+   1025a:	50b2                	lw	ra,44(sp)
+   1025c:	5422                	lw	s0,40(sp)
+   1025e:	6145                	addi	sp,sp,48
+   10260:	8082                	ret
 
-0001026e <bootloader>:
-   1026e:	7179                	addi	sp,sp,-48
-   10270:	d606                	sw	ra,44(sp)
-   10272:	d422                	sw	s0,40(sp)
-   10274:	1800                	addi	s0,sp,48
-   10276:	3585                	jal	100d6 <uart_init>
-   10278:	02900593          	li	a1,41
+00010262 <cmd_load_binary>:
+   10262:	1101                	addi	sp,sp,-32
+   10264:	ce06                	sw	ra,28(sp)
+   10266:	cc22                	sw	s0,24(sp)
+   10268:	1000                	addi	s0,sp,32
+   1026a:	3755                	jal	1020e <uart_read_int>
+   1026c:	fea42423          	sw	a0,-24(s0)
+   10270:	fe042623          	sw	zero,-20(s0)
+   10274:	a01d                	j	1029a <cmd_load_binary+0x38>
+   10276:	3f61                	jal	1020e <uart_read_int>
+   10278:	fea42223          	sw	a0,-28(s0)
    1027c:	67c1                	lui	a5,0x10
-   1027e:	41078513          	addi	a0,a5,1040 # 10410 <_dtb+0x10>
-   10282:	3ded                	jal	1017c <txstr>
-   10284:	fe042623          	sw	zero,-20(s0)
-   10288:	a839                	j	102a6 <bootloader+0x38>
-   1028a:	67c1                	lui	a5,0x10
-   1028c:	4887a703          	lw	a4,1160(a5) # 10488 <pro_vec>
+   1027e:	5507a703          	lw	a4,1360(a5) # 10550 <pro_vec>
+   10282:	fec42783          	lw	a5,-20(s0)
+   10286:	078a                	slli	a5,a5,0x2
+   10288:	97ba                	add	a5,a5,a4
+   1028a:	fe442703          	lw	a4,-28(s0)
+   1028e:	c398                	sw	a4,0(a5)
    10290:	fec42783          	lw	a5,-20(s0)
-   10294:	078a                	slli	a5,a5,0x2
-   10296:	97ba                	add	a5,a5,a4
-   10298:	0007a023          	sw	zero,0(a5)
-   1029c:	fec42783          	lw	a5,-20(s0)
-   102a0:	0785                	addi	a5,a5,1
-   102a2:	fef42623          	sw	a5,-20(s0)
-   102a6:	fec42703          	lw	a4,-20(s0)
-   102aa:	3ff00793          	li	a5,1023
-   102ae:	fce7dee3          	bge	a5,a4,1028a <bootloader+0x1c>
-   102b2:	45ad                	li	a1,11
-   102b4:	67c1                	lui	a5,0x10
-   102b6:	43c78513          	addi	a0,a5,1084 # 1043c <_dtb+0x3c>
-   102ba:	35c9                	jal	1017c <txstr>
-   102bc:	02500593          	li	a1,37
-   102c0:	67c1                	lui	a5,0x10
-   102c2:	44c78513          	addi	a0,a5,1100 # 1044c <_dtb+0x4c>
-   102c6:	3d5d                	jal	1017c <txstr>
-   102c8:	351d                	jal	100ee <recv_byte_from_host>
-   102ca:	fea42223          	sw	a0,-28(s0)
-   102ce:	fe442703          	lw	a4,-28(s0)
-   102d2:	4785                	li	a5,1
-   102d4:	06f71463          	bne	a4,a5,1033c <bootloader+0xce>
-   102d8:	3789                	jal	1021a <cmd_load_binary>
-   102da:	fc042e23          	sw	zero,-36(s0)
-   102de:	a031                	j	102ea <bootloader+0x7c>
-   102e0:	fdc42783          	lw	a5,-36(s0)
-   102e4:	0785                	addi	a5,a5,1
-   102e6:	fcf42e23          	sw	a5,-36(s0)
-   102ea:	fdc42703          	lw	a4,-36(s0)
-   102ee:	3ff00793          	li	a5,1023
-   102f2:	fee7d7e3          	bge	a5,a4,102e0 <bootloader+0x72>
-   102f6:	67c1                	lui	a5,0x10
-   102f8:	48c7a783          	lw	a5,1164(a5) # 1048c <startpro>
-   102fc:	9782                	jalr	a5
-   102fe:	fe042423          	sw	zero,-24(s0)
-   10302:	a839                	j	10320 <bootloader+0xb2>
-   10304:	67c1                	lui	a5,0x10
-   10306:	4887a703          	lw	a4,1160(a5) # 10488 <pro_vec>
-   1030a:	fe842783          	lw	a5,-24(s0)
-   1030e:	078a                	slli	a5,a5,0x2
-   10310:	97ba                	add	a5,a5,a4
-   10312:	0007a023          	sw	zero,0(a5)
-   10316:	fe842783          	lw	a5,-24(s0)
-   1031a:	0785                	addi	a5,a5,1
-   1031c:	fef42423          	sw	a5,-24(s0)
-   10320:	fe842703          	lw	a4,-24(s0)
-   10324:	3ff00793          	li	a5,1023
-   10328:	fce7dee3          	bge	a5,a4,10304 <bootloader+0x96>
-   1032c:	4791                	li	a5,4
-   1032e:	fef401a3          	sb	a5,-29(s0)
-   10332:	fe344783          	lbu	a5,-29(s0)
-   10336:	853e                	mv	a0,a5
-   10338:	3be5                	jal	10130 <send_byte_to_host>
-   1033a:	a011                	j	1033e <bootloader+0xd0>
-   1033c:	0001                	nop
-   1033e:	b769                	j	102c8 <bootloader+0x5a>
+   10294:	0785                	addi	a5,a5,1
+   10296:	fef42623          	sw	a5,-20(s0)
+   1029a:	fe842783          	lw	a5,-24(s0)
+   1029e:	8389                	srli	a5,a5,0x2
+   102a0:	fec42703          	lw	a4,-20(s0)
+   102a4:	fcf769e3          	bltu	a4,a5,10276 <cmd_load_binary+0x14>
+   102a8:	0001                	nop
+   102aa:	0001                	nop
+   102ac:	40f2                	lw	ra,28(sp)
+   102ae:	4462                	lw	s0,24(sp)
+   102b0:	6105                	addi	sp,sp,32
+   102b2:	8082                	ret
+
+000102b4 <cmd_read_mem>:
+   102b4:	1101                	addi	sp,sp,-32
+   102b6:	ce06                	sw	ra,28(sp)
+   102b8:	cc22                	sw	s0,24(sp)
+   102ba:	1000                	addi	s0,sp,32
+   102bc:	3f89                	jal	1020e <uart_read_int>
+   102be:	fea42423          	sw	a0,-24(s0)
+   102c2:	fe042623          	sw	zero,-20(s0)
+   102c6:	a805                	j	102f6 <cmd_read_mem+0x42>
+   102c8:	67c1                	lui	a5,0x10
+   102ca:	5507a703          	lw	a4,1360(a5) # 10550 <pro_vec>
+   102ce:	fec42783          	lw	a5,-20(s0)
+   102d2:	078a                	slli	a5,a5,0x2
+   102d4:	97ba                	add	a5,a5,a4
+   102d6:	439c                	lw	a5,0(a5)
+   102d8:	fef42223          	sw	a5,-28(s0)
+   102dc:	4591                	li	a1,4
+   102de:	67c1                	lui	a5,0x10
+   102e0:	51078513          	addi	a0,a5,1296 # 10510 <_dtb+0x10>
+   102e4:	35c5                	jal	101c4 <txstr>
+   102e6:	fe442503          	lw	a0,-28(s0)
+   102ea:	3541                	jal	1016a <puthex>
+   102ec:	fec42783          	lw	a5,-20(s0)
+   102f0:	0785                	addi	a5,a5,1
+   102f2:	fef42623          	sw	a5,-20(s0)
+   102f6:	fe842783          	lw	a5,-24(s0)
+   102fa:	8389                	srli	a5,a5,0x2
+   102fc:	fec42703          	lw	a4,-20(s0)
+   10300:	fcf764e3          	bltu	a4,a5,102c8 <cmd_read_mem+0x14>
+   10304:	0001                	nop
+   10306:	0001                	nop
+   10308:	40f2                	lw	ra,28(sp)
+   1030a:	4462                	lw	s0,24(sp)
+   1030c:	6105                	addi	sp,sp,32
+   1030e:	8082                	ret
+
+00010310 <bootloader>:
+   10310:	7179                	addi	sp,sp,-48
+   10312:	d606                	sw	ra,44(sp)
+   10314:	d422                	sw	s0,40(sp)
+   10316:	1800                	addi	s0,sp,48
+   10318:	fe042423          	sw	zero,-24(s0)
+   1031c:	67c1                	lui	a5,0x10
+   1031e:	5407a783          	lw	a5,1344(a5) # 10540 <uart_ctrl>
+   10322:	470d                	li	a4,3
+   10324:	c398                	sw	a4,0(a5)
+   10326:	67c1                	lui	a5,0x10
+   10328:	5487a783          	lw	a5,1352(a5) # 10548 <gpio_ctrl>
+   1032c:	0007a023          	sw	zero,0(a5)
+   10330:	67c1                	lui	a5,0x10
+   10332:	5447a783          	lw	a5,1348(a5) # 10544 <gpio_data>
+   10336:	0007a023          	sw	zero,0(a5)
+   1033a:	fe042623          	sw	zero,-20(s0)
+   1033e:	a839                	j	1035c <bootloader+0x4c>
+   10340:	67c1                	lui	a5,0x10
+   10342:	5507a703          	lw	a4,1360(a5) # 10550 <pro_vec>
+   10346:	fec42783          	lw	a5,-20(s0)
+   1034a:	078a                	slli	a5,a5,0x2
+   1034c:	97ba                	add	a5,a5,a4
+   1034e:	0007a023          	sw	zero,0(a5)
+   10352:	fec42783          	lw	a5,-20(s0)
+   10356:	0785                	addi	a5,a5,1
+   10358:	fef42623          	sw	a5,-20(s0)
+   1035c:	fec42703          	lw	a4,-20(s0)
+   10360:	3ff00793          	li	a5,1023
+   10364:	fce7dee3          	bge	a5,a4,10340 <bootloader+0x30>
+   10368:	45ad                	li	a1,11
+   1036a:	67c1                	lui	a5,0x10
+   1036c:	51878513          	addi	a0,a5,1304 # 10518 <_dtb+0x18>
+   10370:	3d91                	jal	101c4 <txstr>
+   10372:	33ad                	jal	100dc <recv_byte_from_host>
+   10374:	fea42223          	sw	a0,-28(s0)
+   10378:	fe442703          	lw	a4,-28(s0)
+   1037c:	478d                	li	a5,3
+   1037e:	02f70463          	beq	a4,a5,103a6 <bootloader+0x96>
+   10382:	fe442703          	lw	a4,-28(s0)
+   10386:	478d                	li	a5,3
+   10388:	0ae7e463          	bltu	a5,a4,10430 <bootloader+0x120>
+   1038c:	fe442703          	lw	a4,-28(s0)
+   10390:	4785                	li	a5,1
+   10392:	00f70863          	beq	a4,a5,103a2 <bootloader+0x92>
+   10396:	fe442703          	lw	a4,-28(s0)
+   1039a:	4789                	li	a5,2
+   1039c:	00f70763          	beq	a4,a5,103aa <bootloader+0x9a>
+   103a0:	a841                	j	10430 <bootloader+0x120>
+   103a2:	35c1                	jal	10262 <cmd_load_binary>
+   103a4:	a079                	j	10432 <bootloader+0x122>
+   103a6:	3739                	jal	102b4 <cmd_read_mem>
+   103a8:	a069                	j	10432 <bootloader+0x122>
+   103aa:	67c1                	lui	a5,0x10
+   103ac:	5547a783          	lw	a5,1364(a5) # 10554 <startpro>
+   103b0:	fe042583          	lw	a1,-32(s0)
+   103b4:	fe842503          	lw	a0,-24(s0)
+   103b8:	9782                	jalr	a5
+   103ba:	fe042623          	sw	zero,-20(s0)
+   103be:	a839                	j	103dc <bootloader+0xcc>
+   103c0:	67c1                	lui	a5,0x10
+   103c2:	5507a703          	lw	a4,1360(a5) # 10550 <pro_vec>
+   103c6:	fec42783          	lw	a5,-20(s0)
+   103ca:	078a                	slli	a5,a5,0x2
+   103cc:	97ba                	add	a5,a5,a4
+   103ce:	0007a023          	sw	zero,0(a5)
+   103d2:	fec42783          	lw	a5,-20(s0)
+   103d6:	0785                	addi	a5,a5,1
+   103d8:	fef42623          	sw	a5,-20(s0)
+   103dc:	fec42703          	lw	a4,-20(s0)
+   103e0:	7ff00793          	li	a5,2047
+   103e4:	fce7dee3          	bge	a5,a4,103c0 <bootloader+0xb0>
+   103e8:	4791                	li	a5,4
+   103ea:	fcf40fa3          	sb	a5,-33(s0)
+   103ee:	fdf44783          	lbu	a5,-33(s0)
+   103f2:	853e                	mv	a0,a5
+   103f4:	332d                	jal	1011e <send_byte_to_host>
+   103f6:	fe042623          	sw	zero,-20(s0)
+   103fa:	a839                	j	10418 <bootloader+0x108>
+   103fc:	67c1                	lui	a5,0x10
+   103fe:	5507a703          	lw	a4,1360(a5) # 10550 <pro_vec>
+   10402:	fec42783          	lw	a5,-20(s0)
+   10406:	078a                	slli	a5,a5,0x2
+   10408:	97ba                	add	a5,a5,a4
+   1040a:	0007a023          	sw	zero,0(a5)
+   1040e:	fec42783          	lw	a5,-20(s0)
+   10412:	0785                	addi	a5,a5,1
+   10414:	fef42623          	sw	a5,-20(s0)
+   10418:	fec42703          	lw	a4,-20(s0)
+   1041c:	7ff00793          	li	a5,2047
+   10420:	fce7dee3          	bge	a5,a4,103fc <bootloader+0xec>
+   10424:	67c1                	lui	a5,0x10
+   10426:	5447a783          	lw	a5,1348(a5) # 10544 <gpio_data>
+   1042a:	470d                	li	a4,3
+   1042c:	c398                	sw	a4,0(a5)
+   1042e:	a011                	j	10432 <bootloader+0x122>
+   10430:	0001                	nop
+   10432:	b781                	j	10372 <bootloader+0x62>
 
 Disassembly of section .rodata.dtb:
 
-00010400 <_dtb>:
-   10400:	5444                	lw	s1,44(s0)
-   10402:	2042                	fld	ft0,16(sp)
-   10404:	73656f67          	0x73656f67
-   10408:	6820                	flw	fs0,80(s0)
-   1040a:	7265                	lui	tp,0xffff9
-   1040c:	65              	Address 0x000000000001040c is out of bounds.
+00010500 <_dtb>:
+   10500:	5444                	lw	s1,44(s0)
+   10502:	2042                	fld	ft0,16(sp)
+   10504:	73656f67          	0x73656f67
+   10508:	6820                	flw	fs0,80(s0)
+   1050a:	7265                	lui	tp,0xffff9
+   1050c:	65              	Address 0x000000000001050c is out of bounds.
 
 
 Disassembly of section .rodata:
 
-00010410 <.rodata>:
-   10410:	0a0a                	slli	s4,s4,0x2
-   10412:	530a                	lw	t1,160(sp)
-   10414:	56524143          	fmadd.q	ft2,ft4,ft5,fa0,rmm
-   10418:	5020                	lw	s0,96(s0)
-   1041a:	6f72                	flw	ft10,28(sp)
-   1041c:	656a                	flw	fa0,152(sp)
-   1041e:	202c7463          	bgeu	s8,sp,10626 <startpro+0x19a>
-   10422:	6f42                	flw	ft10,16(sp)
-   10424:	7261                	lui	tp,0xffff8
-   10426:	2064                	fld	fs1,192(s0)
-   10428:	70707553          	0x70707553
-   1042c:	2074726f          	jal	tp,57e32 <startpro+0x479a6>
-   10430:	6150                	flw	fa2,4(a0)
-   10432:	67616b63          	bltu	sp,s6,10aa8 <startpro+0x61c>
-   10436:	2e65                	jal	107ee <startpro+0x362>
-   10438:	000a                	c.slli	zero,0x2
-   1043a:	0000                	unimp
-   1043c:	6f42                	flw	ft10,16(sp)
-   1043e:	6f6c746f          	jal	s0,d7b34 <startpro+0xc76a8>
-   10442:	6461                	lui	s0,0x18
-   10444:	7265                	lui	tp,0xffff9
-   10446:	0a3a                	slli	s4,s4,0xe
-   10448:	0000                	unimp
-   1044a:	0000                	unimp
-   1044c:	570a                	lw	a4,160(sp)
-   1044e:	6961                	lui	s2,0x18
-   10450:	6974                	flw	fa3,84(a0)
-   10452:	676e                	flw	fa4,216(sp)
-   10454:	7420                	flw	fs0,104(s0)
-   10456:	6f64206f          	j	52b4c <startpro+0x426c0>
-   1045a:	6f6c6e77          	0x6f6c6e77
-   1045e:	6461                	lui	s0,0x18
-   10460:	6120                	flw	fs0,64(a0)
-   10462:	7020                	flw	fs0,96(s0)
-   10464:	6f72                	flw	ft10,28(sp)
-   10466:	6d617267          	0x6d617267
-   1046a:	2e20                	fld	fs0,88(a2)
-   1046c:	2e2e                	fld	ft8,200(sp)
-   1046e:	0a0a                	slli	s4,s4,0x2
-   10470:	000a                	c.slli	zero,0x2
+00010510 <.rodata>:
+   10510:	200a                	fld	ft0,128(sp)
+   10512:	7830                	flw	fa2,112(s0)
+   10514:	0000                	unimp
+   10516:	0000                	unimp
+   10518:	6f42                	flw	ft10,16(sp)
+   1051a:	6f6c746f          	jal	s0,d7c10 <startpro+0xc76bc>
+   1051e:	6461                	lui	s0,0x18
+   10520:	7265                	lui	tp,0xffff9
+   10522:	000a                	c.slli	zero,0x2
+
+Disassembly of section .data:
+
+00010524 <hexchar>:
+   10524:	3130                	fld	fa2,96(a0)
+   10526:	3332                	fld	ft6,296(sp)
+   10528:	3534                	fld	fa3,104(a0)
+   1052a:	3736                	fld	fa4,360(sp)
+   1052c:	3938                	fld	fa4,112(a0)
+   1052e:	4241                	li	tp,16
+   10530:	46454443          	fmadd.q	fs0,fa0,ft4,fs0,rmm
 
 Disassembly of section .sdata:
 
-00010474 <uart_rx>:
-   10474:	0000                	unimp
-   10476:	7060                	flw	fs0,100(s0)
+00010534 <uart_rx>:
+   10534:	0000                	unimp
+   10536:	7060                	flw	fs0,100(s0)
 
-00010478 <uart_tx>:
-   10478:	0004                	0x4
-   1047a:	7060                	flw	fs0,100(s0)
+00010538 <uart_tx>:
+   10538:	0004                	0x4
+   1053a:	7060                	flw	fs0,100(s0)
 
-0001047c <uart_stat>:
-   1047c:	0008                	0x8
-   1047e:	7060                	flw	fs0,100(s0)
+0001053c <uart_stat>:
+   1053c:	0008                	0x8
+   1053e:	7060                	flw	fs0,100(s0)
 
-00010480 <uart_ctrl>:
-   10480:	000c                	0xc
-   10482:	7060                	flw	fs0,100(s0)
+00010540 <uart_ctrl>:
+   10540:	000c                	0xc
+   10542:	7060                	flw	fs0,100(s0)
 
-00010484 <uart_base_ptr>:
-   10484:	1000                	addi	s0,sp,32
-   10486:	7060                	flw	fs0,100(s0)
+00010544 <gpio_data>:
+   10544:	0000                	unimp
+   10546:	7000                	flw	fs0,32(s0)
 
-00010488 <pro_vec>:
-   10488:	0000                	unimp
-   1048a:	6000                	flw	fs0,0(s0)
+00010548 <gpio_ctrl>:
+   10548:	0004                	0x4
+   1054a:	7000                	flw	fs0,32(s0)
 
-0001048c <startpro>:
-   1048c:	0000                	unimp
-   1048e:	6000                	flw	fs0,0(s0)
+0001054c <uart_base_ptr>:
+   1054c:	1000                	addi	s0,sp,32
+   1054e:	7060                	flw	fs0,100(s0)
+
+00010550 <pro_vec>:
+   10550:	0000                	unimp
+   10552:	8000                	0x8000
+
+00010554 <startpro>:
+   10554:	0000                	unimp
+   10556:	8000                	0x8000
 
 Disassembly of section .riscv.attributes:
 
@@ -419,7 +497,7 @@ Disassembly of section .riscv.attributes:
   16:	6932                	flw	fs2,12(sp)
   18:	7032                	flw	ft0,44(sp)
   1a:	5f30                	lw	a2,120(a4)
-  1c:	326d                	jal	fffff9c6 <startpro+0xfffef53a>
+  1c:	326d                	jal	fffff9c6 <startpro+0xfffef472>
   1e:	3070                	fld	fa2,224(s0)
   20:	635f 7032 0030      	0x307032635f
   26:	0108                	addi	a0,sp,128

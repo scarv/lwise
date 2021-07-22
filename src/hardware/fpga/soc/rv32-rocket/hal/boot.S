@@ -4,14 +4,14 @@
 @brief The basic boot script used to initialise the RISC-V core post reset.
 */
 
-.section .text
-.section .text.riscv_reset
-riscv_reset_vector_landing:
-    j riscv_reset_handler
+#.section .text
+#.section .text.riscv_reset
+#riscv_reset_vector_landing:
+#    j riscv_reset_handler
 
-.section .text.riscv_irq_handler
-riscv_irq_vector_landing:
-    j riscv_irq_handler
+#.section .text.riscv_irq_handler
+#riscv_irq_vector_landing:
+#    j riscv_irq_handler
 
 /* ------------------------------------------------------------*/
 
@@ -20,28 +20,27 @@ riscv_irq_vector_landing:
 #
 # Whenever the core is reset, we end up here from riscy_reset_vector_landing
 #
-.global riscv_reset_handler
+.section .text.riscv_reset
 riscv_reset_handler:
-
-	#enable co-processor interface    
-	#li t0, 0x0000C000;   
-    mv  t0, x0
-    li  t0, 0x00018000 
-	csrs mstatus, t0
+    addi  sp,sp,-8
+    sw    ra,4(sp)                      # Push current return address
 
     # Jump to main.
-    j   main
+    call   main
 
+    lw    ra,4(sp)                      # get back return address
+    addi  sp,sp,8
+    ret
 
 #
 # We land here after any environment call
 #
-.global riscv_irq_handler
-riscv_irq_handler:
-    sw    ra,4(sp)                      # Push current return address
-    addi  sp, sp, 0x4                   # to the stack before call.
+#.global riscv_irq_handler
+#riscv_irq_handler:
+#    sw    ra,4(sp)                      # Push current return address
+#    addi  sp, sp, 0x4                   # to the stack before call.
 
 #    call  riscv_irq_delegated_handler   # Jump to the delegated handler.
 
-    mret
+#    mret
 
