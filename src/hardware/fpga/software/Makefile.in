@@ -7,8 +7,13 @@
 #--------------------------------------------------------------------
 # Build software
 #--------------------------------------------------------------------
-DEF_CONF  = -DSPARKLE_RV32_TYPE3
-DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=20 -DDRIVER_MEASURE=1 
+#DEF_CONF  = -DSPARKLE_RV32_TYPE4
+DEF_CONF  = -DSPARKLE_RV64_TYPE4
+DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
+#DEF_CONF += -DSPARKLE_RV32B -DSPARKLE_RV32_ELL 
+DEF_CONF += -DSPARKLE_RV64B -DSPARKLE_RV64_ELL 
+DEF_CONF += -DCRAXS10_ENC_UNROLL -DTRAXL17_ENC_UNROLL -DSPARKLE_FWD_UNROLL 
+DEF_CONF += -DCRAXS10_DEC_UNROLL -DTRAXL17_DEC_UNROLL -DSPARKLE_REV_UNROLL
 DEF_CONF += -DCRAXS10_ENC_EXTERN -DTRAXL17_ENC_EXTERN -DSPARKLE_FWD_EXTERN 
 DEF_CONF += -DCRAXS10_DEC_EXTERN -DTRAXL17_DEC_EXTERN -DSPARKLE_REV_EXTERN
 
@@ -16,7 +21,7 @@ export CONF = $(DEF_CONF)
 
 export SOC_HAL  = ${REPO_HOME}/src/hardware/fpga/soc/${SOC}/hal
 export SOFTWARE = ${REPO_HOME}/src/software
-export FPGA_INCLUDES = ${SOFTWARE}/share ${SOFTWARE}/${ALG} ${SOFTWARE}/${ALG}/arch/${ARCH} ${SOFTWARE}/${ALG}/imp/${IMP} ${FPGA}/software/rdtsc/${ARCH} ${SOC_HAL}
+export FPGA_INCLUDES = ${SOFTWARE}/share ${SOFTWARE}/share/arch/${ARCH} ${SOFTWARE}/${ALG} ${SOFTWARE}/${ALG}/arch/${ARCH} ${SOFTWARE}/${ALG}/imp/${IMP} ${SOC_HAL}
 
 export FPGA_SOURCES  = $(wildcard $(addsuffix /*.c, ${FPGA_INCLUDES}))
 export FPGA_SOURCES += $(wildcard $(addsuffix /*.S, ${FPGA_INCLUDES}))
@@ -28,7 +33,6 @@ FPGA_GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T$(SOC_HAL)/lscript
 GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
 
 FPGA_TARGET   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.elf
-FPGA_OUTHEX   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.hex
 FPGA_OUTBIN   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.bin
 
 # -----------------------------------------------------------------------------
@@ -37,16 +41,13 @@ ${FPGA_TARGET} : ${FPGA_SOURCES} ${FPGA_HEADERS}
 	${GCC_PREFIX}-gcc ${CONF} ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 $(FPGA_OUTBIN) : $(FPGA_TARGET)
-	${GCC_PREFIX}-objcopy -O binary $< $@
-
-$(FPGA_OUTHEX) : $(FPGA_OUTBIN) 
-	od -t x4 -An -w4 -v $< > $@	
+	@${GCC_PREFIX}-objcopy -O binary $< $@
 
 ${FPGA_TARGET}.asm : ${FPGA_TARGET}
-	${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
+	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
 
 fpga-run-software : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
-	@$(FPGA)/script/upload.py --port $(PORT) --baud 57600 upload $(FPGA_OUTBIN) --stdout
+	$(FPGA)/script/upload.py --port $(PORT) --baud 115200 upload $(FPGA_OUTBIN) --stdout
 
 #all   : ${TARGET}.elf ${TARGET}.asm
 #clean : 

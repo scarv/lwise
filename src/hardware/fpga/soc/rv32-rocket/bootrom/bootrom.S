@@ -1,5 +1,3 @@
-#define BRAM_BASE 0x60000000
-
 .section .text.start, "ax", @progbits
 .globl _start
 _start:

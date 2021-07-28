@@ -13,10 +13,6 @@ module system_top_wrapper
     uart_rtl_0_txd,
     gpio_tri_o,
     gpio_led);
-localparam MEM_DATA_WIDTH = 32;
-localparam BRAM_ADDR_WIDTH = 17;     // 32 KB
-localparam BRAM_LINE = 2 ** BRAM_ADDR_WIDTH  * 8 / MEM_DATA_WIDTH;
-localparam BRAM_LINE_OFFSET = $clog2(MEM_DATA_WIDTH/8);
 
 `ifdef Differential_clock_capable_pin
 input k_clk_osc0_clk_p;     // input clk_in1_p
@@ -46,9 +42,10 @@ assign gpio_led   = gpio[0];
   
 wire clk_50M;  
 wire locked, sys_rstn;
+wire rst_request;
+
 assign sys_rstn = locked && (~rst_request);   //reset active low
 
-wire rst_request;
 int_reset int_reset_ins(
     .sys_clk(     clk_50M   ),
     .sys_rst(     k_resetb  ),
@@ -71,6 +68,12 @@ clk_wiz_0 clk_gen
 `endif  
 
 /*    
+
+localparam MEM_DATA_WIDTH = 32;
+localparam BRAM_ADDR_WIDTH = 17;     // 32 KB
+localparam BRAM_LINE = 2 ** BRAM_ADDR_WIDTH  * 8 / MEM_DATA_WIDTH;
+localparam BRAM_LINE_OFFSET = $clog2(MEM_DATA_WIDTH/8);
+
 wire                       bram_clk;  
 wire                       bram_ena;
 wire [                3:0] bram_wea;
@@ -164,7 +167,6 @@ wire           mmio_axi4_0_r_valid;
 wire           mmio_axi4_0_r_ready; 
 
 
-
 wire [3:0]     mem_axi4_0_aw_bits_id; 
 wire [31:0]    mem_axi4_0_aw_bits_addr; 
 wire [7:0]     mem_axi4_0_aw_bits_len;
@@ -255,7 +257,7 @@ axi_bram_ctrl_0 bram_ctrl_ins (
 */
 );
 
-SCARVRocketFPGASystem RocketSystem_Ins ( // @[SaseboRocketTest.scala 14:19:freechips.rocketchip.system.SaseboRocketConfig.fir@156658.4]
+SCARVRocketFPGASystem RocketSystem_Ins ( 
       .clock(clk_50M),
       .reset(~sys_rstn),
       .debug_systemjtag_jtag_TCK( 1'b0),            // input
