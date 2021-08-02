@@ -27,7 +27,7 @@ Throughout the following, we
 
 ## Context
 
-Focusing on encryption, the Alzette function is described in [Appx. C, 1] 
+Focusing on encryption, the Alzette function is described in [Appx. C, 2] 
 as follows
 
 ```
@@ -133,23 +133,26 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- r 
   ```
 
+  Note that this option is required, because of the 32-bit round constant:
+  otherwise we could just use `xori` (which allows a 12-bit immediate).
+
 - `SPARKLE_RV32_TYPE1`: base ISA.
 
 - `SPARKLE_RV32_TYPE2`: base ISA plus custom   ISE.
 
   ```
-  sparkle.addrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.addrori       rd, rs1, rs2, imm => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x + ROR32( y, imm )
                                              GPR[rd] <- r
 
-  sparkle.subrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.subrori       rd, rs1, rs2, imm => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x - ROR32( y, imm )
                                              GPR[rd] <- r
 
-  sparkle.xorrori       rd, rs1, rs2, imm => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.xorrori       rd, rs1, rs2, imm => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x ^ ROR32( y, imm )
                                              GPR[rd] <- r
   ```
@@ -157,53 +160,53 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - `SPARKLE_RV32_TYPE3`: base ISA plus custom   ISE.
 
   ```
-  sparkle.addror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.addror.31     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x + ROR32( y, 31 )
                                              GPR[rd] <- r
 
-  sparkle.addror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.addror.17     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x + ROR32( y, 17 )
                                              GPR[rd] <- r
 
-  sparkle.addror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.addror.24     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x + ROR32( y, 24 )
                                              GPR[rd] <- r
 
-  sparkle.subror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.subror.31     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x - ROR32( y, 31 )
                                              GPR[rd] <- r
 
-  sparkle.subror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.subror.17     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x - ROR32( y, 17 )
                                              GPR[rd] <- r
 
-  sparkle.subror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.subror.24     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x - ROR32( y, 24 )
                                              GPR[rd] <- r
 
-  sparkle.xorror.31     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.xorror.31     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x ^ ROR32( y, 31 )
                                              GPR[rd] <- r
 
-  sparkle.xorror.17     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.xorror.17     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x ^ ROR32( y, 17 )
                                              GPR[rd] <- r
 
-  sparkle.xorror.24     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.xorror.24     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x ^ ROR32( y, 24 )
                                              GPR[rd] <- r
 
-  sparkle.xorror.16     rd, rs1, rs2      => x       <-  GPR[rs1]
-                                             y       <-  GPR[rs2]
+  sparkle.xorror.16     rd, rs1, rs2      => x       <- GPR[rs1]
+                                             y       <- GPR[rs2]
                                              r       <- x ^ ROR32( y, 16 )
                                              GPR[rd] <- r
   ```
@@ -344,6 +347,9 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              r       <- x    ^ RCON[imm]
                                              GPR[rd] <- r
   ```
+
+  Note that this option is required, because of the 32-bit round constant:
+  otherwise we could just use `xori` (which allows a 12-bit immediate).
 
 - `SPARKLE_RV64_TYPE1`: base ISA.
 
@@ -515,17 +521,17 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 ## References
 
-[1] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
+[1] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, A. Moradi, L. Perrin, A.R. Shahmirzadi, A. Udovenko, V. Velichkov, and Q. Wang.
+    [Schwaemm and Esch: Lightweight Authenticated Encryption and Hashing using the Sparkle Permutation Family](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)
+    Submission to NIST (version 1.2), 2021.
+
+[2] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
     [Alzette: a 64-bit ARX-box (feat. CRAX and TRAX)](https://link.springer.com/chapter/10.1007/978-3-030-56877-1_15).
     Advances in Cryptology (CRYPTO), Springer-Verlag LNCS 12172, 419--448, 2020.
     See also [Cryptology ePrint Archive, Report 2019/1378](https://eprint.iacr.org/2019/1378).
 
-[2] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
+[3] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
     [Lightweight AEAD and Hashing using the Sparkle Permutation Family](https://tosc.iacr.org/index.php/ToSC/article/view/8627)
     IACR Transactions on Symmetric Cryptology, 2020(S1), 208--261, 2020.
-
-[3] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, A. Moradi, L. Perrin, A.R. Shahmirzadi, A. Udovenko, V. Velichkov, and Q. Wang.
-    [Schwaemm and Esch: Lightweight Authenticated Encryption and Hashing using the Sparkle Permutation Family](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)
-    Submission to NIST (version 1.2), 2021.
 
 <!--- -------------------------------------------------------------------- --->

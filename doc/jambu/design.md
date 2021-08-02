@@ -36,7 +36,7 @@ Throughout the following, we
   ```
   jambu.xnor            rd, rs1, rs2      => x       <- GPR[rs1]
                                              y       <- GPR[rs2]
-                                             r       <- ~( x ^ y )
+                                             r       <- x ^ ~y
                                              GPR[rd] <- r
 
   jambu.rori            rd, rs1,      imm => x       <- GPR[rs1]
@@ -89,7 +89,7 @@ Throughout the following, we
   ```
   jambu.xnor            rd, rs1, rs2      => x       <- GPR[rs1]
                                              y       <- GPR[rs2]
-                                             r       <- ~( x ^ y )
+                                             r       <- x ^ ~y
                                              GPR[rd] <- r
 
   jambu.rori            rd, rs1,      imm => x       <- GPR[rs1]

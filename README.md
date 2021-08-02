@@ -80,7 +80,7 @@ such as execution latency.
 
   - `${ALG}`
     - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/software/${ALG}`
-    - values: `ascon`, `jambu`, `sparkle`
+    - values: `ascon`, `jambu`, `sparkle`, `xoodyak`
     - default: `sparkle`
 
   - `${ARCH}`
@@ -104,9 +104,10 @@ such as execution latency.
   |           |           |           | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase              |
   |           |           |           | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                |
   |           |           |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum)      |
-  |           | `ascon`   |           |                      | see [documentation](./doc/ascon/ise.md)                                                                        |
-  |           | `jambu`   |           |                      | see [documentation](./doc/jambu/ise.md)                                                                        |
-  |           | `sparkle` |           |                      | see [documentation](./doc/sparkle/ise.md)                                                                      |
+  |           | `ascon`   |           |                      | see [ISE design documentation](./doc/ascon/design.md)                                                          |
+  |           | `jambu`   |           |                      | see [ISE design documentation](./doc/jambu/design.md)                                                          |
+  |           | `sparkle` |           |                      | see [ISE design documentation](./doc/sparkle/design.md)                                                        |
+  |           | `xoodyak` |           |                      | see [ISE design documentation](./doc/xoodyak/design.md)                                                        |
 
 <!--- -------------------------------------------------------------------- --->
 
