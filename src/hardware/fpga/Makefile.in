@@ -45,15 +45,15 @@ rtl_sources = $(wildcard $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/*.v)
 #--------------------------------------------------------------------
 # Gathering Verilogs for FPGA Project
 #--------------------------------------------------------------------
-fpga_verilog: $(ISE)_verilog
+fpga-verilog: $(ISE)_verilog
 
-.PHONY: fpga_verilog
+.PHONY: fpga-verilog
 
 #--------------------------------------------------------------------
 # Project generation
 #--------------------------------------------------------------------
 vivado_project_file = $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).xpr
-fpga_project: fpga_verilog | $(vivado_project_file)
+vivado-project: fpga-verilog | $(vivado_project_file)
 $(vivado_project_file): 
 	$(shell sed -i 's/CONFIG.PRIM_SOURCE.*/''CONFIG.PRIM_SOURCE {$(clktype)} \\''/g' $(FPGA)/soc/$(SOC)/script/make_project.tcl)
 	$(shell sed -i 's/CONFIG.PRIM_IN_FREQ.*/''CONFIG.PRIM_IN_FREQ {$(inclock)} \\''/g' $(FPGA)/soc/$(SOC)/script/make_project.tcl)
@@ -65,13 +65,13 @@ bitstream: $(bitstream)
 $(bitstream) : $(rtl_sources)  $(vivado_project_file)
 	$(VIVADO) -mode batch -source $(FPGA)/script/make_bitstream.tcl -tclargs $(VIVADO_PROJECT) $(FPGA_BUILD)
 
-program: $(bitstream)
+program-fpga: $(bitstream)
 	$(VIVADO) -mode batch -source $(FPGA)/script/program.tcl -tclargs $(device) $(bitstream)
 
 vivado: $(vivado_project_file)
 	$(VIVADO) $(vivado_project_file) &
 
-.PHONY: fpga_project vivado 
+.PHONY: vivado-project program-fpga vivado 
 
 #--------------------------------------------------------------------
 # Sofware Support
