@@ -46,13 +46,13 @@ such as execution latency.
     │   ├── fpga                - source code for the FPGA implementation using Vivado
     │   │   ├── board             - source for supporting a specific board (e.g., sakura-x)
     │   │   ├── script            - scripts for handling the FPGA bitstream on Vivado
-    │   │   ├── soc               - the Vivado projects based on the Rocketchip SoC.
+    │   │   ├── soc               - the Vivado projects based on the Rocket Chip SoC.
     │   │   └── software          - build algorithm-specific sofware running on the FPGA.
-    │   ├── rocketchip          - source code for ISE-enabled Rocket
+    │   ├── rocketchip          - source code for ISE-enabled Rocket Chip
     │   ├── rtl                 - rtl implementation
     │   │   ├── rv32              - 32-bit implementation
     │   │   └── rv64              - 64-bit implementation
-    │   ├── verilator         - source code for emulator for use with Rocket
+    │   ├── verilator         - source code for emulator for use with Rocket Chip
     │   └── yosys_synth       - synthesise hardware implementation using yosys
     ├── software              - source code for software
     │   ├── ${ALG}              - anything algorithm-specific
@@ -70,7 +70,7 @@ such as execution latency.
     │           ├── rv32            - 32-bit RISC-V
     │           └── rv64            - 64-bit RISC-V
     ├── toolchain             - source code for tool-chain
-    └── toolchain-rocket      - source code for tool-chain for use with Rocket
+    └── toolchain-rocket      - source code for the Rocket Chip tool-chain
 ```
 
 <!--- ==================================================================== --->
@@ -212,7 +212,7 @@ such as execution latency.
   source ./bin/Vivado-conf.sh
   ```
 
-- Fix paths for the Rocket-Chip toolchain, e.g., 
+- Fix paths for the Rocket Chip toolchain, e.g., 
   
   ```sh
   export RISCV_ROCKET="/opt/riscv-rocket"
@@ -238,10 +238,10 @@ such as execution latency.
   ```
   
   includes 
-  - ISE-enabled Rocket-Chip implementation, 
+  - ISE-enabled Rocket Chip implementation, 
   - hardware synthesis flow,
   - an emulator for the implementation, 
-  - a FPGA implementation using Vivado
+  - an FPGA implementation using Vivado.
 
 - Get an ISE-enabled
   [Rocket-Chip](https://github.com/chipsalliance/rocket-chip.git)
