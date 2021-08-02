@@ -43,11 +43,16 @@ such as execution latency.
 ├── build                   - working directory for build
 └── src                     - source code
     ├── hardware              - source code for hardware
-    │   ├── rocketchip          - source code for ISE-enabled Rocket
+    │   ├── fpga                - source code for the FPGA implementation using Vivado
+    │   │   ├── board             - source for supporting a specific board (e.g., sakura-x)
+    │   │   ├── script            - scripts for handling the FPGA bitstream on Vivado
+    │   │   ├── soc               - the Vivado projects based on the Rocket Chip SoC.
+    │   │   └── software          - build algorithm-specific sofware running on the FPGA.
+    │   ├── rocketchip          - source code for ISE-enabled Rocket Chip
     │   ├── rtl                 - rtl implementation
     │   │   ├── rv32              - 32-bit implementation
     │   │   └── rv64              - 64-bit implementation
-    │   ├── verilator         - source code for emulator for use with Rocket
+    │   ├── verilator         - source code for emulator for use with Rocket Chip
     │   └── yosys_synth       - synthesise hardware implementation using yosys
     ├── software              - source code for software
     │   ├── ${ALG}              - anything algorithm-specific
@@ -65,7 +70,7 @@ such as execution latency.
     │           ├── rv32            - 32-bit RISC-V
     │           └── rv64            - 64-bit RISC-V
     ├── toolchain             - source code for tool-chain
-    └── toolchain-rocket      - source code for tool-chain for use with Rocket
+    └── toolchain-rocket      - source code for the Rocket Chip tool-chain
 ```
 
 <!--- ==================================================================== --->
@@ -201,6 +206,18 @@ such as execution latency.
 <!--- -------------------------------------------------------------------- --->
 
 ### Hardware
+- Fix path for the installed VIVADO Design suite, e.g., 
+  
+  ```sh
+  export VIVADO_TOOL_DIR="/opt/Xilinx/Vivado/2018.2"
+  source ./bin/Vivado-conf.sh
+  ```
+
+- Fix paths for the Rocket Chip toolchain, e.g., 
+  
+  ```sh
+  export RISCV_ROCKET="/opt/riscv-rocket"
+  ```
 
 - Build a
   [toolchain](https://github.com/riscv/riscv-gnu-toolchain)
@@ -213,16 +230,6 @@ such as execution latency.
   make -f ${REPO_HOME}/src/toolchain-rocket/Makefile build
   ```
 
-  making changes to it is somewhat tricky.  The idea, for each component,
-  (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
-
-  - perform a fresh clone of the component repository,
-  - apply the existing patch to the cloned component repository,
-  - implement the change in the cloned component repository,
-  - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
-  - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
-  - optionally commit and push the updated patch.
-
 ### Hardware-specific
 
 - The build system in
@@ -232,9 +239,10 @@ such as execution latency.
   ```
   
   includes 
-  - ISE-enabled Rocket-Chip implementation, 
+  - ISE-enabled Rocket Chip implementation, 
+  - hardware synthesis flow,
   - an emulator for the implementation, 
-  - hardware synthesis flow
+  - an FPGA implementation using Vivado.
 
 - Get an ISE-enabled
   [Rocket-Chip](https://github.com/chipsalliance/rocket-chip.git)
@@ -244,25 +252,39 @@ such as execution latency.
   make -f ${REPO_HOME}/src/hardware/Makefile rocketchip-clone
   make -f ${REPO_HOME}/src/hardware/Makefile rocketchip-apply
   ```
-- Build the emulator of the implementation using 
-  [verilator](https://www.veripool.org/verilator),
-  e.g.,
 
-  ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" emulator
-  ```
 - Run hardware synthesis flow using
-  [yosys](https://github.com/YosysHQ/yosys),
-  e.g.,
+  [yosys](https://github.com/YosysHQ/yosys)
 
   ```sh
   make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH="rv32" ISE="xalu"
   ```
-- Build and execute software on the emulator of the hardware implementation, e.g.,
+
+- Build the emulator of the implementation using 
+  [verilator](https://www.veripool.org/verilator): 
 
   ```sh
-  make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" ISE="xalu" CONF="-DDRIVER_TRIALS_REAL='10'" clean all emulate
+  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" emulator
   ```
+
+  - Build and execute software on the emulator of the hardware implementation, e.g.,
+
+    ```sh
+    make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" ISE="xalu" CONF="-DDRIVER_TRIALS_REAL='10'" emu-clean emulate
+    ```
+
+- Build the bitstream of the Xilinx FPGA and run a software on the FPGA using Vivado:
+
+  ```sh
+  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" fpga-verilog
+  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" program-fpga
+  ```
+
+  - Build and execute software on the hardware implementation on the FPGA, e.g.,
+
+    ```sh
+    make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" ISE="xalu" fpga-clean fpga-run
+    ```
 
 <!--- -------------------------------------------------------------------- --->
    
