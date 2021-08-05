@@ -7,17 +7,17 @@
 #--------------------------------------------------------------------
 # Build software
 #--------------------------------------------------------------------
-#DEF_CONF  = -DSPARKLE_RV32_TYPE4
-DEF_CONF  = -DSPARKLE_RV64_TYPE4
-DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-#DEF_CONF += -DSPARKLE_RV32B -DSPARKLE_RV32_ELL 
-DEF_CONF += -DSPARKLE_RV64B -DSPARKLE_RV64_ELL 
-DEF_CONF += -DCRAXS10_ENC_UNROLL -DTRAXL17_ENC_UNROLL -DSPARKLE_FWD_UNROLL 
-DEF_CONF += -DCRAXS10_DEC_UNROLL -DTRAXL17_DEC_UNROLL -DSPARKLE_REV_UNROLL
-DEF_CONF += -DCRAXS10_ENC_EXTERN -DTRAXL17_ENC_EXTERN -DSPARKLE_FWD_EXTERN 
-DEF_CONF += -DCRAXS10_DEC_EXTERN -DTRAXL17_DEC_EXTERN -DSPARKLE_REV_EXTERN
+FPGA_DEF_CONF  = -DSPARKLE_RV32_TYPE4
+#FPGA_DEF_CONF  = -DSPARKLE_RV64_TYPE4
+FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
+FPGA_DEF_CONF += -DSPARKLE_RV32B -DSPARKLE_RV32_ELL 
+#FPGA_DEF_CONF += -DSPARKLE_RV64B -DSPARKLE_RV64_ELL 
+FPGA_DEF_CONF += -DCRAXS10_ENC_UNROLL -DTRAXL17_ENC_UNROLL -DSPARKLE_FWD_UNROLL 
+FPGA_DEF_CONF += -DCRAXS10_DEC_UNROLL -DTRAXL17_DEC_UNROLL -DSPARKLE_REV_UNROLL
+FPGA_DEF_CONF += -DCRAXS10_ENC_EXTERN -DTRAXL17_ENC_EXTERN -DSPARKLE_FWD_EXTERN 
+FPGA_DEF_CONF += -DCRAXS10_DEC_EXTERN -DTRAXL17_DEC_EXTERN -DSPARKLE_REV_EXTERN
 
-export CONF = $(DEF_CONF)
+export FPGA_SWCONF = $(FPGA_DEF_CONF)
 
 export SOC_HAL  = ${REPO_HOME}/src/hardware/fpga/soc/${SOC}/hal
 export SOFTWARE = ${REPO_HOME}/src/software
@@ -38,7 +38,7 @@ FPGA_OUTBIN   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.bin
 # -----------------------------------------------------------------------------
 
 ${FPGA_TARGET} : ${FPGA_SOURCES} ${FPGA_HEADERS}
-	${GCC_PREFIX}-gcc ${CONF} ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+	@${GCC_PREFIX}-gcc ${FPGA_SWCONF} ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 $(FPGA_OUTBIN) : $(FPGA_TARGET)
 	@${GCC_PREFIX}-objcopy -O binary $< $@
@@ -46,12 +46,13 @@ $(FPGA_OUTBIN) : $(FPGA_TARGET)
 ${FPGA_TARGET}.asm : ${FPGA_TARGET}
 	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
 
-fpga-run-software : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
-	$(FPGA)/script/upload.py --port $(PORT) --baud 115200 upload $(FPGA_OUTBIN) --stdout
+fpga-run : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
+	@$(FPGA)/script/upload.py --port $(PORT) --baud 115200 upload $(FPGA_OUTBIN) --stdout
 
 #all   : ${TARGET}.elf ${TARGET}.asm
-#clean : 
-#	@rm --force ${TARGET}.elf
-#	@rm --force ${TARGET}.asm
+fpga-clean : 
+	@rm --force ${FPGA_TARGET}
+	@rm --force ${FPGA_TARGET}.asm
+	@rm --force ${FPGA_OUTBIN}
 
 # =============================================================================
