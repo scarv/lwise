@@ -7,7 +7,7 @@
 #--------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------
-RTL64 = $(REPO_HOME)/src/hardware/rtl/rv64
+RTL64 = $(REPO_HOME)/src/hardware/rtl/$(ALG)/rv64
 rtl64_ise_src= \
         $(RTL64)/rv64b_ise.v \
         $(RTL64)/rv64ell_ise.v \
