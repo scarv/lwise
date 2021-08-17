@@ -10,7 +10,7 @@ export FPGA            = $(REPO_HOME)/src/hardware/fpga
 export BOARD          ?= sakura-x
 export SOC	           = $(ARCH)-rocket
 
-VIVADO_PROJECT = $(SOC)-$(ISE)-imp
+VIVADO_PROJECT = $(ALG)-$(SOC)-$(ISE)-imp
 prog_mem       = $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin/prog.mem
 
 VIVADO = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && vivado
@@ -19,7 +19,7 @@ UPDMEM = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && updatemem
 #--------------------------------------------------------------------
 # ISE Implementation
 #--------------------------------------------------------------------
-include ${REPO_HOME}/src/hardware/rtl/$(ARCH)/Makefile.in
+include ${REPO_HOME}/src/hardware/rtl/$(ALG)/$(ARCH)/Makefile.in
 
 #--------------------------------------------------------------------
 # Systems
