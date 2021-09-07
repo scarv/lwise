@@ -1,4 +1,4 @@
-//Alzette Instruction Set Extension
+//Xoodyak Instruction Set Extension
 module xalu_ise (
     ise_clk,
     ise_rst,

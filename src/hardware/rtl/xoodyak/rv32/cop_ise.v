@@ -1,4 +1,4 @@
-//Xoodyak Instruction Set Extension
+//Co-processor interface for Xoodyak ISE
 module cop_ise (
     cop_clk,
     cop_rst,

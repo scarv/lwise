@@ -15,7 +15,7 @@ wire [ 4:0] shamt = imm[4:0];
 //64-bit rotation
 wire [63:0] opr_rot = {rs2, rs1};
 
-wire [63:0]    l0 =  rs1;
+wire [63:0]    l0 =  opr_rot;
 wire [63:0]    l1 = {64{ shamt[0]}} & {l0[   0], l0[63: 1]} |
                     {64{!shamt[0]}} &  l0[63:0];
 wire [63:0]    l2 = {64{ shamt[1]}} & {l1[ 1:0], l1[63: 2]} |

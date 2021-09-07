@@ -41,8 +41,8 @@ wire [63:0] l16_64 = {64{ shamt[4]}} & {l8_64[47:0], l8_64[63:48]} |
 // andnot r = x & ~y
 wire [31:0] andnot = rs1 & (~rs2);
 
-assign      rd     = {64{ op_roli }} & { l16_64 } |
-                     {64{ op_roliw }} & { iornot } |
-                     {64{ op_andn }} & { andnot } ;
+assign      rd     = {64{ op_roliw }} & {r1[63:32], l16    } |
+                     {64{ op_roli  }} & {           l16_64 } |
+                     {64{ op_andn  }} & {           andnot } ;
 endmodule
 
