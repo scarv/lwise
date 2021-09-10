@@ -400,3 +400,4 @@ void test_giftb128(void)
     // masterkey : 0123456789ABCDEFFEDCBA9876543210
     // ciphertext: 0C9B414C744858846A98715ABBCC1AA6
 }
+
