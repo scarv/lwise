@@ -10,28 +10,28 @@ is an attempt to
 "solicit, evaluate, and standardize lightweight cryptographic algorithms that are suitable for use in constrained environments",
 e.g., where even 
 [AES](https://en.wikipedia.org/wiki/Advanced_)
-might be deemed (too) heavyweight.  From an initial 57 submissions, the 10 
+might be deemed (too) heavyweight.  From an initial 57 submissions, 10 
 [final-round candidates](https://csrc.nist.gov/Projects/lightweight-cryptography/finalists) 
-are
-
-1. [Ascon](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf)
-1. [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf)
-1. [GIFT-COFB](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf)
-1. [Grain128-AEAD](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/grain-128aead-spec-final.pdf)
-1. [ISAP](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/isap-spec-final.pdf)
-1. [Photon-Beetle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/photon-beetle-spec-final.pdf)
-1. [Romulus](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf)
-1. [Sparkle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)
-1. [TinyJambu](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/tinyjambu-spec-final.pdf)
-1. [Xoodyak](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/xoodyak-spec-final.pdf)
-
-This repo. captures an exploration of 
+were selected.  This repo. captures an exploration of 
 Instruction Set Extensions (ISEs)
 for (a subset of) these candidates, based on the use of 
 [RISC-V](https://en.wikipedia.org/wiki/RISC-V)
 as a base ISA: the goal is to add understanding to and so inform selection 
 of any resulting standard, with respect to implementation-related criteria
-such as execution latency.
+such as execution latency.  Our progress can be summarised as follows:
+
+| Candidate                                                                                                                                                  | Identifier | Design                       | Software | Hardware |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------: | :--------------------------: | :------: | :------: |
+| [Ascon](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf)                 | `ascon`    | [o](./doc/ascon/design.md)   |          | o        |
+| [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf)           | `elephant` |                              |          |          |
+| [GIFT-COFB](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf)         | `gift`     |                              |          |          |
+| [Grain128-AEAD](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/grain-128aead-spec-final.pdf) | `grain`    |                              |          |          |
+| [ISAP](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/isap-spec-final.pdf)                   | `isap`     |                              |          |          |
+| [Photon-Beetle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/photon-beetle-spec-final.pdf) | `photon`   |                              |          |          |
+| [Romulus](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf)             | `romulus`  |                              |          |          |
+| [Sparkle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)             | `sparkle`  | [o](./doc/sparkle/design.md) | o        | o        |
+| [TinyJambu](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/tinyjambu-spec-final.pdf)         | `jambu`    | [o](./doc/jambu/design.md)   |          | o        |
+| [Xoodyak](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/xoodyak-spec-final.pdf)             | `xoodyak`  | [o](./doc/xoodyak/design.md) |          | o        |
 
 <!--- ==================================================================== --->
 
@@ -101,18 +101,18 @@ such as execution latency.
   Note that the separation of `${ARCH}` and `${IMP}` allows, for example, 
   the generic C implementation to be compiled for the RV32I architecture.
 
-- The `${CONF}` environment variable allows options to be passed to GCC:
+- The `${CONF}` environment variable allows options to be passed to GCC,
+  e.g.,
 
-  | `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
-  | :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-  |           |           |           | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase              |
-  |           |           |           | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase              |
-  |           |           |           | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                |
-  |           |           |           | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum)      |
-  |           | `ascon`   |           |                      | see [ISE design documentation](./doc/ascon/design.md)                                                          |
-  |           | `jambu`   |           |                      | see [ISE design documentation](./doc/jambu/design.md)                                                          |
-  |           | `sparkle` |           |                      | see [ISE design documentation](./doc/sparkle/design.md)                                                        |
-  |           | `xoodyak` |           |                      | see [ISE design documentation](./doc/xoodyak/design.md)                                                        |
+  | Symbol               | Meaning                                                                                                        |
+  | :------------------- | :------------------------------------------------------------------------------------------------------------- |
+  | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase              |
+  | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase              |
+  | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                |
+  | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum)      |
+
+  plus various algorithm-, architecture-, and/or implementation-specific
+  cases documented elsewhere.
 
 <!--- -------------------------------------------------------------------- --->
 
