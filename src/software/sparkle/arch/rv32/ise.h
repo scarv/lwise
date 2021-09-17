@@ -6,29 +6,7 @@
 
 // ============================================================================
 
-#if ( SPARKLE_RV32B )
-.macro ROR32 r, x, n, t0, t1
-  sparkle.rori  \r,  \x,      \n
-.endm
-#else
-.macro ROR32 r, x, n, t0, t1
-  srli          \t0, \x,      \n
-  slli          \t1, \x,   32-\n
-  or            \r,  \t0, \t1
-.endm
-#endif
-
-// ============================================================================
-
-#if ( SPARKLE_RV32B )
-.macro sparkle.rori         rd, rs1,      imm          
-.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0 
-.endm                                              
-#endif
-
-// ----------------------------------------------------------------------------
-
-#if ( SPARKLE_RV32_ELL )
+#if ( SPARKLE_RV32_ELL   )
 .macro sparkle.ell          rd, rs1, rs2                    
 .insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2
 .endm         
@@ -36,7 +14,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if ( SPARKLE_RV32_RCON )
+#if ( SPARKLE_RV32_RCON  )
 .macro sparkle.rcon         rd, rs1,      imm
 .insn r CUSTOM_2, 6, \imm+( 0* 8), \rd, \rs1,   x0
 .endm

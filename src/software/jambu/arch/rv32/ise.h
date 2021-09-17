@@ -6,18 +6,6 @@
 
 // ============================================================================
 
-#if ( JAMBU_RV32B )
-.macro jambu.xnor           rd, rs1, rs2
-.insn r CUSTOM_2, 7,      ( 0* 1), \rd, \rs1, \rs2
-.endm
-
-.macro jambu.rori           rd, rs1,      imm
-.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0
-.endm
-#endif
-
-// ----------------------------------------------------------------------------
-
 #if ( JAMBU_RV32_TYPE2 )
 .macro jambu.fsri           rd, rs1, rs2, imm
 .insn r CUSTOM_1, 7, \imm+( 0*32), \rd, \rs1, \rs2

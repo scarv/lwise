@@ -6,59 +6,7 @@
 
 // ============================================================================
 
-#if ( SPARKLE_RV64B )
-.macro ROR32 r, x, n, t0, t1
-  sparkle.roriw \r,  \x,      \n
-.endm
-.macro ROR64 r, x, n, t0, t1
-  sparkle.rori  \r,  \x,      \n
-.endm
-#else
-.macro ROR32 r, x, n, t0, t1
-  srliw         \t0, \x,      \n
-  slliw         \t1, \x,   32-\n
-  or            \r,  \t0, \t1
-.endm
-.macro ROR64 r, x, n, t0, t1
-  srli          \t0, \x,      \n
-  slli          \t1, \x,   64-\n
-  or            \r,  \t0, \t1
-.endm
-#endif
-
-// ----------------------------------------------------------------------------
-
-#if ( SPARKLE_RV64B )
-.macro PACK r, x0, x1
-  sparkle.pack  \r,  \x0, \x1
-.endm
-#else
-.macro PACK r, x0, x1
-  slli          \x1, \x1,  32
-  or            \r,  \x0, \x1
-.endm
-#endif
-
-// ============================================================================
-
-#if ( SPARKLE_RV64B )
-.macro sparkle.rori         rd, rs1,      imm          
-.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0
-.endm
-.macro sparkle.roriw        rd, rs1,      imm          
-.insn r CUSTOM_0, 6, \imm+( 1*32), \rd, \rs1,   x0 
-.endm        
-.macro sparkle.pack         rd, rs1, rs2               
-.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 
-.endm                                              
-.macro sparkle.packu        rd, rs1, rs2               
-.insn r CUSTOM_3, 7,      ( 1* 1), \rd, \rs1, \rs2 
-.endm                                              
-#endif
-
-// ----------------------------------------------------------------------------
-
-#if ( SPARKLE_RV64_ELL )
+#if ( SPARKLE_RV64_ELL   )
 .macro sparkle.ell          rd, rs1, rs2                    
 .insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2
 .endm           
@@ -69,7 +17,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if ( SPARKLE_RV64_RCON )
+#if ( SPARKLE_RV64_RCON  )
 .macro sparkle.rcon         rd, rs1,      imm
 .insn r CUSTOM_2, 6, \imm+( 0* 8), \rd, \rs1,   x0
 .endm
