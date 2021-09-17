@@ -18,9 +18,9 @@ for (a subset of) these candidates, based on the use of
 [RISC-V](https://en.wikipedia.org/wiki/RISC-V)
 as a base ISA: the goal is to add understanding to and so inform selection 
 of any resulting standard, with respect to implementation-related criteria
-such as execution latency.  Our progress can be summarised as follows:
+such as execution latency.  Our progress can be summarised as follows
 
-| Candidate                                                                                                                                                  | Identifier | Design                       | Encoding                        | Software | Hardware |
+| Algorithm                                                                                                                                                  | Identifier | Design                       | Encoding                        | Software | Hardware |
 | :--------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------: | :--------------------------: | :-----------------------------: | :------: | :------: |
 | [Ascon](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf)                 | `ascon`    | [o](./doc/ascon/design.md)   | [o](./doc/ascon/encoding.txt)   |          | o        |
 | [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf)           | `elephant` |                              |                                 |          |          |
@@ -32,6 +32,9 @@ such as execution latency.  Our progress can be summarised as follows:
 | [Sparkle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)             | `sparkle`  | [o](./doc/sparkle/design.md) | [o](./doc/sparkle/encoding.txt) | o        | o        |
 | [TinyJambu](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/tinyjambu-spec-final.pdf)         | `jambu`    | [o](./doc/jambu/design.md)   | [o](./doc/jambu/encoding.txt)   |          | o        |
 | [Xoodyak](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/xoodyak-spec-final.pdf)             | `xoodyak`  | [o](./doc/xoodyak/design.md) | [o](./doc/xoodyak/encoding.txt) |          | o        |
+
+noting that we ignore ISAP: this construction is more like a generic mode
+of operation, so there *seems* less scope for use of ISEs.
 
 <!--- ==================================================================== --->
 
@@ -85,7 +88,7 @@ such as execution latency.  Our progress can be summarised as follows:
 
   - `${ALG}`
     - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/software/${ALG}`
-    - values: `ascon`, `jambu`, `sparkle`, `xoodyak`
+    - values: `ascon`, `elephant`, `gift`, `grain`, `photon`, `romulus`, `jambu`, `sparkle`, `xoodyak`
     - default: `sparkle`
 
   - `${ARCH}`
