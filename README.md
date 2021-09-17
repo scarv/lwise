@@ -209,7 +209,8 @@ of operation, so there *seems* less scope for use of ISEs.
 <!--- -------------------------------------------------------------------- --->
 
 ### Hardware
-- Fix path for the installed VIVADO Design suite, e.g., 
+
+- Fix path for the installed Vivado Design Suite, e.g., 
   
   ```sh
   export VIVADO_TOOL_DIR="/opt/Xilinx/Vivado/2018.2"

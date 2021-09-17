@@ -35,30 +35,20 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 
 | `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
 | :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `ascon`   | `rv32`    | `ASCON_RV32B`        | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
-|           | `ascon`   | `rv32`    | `ASCON_RV32_TYPE1`   | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `ascon`   | `rv32`    | `ASCON_RV32_TYPE2`   | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-|           | `ascon`   | `rv64`    | `ASCON_RV64B`        | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
-|           | `ascon`   | `rv64`    | `ASCON_RV64_TYPE1`   | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `ascon`   | `rv64`    | `ASCON_RV64_TYPE2`   | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+|           | `ascon`   | `rv32`    | `ASCON_RV32_TYPE1`   | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `ascon`   | `rv32`    | `ASCON_RV32_TYPE2`   | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `ascon`   | `rv64`    | `ASCON_RV64_TYPE1`   | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `ascon`   | `rv64`    | `ASCON_RV64_TYPE2`   | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
 
 <!--- -------------------------------------------------------------------- --->
 
 ## `${IMP} = "rv32"`
 
-- The (optional) BitManip-like ISE:
+- `ASCON_RV32_TYPE1`: baseline ISA.
+
+- `ASCON_RV32_TYPE2`: baseline ISA plus custom ISE.
 
   ```
-  ascon.orn             rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x | ~y
-                                             GPR[rd] <- r
-
-  ascon.andn            rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x & ~y
-                                             GPR[rd] <- r
-
   ascon.rori.lo         rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
                                              x_lo    <- GPR[rs1]
                                              x       <- x_hi || x_lo
@@ -70,13 +60,7 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
                                              x       <- x_hi || x_lo
                                              r       <- ROR64( x, imm )
                                              GPR[rd] <- r_{63..32}
-  ```
 
-- `ASCON_RV32_TYPE1`: base ISA.
-
-- `ASCON_RV32_TYPE2`: base ISA plus custom   ISE.
-
-  ```
   ascon.sigma.lo        rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
                                              x_lo    <- GPR[rs1]
                                              x       <- x_hi || x_lo
@@ -94,27 +78,9 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 
 ## `${IMP} = "rv64"`
 
-- The (optional) BitManip-like ISE:
+- `ASCON_RV64_TYPE1`: baseline ISA.
 
-  ```
-  ascon.orn             rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x | ~y
-                                             GPR[rd] <- r
-
-  ascon.andn            rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x & ~y
-                                             GPR[rd] <- r
-
-  ascon.rori            rd, rs1,      imm => x       <- GPR[rs1]
-                                             r       <- ROR64( x, imm )
-                                             GPR[rd] <- r
-  ```
-
-- `ASCON_RV64_TYPE1`: base ISA.
-
-- `ASCON_RV64_TYPE2`: base ISA plus custom   ISE.
+- `ASCON_RV64_TYPE2`: baseline ISA plus custom ISE.
 
   ```
   ascon.sigma           rd, rs1,      imm => x       <- GPR[rs1]

@@ -19,34 +19,19 @@ Throughout the following, we
 
 | `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
 | :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `jambu`   | `rv32`    | `JAMBU_RV32B`        | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
-|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE1`   | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE2`   | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE3`   | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-|           | `jambu`   | `rv64`    | `JAMBU_RV64B`        | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
-|           | `jambu`   | `rv64`    | `JAMBU_RV64_TYPE1`   | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `jambu`   | `rv64`    | `JAMBU_RV64_TYPE2`   | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
+|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE1`   | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE2`   | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE3`   | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
+|           | `jambu`   | `rv64`    | `JAMBU_RV64_TYPE1`   | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `jambu`   | `rv64`    | `JAMBU_RV64_TYPE2`   | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
 
 <!--- -------------------------------------------------------------------- --->
 
 ## `${IMP} = "rv32"`
 
-- The (optional) BitManip-like ISE:
+- `JAMBU_RV32_TYPE1`: baseline ISA.
 
-  ```
-  jambu.xnor            rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x ^ ~y
-                                             GPR[rd] <- r
-
-  jambu.rori            rd, rs1,      imm => x       <- GPR[rs1]
-                                             r       <- ROR32( x, imm )
-                                             GPR[rd] <- r
-  ```
-
-- `JAMBU_RV32_TYPE1`: base ISA.
-
-- `JAMBU_RV32_TYPE2`: base ISA plus custom   ISE.
+- `JAMBU_RV32_TYPE2`: baseline ISA plus custom ISE.
 
   ```
   jambu.fsri            rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
@@ -56,7 +41,7 @@ Throughout the following, we
                                              
   ```
 
-- `JAMBU_RV32_TYPE3`: base ISA plus custom   ISE.
+- `JAMBU_RV32_TYPE3`: baseline ISA plus custom ISE.
 
   ```
   jambu.fsr.15          rd, rs1, rs2      => x_hi    <- GPR[rs2]
@@ -84,40 +69,9 @@ Throughout the following, we
 
 ## `${IMP} = "rv64"`
 
-- The (optional) BitManip-like ISE:
+- `JAMBU_RV64_TYPE1`: baseline ISA.
 
-  ```
-  jambu.xnor            rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x ^ ~y
-                                             GPR[rd] <- r
-
-  jambu.rori            rd, rs1,      imm => x       <- GPR[rs1]
-                                             r       <- ROR64( x, imm )
-                                             GPR[rd] <- r
-
-  jambu.roriw           rd, rs1,      imm => x       <- GPR[rs1]
-                                             r       <- ROR32( x, imm )
-                                             GPR[rd] <- r
-
-  jambu.pack            rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r_hi    <-   y << 32
-                                             r_lo    <- ( x << 32 ) >> 32
-                                             r       <- r_hi | r_lo
-                                             GPR[rd] <- r
-
-  jambu.packu           rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r_hi    <- ( y >> 32 ) << 32
-                                             r_lo    <-   x >> 32
-                                             r       <- r_hi | r_lo
-                                             GPR[rd] <- r
-  ```
-
-- `JAMBU_RV64_TYPE1`: base ISA.
-
-- `JAMBU_RV64_TYPE2`: base ISA plus custom   ISE.
+- `JAMBU_RV64_TYPE2`: baseline ISA plus custom ISE.
 
   ```
   jambu.block.0         rd, rs1, rs2      => s_0     <- GPR[rs1]_{31.. 0}

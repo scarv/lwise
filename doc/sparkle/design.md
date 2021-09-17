@@ -89,33 +89,23 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 |           | `sparkle` |           | `SPARKLE_REV_EXTERN` | don't include implementation of reverse SPARKLE in driver, i.e., allow an architecture-specific implementation |
 |           | `sparkle` |           | `SPARKLE_FWD_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
 |           | `sparkle` |           | `SPARKLE_REV_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32B`      | enable BitManip-like ISE for 32-bit RISC-V                                                                     |
 |           | `sparkle` | `rv32`    | `SPARKLE_RV32_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
 |           | `sparkle` | `rv32`    | `SPARKLE_RV32_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE1` | select 32-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE2` | select 32-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE3` | select 32-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE4` | select 32-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64B`      | enable BitManip-like ISE for 64-bit RISC-V                                                                     |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE1` | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE2` | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE3` | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
+|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE4` | select 32-bit RISC-V baseline ISA plus custom ISE: option 4, per description below                             |
 |           | `sparkle` | `rv64`    | `SPARKLE_RV64_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
 |           | `sparkle` | `rv64`    | `SPARKLE_RV64_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE1` | select 64-bit RISC-V base ISA:                 option 1, per description below                                 |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE2` | select 64-bit RISC-V base ISA plus custom ISE: option 2, per description below                                 |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE3` | select 64-bit RISC-V base ISA plus custom ISE: option 3, per description below                                 |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE4` | select 64-bit RISC-V base ISA plus custom ISE: option 4, per description below                                 |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE5` | select 64-bit RISC-V base ISA plus custom ISE: option 5, per description below                                 |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE1` | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE2` | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE3` | select 64-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE4` | select 64-bit RISC-V baseline ISA plus custom ISE: option 4, per description below                             |
+|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE5` | select 64-bit RISC-V baseline ISA plus custom ISE: option 5, per description below                             |
 
 <!--- -------------------------------------------------------------------- --->
 
 ## `${IMP} = "rv32"`
-
-- The (optional) BitManip-like ISE:
-
-  ```
-  sparkle.rori          rd, rs1,      imm => x       <- GPR[rs1]
-                                             r       <- ROR32( x, imm )
-                                             GPR[rd] <- r
-  ```
 
 - The (optional) ISE for `\ell` function:
 
@@ -133,12 +123,12 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- r 
   ```
 
-  Note that this option is required, because of the 32-bit round constant:
-  otherwise we could just use `xori` (which allows a 12-bit immediate).
+  Note that this option is required because of the 32-bit round constant:
+  otherwise, we could just use `xori` (which allows a 12-bit immediate).
 
-- `SPARKLE_RV32_TYPE1`: base ISA.
+- `SPARKLE_RV32_TYPE1`: baseline ISA.
 
-- `SPARKLE_RV32_TYPE2`: base ISA plus custom   ISE.
+- `SPARKLE_RV32_TYPE2`: baseline ISA plus custom ISE.
 
   ```
   sparkle.addrori       rd, rs1, rs2, imm => x       <- GPR[rs1]
@@ -157,7 +147,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- r
   ```
 
-- `SPARKLE_RV32_TYPE3`: base ISA plus custom   ISE.
+- `SPARKLE_RV32_TYPE3`: baseline ISA plus custom ISE.
 
   ```
   sparkle.addror.31     rd, rs1, rs2      => x       <- GPR[rs1]
@@ -211,7 +201,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- r
   ```
      
-- `SPARKLE_RV32_TYPE4`: base ISA plus custom   ISE.
+- `SPARKLE_RV32_TYPE4`: baseline ISA plus custom ISE.
    
   ```
   sparkle.whole.enci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
@@ -287,32 +277,6 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 ## `${IMP} = "rv64"`
 
-- The (optional) BitManip-like ISE:
-
-  ```
-  sparkle.rori          rd, rs1,      imm => x       <- GPR[rs1]_{63.. 0}
-                                             r       <- ROR64( x, imm )
-                                             GPR[rd] <- r
-
-  sparkle.roriw         rd, rs1,      imm => x       <- GPR[rs1]_{31.. 0}
-                                             r       <- ROR32( x, imm )
-                                             GPR[rd] <- r
-
-  sparkle.pack          rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r_hi    <-   y << 32
-                                             r_lo    <- ( x << 32 ) >> 32
-                                             r       <- r_hi | r_lo
-                                             GPR[rd] <- r
-
-  sparkle.packu         rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r_hi    <- ( y >> 32 ) << 32
-                                             r_lo    <-   x >> 32
-                                             r       <- r_hi | r_lo
-                                             GPR[rd] <- r
-  ```
-
 - The (optional) ISE for `\ell` function:
 
   ```
@@ -348,12 +312,12 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- r
   ```
 
-  Note that this option is required, because of the 32-bit round constant:
-  otherwise we could just use `xori` (which allows a 12-bit immediate).
+  Note that this option is required because of the 32-bit round constant:
+  otherwise, we could just use `xori` (which allows a 12-bit immediate).
 
-- `SPARKLE_RV64_TYPE1`: base ISA.
+- `SPARKLE_RV64_TYPE1`: baseline ISA.
 
-- `SPARKLE_RV64_TYPE2`: base ISA plus custom   ISE.
+- `SPARKLE_RV64_TYPE2`: baseline ISA plus custom ISE.
 
   ```
   sparkle.block.enci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
@@ -373,7 +337,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- yi || xi
   ```
 
-- `SPARKLE_RV64_TYPE3`: base ISA plus custom   ISE.
+- `SPARKLE_RV64_TYPE3`: baseline ISA plus custom ISE.
 
   ```
   sparkle.block.enc.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
@@ -441,7 +405,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- yi || xi
     ```
 
-- `SPARKLE_RV64_TYPE4`: base ISA plus custom   ISE.
+- `SPARKLE_RV64_TYPE4`: baseline ISA plus custom ISE.
 
   ```
   sparkle.whole.enci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
@@ -479,7 +443,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
                                              GPR[rd] <- yi || xi
   ```
 
-- `SPARKLE_RV64_TYPE5`: base ISA plus custom   ISE.
+- `SPARKLE_RV64_TYPE5`: baseline ISA plus custom ISE.
 
   ```
   sparkle.whole.enc     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
@@ -527,7 +491,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 [2] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
     [Alzette: a 64-bit ARX-box (feat. CRAX and TRAX)](https://link.springer.com/chapter/10.1007/978-3-030-56877-1_15).
-    Advances in Cryptology (CRYPTO), Springer-Verlag LNCS 12172, 419--448, 2020.
+    Advances in Cryptology (CRYPTO), Springer-Verlag, LNCS 12172, 419--448, 2020.
     See also [Cryptology ePrint Archive, Report 2019/1378](https://eprint.iacr.org/2019/1378).
 
 [3] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
