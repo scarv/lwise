@@ -334,6 +334,40 @@ void precompute_rkeys(uint32_t* rkey, const uint8_t* key)
 }
 
 
+// Alternative approach to compute the round keys. This version generates all
+// round keys in classical representation fist and then they get rearranged
+// into fixsliced representation.
+
+void precompute_rkeys_v2(uint32_t* rkey, const uint8_t* key)
+{
+    int i;
+
+    // classical initialization
+    rkey[0] = ReverseByteOrder(((uint32_t *) key)[3]);
+    rkey[1] = ReverseByteOrder(((uint32_t *) key)[1]);
+    rkey[2] = ReverseByteOrder(((uint32_t *) key)[2]);
+    rkey[3] = ReverseByteOrder(((uint32_t *) key)[0]);
+
+    // classical key-schedule
+    for (i = 4; i < 80; i += 2) {
+        rkey[i  ] = rkey[i-3];
+        rkey[i+1] = ClassicalKeyUpdate(rkey[i-4]);
+    }
+
+    // transposition to fixsliced representation
+    for (i = 0; i < 80; i += 10) {
+        rkey[i  ] = RearrangeKey(rkey[i  ], 0);
+        rkey[i+1] = RearrangeKey(rkey[i+1], 0);
+        rkey[i+2] = RearrangeKey(rkey[i+2], 1);
+        rkey[i+3] = RearrangeKey(rkey[i+3], 1);
+        rkey[i+4] = RearrangeKey(rkey[i+4], 2);
+        rkey[i+5] = RearrangeKey(rkey[i+5], 2);
+        rkey[i+6] = RearrangeKey(rkey[i+6], 3);
+        rkey[i+7] = RearrangeKey(rkey[i+7], 3);
+    }
+}
+
+
 // Encryption of a single 128-bit block with GIFTb-128 (used in GIFT-COFB).
 
 void giftb128(uint8_t* ctext, const uint8_t* ptext, const uint32_t* rkey) 
@@ -391,7 +425,9 @@ void test_giftb128(void)
 
     print_bytes("plaintext : ", ptext, 16);
     print_bytes("masterkey : ", (uint8_t *) key, 16);
-    precompute_rkeys(rkey, (uint8_t *) key);
+    // precompute_rkeys(rkey, (uint8_t *) key);
+    precompute_rkeys_v2(rkey, (uint8_t *) key);
+    // print_bytes("roundkeys : ", (uint8_t *) rkey, 80);
     giftb128(ctext, ptext, rkey);
     print_bytes("ciphertext: ", ctext, 16);
 
