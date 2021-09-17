@@ -74,6 +74,8 @@ such as execution latency.
     │   │   └── rv64              - 64-bit implementation
     │   ├── verilator         - source code for emulator for use with Rocket Chip
     │   └── yosys_synth       - synthesise hardware implementation using yosys
+    ├── hardware-toolchain    - source code for hardware toolchain
+    │
     ├── software              - source code for software
     │   ├── ${ALG}              - anything algorithm-specific
     │   │   ├── arch              -   architecture-specific resources
@@ -89,8 +91,7 @@ such as execution latency.
     │           ├── generic         - generic, i.e., vanilla C
     │           ├── rv32            - 32-bit RISC-V
     │           └── rv64            - 64-bit RISC-V
-    ├── toolchain             - source code for tool-chain
-    └── toolchain-rocket      - source code for the Rocket Chip tool-chain
+    └── software-toolchain    - source code for software tool-chain
 ```
 
 <!--- ==================================================================== --->
@@ -142,18 +143,6 @@ such as execution latency.
   [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
   directive, rather than an invasive change to `binutils` itself.
 
-- Since the tool-chain is 
-  [patch](https://savannah.gnu.org/projects/patch)-based,
-  making changes to it is somewhat tricky.  The idea, for each component,
-  (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
-
-  - perform a fresh clone of the component repository,
-  - apply the existing patch to the cloned component repository,
-  - implement the change in the cloned component repository,
-  - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
-  - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
-  - optionally commit and push the updated patch.
-
 - Fix paths, e.g., 
   
   ```sh
@@ -189,26 +178,38 @@ such as execution latency.
   e.g.,
   
   ```sh
-  make ALG="sparkle" toolchain-build
+  make ALG="sparkle" software-toolchain-build
   ```
 
 - Build and execute implementation, 
   e.g.,
 
   ```sh
-  make ALG="sparkle"  software-build
-  make ALG="sparkle"  software-run
+  make ALG="sparkle" software-build
+  make ALG="sparkle" software-run
   ```
 
   or use the script provided, 
   e.g.,
 
   ```sh
-  make ALG="sparkle"  software-scan
+  make ALG="sparkle" software-scan
   ```
 
   to automatically scan through various different configurations
   (such as those with respect to ISEs options, unrolling strategies, and so on).
+
+- Note that since the tool-chain is 
+  [patch](https://savannah.gnu.org/projects/patch)-based,
+  making changes to it is somewhat tricky.  The idea, for each component,
+  (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
+
+  - perform a fresh clone of the component repository,
+  - apply the existing patch to the cloned component repository,
+  - implement the change in the cloned component repository,
+  - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
+  - execute `${REPO_HOME}/src/software-toolchain/${COMPONENT}-update.sh` to produce an updated patch,
+  - optionally commit and push the updated patch.
 
 <!--- -------------------------------------------------------------------- --->
 

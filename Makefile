@@ -21,23 +21,25 @@ export CONF ?=
 
 # -----------------------------------------------------------------------------
 
-toolchain-build :
-	@make --directory="${REPO_HOME}/src/toolchain" clone 
-	@make --directory="${REPO_HOME}/src/toolchain" apply 
-	@make --directory="${REPO_HOME}/src/toolchain" build
-toolchain-clean :
-	@make --directory="${REPO_HOME}/src/toolchain" clean
+software-toolchain-build :
+	@make --directory="${REPO_HOME}/src/software-toolchain" clone 
+	@make --directory="${REPO_HOME}/src/software-toolchain" apply 
+	@make --directory="${REPO_HOME}/src/software-toolchain" build
+software-toolchain-clean :
+	@make --directory="${REPO_HOME}/src/software-toolchain" clean
 
- software-build :
-	@make --directory="${REPO_HOME}/src/software"  build
- software-run   :
-	@make --directory="${REPO_HOME}/src/software"  run
- software-scan  :
-	@make --directory="${REPO_HOME}/src/software"  scan
- software-clean :
-	@make --directory="${REPO_HOME}/src/software"  clean
+software-build :
+	@make --directory="${REPO_HOME}/src/software" build
+software-run   :
+	@make --directory="${REPO_HOME}/src/software" run
+software-scan  :
+	@make --directory="${REPO_HOME}/src/software" scan
+software-clean :
+	@make --directory="${REPO_HOME}/src/software" clean
 
-clean     :
+# -----------------------------------------------------------------------------
+
+clean :
 	@rm --force --recursive ${REPO_HOME}/build/*
 
 # =============================================================================
