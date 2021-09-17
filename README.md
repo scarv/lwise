@@ -206,9 +206,9 @@ such as execution latency.
 
 <!--- -------------------------------------------------------------------- --->
 
-### Notes: hardware
+## Notes: hardware
 
-#### Build system
+### Build system
 
 - ISE supporting hardware is implemented in Verilog and integrated into a Rocket Chip. 
   The build hardware system is controlled by two environment variables, 
@@ -221,7 +221,7 @@ such as execution latency.
     as a functional module, i.e., extended ALU, inside the processor pipeline 
     by configuring `ISE=cop` or `ISE=xalu`, respectively. 
 
-#### Toolchain
+### Toolchain
 
 - Fix path for the installed Vivado Design Suite, e.g., 
   
