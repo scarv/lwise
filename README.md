@@ -15,26 +15,43 @@ might be deemed (too) heavyweight.  From an initial 57 submissions, 10
 were selected.  This repo. captures an exploration of 
 Instruction Set Extensions (ISEs)
 for (a subset of) these candidates, based on the use of 
-[RISC-V](https://en.wikipedia.org/wiki/RISC-V)
-as a base ISA: the goal is to add understanding to and so inform selection 
+[RISC-V](https://en.wikipedia.org/wiki/RISC-V).
+the goal is to add understanding to and so inform selection 
 of any resulting standard, with respect to implementation-related criteria
-such as execution latency.  Our progress can be summarised as follows
+such as execution latency.  
 
-| Algorithm                                                                                                                                                  | Identifier | Design                       | Encoding                        | Software | Hardware |
-| :--------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------: | :--------------------------: | :-----------------------------: | :------: | :------: |
-| [Ascon](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf)                 | `ascon`    | [o](./doc/ascon/design.md)   | [o](./doc/ascon/encoding.txt)   |          | o        |
-| [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf)           | `elephant` |                              |                                 |          |          |
-| [GIFT-COFB](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf)         | `gift`     |                              |                                 |          |          |
-| [Grain128-AEAD](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/grain-128aead-spec-final.pdf) | `grain`    |                              |                                 |          |          |
-| [ISAP](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/isap-spec-final.pdf)                   | `isap`     |  x                           |  x                              | x        | x        |
-| [Photon-Beetle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/photon-beetle-spec-final.pdf) | `photon`   |                              |                                 |          |          |
-| [Romulus](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf)             | `romulus`  |                              |                                 |          |          |
-| [Sparkle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)             | `sparkle`  | [o](./doc/sparkle/design.md) | [o](./doc/sparkle/encoding.txt) | o        | o        |
-| [TinyJambu](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/tinyjambu-spec-final.pdf)         | `jambu`    | [o](./doc/jambu/design.md)   | [o](./doc/jambu/encoding.txt)   |          | o        |
-| [Xoodyak](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/xoodyak-spec-final.pdf)             | `xoodyak`  | [o](./doc/xoodyak/design.md) | [o](./doc/xoodyak/encoding.txt) |          | o        |
+- Our progress can be summarised as follows
 
-noting that we ignore ISAP: this construction is more like a generic mode
-of operation, so there *seems* less scope for use of ISEs.
+  | Algorithm                                                                                                                                                  | Identifier | Design                       | Encoding                        | Software | Hardware |
+  | :--------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------: | :--------------------------: | :-----------------------------: | :------: | :------: |
+  | [Ascon](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf)                 | `ascon`    | [o](./doc/ascon/design.md)   | [o](./doc/ascon/encoding.txt)   |          | o        |
+  | [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf)           | `elephant` |                              |                                 |          |          |
+  | [GIFT-COFB](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf)         | `gift`     |                              |                                 |          |          |
+  | [Grain128-AEAD](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/grain-128aead-spec-final.pdf) | `grain`    |                              |                                 |          |          |
+  | [ISAP](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/isap-spec-final.pdf)                   | `isap`     |  x                           |  x                              | x        | x        |
+  | [Photon-Beetle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/photon-beetle-spec-final.pdf) | `photon`   |                              |                                 |          |          |
+  | [Romulus](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf)             | `romulus`  |                              |                                 |          |          |
+  | [Sparkle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)             | `sparkle`  | [o](./doc/sparkle/design.md) | [o](./doc/sparkle/encoding.txt) | o        | o        |
+  | [TinyJambu](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/tinyjambu-spec-final.pdf)         | `jambu`    | [o](./doc/jambu/design.md)   | [o](./doc/jambu/encoding.txt)   |          | o        |
+  | [Xoodyak](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/xoodyak-spec-final.pdf)             | `xoodyak`  | [o](./doc/xoodyak/design.md) | [o](./doc/xoodyak/encoding.txt) |          | o        |
+  
+  noting that we ignore ISAP: this construction is more like a generic mode
+  of operation, so there *seems* less scope for use of ISEs.
+
+- We consider the RISC-V baseline ISA as being
+  RV32GCB (or RV32IMAFDCB) in the 32-bit case
+  or 
+  RV64GCB (or RV64IMAFDCB) in the 64-bit case,
+  meaning that the
+  
+  - M (multiplication)
+  - A (atomic)
+  - F (single-precision floating-point)
+  - D (double-precision floating-point)
+  - C (compressed)
+  - B (bit manipulation)
+
+  standard extensions are available by default.
 
 <!--- ==================================================================== --->
 
@@ -82,7 +99,9 @@ of operation, so there *seems* less scope for use of ISEs.
 
 <!--- -------------------------------------------------------------------- --->
 
-### Build system
+### Software
+
+#### Build system
 
 - The build system is controlled by several environment variables:
 
@@ -117,15 +136,13 @@ of operation, so there *seems* less scope for use of ISEs.
   plus various algorithm-, architecture-, and/or implementation-specific
   cases documented elsewhere.
 
-<!--- -------------------------------------------------------------------- --->
+#### Toolchain
 
-### Toolchain
-
-- Options which use a RISC-V base ISA plus custom ISE do so via the
+- Options which use a RISC-V baseline ISA plus custom ISE do so via the
   [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
   directive, rather than an invasive change to `binutils` itself.
 
-- Since the RISC-V tool-chain is 
+- Since the tool-chain is 
   [patch](https://savannah.gnu.org/projects/patch)-based,
   making changes to it is somewhat tricky.  The idea, for each component,
   (i.e., `pk` and `spike`) referred to as `${COMPONENT}` is as follows:
@@ -136,19 +153,6 @@ of operation, so there *seems* less scope for use of ISEs.
   - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
   - execute `${REPO_HOME}/src/toolchain/${COMPONENT}-update.sh` to produce an updated patch,
   - optionally commit and push the updated patch.
-
-- ISE supporting hardware is implemented in Verilog and integrated into a Rocket Chip. 
-  The build hardware system is controlled by two environment variables, 
-  namely `${ARCH}` and `${ISE}`.
-
-  - The base Rocket Chip can be configured with a 32-bit or 64-bit architecture (i.e., `ARCH=rv32` or `ARCH=rv64`, respectively).
-    `${ARCH}` is consistent with the build software system. 
-  - The ISE supporting hardware can be integrated into the base processor 
-    as a co-processor via a RoCC interface or 
-    as a functional module, i.e., extended ALU, inside the processor pipeline 
-    by configuring `ISE=cop` or `ISE=xalu`, respectively. 
-
-### Software
 
 - Fix paths, e.g., 
   
@@ -210,6 +214,21 @@ of operation, so there *seems* less scope for use of ISEs.
 
 ### Hardware
 
+#### Build system
+
+- ISE supporting hardware is implemented in Verilog and integrated into a Rocket Chip. 
+  The build hardware system is controlled by two environment variables, 
+  namely `${ARCH}` and `${ISE}`.
+
+  - The base Rocket Chip can be configured with a 32-bit or 64-bit architecture (i.e., `ARCH=rv32` or `ARCH=rv64`, respectively).
+    `${ARCH}` is consistent with the build software system. 
+  - The ISE supporting hardware can be integrated into the base processor 
+    as a co-processor via a RoCC interface or 
+    as a functional module, i.e., extended ALU, inside the processor pipeline 
+    by configuring `ISE=cop` or `ISE=xalu`, respectively. 
+
+#### Toolchain
+
 - Fix path for the installed Vivado Design Suite, e.g., 
   
   ```sh
@@ -233,8 +252,6 @@ of operation, so there *seems* less scope for use of ISEs.
   make -f ${REPO_HOME}/src/toolchain-rocket/Makefile clone
   make -f ${REPO_HOME}/src/toolchain-rocket/Makefile build
   ```
-
-### Hardware-specific
 
 - The build system in
 
