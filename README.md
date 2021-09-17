@@ -96,13 +96,9 @@ such as execution latency.
 
 <!--- ==================================================================== --->
 
-## Notes
+## Notes: software
 
-<!--- -------------------------------------------------------------------- --->
-
-### Software
-
-#### Build system
+### Build system
 
 - The build system is controlled by several environment variables:
 
@@ -134,7 +130,7 @@ such as execution latency.
   plus various algorithm-, architecture-, and/or implementation-specific
   cases documented elsewhere.
 
-#### Toolchain
+### Toolchain
 
 - Options which use a RISC-V baseline ISA plus custom ISE do so via the
   [`.insn`](https://www.sourceware.org/binutils/docs/as/RISC_002dV_002dFormats.html)
@@ -210,7 +206,7 @@ such as execution latency.
 
 <!--- -------------------------------------------------------------------- --->
 
-### Hardware
+### Notes: hardware
 
 #### Build system
 
