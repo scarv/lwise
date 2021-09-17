@@ -2,23 +2,6 @@
 | class               | instruction          | format   | f7                  | f3      | custom      |
 +=====================+======================+==========+=====================+=========+=============+
 |                     |                      |          |                     |         |             |
-| SPARKLE_RV32B       | sparkle.rori         | 1R+I->1R | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
-| SPARKLE_RV64B       | sparkle.rori         | 1R+I->1R | 00 : imm5           | 6 = 110 | 0 = 0001011 | 
-| SPARKLE_RV64B       | sparkle.roriw        | 1R+I->1R | 01 : imm5           | 6 = 110 | 0 = 0001011 |
-|                     |                      |          |                     |         |             |
-+=====================+======================+==========+=====================+=========+=============+
-
-.macro sparkle.rori         rd, rs1,      imm      // sparkle.rori            => 00ii iii0 0000 rrrr r110 rrrr r000 1011
-.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0 //                         => #define MATCH_SPARKLE_RORI         0x0000600B
-.endm                                              //                         => #define  MASK_SPARKLE_RORI         0xC000707F
-.macro sparkle.roriw        rd, rs1,      imm      // sparkle.roriw           => 01ii iii0 0000 rrrr r110 rrrr r000 1011
-.insn r CUSTOM_0, 6, \imm+( 1*32), \rd, \rs1,   x0 //                         => #define MATCH_SPARKLE_RORIW        0x4000600B
-.endm                                              //                         => #define  MASK_SPARKLE_RORIW        0xC000707F
-
-+=====================+======================+==========+=====================+=========+=============+
-| class               | instruction          | format   | f7                  | f3      | custom      |
-+=====================+======================+==========+=====================+=========+=============+
-|                     |                      |          |                     |         |             |
 | SPARKLE_RV32_TYPE2  | sparkle.addrori      | 2R+I->1R | 00 : imm5           | 7 = 111 | 1 = 0101011 |
 | SPARKLE_RV32_TYPE2  | sparkle.subrori      | 2R+I->1R | 01 : imm5           | 7 = 111 | 1 = 0101011 |
 | SPARKLE_RV32_TYPE2  | sparkle.xorrori      | 2R+I->1R | 10 : imm5           | 7 = 111 | 1 = 0101011 |
@@ -93,9 +76,6 @@
 +=====================+======================+==========+=====================+=========+=============+
 | class               | instruction          | format   | f7                  | f3      | custom      |
 +=====================+======================+==========+=====================+=========+=============+
-|                     |                      |          |                     |         |             |
-| SPARKLE_RV64B       | sparkle.pack         | 2R  ->1R | 00 : 00000          | 7 = 111 | 3 = 1111011 |
-| SPARKLE_RV64B       | sparkle.packu        | 2R  ->1R | 00 : 00001          | 7 = 111 | 3 = 1111011 |
 |                     |                      |          |                     |         |             |     
 | SPARKLE_RV32_ELL    | sparkle.ell          | 2R  ->1R | 00 : 00010          | 7 = 111 | 3 = 1111011 |
 | SPARKLE_RV64_ELL    | sparkle.ell          | 2R  ->1R | 00 : 00010          | 7 = 111 | 3 = 1111011 |
@@ -125,13 +105,6 @@
 | SPARKLE_RV64_TYPE5  | sparkle.whole.dec    | 2R  ->1R | 11 : 00001          | 7 = 111 | 3 = 1111011 |
 |                     |                      |          |                     |         |             |
 +=====================+======================+==========+=====================+=========+=============+
-
-.macro sparkle.pack         rd, rs1, rs2           // sparkle.pack            => 0000 000r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_SPARKLE_PACK         0x0000707B
-.endm                                              //                         => #define  MASK_SPARKLE_PACK         0xFE00707F
-.macro sparkle.packu        rd, rs1, rs2           // sparkle.packu           => 0000 001r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 1* 1), \rd, \rs1, \rs2 //                         => #define MATCH_SPARKLE_PACKU        0x0200707B
-.endm                                              //                         => #define  MASK_SPARKLE_PACKU        0xFE00707F
 
 .macro sparkle.ell          rd, rs1, rs2           // sparkle.ell             => 0000 010r rrrr rrrr r111 rrrr r111 1011
 .insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2 //                         => #define MATCH_SPARKLE_ELL          0x0400707B
