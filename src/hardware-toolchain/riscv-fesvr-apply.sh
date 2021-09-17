@@ -6,16 +6,14 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain/share.sh
+source ${REPO_HOME}/src/toolchain-hardware/share.sh
 
 # =============================================================================
 
-if [ ! -d ${PK_REPO} ] ; then
-  git clone https://github.com/riscv/riscv-pk.git ${PK_REPO}
+cd ${ROCKET_FESVR_REPO}
+if [ -s ${ROCKET_FESVR_PATCH} ] ; then
+  git apply ${ROCKET_FESVR_PATCH}
+  git add --all
 fi
-
-cd ${PK_REPO}
-git fetch origin ${PK_COMMIT}:${BRANCH}
-git checkout ${BRANCH}
-
 # =============================================================================
+

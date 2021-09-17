@@ -13,31 +13,27 @@ endif
 
 # =============================================================================
 
-COMPONENTS = pk spike
+COMPONENTS = riscv-gnu riscv-fesvr
 
 define rule_clone
 $(strip ${1})-clone  :
-	@$${REPO_HOME}/src/toolchain/$(strip ${1})-clone.sh
+	@$${REPO_HOME}/src/toolchain-hardware/$(strip ${1})-clone.sh
 endef
 define rule_apply
 $(strip ${1})-apply  :
-	@$${REPO_HOME}/src/toolchain/$(strip ${1})-apply.sh
+	@$${REPO_HOME}/src/toolchain-hardware/$(strip ${1})-apply.sh
 endef
 define rule_build
 $(strip ${1})-build  :
-	@$${REPO_HOME}/src/toolchain/$(strip ${1})-build.sh
+	@$${REPO_HOME}/src/toolchain-hardware/$(strip ${1})-build.sh
 endef
 define rule_update
 $(strip ${1})-update :
-	@$${REPO_HOME}/src/toolchain/$(strip ${1})-update.sh
+	@$${REPO_HOME}/src/toolchain-hardware/$(strip ${1})-update.sh
 endef
 define rule_revert
 $(strip ${1})-revert :
-	@$${REPO_HOME}/src/toolchain/$(strip ${1})-revert.sh
-endef
-define rule_clean
-$(strip ${1})-revert :
-	@$${REPO_HOME}/src/toolchain/$(strip ${1})-clean.sh
+	@$${REPO_HOME}/src/toolchain-hardware/$(strip ${1})-revert.sh
 endef
 
 $(foreach COMPONENT,${COMPONENTS},$(eval $(call rule_clone, ${COMPONENT})))
@@ -56,6 +52,7 @@ update : $(foreach COMPONENT, ${COMPONENTS}, ${COMPONENT}-update)
 
 revert : $(foreach COMPONENT, ${COMPONENTS}, ${COMPONENT}-revert)
 
-clean  : $(foreach COMPONENT, ${COMPONENTS}, ${COMPONENT}-clean)
+clean  :
+	@rm --force --recursive ${REPO_HOME}/build/toolchain-hardware
 
 # =============================================================================

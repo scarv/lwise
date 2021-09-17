@@ -6,14 +6,11 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain-rocket/share.sh
+source ${REPO_HOME}/src/software-toolchain/share.sh
 
 # =============================================================================
 
-cd ${ROCKET_FESVR_REPO}
-if [ -s ${ROCKET_FESVR_PATCH} ] ; then
-  git apply ${ROCKET_FESVR_PATCH}
-  git add --all
-fi
-# =============================================================================
+rm --force --recursive ${SPIKE_REPO}
+rm --force --recursive ${SPIKE_INSTALL}
 
+# =============================================================================

@@ -6,11 +6,11 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain/share.sh
+source ${REPO_HOME}/src/toolchain-hardware/share.sh
 
 # =============================================================================
 
-rm --force --recursive ${PK_REPO}
-rm --force --recursive ${PK_INSTALL}
+cd ${ROCKET_GNU_REPO}
+git diff --cached > ${ROCKET_GNU_PATCH}
 
 # =============================================================================

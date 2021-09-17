@@ -6,20 +6,24 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain-rocket/share.sh
+source ${REPO_HOME}/src/software-toolchain/share.sh
 
 # =============================================================================
 
-mkdir --parents ${RISCV_ROCKET}
+mkdir --parents ${RISCV_ALZETTE}
 
-if [ -d ${ROCKET_GNU_BUILD} ] ; then
-    rm --force --recursive ${ROCKET_GNU_BUILD}
+if [ -d ${SPIKE_BUILD} ] ; then
+    rm --force --recursive ${SPIKE_BUILD}
 fi
 
-mkdir --parents ${ROCKET_GNU_BUILD}
+mkdir --parents ${SPIKE_BUILD}
 
-cd ${ROCKET_GNU_BUILD}
-${ROCKET_GNU_REPO}/configure --prefix="${RISCV_ROCKET}" --enable-multilib --with-cmodel=medany
-make -j4
+export PATH="${RISCV}/bin:${PATH}"
+
+cd ${SPIKE_BUILD}
+${SPIKE_REPO}/configure --prefix="${SPIKE_INSTALL}" --target="riscv64-unknown-elf" --with-isa="rv32gc"
+make
+make install
+
 # =============================================================================
 

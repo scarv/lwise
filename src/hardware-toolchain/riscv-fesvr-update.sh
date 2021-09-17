@@ -6,13 +6,11 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain-rocket/share.sh
+source ${REPO_HOME}/src/toolchain-hardware/share.sh
 
 # =============================================================================
 
 cd ${ROCKET_FESVR_REPO}
-git reset HEAD
-git checkout .
-git clean --force -d 
+git diff --cached > ${ROCKET_FESVR_PATCH}
 
 # =============================================================================

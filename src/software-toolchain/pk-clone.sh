@@ -6,14 +6,16 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain-rocket/share.sh
+source ${REPO_HOME}/src/software-toolchain/share.sh
 
 # =============================================================================
 
-cd ${ROCKET_GNU_REPO}
-if [ -s ${ROCKET_GNU_PATCH} ] ; then
-  git apply ${ROCKET_GNU_PATCH}
-  git add --all
+if [ ! -d ${PK_REPO} ] ; then
+  git clone https://github.com/riscv/riscv-pk.git ${PK_REPO}
 fi
-# =============================================================================
 
+cd ${PK_REPO}
+git fetch origin ${PK_COMMIT}:${BRANCH}
+git checkout ${BRANCH}
+
+# =============================================================================

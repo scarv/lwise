@@ -28,6 +28,6 @@ export GCC_LIBS   =
 FORCE :
 
 ${TARGET}.run : ${TARGET}.elf FORCE
-	@${REPO_HOME}/build/toolchain/${ALG}/bin/spike --isa='rv32gcb' ${REPO_HOME}/build/toolchain/${ALG}/riscv32-unknown-elf/bin/pk ${<} | tee ${@}
+	@${REPO_HOME}/build/software-toolchain/${ALG}/bin/spike --isa='rv32gcb' ${REPO_HOME}/build/toolchain/${ALG}/riscv32-unknown-elf/bin/pk ${<} | tee ${@}
 
 # =============================================================================

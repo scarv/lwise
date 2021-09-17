@@ -6,15 +6,16 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain/share.sh
+source ${REPO_HOME}/src/software-toolchain/share.sh
 
 # =============================================================================
 
-cd ${PK_REPO}
+cd ${SPIKE_REPO}
 
-if [ -s ${PK_PATCH} ] ; then
-  git apply ${PK_PATCH}
+if [ -s ${SPIKE_PATCH} ] ; then
+  git apply ${SPIKE_PATCH}
   git add --all
 fi
 
 # =============================================================================
+

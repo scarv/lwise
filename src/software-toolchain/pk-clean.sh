@@ -6,13 +6,11 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain-rocket/share.sh
+source ${REPO_HOME}/src/software-toolchain/share.sh
 
 # =============================================================================
 
-cd ${ROCKET_GNU_REPO}
-git reset HEAD
-git checkout .
-git clean --force -d 
+rm --force --recursive ${PK_REPO}
+rm --force --recursive ${PK_INSTALL}
 
 # =============================================================================

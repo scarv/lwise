@@ -6,11 +6,14 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-source ${REPO_HOME}/src/toolchain/share.sh
+source ${REPO_HOME}/src/toolchain-hardware/share.sh
 
 # =============================================================================
 
-cd ${SPIKE_REPO}
-git diff --cached > ${SPIKE_PATCH}
-
+cd ${ROCKET_GNU_REPO}
+if [ -s ${ROCKET_GNU_PATCH} ] ; then
+  git apply ${ROCKET_GNU_PATCH}
+  git add --all
+fi
 # =============================================================================
+
