@@ -10,7 +10,7 @@
 
 export PK_REPO="${REPO_HOME}/build/sw-toolchain/${ALG}-riscv-pk"
 export PK_BUILD="${PK_REPO}/build"
-export PK_COMMIT="2ebf3bacce4631390361a72b99b86f3b2c8dc041"
+export PK_COMMIT="7ae86fb97b792586493255f935f2f12ff068b13f"
 export PK_PATCH="${REPO_HOME}/src/sw-toolchain/pk.patch_${ALG}"
 export PK_INSTALL="${REPO_HOME}/build/sw-toolchain/${ALG}"
 
