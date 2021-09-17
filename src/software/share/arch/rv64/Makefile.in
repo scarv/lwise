@@ -19,7 +19,7 @@ endif
 
 export GCC_PREFIX = ${RISCV}/bin/riscv64-unknown-elf
 
-export GCC_FLAGS  = -march='rv64gc' -mabi='lp64'
+export GCC_FLAGS  = -march='rv64gc_zbb' -mabi='lp64'
 export GCC_PATHS  = 
 export GCC_LIBS   = 
 
@@ -28,6 +28,6 @@ export GCC_LIBS   =
 FORCE :
 
 ${TARGET}.run : ${TARGET}.elf FORCE
-	@${REPO_HOME}/build/toolchain/${ALG}/bin/spike --isa='rv64gc' ${REPO_HOME}/build/toolchain/${ALG}/riscv64-unknown-elf/bin/pk ${<} | tee ${@}
+	@${REPO_HOME}/build/toolchain/${ALG}/bin/spike --isa='rv64gcb' ${REPO_HOME}/build/toolchain/${ALG}/riscv64-unknown-elf/bin/pk ${<} | tee ${@}
 
 # =============================================================================
