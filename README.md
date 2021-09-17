@@ -20,6 +20,21 @@ the goal is to add understanding to and so inform selection
 of any resulting standard, with respect to implementation-related criteria
 such as execution latency.  
 
+- We consider the RISC-V baseline ISA as being
+  RV32GCB (or RV32IMAFDCB) in the 32-bit case
+  or 
+  RV64GCB (or RV64IMAFDCB) in the 64-bit case,
+  meaning that the
+  
+  - M (multiplication)
+  - A (atomic)
+  - F (single-precision floating-point)
+  - D (double-precision floating-point)
+  - C (compressed)
+  - B (bit manipulation)
+
+  standard extensions are available by default.
+
 - Our progress can be summarised as follows
 
   | Algorithm                                                                                                                                                  | Identifier | Design                       | Encoding                        | Software | Hardware |
@@ -38,21 +53,6 @@ such as execution latency.
   noting that we ignore ISAP: this construction is more like a generic mode
   of operation, so there *seems* less scope for use of ISEs.
 
-- We consider the RISC-V baseline ISA as being
-  RV32GCB (or RV32IMAFDCB) in the 32-bit case
-  or 
-  RV64GCB (or RV64IMAFDCB) in the 64-bit case,
-  meaning that the
-  
-  - M (multiplication)
-  - A (atomic)
-  - F (single-precision floating-point)
-  - D (double-precision floating-point)
-  - C (compressed)
-  - B (bit manipulation)
-
-  standard extensions are available by default.
-
 <!--- ==================================================================== --->
 
 ## Organisation
@@ -62,7 +62,7 @@ such as execution latency.
 ├── doc                     - documentation
 ├── build                   - working directory for build
 └── src                     - source code
-    ├── hardware              - source code for hardware
+    ├── hw                    - source code for hardware
     │   ├── fpga                - source code for the FPGA implementation using Vivado
     │   │   ├── board             - source for supporting a specific board (e.g., sakura-x)
     │   │   ├── script            - scripts for handling the FPGA bitstream on Vivado
@@ -74,9 +74,9 @@ such as execution latency.
     │   │   └── rv64              - 64-bit implementation
     │   ├── verilator         - source code for emulator for use with Rocket Chip
     │   └── yosys_synth       - synthesise hardware implementation using yosys
-    ├── hardware-toolchain    - source code for hardware toolchain
+    ├── hw-toolchain        - source code for hardware toolchain
     │
-    ├── software              - source code for software
+    ├── sw                  - source code for software
     │   ├── ${ALG}              - anything algorithm-specific
     │   │   ├── arch              -   architecture-specific resources
     │   │   │   ├── generic         - generic, i.e., vanilla C
@@ -91,7 +91,7 @@ such as execution latency.
     │           ├── generic         - generic, i.e., vanilla C
     │           ├── rv32            - 32-bit RISC-V
     │           └── rv64            - 64-bit RISC-V
-    └── software-toolchain    - source code for software tool-chain
+    └── sw-toolchain        - source code for software tool-chain
 ```
 
 <!--- ==================================================================== --->
@@ -107,22 +107,19 @@ such as execution latency.
 - The build system is controlled by several environment variables:
 
   - `${ALG}`
-    - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/software/${ALG}`
+    - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/sw/${ALG}`
     - values: `ascon`, `elephant`, `gift`, `grain`, `photon`, `romulus`, `jambu`, `sparkle`, `xoodyak`
     - default: `sparkle`
 
   - `${ARCH}`
-    - role: specifies the   architecture, i.e., select `${REPO_HOME}/src/software/${ALG}/arch/${ARCH}`
+    - role: specifies the   architecture, i.e., select `${REPO_HOME}/src/sw/${ALG}/arch/${ARCH}`
     - values: `generic`, `rv32`, `rv64`
     - default: `generic`
 
   - `${IMP}`
-    - role: specifies the implementation, i.e., select `${REPO_HOME}/src/software/${ALG}/imp/${IMP}`
+    - role: specifies the implementation, i.e., select `${REPO_HOME}/src/sw/${ALG}/imp/${IMP}`
     - values: `generic`, `rv32`, `rv64`
     - default: `generic`
-
-  Note that the separation of `${ARCH}` and `${IMP}` allows, for example, 
-  the generic C implementation to be compiled for the RV32I architecture.
 
 - The `${CONF}` environment variable allows options to be passed to GCC,
   e.g.,
@@ -178,22 +175,22 @@ such as execution latency.
   e.g.,
   
   ```sh
-  make ALG="sparkle" software-toolchain-build
+  make ALG="sparkle" sw-toolchain-build
   ```
 
 - Build and execute implementation, 
   e.g.,
 
   ```sh
-  make ALG="sparkle" software-build
-  make ALG="sparkle" software-run
+  make ALG="sparkle" sw-build
+  make ALG="sparkle" sw-run
   ```
 
   or use the script provided, 
   e.g.,
 
   ```sh
-  make ALG="sparkle" software-scan
+  make ALG="sparkle" sw-scan
   ```
 
   to automatically scan through various different configurations
@@ -208,7 +205,7 @@ such as execution latency.
   - apply the existing patch to the cloned component repository,
   - implement the change in the cloned component repository,
   - stage the change via `git add`, but do *not* commit it, in the cloned component repository,
-  - execute `${REPO_HOME}/src/software-toolchain/${COMPONENT}-update.sh` to produce an updated patch,
+  - execute `${REPO_HOME}/src/sw-toolchain/${COMPONENT}-update.sh` to produce an updated patch,
   - optionally commit and push the updated patch.
 
 <!--- -------------------------------------------------------------------- --->
@@ -257,7 +254,7 @@ such as execution latency.
 - The build system in
 
   ```sh
-  ${REPO_HOME}/src/hardware/Makefile
+  ${REPO_HOME}/src/hw/Makefile
   ```
   
   includes 
@@ -271,22 +268,22 @@ such as execution latency.
   implementation
 
   ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile rocketchip-clone
-  make -f ${REPO_HOME}/src/hardware/Makefile rocketchip-apply
+  make -f ${REPO_HOME}/src/hw/Makefile rocketchip-clone
+  make -f ${REPO_HOME}/src/hw/Makefile rocketchip-apply
   ```
 
 - Run hardware synthesis flow using
   [yosys](https://github.com/YosysHQ/yosys)
 
   ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile synthesise ARCH="rv32" ISE="xalu"
+  make -f ${REPO_HOME}/src/hw/Makefile synthesise ARCH="rv32" ISE="xalu"
   ```
 
 - Build the emulator of the implementation using 
   [verilator](https://www.veripool.org/verilator): 
 
   ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" emulator
+  make -f ${REPO_HOME}/src/hw/Makefile ARCH="rv32" ISE="xalu" emulator
   ```
 
   - Build and execute software on the emulator of the hardware implementation, e.g.,
@@ -298,14 +295,14 @@ such as execution latency.
 - Build the bitstream of the Xilinx FPGA and run a software on the FPGA using Vivado:
 
   ```sh
-  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" fpga-verilog
-  make -f ${REPO_HOME}/src/hardware/Makefile ARCH="rv32" ISE="xalu" program-fpga
+  make -f ${REPO_HOME}/src/hw/Makefile ARCH="rv32" ISE="xalu" fpga-verilog
+  make -f ${REPO_HOME}/src/hw/Makefile ARCH="rv32" ISE="xalu" program-fpga
   ```
 
   - Build and execute software on the hardware implementation on the FPGA, e.g.,
 
     ```sh
-    make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" ISE="xalu" fpga-clean fpga-run
+    make --directory="${REPO_HOME}/src/hw" ARCH="rv32" IMP="rv32" ISE="xalu" fpga-clean fpga-run
     ```
 
 <!--- -------------------------------------------------------------------- --->

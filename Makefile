@@ -21,21 +21,21 @@ export CONF ?=
 
 # -----------------------------------------------------------------------------
 
-software-toolchain-build :
-	@make --directory="${REPO_HOME}/src/software-toolchain" clone 
-	@make --directory="${REPO_HOME}/src/software-toolchain" apply 
-	@make --directory="${REPO_HOME}/src/software-toolchain" build
-software-toolchain-clean :
-	@make --directory="${REPO_HOME}/src/software-toolchain" clean
+sw-toolchain-build :
+	@make --directory="${REPO_HOME}/src/sw-toolchain" clone 
+	@make --directory="${REPO_HOME}/src/sw-toolchain" apply 
+	@make --directory="${REPO_HOME}/src/sw-toolchain" build
+sw-toolchain-clean :
+	@make --directory="${REPO_HOME}/src/sw-toolchain" clean
 
-software-build :
-	@make --directory="${REPO_HOME}/src/software" build
-software-run   :
-	@make --directory="${REPO_HOME}/src/software" run
-software-scan  :
-	@make --directory="${REPO_HOME}/src/software" scan
-software-clean :
-	@make --directory="${REPO_HOME}/src/software" clean
+sw-build :
+	@make --directory="${REPO_HOME}/src/sw" build
+sw-run   :
+	@make --directory="${REPO_HOME}/src/sw" run
+sw-scan  :
+	@make --directory="${REPO_HOME}/src/sw" scan
+sw-clean :
+	@make --directory="${REPO_HOME}/src/sw" clean
 
 # -----------------------------------------------------------------------------
 
