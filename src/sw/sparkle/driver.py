@@ -24,7 +24,7 @@ def rv32( args ) :
 
   for UNROLL in [ False, True ] :
     for TYPE in [ 'SPARKLE_RV32_TYPE1', 'SPARKLE_RV32_TYPE2', 'SPARKLE_RV32_TYPE3', 'SPARKLE_RV32_TYPE4'                       ] :
-      for ( BITMANIP, ELL, RCON ) in itertools.product( [ False, True ], repeat = 3 ) :
+      for ( ELL, RCON ) in itertools.product( [ False, True ], repeat = 2 ) :
         CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ), 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ), 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ), TYPE ]
   
         if ( UNROLL   ) :
@@ -34,8 +34,6 @@ def rv32( args ) :
         CONF += [ 'CRAXS10_ENC_EXTERN', 'TRAXL17_ENC_EXTERN', 'SPARKLE_FWD_EXTERN' ]
         CONF += [ 'CRAXS10_DEC_EXTERN', 'TRAXL17_DEC_EXTERN', 'SPARKLE_REV_EXTERN' ]
 
-        if ( BITMANIP ) :
-          CONF += [ 'SPARKLE_RV32B'     ]
         if ( ELL      ) :
           CONF += [ 'SPARKLE_RV32_ELL'  ]
         if ( RCON     ) :
@@ -61,7 +59,7 @@ def rv64( args ) :
 
   for UNROLL in [ False, True ] :
     for TYPE in [ 'SPARKLE_RV64_TYPE1', 'SPARKLE_RV64_TYPE2', 'SPARKLE_RV64_TYPE3', 'SPARKLE_RV64_TYPE4', 'SPARKLE_RV64_TYPE5' ] :
-      for ( BITMANIP, ELL, RCON ) in itertools.product( [ False, True ], repeat = 3 ) :
+      for ( ELL, RCON ) in itertools.product( [ False, True ], repeat = 2 ) :
         CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ), 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ), 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ), TYPE ]
   
         if ( UNROLL   ) :
@@ -71,8 +69,6 @@ def rv64( args ) :
         CONF += [ 'CRAXS10_ENC_EXTERN', 'TRAXL17_ENC_EXTERN', 'SPARKLE_FWD_EXTERN' ]
         CONF += [ 'CRAXS10_DEC_EXTERN', 'TRAXL17_DEC_EXTERN', 'SPARKLE_REV_EXTERN' ]
 
-        if ( BITMANIP ) :
-          CONF += [ 'SPARKLE_RV64B'    ]
         if ( ELL      ) :
           CONF += [ 'SPARKLE_RV64_ELL' ]
         if ( RCON     ) :
