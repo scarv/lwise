@@ -110,17 +110,21 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) ISE for `\ell` function:
 
   ```
-  sparkle.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
-                                             r       <- ELL( x  )
-                                             GPR[rd] <- r
+  sparkle.ell          rd, rs1, rs2      {
+    x       <- GPR[rs1] ^ GPR[rs2]
+    r       <- ELL( x  )
+    GPR[rd] <- r
+  }
   ```
 
 - The (optional) ISE for round constant look-up and XOR:
 
   ```
-  sparkle.rcon          rd, rs1,      imm => x       <- GPR[rs1]
-                                             r       <- x  ^ RCON[imm]
-                                             GPR[rd] <- r 
+  sparkle.rcon         rd, rs1,      imm {
+    x       <- GPR[rs1]
+    r       <- x  ^ RCON[imm]
+    GPR[rd] <- r 
+  }
   ```
 
   Note that this option is required because of the 32-bit round constant:
@@ -131,147 +135,178 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - `SPARKLE_RV32_TYPE2`: baseline ISA plus custom ISE.
 
   ```
-  sparkle.addrori       rd, rs1, rs2, imm => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x + ROR32( y, imm )
-                                             GPR[rd] <- r
+  sparkle.addrori      rd, rs1, rs2, imm {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x + ROR32( y, imm )
+    GPR[rd] <- r
+  }
 
-  sparkle.subrori       rd, rs1, rs2, imm => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x - ROR32( y, imm )
-                                             GPR[rd] <- r
+  sparkle.subrori      rd, rs1, rs2, imm {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x - ROR32( y, imm )
+    GPR[rd] <- r
+  }
 
-  sparkle.xorrori       rd, rs1, rs2, imm => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x ^ ROR32( y, imm )
-                                             GPR[rd] <- r
+  sparkle.xorrori      rd, rs1, rs2, imm {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x ^ ROR32( y, imm )
+    GPR[rd] <- r
+  }
   ```
 
 - `SPARKLE_RV32_TYPE3`: baseline ISA plus custom ISE.
 
   ```
-  sparkle.addror.31     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x + ROR32( y, 31 )
-                                             GPR[rd] <- r
+  sparkle.addror.31    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x + ROR32( y, 31 )
+    GPR[rd] <- r
+  }
 
-  sparkle.addror.17     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x + ROR32( y, 17 )
-                                             GPR[rd] <- r
+  sparkle.addror.17    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x + ROR32( y, 17 )
+    GPR[rd] <- r
+  }
 
-  sparkle.addror.24     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x + ROR32( y, 24 )
-                                             GPR[rd] <- r
+  sparkle.addror.24    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x + ROR32( y, 24 )
+    GPR[rd] <- r
+  }
 
-  sparkle.subror.31     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x - ROR32( y, 31 )
-                                             GPR[rd] <- r
+  sparkle.subror.31    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x - ROR32( y, 31 )
+    GPR[rd] <- r
+  }
 
-  sparkle.subror.17     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x - ROR32( y, 17 )
-                                             GPR[rd] <- r
+  sparkle.subror.17    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x - ROR32( y, 17 )
+    GPR[rd] <- r
+  }
 
-  sparkle.subror.24     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x - ROR32( y, 24 )
-                                             GPR[rd] <- r
+  sparkle.subror.24    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x - ROR32( y, 24 )
+    GPR[rd] <- r
+  }
 
-  sparkle.xorror.31     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x ^ ROR32( y, 31 )
-                                             GPR[rd] <- r
+  sparkle.xorror.31    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x ^ ROR32( y, 31 )
+    GPR[rd] <- r
+  }
 
-  sparkle.xorror.17     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x ^ ROR32( y, 17 )
-                                             GPR[rd] <- r
+  sparkle.xorror.17    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x ^ ROR32( y, 17 )
+    GPR[rd] <- r
+  }
 
-  sparkle.xorror.24     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x ^ ROR32( y, 24 )
-                                             GPR[rd] <- r
+  sparkle.xorror.24    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x ^ ROR32( y, 24 )
+    GPR[rd] <- r
+  }
 
-  sparkle.xorror.16     rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- x ^ ROR32( y, 16 )
-                                             GPR[rd] <- r
+  sparkle.xorror.16    rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- x ^ ROR32( y, 16 )
+    GPR[rd] <- r
+  }
   ```
      
 - `SPARKLE_RV32_TYPE4`: baseline ISA plus custom ISE.
    
   ```
-  sparkle.whole.enci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
-                                             yi      <- GPR[rs2]
-                                             ci      <- RCON[imm]
-                                             xi      <- xi + ROR32( yi, 31 )
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi, 17 )
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi,  0 )
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi, 24 )
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- xi
+  sparkle.whole.enci.x rd, rs1, rs2, imm {
+    xi      <- GPR[rs1]
+    yi      <- GPR[rs2]
+    ci      <- RCON[imm]
+    xi      <- xi + ROR32( yi, 31 )
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi, 17 )
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi,  0 )
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi, 24 )
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi ^        ci
+    GPR[rd] <- xi
 
-  sparkle.whole.enci.y  rd, rs1, rs2, imm => xi      <- GPR[rs1]
-                                             yi      <- GPR[rs2]
-                                             ci      <- RCON[imm]
-                                             xi      <- xi + ROR32( yi, 31 )
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi, 17 )
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi,  0 )
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi, 24 )
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- yi
+  sparkle.whole.enci.y rd, rs1, rs2, imm {
+    xi      <- GPR[rs1]
+    yi      <- GPR[rs2]
+    ci      <- RCON[imm]
+    xi      <- xi + ROR32( yi, 31 )
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi, 17 )
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi,  0 )
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi, 24 )
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi ^        ci
+    GPR[rd] <- yi
 
-  sparkle.whole.deci.x  rd, rs1, rs2, imm => xi      <- GPR[rs1]
-                                             yi      <- GPR[rs2]
-                                             ci      <- RCON[imm]
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi - ROR32( yi, 24 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi - ROR32( yi,  0 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi - ROR32( yi, 17 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi - ROR32( yi, 31 )
-                                             GPR[rd] <- xi
+  sparkle.whole.deci.x rd, rs1, rs2, imm {
+    xi      <- GPR[rs1]
+    yi      <- GPR[rs2]
+    ci      <- RCON[imm]
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi - ROR32( yi, 24 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi - ROR32( yi,  0 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi - ROR32( yi, 17 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi - ROR32( yi, 31 )
+    GPR[rd] <- xi
 
-  sparkle.whole.deci.y  rd, rs1, rs2, imm => xi      <- GPR[rs1]
-                                             yi      <- GPR[rs2]
-                                             ci      <- RCON[imm]
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi - ROR32( yi, 24 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi - ROR32( yi,  0 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi - ROR32( yi, 17 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi - ROR32( yi, 31 )
-                                             GPR[rd] <- yi
-    ```
+  sparkle.whole.deci.y rd, rs1, rs2, imm {
+    xi      <- GPR[rs1]
+    yi      <- GPR[rs2]
+    ci      <- RCON[imm]
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi - ROR32( yi, 24 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi - ROR32( yi,  0 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi - ROR32( yi, 17 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi - ROR32( yi, 31 )
+    GPR[rd] <- yi
+  }
+  ```
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -280,36 +315,44 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - The (optional) ISE for `\ell` function:
 
   ```
-  sparkle.ell           rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
-                                             x_hi    <- x_{63..32}
-                                             x_lo    <- x_{31.. 0}
-                                             r_hi    <- ELL( x_hi )
-                                             r_lo    <- ELL( x_lo )
-                                             r       <- r_hi || r_lo
-                                             GPR[rd] <- r
+  sparkle.ell          rd, rs1, rs2      {
+    x       <- GPR[rs1] ^ GPR[rs2]
+    x_hi    <- x_{63..32}
+    x_lo    <- x_{31.. 0}
+    r_hi    <- ELL( x_hi )
+    r_lo    <- ELL( x_lo )
+    r       <- r_hi || r_lo
+    GPR[rd] <- r
+  }
 
-  sparkle.ellrev        rd, rs1, rs2      => x       <- GPR[rs1] ^ GPR[rs2]
-                                             x_hi    <- x_{63..32}
-                                             x_lo    <- x_{31.. 0}
-                                             r_hi    <- ELL( x_hi )
-                                             r_lo    <- ELL( x_lo )
-                                             r       <- r_lo || r_hi
-                                             GPR[rd] <- r
+  sparkle.ellrev       rd, rs1, rs2      {
+    x       <- GPR[rs1] ^ GPR[rs2]
+    x_hi    <- x_{63..32}
+    x_lo    <- x_{31.. 0}
+    r_hi    <- ELL( x_hi )
+    r_lo    <- ELL( x_lo )
+    r       <- r_lo || r_hi
+    GPR[rd] <- r
+  }
   ```
 
 - The (optional) ISE for round constant look-up and XOR:
 
   ```
-  sparkle.rcon          rd, rs1,      imm => x_hi    <- GPR[rs1]_{63..32}
-                                             x_lo    <- GPR[rs1]_{31.. 0}
-                                             r_hi    <- x_hi ^ RCON[imm]
-                                             r_lo    <- x_lo ^ RCON[imm]
-                                             r       <- r_hi || r_lo
-                                             GPR[rd] <- r
+  sparkle.rcon         rd, rs1,      imm {
+    x_hi    <- GPR[rs1]_{63..32}
+    x_lo    <- GPR[rs1]_{31.. 0}
+    r_hi    <- x_hi ^ RCON[imm]
+    r_lo    <- x_lo ^ RCON[imm]
+    r       <- r_hi || r_lo
+    GPR[rd] <- r
+  }
 
-  sparkle.rconw         rd, rs1,      imm => x       <- GPR[rs1]_{31.. 0}
-                                             r       <- x    ^ RCON[imm]
-                                             GPR[rd] <- r
+  sparkle.rconw        rd, rs1,      imm {
+    x       <- GPR[rs1]_{31.. 0}
+    r       <- x    ^ RCON[imm]
+    GPR[rd] <- r
+  }
   ```
 
   Note that this option is required because of the 32-bit round constant:
@@ -320,165 +363,193 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 - `SPARKLE_RV64_TYPE2`: baseline ISA plus custom ISE.
 
   ```
-  sparkle.block.enci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi + ROR32( yi, ROT_0[imm] )
-                                             yi      <- yi ^ ROR32( xi, ROT_1[imm] )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- yi || xi
+  sparkle.block.enci   rd, rs1, rs2, imm {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi + ROR32( yi, ROT_0[imm] )
+    yi      <- yi ^ ROR32( xi, ROT_1[imm] )
+    xi      <- xi ^        ci
+    GPR[rd] <- yi || xi
+  }
     
-  sparkle.block.deci    rd, rs1, rs2, imm => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi ^   ci
-                                             yi      <- yi ^ ROR32( xi, ROT_1[imm] )
-                                             xi      <- xi - ROR32( yi, ROT_0[imm] )
-                                             GPR[rd] <- yi || xi
+  sparkle.block.deci   rd, rs1, rs2, imm {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi ^   ci
+    yi      <- yi ^ ROR32( xi, ROT_1[imm] )
+    xi      <- xi - ROR32( yi, ROT_0[imm] )
+    GPR[rd] <- yi || xi
+  }
   ```
 
 - `SPARKLE_RV64_TYPE3`: baseline ISA plus custom ISE.
 
   ```
-  sparkle.block.enc.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi + ROR32( yi, 31 )
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- yi || xi
+  sparkle.block.enc.0  rd, rs1, rs2      {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi + ROR32( yi, 31 )
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi ^        ci
+    GPR[rd] <- yi || xi
+  }
 
-  sparkle.block.enc.1   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi + ROR32( yi, 17 )
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- yi || xi
+  sparkle.block.enc.1  rd, rs1, rs2      {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi + ROR32( yi, 17 )
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi ^        ci
+    GPR[rd] <- yi || xi
+  }
 
-  sparkle.block.enc.2   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi + ROR32( yi,  0 )
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- yi || xi
+  sparkle.block.enc.2  rd, rs1, rs2      {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi + ROR32( yi,  0 )
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi ^        ci
+    GPR[rd] <- yi || xi
+  }
 
-  sparkle.block.enc.3   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi + ROR32( yi, 24 )
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- yi || xi
+  sparkle.block.enc.3  rd, rs1, rs2      {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi + ROR32( yi, 24 )
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi ^        ci
+    GPR[rd] <- yi || xi
+  }
 
-  sparkle.block.dec.0   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi - ROR32( yi, 31 )
-                                             GPR[rd] <- yi || xi
+  sparkle.block.dec.0  rd, rs1, rs2      {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi - ROR32( yi, 31 )
+    GPR[rd] <- yi || xi
+  }
 
-  sparkle.block.dec.1   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi - ROR32( yi, 17 )
-                                             GPR[rd] <- yi || xi
-    
-  sparkle.block.dec.2   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi - ROR32( yi,  0 )
-                                             GPR[rd] <- yi || xi
+  sparkle.block.dec.1  rd, rs1, rs2      {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi - ROR32( yi, 17 )
+    GPR[rd] <- yi || xi
+  }   
+ 
+  sparkle.block.dec.2  rd, rs1, rs2      {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi - ROR32( yi,  0 )
+    GPR[rd] <- yi || xi
+  }
 
-  sparkle.block.dec.3   rd, rs1, rs2      => yi      <- GPR[rs1]_{63..32}
-                                             xi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi - ROR32( yi, 24 )
-                                             GPR[rd] <- yi || xi
-    ```
+  sparkle.block.dec.3  rd, rs1, rs2      {
+    yi      <- GPR[rs1]_{63..32}
+    xi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi - ROR32( yi, 24 )
+    GPR[rd] <- yi || xi
+  }
+  ```
 
 - `SPARKLE_RV64_TYPE4`: baseline ISA plus custom ISE.
 
   ```
-  sparkle.whole.enci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
-                                             yi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- RCON[imm]
-                                             xi      <- xi + ROR32( yi, 31 )
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi, 17 )
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi,  0 )
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi, 24 )
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- yi || xi
+  sparkle.whole.enci   rd, rs1,      imm {
+    xi      <- GPR[rs1]_{63..32}
+    yi      <- GPR[rs1]_{31.. 0}
+    ci      <- RCON[imm]
+    xi      <- xi + ROR32( yi, 31 )
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi, 17 )
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi,  0 )
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi, 24 )
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi ^        ci
+    GPR[rd] <- yi || xi
+  }
 
-  sparkle.whole.deci    rd, rs1,      imm => xi      <- GPR[rs1]_{63..32}
-                                             yi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- RCON[imm]
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi - ROR32( yi, 24 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi - ROR32( yi,  0 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi - ROR32( yi, 17 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi - ROR32( yi, 31 )
-                                             GPR[rd] <- yi || xi
+  sparkle.whole.deci   rd, rs1,      imm {
+    xi      <- GPR[rs1]_{63..32}
+    yi      <- GPR[rs1]_{31.. 0}
+    ci      <- RCON[imm]
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi - ROR32( yi, 24 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi - ROR32( yi,  0 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi - ROR32( yi, 17 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi - ROR32( yi, 31 )
+    GPR[rd] <- yi || xi
+  }
   ```
 
 - `SPARKLE_RV64_TYPE5`: baseline ISA plus custom ISE.
 
   ```
-  sparkle.whole.enc     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
-                                             yi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi + ROR32( yi, 31 )
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi, 17 )
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi,  0 )
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi ^        ci
-                                             xi      <- xi + ROR32( yi, 24 )
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi ^        ci
-                                             GPR[rd] <- yi || xi
+  sparkle.whole.enc    rd, rs1, rs2      {
+    xi      <- GPR[rs1]_{63..32}
+    yi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi + ROR32( yi, 31 )
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi, 17 )
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi,  0 )
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi ^        ci
+    xi      <- xi + ROR32( yi, 24 )
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi ^        ci
+    GPR[rd] <- yi || xi
+  }
 
-  sparkle.whole.dec     rd, rs1, rs2      => xi      <- GPR[rs1]_{63..32}
-                                             yi      <- GPR[rs1]_{31.. 0}
-                                             ci      <- GPR[rs2]_{31.. 0}
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 16 )
-                                             xi      <- xi - ROR32( yi, 24 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 31 )
-                                             xi      <- xi - ROR32( yi,  0 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 17 )
-                                             xi      <- xi - ROR32( yi, 17 )
-                                             xi      <- xi ^        ci
-                                             yi      <- yi ^ ROR32( xi, 24 )
-                                             xi      <- xi - ROR32( yi, 31 )
-                                             GPR[rd] <- yi || xi
+  sparkle.whole.dec    rd, rs1, rs2      {
+    xi      <- GPR[rs1]_{63..32}
+    yi      <- GPR[rs1]_{31.. 0}
+    ci      <- GPR[rs2]_{31.. 0}
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 16 )
+    xi      <- xi - ROR32( yi, 24 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 31 )
+    xi      <- xi - ROR32( yi,  0 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 17 )
+    xi      <- xi - ROR32( yi, 17 )
+    xi      <- xi ^        ci
+    yi      <- yi ^ ROR32( xi, 24 )
+    xi      <- xi - ROR32( yi, 31 )
+    GPR[rd] <- yi || xi
+  }
   ```
 
 <!--- -------------------------------------------------------------------- --->

@@ -49,29 +49,37 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 - `ASCON_RV32_TYPE2`: baseline ISA plus custom ISE.
 
   ```
-  ascon.rori.lo         rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
-                                             x_lo    <- GPR[rs1]
-                                             x       <- x_hi || x_lo
-                                             r       <- ROR64( x, imm )
-                                             GPR[rd] <- r_{31.. 0}
+  ascon.rori.lo  rd, rs1, rs2, imm {
+    x_hi    <- GPR[rs2]
+    x_lo    <- GPR[rs1]
+    x       <- x_hi || x_lo
+    r       <- ROR64( x, imm )
+    GPR[rd] <- r_{31.. 0}
+  }
 
-  ascon.rori.hi         rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
-                                             x_lo    <- GPR[rs1]
-                                             x       <- x_hi || x_lo
-                                             r       <- ROR64( x, imm )
-                                             GPR[rd] <- r_{63..32}
+  ascon.rori.hi  rd, rs1, rs2, imm {
+    x_hi    <- GPR[rs2]
+    x_lo    <- GPR[rs1]
+    x       <- x_hi || x_lo
+    r       <- ROR64( x, imm )
+    GPR[rd] <- r_{63..32}
+  }
 
-  ascon.sigma.lo        rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
-                                             x_lo    <- GPR[rs1]
-                                             x       <- x_hi || x_lo
-                                             r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
-                                             GPR[rd] <- r_{31.. 0}
+  ascon.sigma.lo rd, rs1, rs2, imm {
+    x_hi    <- GPR[rs2]
+    x_lo    <- GPR[rs1]
+    x       <- x_hi || x_lo
+    r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
+    GPR[rd] <- r_{31.. 0}
+  }
 
-  ascon.sigma.hi        rd, rs1, rs2, imm => x_hi    <- GPR[rs2]
-                                             x_lo    <- GPR[rs1]
-                                             x       <- x_hi || x_lo
-                                             r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
-                                             GPR[rd] <- r_{63..32}
+  ascon.sigma.hi rd, rs1, rs2, imm {
+    x_hi    <- GPR[rs2]
+    x_lo    <- GPR[rs1]
+    x       <- x_hi || x_lo
+    r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
+    GPR[rd] <- r_{63..32}
+  }
   ```
 
 <!--- -------------------------------------------------------------------- --->
@@ -83,9 +91,11 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 - `ASCON_RV64_TYPE2`: baseline ISA plus custom ISE.
 
   ```
-  ascon.sigma           rd, rs1,      imm => x       <- GPR[rs1]
-                                             r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
-                                             GPR[rd] <- r
+  ascon.sigma    rd, rs1,      imm {
+    x       <- GPR[rs1]
+    r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
+    GPR[rd] <- r
+  }
   ```
 
 <!--- -------------------------------------------------------------------- --->

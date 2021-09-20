@@ -32,10 +32,12 @@ Throughout the following, we
 - `XOODYAK_RV32_TYPE2`: baseline ISA plus custom ISE.
 
   ```
-  xoodyak.xorrol        rd, rs1, rs2      => x       <- GPR[rs1]
-                                             y       <- GPR[rs2]
-                                             r       <- ROL32( x, 5 ) ^ ROL32( y, 14 )
-                                             GPR[rd] <- r
+  xoodyak.xorrol rd, rs1, rs2 {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- ROL32( x, 5 ) ^ ROL32( y, 14 )
+    GPR[rd] <- r
+  }
   ```
 
 <!--- -------------------------------------------------------------------- --->

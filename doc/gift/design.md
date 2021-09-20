@@ -11,9 +11,13 @@ Throughout the following, we
 - define
 
   ```
-  SWAPMOVE(x,m,n) => r  = x ^ ( x >> n )
-                     r &= m
-                     r ^= x ^ ( r << n )
+  SWAPMOVE(x,m,n) {
+    r  = x ^ ( x >> n )
+    r &= m
+    r ^= x ^ ( r << n )
+  
+    return r
+  }
   ```
 
 <!--- -------------------------------------------------------------------- --->
@@ -40,57 +44,74 @@ The SWAPMOVE operation originates from [2].
 
 - `XOODYAK_RV32_TYPE2`: base ISA plus custom ISE.
 
-
-gift.rori           rd, rs1,      imm => x       <- GPR[rs1]
-                                         r       <- ROR32( x,   imm )
-                                         GPR[rd] <- r
-
-gift.rev8           rd, rs1           => x_3     <- GPR[rs1]_{31..24}
-                                         x_2     <- GPR[rs1]_{23..16}
-                                         x_1     <- GPR[rs1]_{15.. 8}
-                                         x_0     <- GPR[rs1]_{ 7.. 0}
-                                         r       <- x_0 | x_1 | x_2 | x_3
-                                         GPR[rd] <- r
-
-
-
-gift.rori.n         rd, rs1,      imm => x_7     <- GPR[rs1]_{31..28}
-                                         x_6     <- GPR[rs1]_{27..24}
-                                         x_5     <- GPR[rs1]_{23..20}
-                                         x_4     <- GPR[rs1]_{19..16}
-                                         x_3     <- GPR[rs1]_{15..12}
-                                         x_2     <- GPR[rs1]_{11.. 8}
-                                         x_1     <- GPR[rs1]_{ 7.. 4}
-                                         x_0     <- GPR[rs1]_{ 3.. 0}
-                                         r       <- ROT4 ( x_7, imm ) | ROT4 ( x_6, imm ) | 
-                                                    ROT4 ( x_5, imm ) | ROT4 ( x_4, imm ) | 
-                                                    ROT4 ( x_3, imm ) | ROT4 ( x_2, imm ) | 
-                                                    ROT4 ( x_1, imm ) | ROT4 ( x_0, imm ) 
-                                         GPR[rd] <- r
-
-gift.rori.b         rd, rs1,      imm => x_3     <- GPR[rs1]_{31..24}
-                                         x_2     <- GPR[rs1]_{23..16}
-                                         x_1     <- GPR[rs1]_{15.. 8}
-                                         x_0     <- GPR[rs1]_{ 7.. 0}
-                                         r       <- ROT8 ( x_3, imm ) | ROT8 ( x_2, imm ) | 
-                                                    ROT8 ( x_1, imm ) | ROT8 ( x_0, imm ) 
-                                         GPR[rd] <- r
-
-gift.rori.h         rd, rs1,      imm => x_1     <- GPR[rs1]_{31..16}
-                                         x_0     <- GPR[rs1]_{15.. 0}
-                                         r       <- ROT16( x_1, imm ) | ROT16( x_0, imm )
-                                         GPR[rd] <- r
-
-gift.swapmove       rd, rs1, rs2, imm => x       <- GPR[rs1]
-                                         m       <- GPR[rs2]
-                                         r       <- SWAPMOVE( x, m, imm )
-                                         GPR[rd] <- r
-
-gift.key.reorg      rd, rs1,      imm =>
-
-gift.key.update.std rd, rs1           =>
-
-gift.key.update.fix rd, rs1,      imm =>
+  ```
+  gift.rori           rd, rs1,      imm {
+    x       <- GPR[rs1]
+    r       <- ROR32( x,   imm )
+    GPR[rd] <- r
+  }
+  
+  gift.rev8           rd, rs1           { 
+    x_3     <- GPR[rs1]_{31..24}
+    x_2     <- GPR[rs1]_{23..16}
+    x_1     <- GPR[rs1]_{15.. 8}
+    x_0     <- GPR[rs1]_{ 7.. 0}
+    r       <- x_0 | x_1 | x_2 | x_3
+    GPR[rd] <- r
+  }
+  
+  gift.rori.n         rd, rs1,      imm {
+    x_7     <- GPR[rs1]_{31..28}
+    x_6     <- GPR[rs1]_{27..24}
+    x_5     <- GPR[rs1]_{23..20}
+    x_4     <- GPR[rs1]_{19..16}
+    x_3     <- GPR[rs1]_{15..12}
+    x_2     <- GPR[rs1]_{11.. 8}
+    x_1     <- GPR[rs1]_{ 7.. 4}
+    x_0     <- GPR[rs1]_{ 3.. 0}
+    r       <- ROT4 ( x_7, imm ) | ROT4 ( x_6, imm ) | 
+               ROT4 ( x_5, imm ) | ROT4 ( x_4, imm ) | 
+               ROT4 ( x_3, imm ) | ROT4 ( x_2, imm ) | 
+               ROT4 ( x_1, imm ) | ROT4 ( x_0, imm ) 
+    GPR[rd] <- r
+  ]
+  
+  gift.rori.b         rd, rs1,      imm {
+    x_3     <- GPR[rs1]_{31..24}
+    x_2     <- GPR[rs1]_{23..16}
+    x_1     <- GPR[rs1]_{15.. 8}
+    x_0     <- GPR[rs1]_{ 7.. 0}
+    r       <- ROT8 ( x_3, imm ) | ROT8 ( x_2, imm ) | 
+               ROT8 ( x_1, imm ) | ROT8 ( x_0, imm ) 
+    GPR[rd] <- r
+  }
+  
+  gift.rori.h         rd, rs1,      imm {
+    x_1     <- GPR[rs1]_{31..16}
+    x_0     <- GPR[rs1]_{15.. 0}
+    r       <- ROT16( x_1, imm ) | ROT16( x_0, imm )
+    GPR[rd] <- r
+  }
+  
+  gift.swapmove       rd, rs1, rs2, imm {
+    x       <- GPR[rs1]
+    m       <- GPR[rs2]
+    r       <- SWAPMOVE( x, m, imm )
+    GPR[rd] <- r
+  }
+  
+  gift.key.reorg      rd, rs1,      imm {
+  
+  }
+  
+  gift.key.update.std rd, rs1           {
+  
+  }
+  
+  gift.key.update.fix rd, rs1,      imm {
+  
+  }
+  ```
 
 <!--- -------------------------------------------------------------------- --->
 
