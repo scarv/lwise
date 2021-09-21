@@ -1,0 +1,25 @@
+# Copyright (C) 2021 SCARV project <info@scarv.org>
+#
+# Use of this source code is restricted per the MIT license, a copy of which 
+# can be found at https://opensource.org/licenses/MIT (or should be included 
+# as LICENSE.txt within the associated archive or repository).
+
+#--------------------------------------------------------------------
+# Sources
+#--------------------------------------------------------------------
+RTL32 =$(REPO_HOME)/src/hardware/rtl/$(ALG)/rv32
+
+rtl32_ise_src= \
+        $(RTL32)/rv32b_ise.v \
+        $(RTL32)/xoodyak_ise.v 
+
+rtl32_cop_src = $(RTL32)/cop_ise.v 
+rtl32_xalu_src= $(RTL32)/xalu_ise.v 
+
+rtl32_src= \
+        $(rtl32_ise_src) \
+        $(rtl32_cop_src) \
+        $(rtl32_xalu_src) 
+         
+
+
