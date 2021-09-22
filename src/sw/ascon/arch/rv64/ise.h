@@ -7,7 +7,7 @@
 // ============================================================================
 
 #if ( ASCON_RV64_TYPE2 )
-.macro ascon.sigma          rd, rs1, rs2, imm
+.macro ascon.sigma          rd, rs1,      imm
 .insn r CUSTOM_1, 6, \imm+( 2*32), \rd, \rs1,   x0
 .endm
 #endif

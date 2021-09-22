@@ -72,6 +72,13 @@ inter-word: this yields the alternative definition as above.
 - `GIFT_RV32_TYPE2`: base ISA plus custom ISE.
 
   ```
+  gift.swapmove   rd, rs1, rs2, imm {
+    x       <- GPR[rs1]
+    m       <- GPR[rs2]
+    r       <- SWAPMOVE( x, m, imm )
+    GPR[rd] <- r
+  }
+
   gift.rori.n     rd, rs1,      imm {
     x_7     <- GPR[rs1]_{31..28}
     x_6     <- GPR[rs1]_{27..24}
@@ -86,7 +93,7 @@ inter-word: this yields the alternative definition as above.
                ROR4 ( x_3, imm ) | ROR4 ( x_2, imm ) | 
                ROR4 ( x_1, imm ) | ROR4 ( x_0, imm ) 
     GPR[rd] <- r
-  ]
+  }
   
   gift.rori.b     rd, rs1,      imm {
     x_3     <- GPR[rs1]_{31..24}
@@ -104,14 +111,7 @@ inter-word: this yields the alternative definition as above.
     r       <- ROR16( x_1, imm ) | ROR16( x_0, imm )
     GPR[rd] <- r
   }
-  
-  gift.swapmove   rd, rs1, rs2, imm {
-    x       <- GPR[rs1]
-    m       <- GPR[rs2]
-    r       <- SWAPMOVE( x, m, imm )
-    GPR[rd] <- r
-  }
-  
+    
   gift.key.reorg  rd, rs1,      imm {
     x       <- GPR[rs1]  
 
