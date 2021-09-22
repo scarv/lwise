@@ -6,14 +6,23 @@
 
 // ============================================================================
 
-orn
-andn
-xnor
-rori
-roli
-roriw
-roliw
-rev8
-pack
+.macro  ORN rd, rs1, rs2
+   orn \rd, \rs1, \rs2
+.endm
+.macro ANDN rd, rs1, rs2
+  andn \rd, \rs1, \rs2
+.endm
+.macro XNOR rd, rs1, rs2
+  xnor \rd, \rs1, \rs2
+.endm
+.macro RORI rd, rs1, imm
+  rori \rd, \rs1,    \imm
+.endm
+.macro ROLI rd, rs1,  imm
+  rori \rd, \rs1, 32-\imm
+.endm
+.macro REV8 rd, rs1
+  rev8 \rd, \rs1
+.endm
 
 // ============================================================================
