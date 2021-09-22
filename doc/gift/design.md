@@ -11,12 +11,13 @@ Throughout the following, we
 - define
 
   ```
-  SWAPMOVE(x,m,n) {
-    r  = x ^ ( x >> n )
-    r &= m
-    r ^= x ^ ( r << n )
-  
-    return r
+  SWAPMOVE(x,  m,n) {
+    t = x ^ ( x >> n )
+    t = t & m
+    t = t ^ ( t << n )
+    x = t ^ x
+
+    return x
   }
   ```
 
@@ -24,7 +25,33 @@ Throughout the following, we
 
 ## Context
 
-The SWAPMOVE operation originates from [2].
+SWAPMOVE *seems* to have been first defined in [Sec. 3.1, 2], although
+even that cites prior art (e.g., libdes).  Either way, that definition 
+is (with some cosmetic alterations) as follows:
+
+  ```
+  SWAPMOVE(x,y,m,n) {
+    t = y ^ ( x >> n )
+    t = t & m
+    x = x ^ ( t << n )
+    y = y ^ ( t      )
+
+    return ( x, y )
+  }
+  ```
+
+The basic idea is that 
+the bits in  `y` masked by `m` 
+are swapped with
+the bits in  `x` masked by `m << n`.
+Or put even more simply, 
+some bits in `y` 
+are swapped with 
+some bits in `x`
+with the bits in question controlled by `n` and `m`.
+However, GIFT-COFB involves a special-purpose version of SWAPMOVE where
+`x` and `y` are the same, i.e., the movement of bits is intra-word vs.
+inter-word: this yields the alternative definition as above.
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -40,27 +67,12 @@ The SWAPMOVE operation originates from [2].
 
 ## `${IMP} = "rv32"`
 
-- `XOODYAK_RV32_TYPE1`: base ISA.
+- `GIFT_RV32_TYPE1`: base ISA.
 
-- `XOODYAK_RV32_TYPE2`: base ISA plus custom ISE.
+- `GIFT_RV32_TYPE2`: base ISA plus custom ISE.
 
   ```
-  gift.rori           rd, rs1,      imm {
-    x       <- GPR[rs1]
-    r       <- ROR32( x,   imm )
-    GPR[rd] <- r
-  }
-  
-  gift.rev8           rd, rs1           { 
-    x_3     <- GPR[rs1]_{31..24}
-    x_2     <- GPR[rs1]_{23..16}
-    x_1     <- GPR[rs1]_{15.. 8}
-    x_0     <- GPR[rs1]_{ 7.. 0}
-    r       <- x_0 | x_1 | x_2 | x_3
-    GPR[rd] <- r
-  }
-  
-  gift.rori.n         rd, rs1,      imm {
+  gift.rori.n     rd, rs1,      imm {
     x_7     <- GPR[rs1]_{31..28}
     x_6     <- GPR[rs1]_{27..24}
     x_5     <- GPR[rs1]_{23..20}
@@ -69,47 +81,137 @@ The SWAPMOVE operation originates from [2].
     x_2     <- GPR[rs1]_{11.. 8}
     x_1     <- GPR[rs1]_{ 7.. 4}
     x_0     <- GPR[rs1]_{ 3.. 0}
-    r       <- ROT4 ( x_7, imm ) | ROT4 ( x_6, imm ) | 
-               ROT4 ( x_5, imm ) | ROT4 ( x_4, imm ) | 
-               ROT4 ( x_3, imm ) | ROT4 ( x_2, imm ) | 
-               ROT4 ( x_1, imm ) | ROT4 ( x_0, imm ) 
+    r       <- ROR4 ( x_7, imm ) | ROR4 ( x_6, imm ) | 
+               ROR4 ( x_5, imm ) | ROR4 ( x_4, imm ) | 
+               ROR4 ( x_3, imm ) | ROR4 ( x_2, imm ) | 
+               ROR4 ( x_1, imm ) | ROR4 ( x_0, imm ) 
     GPR[rd] <- r
   ]
   
-  gift.rori.b         rd, rs1,      imm {
+  gift.rori.b     rd, rs1,      imm {
     x_3     <- GPR[rs1]_{31..24}
     x_2     <- GPR[rs1]_{23..16}
     x_1     <- GPR[rs1]_{15.. 8}
     x_0     <- GPR[rs1]_{ 7.. 0}
-    r       <- ROT8 ( x_3, imm ) | ROT8 ( x_2, imm ) | 
-               ROT8 ( x_1, imm ) | ROT8 ( x_0, imm ) 
+    r       <- ROR8 ( x_3, imm ) | ROR8 ( x_2, imm ) | 
+               ROR8 ( x_1, imm ) | ROR8 ( x_0, imm ) 
     GPR[rd] <- r
   }
   
-  gift.rori.h         rd, rs1,      imm {
+  gift.rori.h     rd, rs1,      imm {
     x_1     <- GPR[rs1]_{31..16}
     x_0     <- GPR[rs1]_{15.. 0}
-    r       <- ROT16( x_1, imm ) | ROT16( x_0, imm )
+    r       <- ROR16( x_1, imm ) | ROR16( x_0, imm )
     GPR[rd] <- r
   }
   
-  gift.swapmove       rd, rs1, rs2, imm {
+  gift.swapmove   rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     m       <- GPR[rs2]
     r       <- SWAPMOVE( x, m, imm )
     GPR[rd] <- r
   }
   
-  gift.key.reorg      rd, rs1,      imm {
-  
+  gift.key.reorg  rd, rs1,      imm {
+    x       <- GPR[rs1]  
+
+    if      ( imm = 0 ) {
+      r <- SWAPMOVE( x, 0x00550055,  9 )
+      r <- SWAPMOVE( r, 0x00003333, 18 )
+      r <- SWAPMOVE( r, 0x000F000F, 12 )
+      r <- SWAPMOVE( r, 0x000000FF, 24 )
+    }
+    else if ( imm = 1 ) {
+      r <- SWAPMOVE( x, 0x11111111,  3 )
+      r <- SWAPMOVE( r, 0x03030303,  6 )
+      r <- SWAPMOVE( r, 0x000F000F, 12 )
+      r <- SWAPMOVE( r, 0x000000FF, 24 )
+    else if ( imm = 2 ) {
+      r <- SWAPMOVE( x, 0x0000AAAA, 15 )
+      r <- SWAPMOVE( r, 0x00003333, 18 )
+      r <- SWAPMOVE( r, 0x0000F0F0, 12 )
+      r <- SWAPMOVE( r, 0x000000FF, 24 )
+    else if ( imm = 3 ) {
+      r <- SWAPMOVE( x, 0x0A0A0A0A,  3 )
+      r <- SWAPMOVE( r, 0x00CC00CC,  6 )
+      r <- SWAPMOVE( r, 0x0000F0F0, 12 )
+      r <- SWAPMOVE( r, 0x000000FF, 24 )
+    }
+
+    GPR[rd] <- r
   }
   
-  gift.key.update.std rd, rs1           {
-  
+  gift.key.updstd rd, rs1           {
+    x       <- GPR[rs1]
+
+      r <-     ( ( x >> 12 ) & 0x0000000F ) 
+      r <- r | ( ( x & 0x00000FFF ) <<  4 )
+      r <- r | ( ( x >>  2 ) & 0x3FFF0000 ) 
+      r <- r | ( ( x & 0x00030000 ) << 14 )
+
+    GPR[rd] <- r
   }
   
-  gift.key.update.fix rd, rs1,      imm {
-  
+  gift.key.updfix rd, rs1,      imm {
+    x       <- GPR[rs1]
+
+    if      ( imm = 0 ) {
+      r <- SWAPMOVE( x, 0x00003333, 16 )
+      r <- SWAPMOVE( r, 0x55554444,  1 )
+    }
+    else if ( imm = 1 ) {
+      r <-     ROR32( x & 0x33333333, 24 )
+      r <- r | ROR32( x & 0xCCCCCCCC, 16 )
+      r <- SWAPMOVE( r, 0x55551100,  1 )
+    }
+    else if ( imm = 2 ) {
+      r <-     ( ( x >>  4 ) & 0x0F000F00 ) 
+      r <- r | ( ( x & 0x0F000F00 ) <<  4 )
+      r <- r | ( ( x >>  6 ) & 0x00030003 )
+      r <- r | ( ( x & 0x003F003F ) <<  2 )
+    }
+    else if ( imm = 3 ) { 
+      r <-     ( ( x >>  6 ) & 0x03000300 )
+      r <- r | ( ( x & 0x3F003F00 ) <<  2 )
+      r <- r | ( ( x >>  5 ) & 0x00070007 )
+      r <- r | ( ( x & 0x001F001F ) <<  3 )
+    }
+    else if ( imm = 4 ) {
+      r <-     ROR32( x & 0xAAAAAAAA, 24 )
+      r <- r | ROR32( x & 0x55555555, 16 )
+    }
+    else if ( imm = 5 ) {
+      r <-     ROR32( x & 0x55555555, 24 )
+      r <- r | ROR32( x & 0xAAAAAAAA, 20 )
+    }
+    else if ( imm = 6 ) {
+      r <-     ( ( x >>  2 ) & 0x03030303 ) 
+      r <- r | ( ( x & 0x03030303 ) <<  2 )
+      r <- r | ( ( x >>  1 ) & 0x70707070 )
+      r <- r | ( ( x & 0x10101010 ) <<  3 )
+    }
+    else if ( imm = 7 ) {
+      r <-     ( ( x >> 18 ) & 0x00003030 )
+      r <- r | ( ( x & 0x01010101 ) <<  3 )
+      r <- r | ( ( x >> 14 ) & 0x0000C0C0 )
+      r <- r | ( ( x & 0x0000E0E0 ) << 15 )
+      r <- r | ( ( x >>  1 ) & 0x07070707 )
+      r <- r | ( ( x & 0x00001010 ) << 19 )
+    }
+    else if ( imm = 8 ) {
+      r <-     ( ( x >>  4 ) & 0x0FFF0000 )
+      r <- r | ( ( x & 0x000F0000 ) << 12 )
+      r <- r | ( ( x >>  8 ) & 0x000000FF )
+      r <- r | ( ( x & 0x000000FF ) <<  8 )
+    }
+    else if ( imm = 9 ) {
+      r <-     ( ( x >>  6 ) & 0x03FF0000 ) 
+      r <- r | ( ( x & 0x003F0000 ) << 10 )
+      r <- r | ( ( x >>  4 ) & 0x00000FFF ) 
+      r <- r | ( ( x & 0x0000000F ) << 12 )
+    }
+
+    GPR[rd] <- r
   }
   ```
 
@@ -117,7 +219,7 @@ The SWAPMOVE operation originates from [2].
 
 ## `${IMP} = "rv64"`
 
-- `XOODYAK_RV64_TYPE1`: baseline ISA.
+- `GIFT_RV64_TYPE1`: baseline ISA.
 
 <!--- -------------------------------------------------------------------- --->
 

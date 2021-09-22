@@ -1,0 +1,224 @@
+inline uint32_t ROL4 ( uint32_t x, int n ) {
+  return ( ( x << n ) | ( x >> (  4 - n ) ) );
+}
+inline uint32_t ROR4 ( uint32_t x, int n ) {
+  return ( ( x >> n ) | ( x << (  4 - n ) ) );
+}
+inline uint32_t ROL8 ( uint32_t x, int n ) {
+  return ( ( x << n ) | ( x >> (  8 - n ) ) );
+}
+inline uint32_t ROR8 ( uint32_t x, int n ) {
+  return ( ( x >> n ) | ( x << (  8 - n ) ) );
+}
+inline uint32_t ROL16( uint32_t x, int n ) {
+  return ( ( x << n ) | ( x >> ( 16 - n ) ) );
+}
+inline uint32_t ROR16( uint32_t x, int n ) {
+  return ( ( x >> n ) | ( x << ( 16 - n ) ) );
+}
+inline uint32_t ROL32( uint32_t x, int n ) {
+  return ( ( x << n ) | ( x >> ( 32 - n ) ) );
+}
+inline uint32_t ROR32( uint32_t x, int n ) {
+  return ( ( x >> n ) | ( x << ( 32 - n ) ) );
+}
+
+inline uint32_t SWAPMOVE( uint32_t x, uint32_t m, int n ) {
+  uint32_t t = x ^ ( x >> n );
+           t = t & m;
+           t = t ^ ( t << n );
+           x = t ^ x;
+
+  return x;
+}
+
+-- gift_rori_n.h
+
+if( xlen == 32 ) {
+  uint32_t x   = READ_REG( insn.rs1() );
+
+  uint32_t x_7 = ( x >> 28 ) & 0xF;
+  uint32_t x_6 = ( x >> 24 ) & 0xF;
+  uint32_t x_5 = ( x >> 20 ) & 0xF;
+  uint32_t x_4 = ( x >> 16 ) & 0xF;
+  uint32_t x_3 = ( x >> 12 ) & 0xF;
+  uint32_t x_2 = ( x >>  8 ) & 0xF;
+  uint32_t x_1 = ( x >>  4 ) & 0xF;
+  uint32_t x_0 = ( x >>  0 ) & 0xF;
+
+  uint32_t r   = ( ROR4 ( x_7, insn.funct7() & 0x1F ) << 28 ) | 
+                 ( ROR4 ( x_6, insn.funct7() & 0x1F ) << 24 ) | 
+                 ( ROR4 ( x_5, insn.funct7() & 0x1F ) << 20 ) | 
+                 ( ROR4 ( x_4, insn.funct7() & 0x1F ) << 16 ) | 
+                 ( ROR4 ( x_3, insn.funct7() & 0x1F ) << 12 ) | 
+                 ( ROR4 ( x_2, insn.funct7() & 0x1F ) <<  8 ) | 
+                 ( ROR4 ( x_1, insn.funct7() & 0x1F ) <<  4 ) | 
+                 ( ROR4 ( x_0, insn.funct7() & 0x1F ) <<  0 ) ;
+
+  WRITE_REG( insn.rd(), r );
+}
+
+-- gift_rori_b.h
+
+if( xlen == 32 ) {
+  uint32_t x   = READ_REG( insn.rs1() );
+
+  uint32_t x_3 = ( x >> 24 ) & 0xFF;
+  uint32_t x_2 = ( x >> 16 ) & 0xFF;
+  uint32_t x_1 = ( x >>  8 ) & 0xFF;
+  uint32_t x_0 = ( x >>  0 ) & 0xFF;
+
+  uint32_t r   = ( ROR8 ( x_3, insn.funct7() & 0x1F ) << 24 ) | 
+                 ( ROR8 ( x_2, insn.funct7() & 0x1F ) << 16 ) | 
+                 ( ROR8 ( x_1, insn.funct7() & 0x1F ) <<  8 ) | 
+                 ( ROR8 ( x_0, insn.funct7() & 0x1F ) <<  0 ) ;
+
+  WRITE_REG( insn.rd(), r );
+}
+
+-- gift_rori_h.h
+
+if( xlen == 32 ) {
+  uint32_t x   = READ_REG( insn.rs1() );
+
+  uint32_t x_1 = ( x >> 16 ) & 0xFFFF;
+  uint32_t x_0 = ( x >>  0 ) & 0xFFFF;
+
+  uint32_t r   = ( ROR16( x_1, insn.funct7() & 0x1F ) << 16 ) | 
+                 ( ROR16( x_0, insn.funct7() & 0x1F ) <<  0 ) ;
+
+  WRITE_REG( insn.rd(), r );
+}
+
+-- gift_swapmove.h
+
+if( xlen == 32 ) {
+  uint32_t x   = READ_REG( insn.rs1() );
+  uint32_t m   = READ_REG( insn.rs2() );
+
+  uint32_t r   = SWAPMOVE( x, m, insn.funct7() & 0x1F );
+
+  WRITE_REG( insn.rd(), r );
+}
+
+-- gift_key_reorg.h
+
+if( xlen == 32 ) {
+  uint32_t r, x = READ_REG( insn.rs1() );
+  
+  switch( insn.funct7() & 0x1F ) {
+    case 0 : {
+      r = SWAPMOVE( x, 0x00550055,  9 );
+      r = SWAPMOVE( r, 0x00003333, 18 );
+      r = SWAPMOVE( r, 0x000F000F, 12 );
+      r = SWAPMOVE( r, 0x000000FF, 24 ); 
+
+      break;
+    }
+    case 1 : {
+      r = SWAPMOVE( x, 0x11111111,  3 );
+      r = SWAPMOVE( r, 0x03030303,  6 );
+      r = SWAPMOVE( r, 0x000F000F, 12 );
+      r = SWAPMOVE( r, 0x000000FF, 24 ); 
+
+      break;
+    }
+    case 2 : {
+      r = SWAPMOVE( x, 0x0000AAAA, 15 );
+      r = SWAPMOVE( r, 0x00003333, 18 );
+      r = SWAPMOVE( r, 0x0000F0F0, 12 );
+      r = SWAPMOVE( r, 0x000000FF, 24 ); 
+
+      break;
+    }
+    case 3 : {
+      r = SWAPMOVE( x, 0x0A0A0A0A,  3 );
+      r = SWAPMOVE( r, 0x00CC00CC,  6 );
+      r = SWAPMOVE( r, 0x0000F0F0, 12 );
+      r = SWAPMOVE( r, 0x000000FF, 24 ); 
+
+      break;
+    }
+  }
+
+  WRITE_REG( insn.rd(), r );
+}
+
+-- gift_key_updstd.h
+
+if( xlen == 32 ) {
+  uint32_t r, x = READ_REG( insn.rs1() );
+
+      r =     ( ( x >> 12 ) & 0x0000000F );
+      r = r | ( ( x & 0x00000FFF ) <<  4 );
+      r = r | ( ( x >>  2 ) & 0x3FFF0000 );
+      r = r | ( ( x & 0x00030000 ) << 14 );
+
+  WRITE_REG( insn.rd(), r );
+}
+
+-- gift_key_updfix.h
+
+if( xlen == 32 ) {
+  uint32_t r, x = READ_REG( insn.rs1() );
+
+  switch( insn.funct7() & 0x1F ) {
+    case 0 : { 
+      r = SWAPMOVE( x, 0x00003333, 16 );
+      r = SWAPMOVE( r, 0x55554444,  1 );
+    }
+    case 1 : { 
+      r =     ROR32( x & 0x33333333, 24 );
+      r = r | ROR32( x & 0xCCCCCCCC, 16 );
+      r = SWAPMOVE( r, 0x55551100,  1 );
+    }
+    case 2 : { 
+      r =     ( ( x >>  4 ) & 0x0F000F00 );
+      r = r | ( ( x & 0x0F000F00 ) <<  4 );
+      r = r | ( ( x >>  6 ) & 0x00030003 );
+      r = r | ( ( x & 0x003F003F ) <<  2 );
+    }
+    case 3 : { 
+      r =     ( ( x >>  6 ) & 0x03000300 );
+      r = r | ( ( x & 0x3F003F00 ) <<  2 );
+      r = r | ( ( x >>  5 ) & 0x00070007 );
+      r = r | ( ( x & 0x001F001F ) <<  3 );
+    }
+    case 4 : { 
+      r =     ROR32( x & 0xAAAAAAAA, 24 );
+      r = r | ROR32( x & 0x55555555, 16 );
+    }
+    case 5 : { 
+      r =     ROR32( x & 0x55555555, 24 );
+      r = r | ROR32( x & 0xAAAAAAAA, 20 );
+    }
+    case 6 : { 
+      r =     ( ( x >>  2 ) & 0x03030303 ); 
+      r = r | ( ( x & 0x03030303 ) <<  2 );
+      r = r | ( ( x >>  1 ) & 0x70707070 );
+      r = r | ( ( x & 0x10101010 ) <<  3 );
+    }
+    case 7 : { 
+      r =     ( ( x >> 18 ) & 0x00003030 );
+      r = r | ( ( x & 0x01010101 ) <<  3 );
+      r = r | ( ( x >> 14 ) & 0x0000C0C0 );
+      r = r | ( ( x & 0x0000E0E0 ) << 15 );
+      r = r | ( ( x >>  1 ) & 0x07070707 );
+      r = r | ( ( x & 0x00001010 ) << 19 );
+    }
+    case 8 : { 
+      r =     ( ( x >>  4 ) & 0x0FFF0000 );
+      r = r | ( ( x & 0x000F0000 ) << 12 );
+      r = r | ( ( x >>  8 ) & 0x000000FF );
+      r = r | ( ( x & 0x000000FF ) <<  8 );
+    }
+    case 9 : { 
+      r =     ( ( x >>  6 ) & 0x03FF0000 );
+      r = r | ( ( x & 0x003F0000 ) << 10 );
+      r = r | ( ( x >>  4 ) & 0x00000FFF );
+      r = r | ( ( x & 0x0000000F ) << 12 );
+    }
+  }
+
+  WRITE_REG( insn.rd(), r );
+}
