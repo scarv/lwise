@@ -127,8 +127,9 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
 
-  Note that this option is required because of the 32-bit round constant:
-  otherwise, we could just use `xori` (which allows a 12-bit immediate).
+  Note that, in theory, this operation is basically `xori`.  However,
+  in practice `xori` only allows a 12-bit immediate: we need a 32-bit
+  round constant.
 
 - `SPARKLE_RV32_TYPE1`: baseline ISA.
 
@@ -355,8 +356,9 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
 
-  Note that this option is required because of the 32-bit round constant:
-  otherwise, we could just use `xori` (which allows a 12-bit immediate).
+  Note that, in theory, this operation is basically `xori`.  However,
+  in practice `xori` only allows a 12-bit immediate: we need a 32-bit
+  round constant.
 
 - `SPARKLE_RV64_TYPE1`: baseline ISA.
 

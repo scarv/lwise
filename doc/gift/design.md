@@ -11,7 +11,7 @@ Throughout the following, we
 - define
 
   ```
-  SWAPMOVE(x,  m,n) {
+  SWAPMOVE32(x,  m,n) {
     t = x ^ ( x >> n )
     t = t & m
     t = t ^ ( t << n )
@@ -20,6 +20,8 @@ Throughout the following, we
     return x
   }
   ```
+  
+  i.e., a 32-bit version of some more general `SWAPMOVE`.
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -49,9 +51,6 @@ some bits in `y`
 are swapped with 
 some bits in `x`
 with the bits in question controlled by `n` and `m`.
-However, GIFT-COFB involves a special-purpose version of SWAPMOVE where
-`x` and `y` are the same, i.e., the movement of bits is intra-word vs.
-inter-word: this yields the alternative definition as above.
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -75,10 +74,18 @@ inter-word: this yields the alternative definition as above.
   gift.swapmove   rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     m       <- GPR[rs2]
-    r       <- SWAPMOVE( x, m, imm )
+    r       <- SWAPMOVE32( x, m, imm )
     GPR[rd] <- r
   }
+  ```
 
+  Note that this operation is *already* more special-purpose than the
+  original definition of `SWAPMOVE`, in the sense it moves bits in an
+  intra-word vs. inter-word manner.  It is at least possible to think
+  about a *further* specialisation, because GIFT-COFB uses a fairly
+  small set of masks (`m`) and distances (`imm`).
+
+  ```
   gift.rori.n     rd, rs1,      imm {
     x_7     <- GPR[rs1]_{31..28}
     x_6     <- GPR[rs1]_{27..24}
@@ -116,26 +123,26 @@ inter-word: this yields the alternative definition as above.
     x       <- GPR[rs1]  
 
     if      ( imm = 0 ) {
-      r <- SWAPMOVE( x, 0x00550055,  9 )
-      r <- SWAPMOVE( r, 0x00003333, 18 )
-      r <- SWAPMOVE( r, 0x000F000F, 12 )
-      r <- SWAPMOVE( r, 0x000000FF, 24 )
+      r <- SWAPMOVE32( x, 0x00550055,  9 )
+      r <- SWAPMOVE32( r, 0x00003333, 18 )
+      r <- SWAPMOVE32( r, 0x000F000F, 12 )
+      r <- SWAPMOVE32( r, 0x000000FF, 24 )
     }
     else if ( imm = 1 ) {
-      r <- SWAPMOVE( x, 0x11111111,  3 )
-      r <- SWAPMOVE( r, 0x03030303,  6 )
-      r <- SWAPMOVE( r, 0x000F000F, 12 )
-      r <- SWAPMOVE( r, 0x000000FF, 24 )
+      r <- SWAPMOVE32( x, 0x11111111,  3 )
+      r <- SWAPMOVE32( r, 0x03030303,  6 )
+      r <- SWAPMOVE32( r, 0x000F000F, 12 )
+      r <- SWAPMOVE32( r, 0x000000FF, 24 )
     else if ( imm = 2 ) {
-      r <- SWAPMOVE( x, 0x0000AAAA, 15 )
-      r <- SWAPMOVE( r, 0x00003333, 18 )
-      r <- SWAPMOVE( r, 0x0000F0F0, 12 )
-      r <- SWAPMOVE( r, 0x000000FF, 24 )
+      r <- SWAPMOVE32( x, 0x0000AAAA, 15 )
+      r <- SWAPMOVE32( r, 0x00003333, 18 )
+      r <- SWAPMOVE32( r, 0x0000F0F0, 12 )
+      r <- SWAPMOVE32( r, 0x000000FF, 24 )
     else if ( imm = 3 ) {
-      r <- SWAPMOVE( x, 0x0A0A0A0A,  3 )
-      r <- SWAPMOVE( r, 0x00CC00CC,  6 )
-      r <- SWAPMOVE( r, 0x0000F0F0, 12 )
-      r <- SWAPMOVE( r, 0x000000FF, 24 )
+      r <- SWAPMOVE32( x, 0x0A0A0A0A,  3 )
+      r <- SWAPMOVE32( r, 0x00CC00CC,  6 )
+      r <- SWAPMOVE32( r, 0x0000F0F0, 12 )
+      r <- SWAPMOVE32( r, 0x000000FF, 24 )
     }
 
     GPR[rd] <- r
@@ -156,13 +163,13 @@ inter-word: this yields the alternative definition as above.
     x       <- GPR[rs1]
 
     if      ( imm = 0 ) {
-      r <- SWAPMOVE( x, 0x00003333, 16 )
-      r <- SWAPMOVE( r, 0x55554444,  1 )
+      r <- SWAPMOVE32( x, 0x00003333, 16 )
+      r <- SWAPMOVE32( r, 0x55554444,  1 )
     }
     else if ( imm = 1 ) {
       r <-     ROR32( x & 0x33333333, 24 )
       r <- r | ROR32( x & 0xCCCCCCCC, 16 )
-      r <- SWAPMOVE( r, 0x55551100,  1 )
+      r <- SWAPMOVE32( r, 0x55551100,  1 )
     }
     else if ( imm = 2 ) {
       r <-     ( ( x >>  4 ) & 0x0F000F00 ) 
