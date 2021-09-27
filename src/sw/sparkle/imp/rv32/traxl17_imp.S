@@ -4,11 +4,15 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
-#include     "ise.h"
-#include     "ell.h"
-#include "alzette.h"
+// ============================================================================	
+	
+#include "bitmanip.h"
+#include      "ise.h"
 
-// ============================================================================
+#include      "ell.h"
+#include  "alzette.h"
+
+// ----------------------------------------------------------------------------	
 // register allocation
 
 // t0  => subkey
@@ -130,6 +134,7 @@
               lw         \tk2,  8(a3)                   // s10 = MEM[ a3 +  8 ] => tk[ 2 ] = tweak[ 2 ]
               lw         \tk3, 12(a3)                   // s11 = MEM[ a3 + 12 ] => tk[ 3 ] = tweak[ 3 ]
 .endm
+	
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => TRAXL17_WR_STATE
 .macro  TRAXL17_WR_STATE  x0, x1, x2, x3, y0, y1, y2, y3
@@ -147,12 +152,14 @@
 
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => add tweak
+
 .macro TRAXL17_ADD_TWEAK   x0,  x1,  y0,  y1, tk0, tk1, tk2, tk3
               xor         \x0, \x0, \tk0                 // x0 ^= tk[0]
               xor         \y0, \y0, \tk1                 // y0 ^= tk[1]
               xor         \x1, \x1, \tk2                 // x1 ^= tk[2]
               xor         \y1, \y1, \tk3                 // y1 ^= tk[3]
 .endm
+
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => en/decrypt linear layer
 
@@ -204,6 +211,7 @@
 
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => add subkeys
+
 .macro TRAXL17_ADD_SUBKEY  sk, x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,  t0
               lw          \t0,    0(\sk)
               xor         \x0, \x0, \t0

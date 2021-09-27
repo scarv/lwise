@@ -4,7 +4,15 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
+#ifndef __ELL_H
+#define __ELL_H
+
 // ============================================================================
+
+#include "bitmanip.h"
+#include      "ise.h"
+
+// ----------------------------------------------------------------------------
 
 #if ( SPARKLE_RV32_ELL )
 .macro ELL   r, x0, x1, t0, t1
@@ -15,8 +23,10 @@
   xor                  \t0, \x0, \x1
   slli                 \t1, \t0,  16
   xor                  \r,  \t0,  \t1
-  ROR32                \r,  \r,   16, \t0, \t1
+  RORI                 \r,  \r,   16, \t0, \t1
 .endm
 #endif
 
 // ============================================================================
+
+#endif

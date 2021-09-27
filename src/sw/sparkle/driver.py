@@ -12,7 +12,11 @@ def rv32( args ) :
   # rv32/generic
 
   for UNROLL in [ False, True ] :
-        CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ), 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ), 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) )       ]
+        CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ) ]
+        CONF += [ 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ) ]
+        CONF += [ 'DRIVER_TRIALS_KAT'  ]
+        CONF += [ 'DRIVER_TRIALS_BIST' ]
+        CONF += [ 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ) ]
   
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
@@ -25,14 +29,17 @@ def rv32( args ) :
   for UNROLL in [ False, True ] :
     for TYPE in [ 'SPARKLE_RV32_TYPE1', 'SPARKLE_RV32_TYPE2', 'SPARKLE_RV32_TYPE3', 'SPARKLE_RV32_TYPE4'                       ] :
       for ( ELL, RCON ) in itertools.product( [ False, True ], repeat = 2 ) :
-        CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ), 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ), 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ), TYPE ]
+        CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ) ]
+        CONF += [ 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ) ]
+        CONF += [ 'DRIVER_TRIALS_KAT'  ]
+        CONF += [ 'DRIVER_TRIALS_BIST' ]
+        CONF += [ 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ) ]
+      
+        CONF += [ TYPE ]
   
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL', 'SPARKLE_REV_UNROLL' ]
-
-        CONF += [ 'CRAXS10_ENC_EXTERN', 'TRAXL17_ENC_EXTERN', 'SPARKLE_FWD_EXTERN' ]
-        CONF += [ 'CRAXS10_DEC_EXTERN', 'TRAXL17_DEC_EXTERN', 'SPARKLE_REV_EXTERN' ]
 
         if ( ELL      ) :
           CONF += [ 'SPARKLE_RV32_ELL'  ]
@@ -47,7 +54,11 @@ def rv64( args ) :
   # rv64/generic
 
   for UNROLL in [ False, True ] :
-        CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ), 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ), 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) )       ]
+        CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ) ]
+        CONF += [ 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ) ]
+        CONF += [ 'DRIVER_TRIALS_KAT'  ]
+        CONF += [ 'DRIVER_TRIALS_BIST' ]
+        CONF += [ 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ) ]
   
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
@@ -60,17 +71,20 @@ def rv64( args ) :
   for UNROLL in [ False, True ] :
     for TYPE in [ 'SPARKLE_RV64_TYPE1', 'SPARKLE_RV64_TYPE2', 'SPARKLE_RV64_TYPE3', 'SPARKLE_RV64_TYPE4', 'SPARKLE_RV64_TYPE5' ] :
       for ( ELL, RCON ) in itertools.product( [ False, True ], repeat = 2 ) :
-        CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ), 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ), 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ), TYPE ]
+        CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ) ]
+        CONF += [ 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ) ]
+        CONF += [ 'DRIVER_TRIALS_KAT'  ]
+        CONF += [ 'DRIVER_TRIALS_BIST' ]
+        CONF += [ 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ) ]
+      
+        CONF += [ TYPE ]
   
         if ( UNROLL   ) :
           CONF += [ 'CRAXS10_ENC_UNROLL', 'TRAXL17_ENC_UNROLL', 'SPARKLE_FWD_UNROLL' ]
           CONF += [ 'CRAXS10_DEC_UNROLL', 'TRAXL17_DEC_UNROLL', 'SPARKLE_REV_UNROLL' ]
 
-        CONF += [ 'CRAXS10_ENC_EXTERN', 'TRAXL17_ENC_EXTERN', 'SPARKLE_FWD_EXTERN' ]
-        CONF += [ 'CRAXS10_DEC_EXTERN', 'TRAXL17_DEC_EXTERN', 'SPARKLE_REV_EXTERN' ]
-
         if ( ELL      ) :
-          CONF += [ 'SPARKLE_RV64_ELL' ]
+          CONF += [ 'SPARKLE_RV64_ELL'  ]
         if ( RCON     ) :
           CONF += [ 'SPARKLE_RV64_RCON' ]
 

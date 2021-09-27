@@ -4,30 +4,40 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
+#ifndef __BITMANIP_H
+#define __BITMANIP_H
+
 // ============================================================================
 
-.macro  ORN rd, rs1, rs2
+.macro B_ORN  rd, rs1, rs2
    orn \rd, \rs1, \rs2
 .endm
-.macro ANDN rd, rs1, rs2
+
+.macro B_ANDN rd, rs1, rs2
   andn \rd, \rs1, \rs2
 .endm
-.macro XNOR rd, rs1, rs2
+
+.macro B_XNOR rd, rs1, rs2
   xnor \rd, \rs1, \rs2
 .endm
-.macro RORI rd, rs1, imm
+
+.macro B_RORI rd, rs1, imm
   rori \rd, \rs1,    \imm
 .endm
-.macro ROLI rd, rs1,  imm
+
+.macro B_ROLI rd, rs1,  imm
   rori \rd, \rs1, 64-\imm
 .endm
-.macro REV8 rd, rs1
+
+.macro B_REV8 rd, rs1
   rev8 \rd, \rs1
 .endm
 
-.macro PACK rd, rs1, rs2
+.macro B_PACK rd, rs1, rs2
   slli \r, \rs2, 32
   or   \r, \rs1, \r
 .endm
 
 // ============================================================================
+
+#endif

@@ -4,6 +4,9 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
+#ifndef __ISE_H
+#define __ISE_H
+
 // ============================================================================
 
 #if ( SPARKLE_RV64_ELL   )
@@ -89,3 +92,5 @@
 #endif
 
 // ============================================================================
+
+#endif

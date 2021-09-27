@@ -12,7 +12,7 @@
 #include "rdtsc.h"
 
 #include "craxs10.h"
-#include "traxl17.h"
-#include "sparkle.h"
+//#include "traxl17.h"
+//#include "sparkle.h"
 
 #endif

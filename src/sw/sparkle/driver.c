@@ -7,95 +7,14 @@
 
 #include "driver.h"
 
-#if !defined( DRIVER_TRIALS_WARM )
-#define DRIVER_TRIALS_WARM   10
-#endif
-#if !defined( DRIVER_TRIALS_REAL )
-#define DRIVER_TRIALS_REAL 1000
-#endif
+#if defined( DRIVER_TRIALS_KAT  )
+void test_craxs10_kat ( int trials_warm, int trials_real ) {
 
-#if !defined( DRIVER_MEASURE )
-#define measure_prologue(id)
-#define measure_step(id,...) id( __VA_ARGS__ )
-#define measure_epilogue(id)
-#else
-#if ( DRIVER_MEASURE == 0 ) // mode = average
-#define measure_prologue(id)                                                           \
-  uint32_t id ## _tsc_b =  0;                                                          \
-  uint32_t id ## _tsc_a =  0;                                                          \
-  uint32_t id ## _tsc_t =  0;
-#define measure_step(id,...)                                                           \
-  id ## _tsc_b = rdtsc();                                                              \
-  id( __VA_ARGS__ );                                                                   \
-  id ## _tsc_a = rdtsc();                                                              \
-                                                                                       \
-  if( i >= trials_warm ) {                                                             \
-    id ## _tsc_t += ( id ## _tsc_a - id ## _tsc_b );                                   \
-  }
-#define measure_epilogue(id)                                                           \
-  printf( "tsc (average): %s => %f\n", #id, ( float )( id ## _tsc_t ) / trials_real );
-#endif
-#if ( DRIVER_MEASURE == 1 ) // mode = minimum
-#define measure_prologue(id)                                                           \
-  uint32_t id ## _tsc_b =  0;                                                          \
-  uint32_t id ## _tsc_a =  0;                                                          \
-  uint32_t id ## _tsc_t = -1;
-#define measure_step(id,...)                                                           \
-  id ## _tsc_b = rdtsc();                                                              \
-  id( __VA_ARGS__ );                                                                   \
-  id ## _tsc_a = rdtsc();                                                              \
-                                                                                       \
-  if( i >= trials_warm ) {                                                             \
-    id ## _tsc_t  = MIN( id ## _tsc_t, id ## _tsc_a - id ## _tsc_b );                  \
-  }
-#define measure_epilogue(id)                                                           \
-    printf( "tsc (minimum): %s => %f\n", #id, ( float )( id ## _tsc_t )             );
-#endif
-#if ( DRIVER_MEASURE == 2 ) // mode = maximum
-#define measure_prologue(id)                                                           \
-  uint32_t id ## _tsc_b =  0;                                                          \
-  uint32_t id ## _tsc_a =  0;                                                          \
-  uint32_t id ## _tsc_t =  0;
-#define measure_step(id,...)                                                           \
-  id ## _tsc_b = rdtsc();                                                              \
-  id( __VA_ARGS__ );                                                                   \
-  id ## _tsc_a = rdtsc();                                                              \
-                                                                                       \
-  if( i >= trials_warm ) {                                                             \
-    id ## _tsc_t  = MAX( id ## _tsc_t, id ## _tsc_a - id ## _tsc_b );                  \
-  }
-#define measure_epilogue(id)                                                           \
-    printf( "tsc (maximum): %s => %f\n", #id, ( float )( id ## _tsc_t )             );
-#endif
-#endif
-
-#if  defined( DRIVER_RANDOM  )
-FILE* prg = NULL;
-
-void bytes_rand(           uint8_t* x, int n ) {
-  if( n != fread( x, sizeof( uint8_t ), n, prg ) ) {
-    abort();
-  }
-}
-#else
-void bytes_rand(           uint8_t* x, int n ) {
-  for( int i = 0; i < n; i++ ) {
-    x[ i ] = rand() & 0xFF;
-  }
 }
 #endif
 
-void bytes_dump( char* id, uint8_t* x, int n ) {
-  printf( "%s = ", id );
-
-  for( int i = ( n - 1 ); i >= 0; i-- ) {
-    printf( "%02X", x[ i ] );
-  }
-
-  printf( "\n" );
-}
-
-void test_craxs10( int trials_warm, int trials_real ) {
+#if defined( DRIVER_TRIALS_BIST )
+void test_craxs10_bist( int trials_warm, int trials_real ) {
   uint32_t k[ 4 ];
   uint32_t m[ 2 ];
   uint32_t c[ 2 ];
@@ -106,8 +25,8 @@ void test_craxs10( int trials_warm, int trials_real ) {
   measure_prologue( craxs10_dec );
 
   for( int i = 0; i < ( trials_warm + trials_real ); i++ ) {
-    bytes_rand( ( uint8_t* )( k ), 4 * sizeof( uint32_t ) );
-    bytes_rand( ( uint8_t* )( m ), 2 * sizeof( uint32_t ) );
+    rand_bytes( ( uint8_t* )( k ), 4 * sizeof( uint32_t ) );
+    rand_bytes( ( uint8_t* )( m ), 2 * sizeof( uint32_t ) );
 
     memcpy( c, m, 2 * sizeof( uint32_t ) );
     measure_step( craxs10_enc, c, k );
@@ -119,11 +38,11 @@ void test_craxs10( int trials_warm, int trials_real ) {
         !memcmp( r, c, 2 * sizeof( uint32_t ) ) ) { // or r == c, i.e.,         Dec( k, c )   == c, so Dec is acting as a NOP!
       printf( "failed craxs10 %d\n", i );
 
-      bytes_dump( "k", ( uint8_t* )( k ), 4 * sizeof( uint32_t ) );
-      bytes_dump( "m", ( uint8_t* )( m ), 2 * sizeof( uint32_t ) );
-      bytes_dump( "c", ( uint8_t* )( c ), 2 * sizeof( uint32_t ) );
+      dump_bytes( "k", ( uint8_t* )( k ), 4 * sizeof( uint32_t ) );
+      dump_bytes( "m", ( uint8_t* )( m ), 2 * sizeof( uint32_t ) );
+      dump_bytes( "c", ( uint8_t* )( c ), 2 * sizeof( uint32_t ) );
 
-      bytes_dump( "r", ( uint8_t* )( r ), 2 * sizeof( uint32_t ) );
+      dump_bytes( "r", ( uint8_t* )( r ), 2 * sizeof( uint32_t ) );
 
       abort();
     }
@@ -132,8 +51,21 @@ void test_craxs10( int trials_warm, int trials_real ) {
   measure_epilogue( craxs10_enc );
   measure_epilogue( craxs10_dec );
 }
+#endif
+/*
+#if defined( DRIVER_TRIALS_KAT  )
+void test_traxl17_kat ( int trials_warm, int trials_real ) {
 
-void test_traxl17( int trials_warm, int trials_real ) {
+}
+#endif
+
+#if defined( DRIVER_TRIALS_BIST )
+void test_traxl17_bist( int trials_warm, int trials_real ) {
+  #if defined( DRIVER_TRIALS_KAT  )
+
+  #endif
+
+  #if defined( DRIVER_TRIALS_BIST )
   uint32_t  k[ 8 ];
   uint32_t tk[ 4 ];
   uint32_t mx[ 4 ];
@@ -150,10 +82,10 @@ void test_traxl17( int trials_warm, int trials_real ) {
   measure_prologue( traxl17_dec );
 
   for( int i = 0; i < ( trials_warm + trials_real ); i++ ) {
-    bytes_rand( ( uint8_t* )(  k ), 8 * sizeof( uint32_t ) );
-    bytes_rand( ( uint8_t* )( tk ), 4 * sizeof( uint32_t ) );
-    bytes_rand( ( uint8_t* )( mx ), 4 * sizeof( uint32_t ) );
-    bytes_rand( ( uint8_t* )( my ), 4 * sizeof( uint32_t ) );
+    rand_bytes( ( uint8_t* )(  k ), 8 * sizeof( uint32_t ) );
+    rand_bytes( ( uint8_t* )( tk ), 4 * sizeof( uint32_t ) );
+    rand_bytes( ( uint8_t* )( mx ), 4 * sizeof( uint32_t ) );
+    rand_bytes( ( uint8_t* )( my ), 4 * sizeof( uint32_t ) );
 
     traxl17_genkeys( sk, k );
 
@@ -169,15 +101,15 @@ void test_traxl17( int trials_warm, int trials_real ) {
         !memcmp( rx, cx, 4 * sizeof( uint32_t ) ) ) { // or r == c, i.e.,         Dec( k, c )   == c, so Dec is acting as a NOP!
       printf( "failed traxl17 %d\n", i );
 
-      bytes_dump( " k", ( uint8_t* )( k  ), 8 * sizeof( uint32_t ) );
-      bytes_dump( "tk", ( uint8_t* )( tk ), 4 * sizeof( uint32_t ) );
-      bytes_dump( "mx", ( uint8_t* )( mx ), 4 * sizeof( uint32_t ) );
-      bytes_dump( "my", ( uint8_t* )( my ), 4 * sizeof( uint32_t ) );
-      bytes_dump( "cx", ( uint8_t* )( cx ), 4 * sizeof( uint32_t ) );
-      bytes_dump( "cy", ( uint8_t* )( cy ), 4 * sizeof( uint32_t ) );
+      dump_bytes( " k", ( uint8_t* )( k  ), 8 * sizeof( uint32_t ) );
+      dump_bytes( "tk", ( uint8_t* )( tk ), 4 * sizeof( uint32_t ) );
+      dump_bytes( "mx", ( uint8_t* )( mx ), 4 * sizeof( uint32_t ) );
+      dump_bytes( "my", ( uint8_t* )( my ), 4 * sizeof( uint32_t ) );
+      dump_bytes( "cx", ( uint8_t* )( cx ), 4 * sizeof( uint32_t ) );
+      dump_bytes( "cy", ( uint8_t* )( cy ), 4 * sizeof( uint32_t ) );
 
-      bytes_dump( "rx", ( uint8_t* )( rx ), 4 * sizeof( uint32_t ) );
-      bytes_dump( "ry", ( uint8_t* )( ry ), 4 * sizeof( uint32_t ) );
+      dump_bytes( "rx", ( uint8_t* )( rx ), 4 * sizeof( uint32_t ) );
+      dump_bytes( "ry", ( uint8_t* )( ry ), 4 * sizeof( uint32_t ) );
 
       abort();
     }
@@ -185,9 +117,22 @@ void test_traxl17( int trials_warm, int trials_real ) {
 
   measure_epilogue( traxl17_enc );
   measure_epilogue( traxl17_dec );
+  #endif
 }
 
-void test_sparkle( int trials_warm, int trials_real ) {
+#if defined( DRIVER_TRIALS_KAT  )
+void test_sparkle_kat ( int trials_warm, int trials_real ) {
+
+}
+#endif
+
+#if defined( DRIVER_TRIALS_BIST )
+void test_sparkle_bist( int trials_warm, int trials_real ) {
+  #if defined( DRIVER_TRIALS_KAT  )
+
+  #endif
+
+  #if defined( DRIVER_TRIALS_BIST )
   uint32_t state_ini[ 2 * SPARKLE_BRANS ] = { 0 };
   uint32_t state_fwd[ 2 * SPARKLE_BRANS ] = { 0 };
   uint32_t state_rev[ 2 * SPARKLE_BRANS ] = { 0 };
@@ -199,7 +144,7 @@ void test_sparkle( int trials_warm, int trials_real ) {
   measure_prologue( sparkle_rev );
 
   for( int i = 0; i < ( trials_warm + trials_real ); i++ ) {
-    bytes_rand( ( uint8_t* )( state_ini ), 2 * brans * sizeof( uint32_t ) );
+    rand_bytes( ( uint8_t* )( state_ini ), 2 * brans * sizeof( uint32_t ) );
 
     memcpy( state_fwd, state_ini, 2 * brans * sizeof( uint32_t ) );
     measure_step( sparkle_fwd, state_fwd, brans, steps );
@@ -211,9 +156,9 @@ void test_sparkle( int trials_warm, int trials_real ) {
         !memcmp( state_rev, state_fwd, 2 * brans * sizeof( uint32_t ) ) ) { // or rev == fwd, i.e.,       Rev( fwd )   == fwd, so Rev is acting as a NOP!
       printf( "failed sparkle %d\n", i );
 
-      bytes_dump( "state_ini", ( uint8_t* )( state_ini ), 2 * brans * sizeof( uint32_t ) );
-      bytes_dump( "state_fwd", ( uint8_t* )( state_fwd ), 2 * brans * sizeof( uint32_t ) );
-      bytes_dump( "state_rev", ( uint8_t* )( state_rev ), 2 * brans * sizeof( uint32_t ) );
+      dump_bytes( "state_ini", ( uint8_t* )( state_ini ), 2 * brans * sizeof( uint32_t ) );
+      dump_bytes( "state_fwd", ( uint8_t* )( state_fwd ), 2 * brans * sizeof( uint32_t ) );
+      dump_bytes( "state_rev", ( uint8_t* )( state_rev ), 2 * brans * sizeof( uint32_t ) );
 
       abort();
     }
@@ -221,32 +166,41 @@ void test_sparkle( int trials_warm, int trials_real ) {
 
   measure_epilogue( sparkle_fwd );
   measure_epilogue( sparkle_rev );
+  #endif
 }
-
+*/
 int main( int argc, char* argv[] ) {
-#if defined( DRIVER_RANDOM )
-  if( NULL == ( prg = fopen( "/dev/urandom", "rb" ) ) ) {
-    abort();
-  }
-#else
-  srand( ( argc == 2 ) ? atoi( argv[ 0 ] ) : 0 );
-#endif
+  rand_init();
 
-  printf( "++ testing craxs10\n" );
-  test_craxs10( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
-  printf( "-- testing craxs10\n" );
+  #if defined( DRIVER_TRIALS_KAT  )
+  printf( "++ KAT  : testing craxs10\n" );
+  test_craxs10_kat ( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  printf( "-- KAT  : testing craxs10\n" );
 
-  printf( "++ testing traxl17\n" );
-  test_traxl17( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
-  printf( "-- testing traxl17\n" );
+  printf( "++ KAT  : testing traxl17\n" );
+//test_traxl17_kat ( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  printf( "-- KAT  : testing traxl17\n" );
 
-  printf( "++ testing sparkle\n" );
-  test_sparkle( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
-  printf( "-- testing sparkle\n" );
+  printf( "++ KAT  : testing sparkle\n" );
+//test_sparkle_kat ( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  printf( "-- KAT  : testing sparkle\n" );
+  #endif
 
-#if defined( DRIVER_RANDOM )
-  fclose( prg );
-#endif
+  #if defined( DRIVER_TRIALS_BIST )
+  printf( "++ BIST : testing craxs10\n" );
+  test_craxs10_bist( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  printf( "-- BIST : testing craxs10\n" );
+
+  printf( "++ BIST : testing traxl17\n" );
+//test_traxl17_bist( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  printf( "-- BIST : testing traxl17\n" );
+
+  printf( "++ BIST : testing sparkle\n" );
+//test_sparkle_bist( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  printf( "-- BIST : testing sparkle\n" );
+  #endif
+
+  rand_fini();
 
   return 0;
 }
