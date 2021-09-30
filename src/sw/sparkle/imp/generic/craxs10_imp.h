@@ -13,4 +13,6 @@
 #include "alzette.h"
 #include     "ell.h"
 
+#include "craxs10.h"
+
 #endif

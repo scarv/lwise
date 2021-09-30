@@ -13,4 +13,6 @@
 #include "alzette.h"
 #include     "ell.h"
 
+#include "traxl17.h"
+
 #endif
