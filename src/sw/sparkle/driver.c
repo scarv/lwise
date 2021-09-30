@@ -65,6 +65,7 @@ void test_craxs10_bist( int trials_warm, int trials_real ) {
 }
 
 void test_traxl17_bist( int trials_warm, int trials_real ) {
+/*
   uint32_t  k[ 8 ];
   uint32_t tk[ 4 ];
   uint32_t mx[ 4 ];
@@ -116,9 +117,11 @@ void test_traxl17_bist( int trials_warm, int trials_real ) {
 
   measure_epilogue( traxl17_enc );
   measure_epilogue( traxl17_dec );
+*/
 }
 
 void test_sparkle_bist( int trials_warm, int trials_real ) {
+/*
   uint32_t state_ini[ 2 * SPARKLE_BRANS ] = { 0 };
   uint32_t state_fwd[ 2 * SPARKLE_BRANS ] = { 0 };
   uint32_t state_rev[ 2 * SPARKLE_BRANS ] = { 0 };
@@ -152,6 +155,7 @@ void test_sparkle_bist( int trials_warm, int trials_real ) {
 
   measure_epilogue( sparkle_fwd );
   measure_epilogue( sparkle_rev );
+*/
 }
 #endif
 

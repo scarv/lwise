@@ -34,27 +34,27 @@
 .insn i 0x1B, 0x5, \rd, \rs1, \shamt + ( 0x30 << 5 )
 .endm
 // 010 0000 | rs2 | rs1   | 111 | rd | 0110011
-.macro andn  rd, rs1, shamt
+.macro andn  rd, rs1, rs2
 .insn r 0x33, 0x7, 0x20, \rd, \rs1, \rs2
 .endm
 // 010 0000 | rs2 | rs1   | 111 | rd | 0110011
-.macro  orn  rd, rs1, shamt
+.macro  orn  rd, rs1, rs2
 .insn r 0x33, 0x6, 0x20, \rd, \rs1, \rs2
 .endm
 // 010 0000 | rs2 | rs1   | 111 | rd | 0110011
-.macro xnor  rd, rs1, shamt
+.macro xnor  rd, rs1, rs2
 .insn r 0x33, 0x4, 0x20, \rd, \rs1, \rs2
 .endm
 // 000 0100 | rs2 | rs1   | 100 | rd | 0110011
-.macro pack  rd, rs1, shamt
+.macro pack  rd, rs1, rs2
 .insn r 0x33, 0x4, 0x04, \rd, \rs1, \rs2
 .endm
 // 000 0100 | rs2 | rs1   | 100 | rd | 0110011
-.macro packh rd, rs1, shamt
+.macro packh rd, rs1, rs2
 .insn r 0x33, 0x7, 0x04, \rd, \rs1, \rs2
 .endm
 // 000 0100 | rs2 | rs1   | 100 | rd | 0111011
-.macro packw rd, rs1, shamt
+.macro packw rd, rs1, rs2
 .insn r 0x3B, 0x4, 0x04, \rd, \rs1, \rs2
 .endm
 // 0110 1000 0111 | rs1   | 101 | rd | 0010011
