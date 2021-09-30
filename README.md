@@ -37,10 +37,11 @@ such as execution latency.
 
 - Our strategy for each candidate is roughly
 
-  1. after (manual) analysis, produce an ISE design (including instruction semantics and encoding),
-  2. develop a simulator-supported implementation of the ISE,
-  3. develop an ISE-assisted software implementation,
-  4. develop a  hardware-supported implementation of the ISE,
+  1. do some (manual) analysis, 
+  2. produce an ISE design (including instruction semantics, encoding, and so on),
+  3. develop a simulator-supported implementation of the ISE,
+  4. develop an ISE-assisted software implementation,
+  5. develop a  hardware-supported implementation of the ISE,
 
   with progress so far summarised as follows
 
