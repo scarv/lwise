@@ -12,7 +12,7 @@
 #if ( SPARKLE_RV32_ELL   )
 .macro sparkle.ell          rd, rs1, rs2                    
 .insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2
-.endm         
+.endm
 #endif                                     
 
 // ----------------------------------------------------------------------------
