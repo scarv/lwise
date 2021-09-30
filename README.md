@@ -160,7 +160,7 @@ such as execution latency.
   git clone https://github.com/riscv/riscv-gnu-toolchain.git ./riscv-gnu-toolchain
   cd ./riscv-gnu-toolchain
   git submodule update --init --recursive
-  ./configure --prefix="${RISCV}" --enable-multilib --with-multilib-generator="rv32gc_zbb-ilp32--;rv64gc_zbb-lp64--"
+  ./configure --prefix="${RISCV}" --enable-multilib --with-multilib-generator="rv32gc-ilp32--;rv64gc-lp64--"
   make
   ```
 
