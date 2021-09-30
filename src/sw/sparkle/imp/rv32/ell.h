@@ -23,7 +23,7 @@
   xor            \t0, \x0, \x1
   slli           \t1, \t0,  16
   xor            \r,  \t0, \t1
-  rori           \r,  \r,   16, \t0, \t1
+  rori           \r,  \r,   16
 .endm
 #endif
 

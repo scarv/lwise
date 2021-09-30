@@ -23,7 +23,7 @@
   xor            \t0, \x0, \x1
   slliw          \t1, \t0,  16
   xor            \r,  \t0, \t1
-  roriw          \r,  \r,   16, \t0, \t1
+  roriw          \r,  \r,   16
 .endm
 #endif
 
@@ -33,16 +33,16 @@
 .endm
 #else
 .macro ELL64 r, x0, x1, t0, t1, t2
-  xor                  \t0, \x0, \x1 
-  slliw                \t1, \t0,  16
-  xor                  \t2, \t0, \t1
-  srli                 \t0, \t0,  32
-  slliw                \t1, \t0,  16                    
-  xor                  \t1, \t1, \t0
-  mv                   \r,  \t2
-  roriw                \r,  \r,   16, \t0, \t2
-  roriw                \t1, \t1,  16, \t0, \t2
-  pack                 \r,  \t1, \r
+  xor            \t0, \x0, \x1 
+  slliw          \t1, \t0,  16
+  xor            \t2, \t0, \t1
+  srli           \t0, \t0,  32
+  slliw          \t1, \t0,  16                    
+  xor            \t1, \t1, \t0
+  mv             \r,  \t2
+  roriw          \r,  \r,   16
+  roriw          \t1, \t1,  16
+  pack           \r,  \t1, \r
 .endm
 #endif
 
