@@ -24,18 +24,25 @@ such as execution latency.
   RV32GCB (or RV32IMAFDCB) in the 32-bit case
   or 
   RV64GCB (or RV64IMAFDCB) in the 64-bit case,
-  meaning that the
+  meaning that the following standard extensions
   
   - M (multiplication)
   - A (atomic)
   - F (single-precision floating-point)
   - D (double-precision floating-point)
   - C (compressed)
-  - B (bit manipulation)
+  - Zbkb (a subset of K: bit manipulation instructions for cryptography)
 
-  standard extensions are available by default.
+  are available by default.
 
-- Our progress can be summarised as follows
+- Our strategy for each candidate is roughly
+
+  1. after (manual) analysis, produce an ISE design (including instruction semantics and encoding),
+  2. develop a simulator-supported implementation of the ISE,
+  3. develop an ISE-assisted software implementation,
+  4. develop a  hardware-supported implementation of the ISE,
+
+  with progress so far summarised as follows
 
   | Algorithm                                                                                                                                                  | Identifier | Design                       | Encoding                        | Toolchain | Software | Hardware |
   | :--------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------: | :--------------------------: | :-----------------------------: | :-------: | :------: | :------: |
