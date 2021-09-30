@@ -12,6 +12,8 @@
 
 #include "craxs10_imp.h"
 
+#define CRAXS10_NSTEPS ( 10 )
+
 extern const uint32_t CRAXS10_RCON[ 10 ];
 
 extern void craxs10_enc( uint32_t* state, const uint32_t* key );

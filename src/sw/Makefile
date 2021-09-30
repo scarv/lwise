@@ -26,7 +26,7 @@ export TARGET   = ${REPO_HOME}/build/driver-${ALG}_${ARCH}_${IMP}
 include ./share/arch/${ARCH}/Makefile.in
 
 ${TARGET}.elf : ${SOURCES} ${HEADERS}
-	@${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -Wall -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+	${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -Wall -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 ${TARGET}.asm : ${TARGET}.elf
 	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}

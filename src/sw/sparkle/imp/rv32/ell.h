@@ -9,21 +9,21 @@
 
 // ============================================================================
 
-#include "bitmanip.h"
-#include      "ise.h"
+#include "zbkb.h"
+#include  "ise.h"
 
 // ----------------------------------------------------------------------------
 
 #if ( SPARKLE_RV32_ELL )
 .macro ELL   r, x0, x1, t0, t1
-  sparkle.ell          \r,  \x0, \x1
+  sparkle.ell    \r,  \x0, \x1
 .endm
 #else
 .macro ELL   r, x0, x1, t0, t1
-  xor                  \t0, \x0, \x1
-  slli                 \t1, \t0,  16
-  xor                  \r,  \t0,  \t1
-  RORI                 \r,  \r,   16, \t0, \t1
+  xor            \t0, \x0, \x1
+  slli           \t1, \t0,  16
+  xor            \r,  \t0, \t1
+  rori           \r,  \r,   16, \t0, \t1
 .endm
 #endif
 

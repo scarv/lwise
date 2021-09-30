@@ -7,11 +7,23 @@
 
 #include "driver.h"
 
+// ============================================================================
+
 #if defined( DRIVER_TRIALS_KAT  )
 void test_craxs10_kat ( int trials_warm, int trials_real ) {
 
 }
+
+void test_traxl17_kat ( int trials_warm, int trials_real ) {
+
+}
+
+void test_sparkle_kat ( int trials_warm, int trials_real ) {
+
+}
 #endif
+
+// ----------------------------------------------------------------------------
 
 #if defined( DRIVER_TRIALS_BIST )
 void test_craxs10_bist( int trials_warm, int trials_real ) {
@@ -51,21 +63,8 @@ void test_craxs10_bist( int trials_warm, int trials_real ) {
   measure_epilogue( craxs10_enc );
   measure_epilogue( craxs10_dec );
 }
-#endif
-/*
-#if defined( DRIVER_TRIALS_KAT  )
-void test_traxl17_kat ( int trials_warm, int trials_real ) {
 
-}
-#endif
-
-#if defined( DRIVER_TRIALS_BIST )
 void test_traxl17_bist( int trials_warm, int trials_real ) {
-  #if defined( DRIVER_TRIALS_KAT  )
-
-  #endif
-
-  #if defined( DRIVER_TRIALS_BIST )
   uint32_t  k[ 8 ];
   uint32_t tk[ 4 ];
   uint32_t mx[ 4 ];
@@ -117,22 +116,9 @@ void test_traxl17_bist( int trials_warm, int trials_real ) {
 
   measure_epilogue( traxl17_enc );
   measure_epilogue( traxl17_dec );
-  #endif
 }
 
-#if defined( DRIVER_TRIALS_KAT  )
-void test_sparkle_kat ( int trials_warm, int trials_real ) {
-
-}
-#endif
-
-#if defined( DRIVER_TRIALS_BIST )
 void test_sparkle_bist( int trials_warm, int trials_real ) {
-  #if defined( DRIVER_TRIALS_KAT  )
-
-  #endif
-
-  #if defined( DRIVER_TRIALS_BIST )
   uint32_t state_ini[ 2 * SPARKLE_BRANS ] = { 0 };
   uint32_t state_fwd[ 2 * SPARKLE_BRANS ] = { 0 };
   uint32_t state_rev[ 2 * SPARKLE_BRANS ] = { 0 };
@@ -166,9 +152,11 @@ void test_sparkle_bist( int trials_warm, int trials_real ) {
 
   measure_epilogue( sparkle_fwd );
   measure_epilogue( sparkle_rev );
-  #endif
 }
-*/
+#endif
+
+// ----------------------------------------------------------------------------
+
 int main( int argc, char* argv[] ) {
   rand_init();
 
@@ -178,11 +166,11 @@ int main( int argc, char* argv[] ) {
   printf( "-- KAT  : testing craxs10\n" );
 
   printf( "++ KAT  : testing traxl17\n" );
-//test_traxl17_kat ( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  test_traxl17_kat ( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
   printf( "-- KAT  : testing traxl17\n" );
 
   printf( "++ KAT  : testing sparkle\n" );
-//test_sparkle_kat ( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  test_sparkle_kat ( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
   printf( "-- KAT  : testing sparkle\n" );
   #endif
 
@@ -192,11 +180,11 @@ int main( int argc, char* argv[] ) {
   printf( "-- BIST : testing craxs10\n" );
 
   printf( "++ BIST : testing traxl17\n" );
-//test_traxl17_bist( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  test_traxl17_bist( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
   printf( "-- BIST : testing traxl17\n" );
 
   printf( "++ BIST : testing sparkle\n" );
-//test_sparkle_bist( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
+  test_sparkle_bist( DRIVER_TRIALS_WARM, DRIVER_TRIALS_REAL );
   printf( "-- BIST : testing sparkle\n" );
   #endif
 
@@ -204,3 +192,5 @@ int main( int argc, char* argv[] ) {
 
   return 0;
 }
+
+// ============================================================================

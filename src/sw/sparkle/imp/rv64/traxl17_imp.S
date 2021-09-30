@@ -4,11 +4,15 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
+// ============================================================================	
+	
+#include    "zbkb.h"
 #include     "ise.h"
-#include     "ell.h"
-#include "alzette.h"
 
-// ============================================================================
+#include "alzette.h"
+#include     "ell.h"
+
+// ----------------------------------------------------------------------------	
 // register allocation
 
 // t0  => subkey
@@ -35,7 +39,7 @@
 // s10 =>   tweak[ 2 ] = tk3 || tk2
 // s11 =>   tweak[ 3 ] = tk3
 
-// ============================================================================
+// ----------------------------------------------------------------------------	
 // TRAXL17 implementation => en/decrypt prologue + epilogue
 
 .macro TRAXL17_ENC_PROLOGUE 
@@ -146,18 +150,18 @@
               lwu         \tk2,  8(a1)                   // s6  = MEM[ a1 +  8 ] => y[ 2 ] = ystate[ 2 ]
               lwu         \tk3, 12(a1)                   // s7  = MEM[ a1 + 12 ] => y[ 3 ] = ystate[ 3 ]
 
-              PACK        \yx0, \yx0, \tk0               //                      => ( yw || xw )
-              PACK        \yx1, \yx1, \tk1               //                      => ( yw || xw )
-              PACK        \yx2, \yx2, \tk2               //                      => ( yw || xw )
-              PACK        \yx3, \yx3, \tk3               //                      => ( yw || xw )
+              pack        \yx0, \yx0, \tk0               //                      => ( yw || xw )
+              pack        \yx1, \yx1, \tk1               //                      => ( yw || xw )
+              pack        \yx2, \yx2, \tk2               //                      => ( yw || xw )
+              pack        \yx3, \yx3, \tk3               //                      => ( yw || xw )
 
               lwu         \tk0,  0(a3)                   // s8  = MEM[ a3 +  0 ] => tk[ 0 ] = tweak[ 0 ]
               lwu         \tk1,  4(a3)                   // s9  = MEM[ a3 +  4 ] => tk[ 1 ] = tweak[ 1 ]
               lwu         \tk2,  8(a3)                   // s10 = MEM[ a3 +  8 ] => tk[ 2 ] = tweak[ 2 ]
               lwu         \tk3, 12(a3)                   // s11 = MEM[ a3 + 12 ] => tk[ 3 ] = tweak[ 3 ]
 
-              PACK        \tk0, \tk0, \tk1               //                      => ( yw || xw )
-              PACK        \tk2, \tk2, \tk3               //                      => ( yw || xw )
+              pack        \tk0, \tk0, \tk1               //                      => ( yw || xw )
+              pack        \tk2, \tk2, \tk3               //                      => ( yw || xw )
 .endm
 #endif
 
@@ -270,29 +274,28 @@
               ELL64       \t0 , \yx2, \yx3, \t1, \t2, \t3 //          t0 = tmpx || tmpy
               xor         \yx0, \yx0, \t0                 // ( y0 || x0) = ( y0 || x0) ^ (tmpx || tmpy)
               xor         \yx1, \yx1, \t0                 // ( y1 || x1) = ( y1 || x1) ^ (tmpx || tmpy)  
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               mv          \t0 , \yx0
               mv          \yx0, \yx3
               mv          \yx3, \yx1
               mv          \yx1, \yx2
               mv          \yx2, \t0
-              #endif
+#endif
 .endm
 
 .macro TRAXL17_DEC_LINEAR yx0,  yx1,  yx2, yx3,  t0,  t1,  t2,  t3
-              #if !( TRAXL17_DEC_UNROLL )
+#if !( TRAXL17_DEC_UNROLL )
               mv          \t0 , \yx0
               mv          \yx0, \yx2
               mv          \yx2, \yx1
               mv          \yx1, \yx3
               mv          \yx3, \t0
-              #endif	
+#endif	
               ELL64       \t0 , \yx2, \yx3, \t1, \t2, \t3 //          t0 = tmpx || tmpy
               xor         \yx0, \yx0, \t0                 // ( y0 || x0) = ( y0 || x0) ^ (tmpx || tmpy)
               xor         \yx1, \yx1, \t0                 // ( y1 || x1) = ( y1 || x1) ^ (tmpx || tmpy)  
 .endm	
 #endif
-
 
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => add subkeys
@@ -357,6 +360,7 @@
               ALZETTE_DEC \x3, \y3,  \t0, \t1, \t2
 .endm
 #endif
+
 #if ( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE5 )
 .macro TRAXL17_ENC_SUBS rc,  yx0,  yx1,  yx2,  yx3,  t0
               lwu         \t0 ,    0(\rc)                 // t0 = MEM[ \rc +  0 ] => TRAXL1710_RCON[ 0/4 ]
@@ -399,6 +403,7 @@
 
 // ----------------------------------------------------------------------------
 // TRAXL17 implementation => en/decrypt step
+
 #if ( SPARKLE_RV64_TYPE1 )
 .macro TRAXL17_ENC_STEP_EVE   sk, rc,  x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,                          t0,  t1,  t2
               TRAXL17_ADD_SUBKEY \sk, \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0
@@ -406,9 +411,9 @@
               TRAXL17_ENC_LINEAR      \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0, \t1, \t2
 
               addi         \sk, \sk, 32                 //             => sk += 8
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               addi         t2, t2,  1                   // t2 = t2 + 1 => step++
-              #endif
+#endif
 .endm     
 
 .macro TRAXL17_ENC_STEP_ODD   sk, rc,  x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,  tk0,  tk1,  tk2,  tk3,  t0,  t1,  t2
@@ -418,9 +423,9 @@
               TRAXL17_ENC_LINEAR      \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0, \t1, \t2
 
               addi         \sk, \sk, 32                 //             => sk += 8
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               addi         t2, t2,  1                   // t2 = t2 + 1 => step++
-              #endif
+#endif
 .endm   
 
 .macro TRAXL17_DEC_STEP_EVE   sk, rc,  x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,                          t0,  t1,  t2
@@ -429,9 +434,9 @@
               TRAXL17_ADD_SUBKEY \sk, \x0, \x1, \x2, \x3, \y0, \y1, \y2, \y3,                         \t0
 
               addi         \sk, \sk, -32                //             => sk += 8
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               addi         t2,   t2, -1                 // t2 = t2 - 1 => step++
-              #endif
+#endif
 .endm       
 
 .macro TRAXL17_DEC_STEP_ODD   sk, rc,  x0,  x1,  x2,  x3,  y0,  y1,  y2,  y3,  tk0,  tk1,  tk2,  tk3,  t0,  t1,  t2
@@ -441,9 +446,9 @@
               TRAXL17_ADD_TWEAK       \x0, \x1,           \y0, \y1,           \tk0, \tk1, \tk2, \tk3
 
               addi         \sk, \sk, -32                //             => sk += 8
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               addi         t2,   t2, -1                 // t2 = t2 - 1 => step++
-              #endif
+#endif
 .endm   
 #endif
 
@@ -454,9 +459,9 @@
               TRAXL17_ENC_LINEAR      \yx0, \yx1, \yx2, \yx3,             \t0, \t1, \t2, \t3
 
               addi         \sk, \sk, 32                 //             => sk += 8
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               addi         t2, t2,  1                   // t2 = t2 + 1 => step++
-              #endif
+#endif
 .endm     
 
 .macro TRAXL17_ENC_STEP_ODD   sk, rc,  yx0,  yx1,  yx2,  yx3,  tk0,  tk2,  t0,  t1,  t2,  t3
@@ -466,9 +471,9 @@
               TRAXL17_ENC_LINEAR      \yx0, \yx1, \yx2, \yx3,             \t0, \t1, \t2, \t3
 
               addi         \sk, \sk, 32                 //             => sk += 8
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               addi         t2, t2,  1                   // t2 = t2 + 1 => step++
-              #endif
+#endif
 .endm   
 
 .macro TRAXL17_DEC_STEP_EVE   sk, rc,  yx0,  yx1,  yx2,  yx3,              t0,  t1,  t2,  t3
@@ -477,9 +482,9 @@
               TRAXL17_ADD_SUBKEY \sk, \yx0, \yx1, \yx2, \yx3,             \t0
 
               addi         \sk, \sk, -32                //             => sk += 8
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               addi         t2,   t2, -1                 // t2 = t2 - 1 => step++
-              #endif
+#endif
 .endm       
 
 .macro TRAXL17_DEC_STEP_ODD   sk, rc,  yx0,  yx1,  yx2,  yx3,  tk0,  tk2,  t0,  t1,  t2,  t3
@@ -489,17 +494,19 @@
               TRAXL17_ADD_TWEAK       \yx0, \yx1,             \tk0, \tk2
 
               addi         \sk, \sk, -32                //             => sk += 8
-              #if !( TRAXL17_ENC_UNROLL )
+#if !( TRAXL17_ENC_UNROLL )
               addi         t2,   t2, -1                 // t2 = t2 - 1 => step++
-              #endif
+#endif
 .endm   
 #endif
+
 // ----------------------------------------------------------------------------	
 // TRAXL17 implementation => encrypt
 
-#if ( TRAXL17_ENC_EXTERN )
 .section .text  
+
 .global traxl17_enc
+
 traxl17_enc:  TRAXL17_ENC_PROLOGUE 
 
 #if ( SPARKLE_RV64_TYPE1 ) 
@@ -508,7 +515,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               addi         a7, a6,  16                   // a7 = &TRAXL17_RCON[4]
               //                   sk  rc  x0  x1  x2  x3  y0  y1  y2  y3 tk0 tk1  tk2  tk3  t0  t1  t2
               TRAXL17_RD_STATE             s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
-              #if ( TRAXL17_ENC_UNROLL )
+#if ( TRAXL17_ENC_UNROLL )
               TRAXL17_ENC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
               TRAXL17_ENC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
               TRAXL17_ENC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
@@ -528,7 +535,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               TRAXL17_ENC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
               TRAXL17_ADD_SUBKEY   t0,     s0, s1, s2, s3, s4, s5, s6, s7,                   t4
 			  TRAXL17_WR_STATE             s0, s1, s2, s3, s4, s5, s6, s7
-              #else             
+#else             
 0:            bgeu         t2, t3, 1f                    // if i >= n, goto 1
               TRAXL17_ENC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6    
               TRAXL17_ENC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
@@ -536,8 +543,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
 1:            TRAXL17_ENC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
               TRAXL17_ADD_SUBKEY   t0,     s0, s1, s2, s3, s4, s5, s6, s7,                   t4
 			  TRAXL17_WR_STATE             s0, s1, s2, s3, s4, s5, s6, s7
-              #endif
-                 
+#endif
 #endif
 
 #if ( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE5 )
@@ -546,7 +552,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               addi         a7, a6,  16                   // a7 = &TRAXL17_RCON[4]
               //                   sk  rc  yx0  yx1  yx2  yx3  tk0 tk1  tk2  tk3 t0  t1  t2  t3
               TRAXL17_RD_STATE              s0,  s1,  s2,  s3,  s8, s9, s10, s11
-              #if ( TRAXL17_ENC_UNROLL )
+#if ( TRAXL17_ENC_UNROLL )
               TRAXL17_ENC_STEP_EVE t0, a6,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_ENC_STEP_ODD t0, a7,  s3,  s2,  s0,  s1,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_ENC_STEP_EVE t0, a6,  s1,  s0,  s3,  s2,                   t1, t4, t5, t6
@@ -566,7 +572,7 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               TRAXL17_ENC_STEP_EVE t0, a6,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_ADD_SUBKEY   t0,      s3,  s2,  s0,  s1,                   t1
 			  TRAXL17_WR_STATE              s3,  s2,  s0,  s1,                   s7, s6, s4, s5
-              #else             
+#else             
 0:            bgeu         t2, t3, 1f                    // if i >= n, goto 1
               TRAXL17_ENC_STEP_EVE t0, a6,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_ENC_STEP_ODD t0, a7,  s0,  s1,  s2,  s3,  s8,     s10,     t1, t4, t5, t6
@@ -574,13 +580,13 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
 1:            TRAXL17_ENC_STEP_EVE t0, a6,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_ADD_SUBKEY   t0,      s0,  s1,  s2,  s3,                   t1
 			  TRAXL17_WR_STATE              s0,  s1,  s2,  s3,                   s4, s5, s6, s7
-              #endif
+#endif
 #endif
 
 #if ( SPARKLE_RV64_TYPE4 )
               mv           t0, a2                        // t0 = &subkeys
               TRAXL17_RD_STATE              s0,  s1,  s2,  s3,  s8, s9, s10, s11
-              #if ( TRAXL17_ENC_UNROLL )
+#if ( TRAXL17_ENC_UNROLL )
               TRAXL17_ENC_STEP_EVE t0,  0,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_ENC_STEP_ODD t0,  4,  s3,  s2,  s0,  s1,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_ENC_STEP_EVE t0,  0,  s1,  s0,  s3,  s2,                   t1, t4, t5, t6
@@ -600,19 +606,19 @@ traxl17_enc:  TRAXL17_ENC_PROLOGUE
               TRAXL17_ENC_STEP_EVE t0,  0,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_ADD_SUBKEY   t0,      s3,  s2,  s0,  s1,                   t1
 			  TRAXL17_WR_STATE              s3,  s2,  s0,  s1,                   s7, s6, s4, s5
-              #else	
-              #error "can't use SPARKLE_RV32_TYPE4 without TRAXL17_ENC_UNROLL"
-              #endif
+#else	
+#error "can't use SPARKLE_RV32_TYPE4 without TRAXL17_ENC_UNROLL"
+#endif
 #endif
               TRAXL17_ENC_EPILOGUE
-#endif
 
 // ----------------------------------------------------------------------------	
 // TRAXL17 implementation => decrypt
 
-#if ( TRAXL17_DEC_EXTERN )
 .section .text  
+
 .global traxl17_dec
+
 traxl17_dec:  TRAXL17_DEC_PROLOGUE
 
 #if ( SPARKLE_RV64_TYPE1 ) 
@@ -624,7 +630,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_ADD_SUBKEY   t0,     s0, s1, s2, s3, s4, s5, s6, s7,                   t4
               addi         t0, t0, -32                // sk-=  8
               TRAXL17_DEC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
-              #if ( TRAXL17_DEC_UNROLL )         
+#if ( TRAXL17_DEC_UNROLL )         
               TRAXL17_DEC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
               TRAXL17_DEC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
@@ -642,13 +648,13 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_DEC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
               TRAXL17_WR_STATE             s0, s1, s2, s3, s4, s5, s6, s7    
-              #else             
+#else             
 0:            blez         t2,     1f                 // if i <= 0, goto 1
               TRAXL17_DEC_STEP_ODD t0, a7, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0, a6, s0, s1, s2, s3, s4, s5, s6, s7,                   t4, t5, t6
               j                    0b                 //            goto 0
 1:            TRAXL17_WR_STATE             s0, s1, s2, s3, s4, s5, s6, s7               
-              #endif
+#endif
 #endif
 
 #if ( SPARKLE_RV64_TYPE2 ) || ( SPARKLE_RV64_TYPE3 ) || ( SPARKLE_RV64_TYPE5 )
@@ -659,7 +665,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_RD_STATE              s0,  s1,  s2,  s3,  s8, s9, s10, s11
               TRAXL17_ADD_SUBKEY   t0,      s0,  s1,  s2,  s3, t1
               addi         t0, t0, -32                // sk-=  8
-              #if ( TRAXL17_DEC_UNROLL )         
+#if ( TRAXL17_DEC_UNROLL )         
               TRAXL17_DEC_STEP_EVE t0, a6,  s2,  s3,  s1,  s0,                   t1, t4, t5, t6    
               TRAXL17_DEC_STEP_ODD t0, a7,  s1,  s0,  s3,  s2,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0, a6,  s3,  s2,  s0,  s1,                   t1, t4, t5, t6    
@@ -678,14 +684,14 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_DEC_STEP_ODD t0, a7,  s0,  s1,  s2,  s3,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0, a6,  s2,  s3,  s1,  s0,                   t1, t4, t5, t6
               TRAXL17_WR_STATE              s2,  s3,  s1,  s0,                   s6, s7, s5, s4
-              #else      
+#else      
 0:            blez         t2,     1f                 // if i <= 0, goto 1
               TRAXL17_DEC_STEP_EVE t0, a6,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6       
               TRAXL17_DEC_STEP_ODD t0, a7,  s0,  s1,  s2,  s3,  s8,     s10,     t1, t4, t5, t6
               j                    0b                 //            goto 0
 1:            TRAXL17_DEC_STEP_EVE t0, a6,  s0,  s1,  s2,  s3,                   t1, t4, t5, t6
               TRAXL17_WR_STATE              s0,  s1,  s2,  s3,                   s4, s5, s6, s7
-              #endif
+#endif
 #endif
 
 #if ( SPARKLE_RV64_TYPE4 )
@@ -694,7 +700,7 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_RD_STATE              s0,  s1,  s2,  s3,  s8, s9, s10, s11
               TRAXL17_ADD_SUBKEY   t0,      s0,  s1,  s2,  s3,                   t1
               addi         t0, t0, -32                // sk-=  8
-              #if ( TRAXL17_DEC_UNROLL )
+#if ( TRAXL17_DEC_UNROLL )
               TRAXL17_DEC_STEP_EVE t0,  0,  s2,  s3,  s1,  s0,                   t1, t4, t5, t6    
               TRAXL17_DEC_STEP_ODD t0,  4,  s1,  s0,  s3,  s2,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0,  0,  s3,  s2,  s0,  s1,                   t1, t4, t5, t6    
@@ -713,11 +719,10 @@ traxl17_dec:  TRAXL17_DEC_PROLOGUE
               TRAXL17_DEC_STEP_ODD t0,  4,  s0,  s1,  s2,  s3,  s8,     s10,     t1, t4, t5, t6
               TRAXL17_DEC_STEP_EVE t0,  0,  s2,  s3,  s1,  s0,                   t1, t4, t5, t6
               TRAXL17_WR_STATE              s2,  s3,  s1,  s0,                   s6, s7, s5, s4
-              #else	
-              #error "can't use SPARKLE_RV32_TYPE4 without TRAXL17_DEC_UNROLL"
-              #endif
+#else	
+#error "can't use SPARKLE_RV32_TYPE4 without TRAXL17_DEC_UNROLL"
+#endif
 #endif
               TRAXL17_DEC_EPILOGUE
-#endif
 
 // ============================================================================

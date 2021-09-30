@@ -7,8 +7,6 @@
 
 #include "craxs10_imp.h"
 
-#define CRAXS10_NSTEPS ( 10 )
-
 #if defined( CRAXS10_ENC_UNROLL )
 #define CRAXS10_ENC_STEP(k0,k1,i) {         \
   xw ^= ( k0 ^ i );                         \

@@ -9,53 +9,40 @@
 
 // ============================================================================
 
-#include "bitmanip.h"
-#include      "ise.h"
+#include "zbkb.h"
+#include  "ise.h"
 
 // ----------------------------------------------------------------------------
 
-#if ( SPARKLE_RV64_ELL )
+#if ( SPARKLE_RV32_ELL )
 .macro ELL32 r, x0, x1, t0, t1
-  sparkle.ell          \r,  \x0, \x1
+  sparkle.ell    \r,  \x0, \x1
 .endm
 #else
 .macro ELL32 r, x0, x1, t0, t1
-  xor                  \t0, \x0, \x1
-  slliw                \t1, \t0,  16
-  xor                  \r,  \t0,  \t1
-  ROR32                \r,  \r,   16, \t0, \t1
+  xor            \t0, \x0, \x1
+  slliw          \t1, \t0,  16
+  xor            \r,  \t0, \t1
+  roriw          \r,  \r,   16, \t0, \t1
 .endm
 #endif
 
 #if ( SPARKLE_RV64_ELL )
 .macro ELL64 r, x0, x1, t0, t1, t2
-  sparkle.ellrev       \r,  \x0, \x1
+  sparkle.ellrev \r,  \x0, \x1
 .endm
 #else
 .macro ELL64 r, x0, x1, t0, t1, t2
   xor                  \t0, \x0, \x1 
-#if ( SPARKLE_RV64B )
-  slliw                \t1, \t0,  16 // t0 <= tmpx 
+  slliw                \t1, \t0,  16
   xor                  \t2, \t0, \t1
-#else
-  slli                 \t1, \t0,  32                  
-  srli                 \t1, \t1,  32              
-  slliw                \t2, \t1,  16 // t2 <= tmpx 
-  xor                  \t2, \t2, \t1
-#endif
-  srli                 \t0, \t0,  32 // t1 <= tmpy   
+  srli                 \t0, \t0,  32
   slliw                \t1, \t0,  16                    
   xor                  \t1, \t1, \t0
   mv                   \r,  \t2
-  ROR32                \r,  \r,   16, \t0, \t2
-  ROR32                \t1, \t1,  16, \t0, \t2
-#if ( SPARKLE_RV64B )
-  PACK                 \r,  \t1, \r
-#else
-  slli                 \t1, \t1,  32                  
-  srli                 \t1, \t1,  32   
-  PACK                 \r,  \t1, \r
-#endif
+  roriw                \r,  \r,   16, \t0, \t2
+  roriw                \t1, \t1,  16, \t0, \t2
+  pack                 \r,  \t1, \r
 .endm
 #endif
 

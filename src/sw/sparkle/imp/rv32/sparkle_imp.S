@@ -4,13 +4,15 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
-// imp_sparkle.S: RISCV-based implementation of the SPARKLE384 permutation.  
-
+// ============================================================================	
+	
+#include    "zbkb.h"
 #include     "ise.h"
-#include     "ell.h"
-#include "alzette.h"
 
-// ============================================================================
+#include "alzette.h"
+#include     "ell.h"
+
+// ----------------------------------------------------------------------------	
 // register allocation
 
 // t0 => &SPARKLE_RCON_POINTER
@@ -34,26 +36,7 @@
 // s10 =>  state[  9 ] =  y4
 // s11 =>  state[ 11 ] =  y5
 
-
 // ----------------------------------------------------------------------------
-// SPARKLE384  implementation => RCON
-
-#if ( SPARKLE_FWD_EXTERN ) || ( SPARKLE_REV_EXTERN )
-.section .rodata
-
-.balign 4
-
-SPARKLE_RCON: .word 0xB7E15162
-              .word 0xBF715880
-              .word 0x38B4DA56
-              .word 0x324E7738
-              .word 0xBB1185EB
-              .word 0x4F7C7B57
-              .word 0xCFBFA1C8
-              .word 0xC2B3293D
-#endif
-
-// ============================================================================
 // SPARKLE    implementation => forward/inverse prologue + epilogue
 
 .macro SPARKLE_FWD_PROLOGUE
@@ -72,8 +55,7 @@ SPARKLE_RCON: .word 0xB7E15162
               sw           s11, 44(sp)                    // push s11
 
               li           t2,   0                        // t2 =  0              => i = 0
-              li           t3,   7                        // t3 =  7              => n = 7
-	
+              li           t3,   7                        // t3 =  7              => n = 7	
 .endm
 
 .macro SPARKLE_FWD_EPILOGUE
@@ -132,7 +114,8 @@ SPARKLE_RCON: .word 0xB7E15162
 
 // ----------------------------------------------------------------------------
 // SPARKLE implementation => SPARKLE_RD_STATE
-.macro  SPARKLE_RD_STATE   x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5              
+	
+.macro SPARKLE_RD_STATE   x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5              
               lw          \x0,   0(a0)                    // s0 = MEM[ a0 +  0 ]  => x0 = state[  0 ]
               lw          \x1,   8(a0)                    // s1 = MEM[ a0 +  8 ]  => x1 = state[  2 ]
               lw          \x2,  16(a0)                    // s2 = MEM[ a0 + 16 ]  => x2 = state[  4 ]
@@ -147,9 +130,11 @@ SPARKLE_RCON: .word 0xB7E15162
               lw          \y4,  36(a0)                    // s10= MEM[ a0 + 36 ]  => y4 = state[  9 ]
               lw          \y5,  44(a0)                    // s11= MEM[ a0 + 44 ]  => y5 = state[ 11 ]
 .endm
+	
 // ----------------------------------------------------------------------------
 // SPARKLE implementation => SPARKLE_WR_STATE
-.macro  SPARKLE_WR_STATE   x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5              
+	
+.macro SPARKLE_WR_STATE   x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5              
               sw          \x0,   0(a0)                    // s0 ->MEM[ a0 +  0 ]  => x0 -> state[  0 ]
               sw          \x1,   8(a0)                    // s1 ->MEM[ a0 +  8 ]  => x1 -> state[  2 ]
               sw          \x2,  16(a0)                    // s2 ->MEM[ a0 + 16 ]  => x2 -> state[  4 ]
@@ -180,7 +165,7 @@ SPARKLE_RCON: .word 0xB7E15162
               XOR3        \x3, \x3, \x0, \t0, \t1        //  x3 ^= x0 ^ tmpy 
               XOR3        \x4, \x4, \x1, \t0, \t1        //  x4 ^= x1 ^ tmpy
               XOR3        \x5, \x5, \x2, \t0, \t1        //  x5 ^= x2 ^ tmpy
-              #if !( SPARKLE_FWD_UNROLL )
+#if !( SPARKLE_FWD_UNROLL )
               // 0 1 2  3 4 5
               // 4 5 3  0 1 2
               // Branch swap of the x part
@@ -199,11 +184,11 @@ SPARKLE_RCON: .word 0xB7E15162
               mv          \y5, \y2
               mv          \y2, \y3
               mv          \y3, \t0
-              #endif
+#endif
 .endm
 
 .macro SPARKLE_REV_LINEAR  x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2  
-              #if !( SPARKLE_REV_UNROLL )
+#if !( SPARKLE_REV_UNROLL )
               // 0 1 2  3 4 5
               // 3 4 5  2 0 1
               // Branch swap of the x part
@@ -222,7 +207,7 @@ SPARKLE_RCON: .word 0xB7E15162
               mv          \y4, \y0
               mv          \y0, \y3
               mv          \y3, \t0
-              #endif
+#endif
               xor         \t0, \y1, \y2                  //  t0  = y1 ^ y2
               ELL         \t0, \t0, \y0, \t1, \t2        // tmpy = ELL( y0 ^ t0)
               XOR3        \x3, \x3, \x0, \t0, \t1        //  x3 ^= x0 ^ tmpy 
@@ -243,6 +228,7 @@ SPARKLE_RCON: .word 0xB7E15162
 
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => forward/inverse ARXBOX
+	
 #if ( SPARKLE_RV32_TYPE1 ) || ( SPARKLE_RV32_TYPE2 ) || ( SPARKLE_RV32_TYPE3 )
 .macro SPARKLE_FWD_ARXBOX rcb, x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2 
               lw          \t0,    0(\rcb)                 // t0 = MEM[ rc +  0 ] => SPARKLE_RCON[ 0 ]
@@ -325,21 +311,21 @@ SPARKLE_RCON: .word 0xB7E15162
 .macro SPARKLE_FWD_ADDCNT rc, st, y0, y1, t0
               lw          \t0,    0(\rc)
               xor         \y0, \y0, \t0                  // y0 ^= rc
-              #if  ( SPARKLE_FWD_UNROLL )
+#if  ( SPARKLE_FWD_UNROLL )
               xori        \y1, \y1, \st                  // y1 ^= i
-              #else
+#else
               xor         \y1, \y1, \st                  // y1 ^= i
-	          #endif
+#endif
 .endm
 
 .macro SPARKLE_REV_ADDCNT rc, st, y0, y1, t0
               lw          \t0,    0(\rc)
               xor         \y0, \y0, \t0                  // y0 ^= rc
-              #if  ( SPARKLE_REV_UNROLL )
+#if  ( SPARKLE_REV_UNROLL )
               xori        \y1, \y1, \st                  // y1 ^= i
-              #else
+#else
               xor         \y1, \y1, \st                  // y1 ^= i
-	          #endif
+#endif
 .endm
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => forward/ inverse step
@@ -352,15 +338,15 @@ SPARKLE_RCON: .word 0xB7E15162
               SPARKLE_FWD_LINEAR                 \x0, \x1, \x2, \x3, \x4, \x5, \y0, \y1, \y2, \y3, \y4, \y5, \t0, \t1, \t2
 
               addi                     \rc, \rc,   4          //          => rc +=  4
-              #if !( SPARKLE_FWD_UNROLL )
+#if !( SPARKLE_FWD_UNROLL )
               addi                     \st, \st,   1          //  t2 = t2 + 1  => step++
-              #endif
+#endif
 .endm     
 
 .macro SPARKLE_REV_STEP           rcb,  rc,  st,  x0,  x1,  x2,  x3,  x4,  x5,  y0,  y1,  y2,  y3,  y4,  y5,  t0,  t1,  t2
-              #if !( SPARKLE_REV_UNROLL )
+#if !( SPARKLE_REV_UNROLL )
               addi                     \st, \st,  -1          //  t2 = t2 - 1   => step++
-              #endif
+#endif
               SPARKLE_REV_LINEAR                 \x0, \x1, \x2, \x3, \x4, \x5, \y0, \y1, \y2, \y3, \y4, \y5, \t0, \t1, \t2
               SPARKLE_REV_ARXBOX \rcb,           \x0, \x1, \x2, \x3, \x4, \x5, \y0, \y1, \y2, \y3, \y4, \y5, \t0, \t1, \t2
               SPARKLE_REV_ADDCNT       \rc, \st,                               \y0, \y1,                     \t0
@@ -372,9 +358,10 @@ SPARKLE_RCON: .word 0xB7E15162
 // ----------------------------------------------------------------------------	
 // SPARKLE    implementation => forward permutation
 
-#if ( SPARKLE_FWD_EXTERN )
 .section .text  
+
 .global sparkle_fwd
+
 sparkle_fwd:  SPARKLE_FWD_PROLOGUE
               la           t0, SPARKLE_RCON              // t0 = &SPARKLE_RCON_POINTER
               mv           t1, t0                        // t1 = &SPARKLE_RCON_INDEX
@@ -392,24 +379,24 @@ sparkle_fwd:  SPARKLE_FWD_PROLOGUE
               SPARKLE_FWD_STEP  t0, t1,  6, s0, s1, s2, s3, s4, s5,  s6 , s7 , s8 , s9 , s10, s11, t4, t5, t6
               SPARKLE_WR_STATE              s4, s5, s3, s0, s1, s2,  s10, s11, s9 , s6 , s7 , s8 
 #else    
-              #if !( SPARKLE_RV32_TYPE4 )	
+#if !( SPARKLE_RV32_TYPE4 )	
 0:            bgeu         t2, t3, 1f                    // if i >= n, goto 1
               SPARKLE_FWD_STEP  t0, t1, t2, s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9,  s10, s11, t4, t5, t6    
               j                    0b                    //            goto 0
 1:            SPARKLE_WR_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9,  s10, s11
-              #else	
-              #error "can't use SPARKLE_RV32_TYPE4 without SPARKLE_FWD_UNROLL"
-              #endif                           
+#else	
+#error "can't use SPARKLE_RV32_TYPE4 without SPARKLE_FWD_UNROLL"
+#endif                           
 #endif
               SPARKLE_FWD_EPILOGUE
-#endif
 
 // ----------------------------------------------------------------------------	
 // SPARKLE    implementation => reverse permutation
 
-#if ( SPARKLE_REV_EXTERN )
 .section .text  
+
 .global sparkle_rev
+
 sparkle_rev:  SPARKLE_REV_PROLOGUE                      
               la           t0, SPARKLE_RCON              // t0 = &SPARKLE_RCON_POINTER
               addi         t1, t0, 4*6                   // t1 = &SPARKLE_RCON_INDEX
@@ -427,16 +414,15 @@ sparkle_rev:  SPARKLE_REV_PROLOGUE
               SPARKLE_REV_STEP  t0, t1,  0, s3, s4, s5, s2, s0, s1,  s9 , s10, s11, s8 , s6 , s7 , t4, t5, t6
               SPARKLE_WR_STATE              s3, s4, s5, s2, s0, s1,  s9 , s10, s11, s8 , s6 , s7 
 #else             
-              #if !( SPARKLE_RV32_TYPE4 )	
+#if !( SPARKLE_RV32_TYPE4 )	
 0:            blez         t2,     1f                    // if i <= 0, goto 1
               SPARKLE_REV_STEP  t0, t1, t2, s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9, s10, s11, t4, t5, t6     
               j                    0b                    //            goto 0
 1:            SPARKLE_WR_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9, s10, s11
-              #else	
-              #error "can't use SPARKLE_RV32_TYPE4 without SPARKLE_FWD_UNROLL"
-              #endif  
+#else	
+#error "can't use SPARKLE_RV32_TYPE4 without SPARKLE_FWD_UNROLL"
+#endif  
 #endif
               SPARKLE_REV_EPILOGUE
-#endif
 
 // ============================================================================

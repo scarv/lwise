@@ -9,59 +9,59 @@
 
 // ============================================================================
 
-#include "bitmanip.h"
-#include      "ise.h"
+#include "zbkb.h"
+#include  "ise.h"
 
 // ----------------------------------------------------------------------------
 	
 #if ( SPARKLE_RV32_TYPE1 )
 .macro ALZETTE_ENC xi, yi, ci, t0, t1
-  B_RORI               \t0, \yi, 31  // \t0 = ROR32( \yi, 31 ) =>             yi >>> 31
+  rori                 \t0, \yi, 31  // \t0 = ROR32( \yi, 31 ) =>             yi >>> 31
   add                  \xi, \xi, \t0 // \xi = \xi + \t0        => xi = xi + ( yi >>> 31 )
-  B_RORI               \t0, \xi, 24  // \t0 = ROR32( \xi, 24 ) =>             xi >>> 24
+  rori                 \t0, \xi, 24  // \t0 = ROR32( \xi, 24 ) =>             xi >>> 24
   xor                  \yi, \yi, \t0 // \yi = \yi ^ \t0        => yi = yi ^ ( xi >>> 24 )
   xor                  \xi, \xi, \ci // \xi = \xi ^ \ci        => xi = xi ^ ci
 
-  B_RORI               \t0, \yi, 17  // \t0 = ROR32( \yi, 17 ) =>             yi >>> 17
+  rori                 \t0, \yi, 17  // \t0 = ROR32( \yi, 17 ) =>             yi >>> 17
   add                  \xi, \xi, \t0 // \xi = \xi + \t0        => xi = xi + ( yi >>> 17 )
-  B_RORI               \t0, \xi, 17  // \t0 = ROR32( \xi, 17 ) =>             xi >>> 17
+  rori                 \t0, \xi, 17  // \t0 = ROR32( \xi, 17 ) =>             xi >>> 17
   xor                  \yi, \yi, \t0 // \yi = \yi ^ \t0        => yi = yi ^ ( xi >>> 17 )
   xor                  \xi, \xi, \ci // \xi = \xi ^ \ci        => xi = xi ^ ci
 
   add                  \xi, \xi, \yi // \xi = \xi + \yi        => xi = xi + ( yi >>>  0 )
-  B_RORI               \t0, \xi, 31  // \t  = ROR32( \xi, 31 ) =>             xi >>> 31
+  rori                 \t0, \xi, 31  // \t  = ROR32( \xi, 31 ) =>             xi >>> 31
   xor                  \yi, \yi, \t0 // \yi = \yi ^ \t         => yi = yi ^ ( xi >>> 31 )
   xor                  \xi, \xi, \ci // \xi = \xi ^ \ci        => xi = xi ^ ci
 
-  B_RORI               \t0, \yi, 24  // \t0 = ROR32( \yi, 24 ) =>             yi >>> 24
+  rori                 \t0, \yi, 24  // \t0 = ROR32( \yi, 24 ) =>             yi >>> 24
   add                  \xi, \xi, \t0 // \xi = \xi + \t0        => xi = xi + ( yi >>> 24 )
-  B_RORI               \t0, \xi, 16  // \t0 = ROR32( \xi, 16 ) =>             xi >>> 16
+  rori                 \t0, \xi, 16  // \t0 = ROR32( \xi, 16 ) =>             xi >>> 16
   xor                  \yi, \yi, \t0 // \yi = \yi ^ \t0        => yi = yi ^ ( xi >>> 16 )
   xor                  \xi, \xi, \ci // \xi = \xi ^ \ci        => xi = xi ^ ci
 .endm
 
 .macro ALZETTE_DEC xi, yi, ci, t0, t1
   xor                  \xi, \xi, \ci // \xi = \xi ^ \ci        => xi = xi ^ ci
-  B_RORI               \t0, \xi, 16  // \t0 = ROR32( \xi, 16 ) =>             xi >>> 16
+  rori                 \t0, \xi, 16  // \t0 = ROR32( \xi, 16 ) =>             xi >>> 16
   xor                  \yi, \yi, \t0 // \yi = \yi ^ \t0        => yi = yi ^ ( xi >>> 16 )
-  B_RORI               \t0, \yi, 24  // \t0 = ROR32( \yi, 24 ) =>             yi >>> 24
+  rori                 \t0, \yi, 24  // \t0 = ROR32( \yi, 24 ) =>             yi >>> 24
   sub                  \xi, \xi, \t0 // \xi = \xi - \t0        => xi = xi - ( yi >>> 24 )
 
   xor                  \xi, \xi, \ci // \xi = \xi ^ \ci        => xi = xi ^ ci
-  B_RORI               \t0, \xi, 31  // \t0 = ROR32( \xi, 31 ) =>             xi >>> 31
+  rori                 \t0, \xi, 31  // \t0 = ROR32( \xi, 31 ) =>             xi >>> 31
   xor                  \yi, \yi, \t0 // \yi = \yi ^ \t0        => yi = yi ^ ( xi >>> 31 )
   sub                  \xi, \xi, \yi // \xi = \xi - \yi        => xi = xi - ( yi >>>  0 )
 
   xor                  \xi, \xi, \ci // \xi = \xi ^ \ci        => xi = xi ^ ci
-  B_RORI               \t0, \xi, 17  // \t0 = ROR32( \xi, 17 ) =>             xi >>> 17
+  rori                 \t0, \xi, 17  // \t0 = ROR32( \xi, 17 ) =>             xi >>> 17
   xor                  \yi, \yi, \t0 // \yi = \yi ^ \t0        => yi = yi ^ ( xi >>> 17 )
-  B_RORI               \t0, \yi, 17  // \t0 = ROR32( \yi, 17 ) =>             yi >>> 17
+  rori                 \t0, \yi, 17  // \t0 = ROR32( \yi, 17 ) =>             yi >>> 17
   sub                  \xi, \xi, \t0 // \xi = \xi - \t0        => xi = xi - ( yi >>> 17 )
  
   xor                  \xi, \xi, \ci // \xi = \xi ^ \ci        => xi = xi ^ ci
-  B_RORI               \t0, \xi, 24  // \t0 = ROR32( \xi, 24 ) =>             xi >>> 24
+  rori                 \t0, \xi, 24  // \t0 = ROR32( \xi, 24 ) =>             xi >>> 24
   xor                  \yi, \yi, \t0 // \yi = \yi ^ \t0        => yi = yi ^ ( xi >>> 24 )
-  B_RORI               \t0, \yi, 31  // \t0 = ROR32( \yi, 31 ) =>             yi >>> 31
+  rori                 \t0, \yi, 31  // \t0 = ROR32( \yi, 31 ) =>             yi >>> 31
   sub                  \xi, \xi, \t0 // \xi = \xi - \t0        => xi = xi - ( yi >>> 31 )
 .endm
 #endif
