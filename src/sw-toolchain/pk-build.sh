@@ -21,13 +21,13 @@ mkdir --parents ${PK_BUILD}
 export PATH="${RISCV}/bin:${PATH}"
 
 cd ${PK_BUILD}
-${PK_REPO}/configure --prefix="${PK_INSTALL}" --host="riscv64-unknown-elf" --with-arch="rv32gc_zbb" --with-abi="ilp32"
+${PK_REPO}/configure --prefix="${PK_INSTALL}" --host="riscv64-unknown-elf" --with-arch="rv32gc" --with-abi="ilp32"
 make clean
 make
 make install
 
 cd ${PK_BUILD}
-${PK_REPO}/configure --prefix="${PK_INSTALL}" --host="riscv64-unknown-elf" --with-arch="rv64gc_zbb" --with-abi="lp64"
+${PK_REPO}/configure --prefix="${PK_INSTALL}" --host="riscv64-unknown-elf" --with-arch="rv64gc" --with-abi="lp64"
 make clean
 make
 make install
