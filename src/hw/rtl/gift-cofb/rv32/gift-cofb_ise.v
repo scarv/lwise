@@ -1,99 +1,139 @@
-module gift-cofb_ise(
+module gift_cofb_ise(
 input  wire [31:0]  rs1,
+input  wire [31:0]  rs2,
 input  wire [ 4:0]  imm,
 
-input  wire         swapmove,
-input  wire         keyupdate, 
-input  wire         keyarrange,
+input  wire         op_swapmove,
+input  wire         op_keyupdate, 
+input  wire         op_keyarrange,
+input  wire         op_fskeyupdate, //FixslicedKeyUpdate
 
 output wire [31:0]  rd
 );
+parameter [0:0] FIXSLICE = 1'b0;
 
-wire keyarrange_0 = keyarrange && (imm = 0);  // swapmov : mask = 0x00550055 shamt =  9
-wire keyarrange_1 = keyarrange && (imm = 1);  // swapmov : mask = 0x11111111 shamt =  3
-wire keyarrange_2 = keyarrange && (imm = 2);  // swapmov : mask = 0x0000aaaa shamt = 15
-wire keyarrange_3 = keyarrange && (imm = 3);  // swapmov : mask = 0x0a0a0a0a shamt =  3
+`define rotmsk( x, A, M )    ({ x[ A-1:0], x[31: A] } & M)                  //right rotation and mask
+`define mskshl( x, A, M )    ({ x[31-A:0],{A{ 1'b0}}} &(M<<A))
+`define shrmsk( x, A, M )    ({{A{ 1'b0}}, x[31: A] } & M)
+`define swapmvc(x, A, M, L ) (  x ^ {t``L[31-A:0] , {A{1'b0}}}  ^ t``L); \
+        wire[31:0]    t``L  =( (x ^ {{  A{  1'b0}},  x[31:A] }) &    M)     //swapmove with constants
 
-// swapmove 0
-wire [31:0] sm0_mask  = keyarrange_0 ?  32'h00550055:
-                        keyarrange_1 ?  32'h11111111:
-                        keyarrange_2 ?  32'h0000aaaa: 
-                      /*keyarrange_3*/  32'h0a0a0a0a;
+`define rsh(x,imm, l)       ({32{imm[4]}} & {16'd0, l8``l[31:16]}) | ({32{!imm[4]}} & l8``l[31:0]); \
+        wire [31:0] l8``l = ({32{imm[3]}} & { 8'd0, l4``l[31: 8]}) | ({32{!imm[3]}} & l4``l[31:0]); \
+        wire [31:0] l4``l = ({32{imm[2]}} & { 4'd0, l2``l[31: 4]}) | ({32{!imm[2]}} & l2``l[31:0]); \
+        wire [31:0] l2``l = ({32{imm[1]}} & { 2'd0, l1``l[31: 2]}) | ({32{!imm[1]}} & l1``l[31:0]); \
+        wire [31:0] l1``l = ({32{imm[0]}} & { 1'd0, l0``l[31: 1]}) | ({32{!imm[0]}} & l0``l[31:0]); \
+        wire [31:0] l0``l = x  
 
-wire [31:0] rs1_rshf  = keyarrange_0 ?  { 9'd0, rs1[31: 9]}:
-                        keyarrange_1 ?  { 3'd0, rs1[31: 3]}:
-                        keyarrange_2 ?  {15'd0, rs1[31:15]}: 
-                      /*keyarrange_3*/  { 3'd0, rs1[31: 3]};
- 
-wire [31:0] sm0_tem   = (rs1 ^ rs1_rshf) & sm0_mask; //x ^ (x >> n)) & mask;
+`define lsh(x,imm, l)       ({32{imm[4]}} & {l8``l[15:0], 16'd0 }) | ({32{!imm[4]}} & l8``l[31:0]); \
+        wire [31:0] l8``l = ({32{imm[3]}} & {l4``l[23:0],  8'd0 }) | ({32{!imm[3]}} & l4``l[31:0]); \
+        wire [31:0] l4``l = ({32{imm[2]}} & {l2``l[27:0],  4'd0 }) | ({32{!imm[2]}} & l2``l[31:0]); \
+        wire [31:0] l2``l = ({32{imm[1]}} & {l1``l[29:0],  2'd0 }) | ({32{!imm[1]}} & l1``l[31:0]); \
+        wire [31:0] l1``l = ({32{imm[0]}} & {l0``l[30:0],  1'd0 }) | ({32{!imm[0]}} & l0``l[31:0]); \
+        wire [31:0] l0``l = x
+`define swapmv(x, xshf, msk, t, tshf)   (x ^ tshf  ^ t); \
+                        assign  t     = (x ^ xshf) & msk
 
-wire [31:0] tem0_lshf = keyarrange_0 ?  {sm0_tem[22:0],  9'd0}:
-                        keyarrange_1 ?  {sm0_tem[28:0],  3'd0}:
-                        keyarrange_2 ?  {sm0_tem[16:0], 15'd0}: 
-                      /*keyarrange_3*/  {sm0_tem[28:0],  3'd0};
+wire [31:0] rt1;
+wire [31:0] rs1_rsh   = `rsh(rs1, imm, rsh0);
+wire [31:0] rt1_lsh   = `lsh(rt1, imm, lsh0);
+wire [31:0] swapmove  = `swapmv(rs1, rs1_rsh, rs2, rt1, rt1_lsh);
 
-wire [31:0] sm0 = rs1 ^ sm0_tem ^ tem0_lshf;
+wire [31:0] keyupdate = `shrmsk(rs1, 12, 32'h0000000f) | `mskshl(rs1,  4, 32'h00000fff) |
+                        `shrmsk(rs1,  2, 32'h3fff0000) | `mskshl(rs1, 14, 32'h00030000) ;                        
+             
+wire keyarrange_0 = op_keyarrange && (imm == 0);  
+wire keyarrange_1 = op_keyarrange && (imm == 1);  
+wire keyarrange_2 = op_keyarrange && (imm == 2);  
+wire keyarrange_3 = op_keyarrange && (imm == 3);  
 
-// swapmove 1
-wire [31:0] sm1_mask  = keyarrange_0 ?  32'h00003333: // swapmov : mask = 0x00003333 shamt = 18
-                        keyarrange_1 ?  32'h03030303: // swapmov : mask = 0x03030303 shamt =  6
-                        keyarrange_2 ?  32'h00003333: // swapmov : mask = 0x00003333 shamt = 18 
-                      /*keyarrange_3*/  32'h00cc00cc; // swapmov : mask = 0x00cc00cc shamt =  6 
-wire [31:0] sm0_rshf  = (keyarrange_0 || keyarrange_2) ?  {18'd0, sm0[31:18]}:
-                      /*(keyarrange_1 || keyarrange_3)*/  { 6'd0, sm0[31: 6]};
- 
-wire [31:0] sm1_tem   = (sm0 ^ sm0_rshf) & sm1_mask; //x ^ (x >> n)) & mask;
-wire [31:0] tem1_lshf = (keyarrange_0 || keyarrange_2) ? {sm1_tem[13:0],18'd0}:
-                      /*(keyarrange_1 || keyarrange_3)*/ {sm1_tem[25:0], 6'd0};
+wire [31:0]  ka00 = `swapmvc(rs1 ,  9, 32'h00550055, _ka00);
+wire [31:0]  ka01 = `swapmvc(ka00, 18, 32'h00003333, _ka01);
+wire [31:0]  ka02 = `swapmvc(ka01, 12, 32'h000f000f, _ka02);
+wire [31:0]  ka0  = `swapmvc(ka02, 24, 32'h000000ff, _ka03);
 
-wire [31:0] sm1 = sm0 ^ sm1_tem ^ tem1_lshf;
+wire [31:0]  ka10 = `swapmvc(rs1 ,  3, 32'h11111111, _ka10);
+wire [31:0]  ka11 = `swapmvc(ka10,  6, 32'h03030303, _ka11);
+wire [31:0]  ka12 = `swapmvc(ka11, 12, 32'h000f000f, _ka12);
+wire [31:0]  ka1  = `swapmvc(ka12, 24, 32'h000000ff, _ka13);
 
-// swapmove 2
-wire [31:0] sm2_mask  = (keyarrange_0 || keyarrange_1) ? 32'h000f000f: // swapmov : mask = 0x000f000f shamt = 12
-                      /*(keyarrange_2 || keyarrange_3)*/ 32'h0000f0f0; // swapmov : mask = 0x0000f0f0 shamt = 12
-wire [31:0] sm1_rshf  = {12'd0, sm1[31:12]};                
- 
-wire [31:0] sm2_tem   = (sm1 ^ sm1_rshf) & sm2_mask; //x ^ (x >> n)) & mask;
-wire [31:0] tem2_lshf = {sm2_tem[19:0],12'd0};
+wire [31:0]  ka20 = `swapmvc(rs1 , 15, 32'h0000aaaa, _ka20);
+wire [31:0]  ka21 = `swapmvc(ka20, 18, 32'h00003333, _ka21);
+wire [31:0]  ka22 = `swapmvc(ka21, 12, 32'h0000f0f0, _ka22);
+wire [31:0]  ka2  = `swapmvc(ka22, 24, 32'h000000ff, _ka23);
 
-wire [31:0] sm2 = sm1 ^ sm2_tem ^ tem2_lshf;
+wire [31:0]  ka30 = `swapmvc(rs1 ,  3, 32'h0a0a0a0a, _ka30);
+wire [31:0]  ka31 = `swapmvc(ka30,  6, 32'h00cc00cc, _ka31);
+wire [31:0]  ka32 = `swapmvc(ka31, 12, 32'h0000f0f0, _ka32);
+wire [31:0]  ka3  = `swapmvc(ka32, 24, 32'h000000ff, _ka33);
 
-wire swapmove_0   = swapmove   && (imm = 0);  // swapmov : mask = 0x00003333 shamt = 16
-wire swapmove_1   = swapmove   && (imm = 1);  // swapmov : mask = 0x55554444 shamt =  1
-wire swapmove_2   = swapmove   && (imm = 2);  // swapmov : mask = 0x55551100 shamt =  1
+wire [31:0] fskeyupdate;
+generate 
+    if (FIXSLICE[0] == 1'b1) begin :                                                      FIXSLICE_IMP
+wire     fskeyupdate_0 = op_fskeyupdate && (imm == 0);  
+wire     fskeyupdate_1 = op_fskeyupdate && (imm == 1);  
+wire     fskeyupdate_2 = op_fskeyupdate && (imm == 2);  
+wire     fskeyupdate_3 = op_fskeyupdate && (imm == 3);  
+wire     fskeyupdate_4 = op_fskeyupdate && (imm == 4);  
+wire     fskeyupdate_5 = op_fskeyupdate && (imm == 5);  
+wire     fskeyupdate_6 = op_fskeyupdate && (imm == 6);  
+wire     fskeyupdate_7 = op_fskeyupdate && (imm == 7);  
+wire     fskeyupdate_8 = op_fskeyupdate && (imm == 8);  
+wire     fskeyupdate_9 = op_fskeyupdate && (imm == 9);  
 
-wire swapmove_3   = swapmove   && (imm = 3);  // swapmov : mask = 0x55555555 shamt =  1
-wire swapmove_4   = swapmove   && (imm = 4);  // swapmov : mask = 0x00005555 shamt =  1
-wire swapmove_5   = swapmove   && (imm = 5);  // swapmov : mask = 0x55550000 shamt =  1
+wire [31:0]        rt0 = `swapmvc(rs1, 16, 32'h00003333, _rt0);
+wire [31:0] fs_upkey_0 = `swapmvc(rs1,  1, 32'h55554444, _fs0);
 
-// swapmove 3 MUX swapmov instr.
+wire [31:0]        rt2 = `rotmsk(rs1, 24, 32'h33333333) | `rotmsk(rs1, 16, 32'hcccccccc); 
+wire [31:0] fs_upkey_1 = `swapmvc(rt2,  1, 32'h55551100, _fs1);
 
-wire [31:0] sm3_in = swapmove ? rs1 : sm2;
+wire [31:0] fs_upkey_2 = `shrmsk(rs1,  4, 32'h0f000f00) | `mskshl(rs1,  4, 32'h0f000f00) |
+                         `shrmsk(rs1,  6, 32'h00030003) | `mskshl(rs1,  2, 32'h003f003f) ;
 
-wire [31:0] sm3_mask  = (~swapmove)  ? 32'h000000ff: 
-                          swapmove_0 ? 32'h00003333: 
-                          swapmove_1 ? 32'h55554444: 
-                          swapmove_2 ? 32'h55551100: 
-                          swapmove_3 ? 32'h55555555: 
-                          swapmove_4 ? 32'h00005555: 
-                        /*swapmove_5*/ 32'h55550000; 
+wire [31:0] fs_upkey_3 = `shrmsk(rs1,  6, 32'h03000300) | `mskshl(rs1,  2, 32'h3f003f00) |
+                         `shrmsk(rs1,  5, 32'h00070007) | `mskshl(rs1,  3, 32'h001f001f) ;
 
-wire [31:0] sm2_rshf  = (~swapmove)    ? {24'd0, sm3_in[31:24]}: 
-                          swapmove_0   ? {16'd0, sm3_in[31:16]}:
-                        /*swapmove_1-5*/ { 1'd0, sm3_in[31: 1]};                 
- 
-wire [31:0] sm3_tem   = (sm2 ^ sm2_rshf) & sm3_mask; //x ^ (x >> n)) & mask;
-wire [31:0] tem3_lshf = (~swapmove)    ? {sm3_tem[ 7:0], 24'd0}: 
-                          swapmove_0   ? {sm3_tem[15:0], 16'd0}:
-                        /*swapmove_1-5*/ {sm3_tem[30:0],  1'd0};
+wire [31:0] fs_upkey_4 = `rotmsk(rs1, 24, 32'haaaaaaaa) | `rotmsk(rs1, 16, 32'h55555555);
 
-wire [31:0] sm3 = sm3_in ^ sm3_tem ^ tem3_lshf;
+wire [31:0] fs_upkey_5 = `rotmsk(rs1, 24, 32'h55555555) | `rotmsk(rs1, 20, 32'haaaaaaaa);
 
-wire [31:0]         tem =  {28'h0000000,rs1[16:12]}     | {16'h0000,rs1[11:0],4'h0};         //   ((x >> 12) & 0x0000000f) | ((x & 0x00000fff) <<  4);
-wire [31:0] updated_key =  { 2'b00,rs1[31:18],16'h0000} | {rs1[17:16],30'd0} | tem;          // | ((x >>  2) & 0x3fff0000) | ((x & 0x00030000) << 14);
+wire [31:0] fs_upkey_6 = `shrmsk(rs1,  2, 32'h03030303) | `mskshl(rs1,  2, 32'h03030303) |
+                         `shrmsk(rs1,  1, 32'h70707070) | `mskshl(rs1,  3, 32'h10101010) ;
 
-assign        rd  = {32{swapmove | keyarrange}} & sm3        |
-                    {32{     keyupdate       }} & updated_key;
+wire [31:0] fs_upkey_7 = `shrmsk(rs1, 18, 32'h00003030) | `mskshl(rs1,  3, 32'h01010101) |
+                         `shrmsk(rs1, 14, 32'h0000c0c0) | `mskshl(rs1, 15, 32'h0000e0e0) |
+                         `shrmsk(rs1,  1, 32'h07070707) | `mskshl(rs1, 19, 32'h00001010) ;
+
+wire [31:0] fs_upkey_8 = `shrmsk(rs1,  4, 32'h0fff0000) | `mskshl(rs1, 12, 32'h000f0000) |
+                         `shrmsk(rs1,  8, 32'h000000ff) | `mskshl(rs1,  8, 32'h000000ff) ;
+
+wire [31:0] fs_upkey_9 = `shrmsk(rs1,  6, 32'h03ff0000) | `mskshl(rs1, 10, 32'h003f0000) |
+                         `shrmsk(rs1,  4, 32'h00000fff) | `mskshl(rs1, 12, 32'h0000000f) ;
+
+wire [31:0] keyupdate  = `shrmsk(rs1, 12, 32'h0000000f) | `mskshl(rs1,  4, 32'h00000fff) |
+                         `shrmsk(rs1,  2, 32'h3fff0000) | `mskshl(rs1, 14, 32'h00030000) ;
+
+assign fskeyupdate = {32{ fskeyupdate_0 }} & fs_upkey_0 |
+                     {32{ fskeyupdate_1 }} & fs_upkey_1 |
+                     {32{ fskeyupdate_2 }} & fs_upkey_2 |
+                     {32{ fskeyupdate_3 }} & fs_upkey_3 |
+                     {32{ fskeyupdate_4 }} & fs_upkey_4 |
+                     {32{ fskeyupdate_5 }} & fs_upkey_5 |
+                     {32{ fskeyupdate_6 }} & fs_upkey_6 |
+                     {32{ fskeyupdate_7 }} & fs_upkey_7 |
+                     {32{ fskeyupdate_8 }} & fs_upkey_8 |
+                     {32{ fskeyupdate_9 }} & fs_upkey_9 ;
+end else begin       :                                                                      No_FIXSLICE
+assign fskeyupdate =  32'd0;  
+end
+endgenerate              
+
+assign        rd  = {32{op_swapmove   }} & swapmove    |
+                    {32{op_keyupdate  }} & keyupdate   |
+                    {32{op_fskeyupdate}} & fskeyupdate |
+                    {32{keyarrange_0  }} & ka0         |
+                    {32{keyarrange_1  }} & ka1         |
+                    {32{keyarrange_2  }} & ka2         |
+                    {32{keyarrange_3  }} & ka3         ;   
 endmodule
-
 
