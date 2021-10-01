@@ -18,6 +18,6 @@ export ROCKET_FESVR_COMMIT="21e48156e8dc2d0ac53bee50c72b022f95529651"
 export ROCKET_FESVR_PATCH="${REPO_HOME}/src/hw-toolchain/riscv-fesvr.patch"
 export ROCKET_FESVR_BUILD="${ROCKET_FESVR_REPO}/build"
 
-export BRANCH="scarv/alzette"
+export BRANCH="scarv/lwise"
 
 # =============================================================================

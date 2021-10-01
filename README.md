@@ -167,8 +167,8 @@ such as execution latency.
 - Clone the repo.
 
   ```sh
-  git clone https://github.com/scarv/alzette.git ./alzette
-  cd ./alzette
+  git clone https://github.com/scarv/lwise.git ./lwise
+  cd ./lwise
   git submodule update --init --recursive
   source ./bin/conf.sh
   ```

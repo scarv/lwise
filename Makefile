@@ -13,7 +13,7 @@ endif
 
 # =============================================================================
 
-export ALG  ?= alzette
+export ALG  ?= sparkle
 
 export ARCH ?= generic
 export IMP  ?= generic

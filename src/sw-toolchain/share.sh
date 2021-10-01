@@ -20,6 +20,6 @@ export SPIKE_COMMIT="c6ec6f3582eb2ae106dff95e569b7da927910629"
 export SPIKE_PATCH="${REPO_HOME}/src/sw-toolchain/spike.patch_${ALG}"
 export SPIKE_INSTALL="${REPO_HOME}/build/sw-toolchain/${ALG}"
 
-export BRANCH="scarv/alzette"
+export BRANCH="scarv/lwise"
 
 # =============================================================================
