@@ -21,9 +21,9 @@ of any resulting standard, with respect to implementation-related criteria
 such as execution latency.  
 
 - We consider the RISC-V baseline ISA as being
-  RV32GCB (or RV32IMAFDCB) in the 32-bit case
+  `rv32gc_Zbkb` in the 32-bit case
   or 
-  RV64GCB (or RV64IMAFDCB) in the 64-bit case,
+  `rv64gc_Zbkb` in the 64-bit case,
   meaning that the following standard extensions
   
   - M (multiplication)
