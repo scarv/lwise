@@ -64,7 +64,14 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
     r       <- ROR64( x, imm )
     GPR[rd] <- r_{63..32}
   }
+  ```
 
+  Note that this operation overlaps with, or is at least similar to one 
+  which exists for the
+  `jambu`
+  case: there it is called `jambu.fsri`.
+
+  ```
   ascon.sigma.lo rd, rs1, rs2, imm {
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]

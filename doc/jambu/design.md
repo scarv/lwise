@@ -42,6 +42,11 @@ Throughout the following, we
   }                                             
   ```
 
+  Note that this operation overlaps with, or is at least similar to one 
+  which exists for the
+  `ascon`
+  case: there it is called `ascon.rori.lo`.
+
 - `JAMBU_RV32_TYPE3`: baseline ISA plus custom ISE.
 
   ```
