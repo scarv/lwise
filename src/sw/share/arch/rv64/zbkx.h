@@ -4,29 +4,19 @@
 // can be found at https://opensource.org/licenses/MIT (or should be included 
 // as LICENSE.txt within the associated archive or repository).
 
-#ifndef __ELL_H
-#define __ELL_H
+#ifndef __ZBKX_H
+#define __ZBKX_H
 
 // ============================================================================
 
-#include "zbkb.h"
-#include "zbkx.h"
-#include  "ise.h"
-
-// ----------------------------------------------------------------------------
-
-#if ( SPARKLE_RV32_ELL )
-.macro ELL   r, x0, x1, t0, t1
-  sparkle.ell    \r,  \x0, \x1
+// 001 0100 | rs2   | rs1 | 010 | rd | 011 0011
+.macro xperm4 rd, rs1, rs2
+.insn r 0x33, 0x2, 0x14, \rd, \rs1, \rs2
 .endm
-#else
-.macro ELL   r, x0, x1, t0, t1
-  xor            \t0, \x0, \x1
-  slli           \t1, \t0,  16
-  xor            \r,  \t0, \t1
-  rori           \r,  \r,   16
+// 001 0100 | rs2   | rs1 | 100 | rd | 011 0011
+.macro xperm8 rd, rs1, rs2
+.insn r 0x33, 0x4, 0x14, \rd, \rs1, \rs2
 .endm
-#endif
 
 // ============================================================================
 

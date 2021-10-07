@@ -7,6 +7,7 @@
 // ============================================================================	
 	
 #include    "zbkb.h"
+#include    "zbkx.h"
 #include     "ise.h"
 
 #include "alzette.h"

@@ -21,17 +21,18 @@ of any resulting standard, with respect to implementation-related criteria
 such as execution latency.  
 
 - We consider the RISC-V baseline ISA as being
-  `rv32gc_Zbkb` in the 32-bit case
+  `rv32gc_Zbkb_Zbkx` in the 32-bit case
   or 
-  `rv64gc_Zbkb` in the 64-bit case,
+  `rv64gc_Zbkb_Zbkb` in the 64-bit case,
   meaning that the following standard extensions
   
-  - M (multiplication)
-  - A (atomic)
-  - F (single-precision floating-point)
-  - D (double-precision floating-point)
-  - C (compressed)
+  - M    (multiplication)
+  - A    (atomic)
+  - F    (single-precision floating-point)
+  - D    (double-precision floating-point)
+  - C    (compressed)
   - Zbkb (a subset of K: bit manipulation instructions for cryptography)
+  - Zbkx (a subset of K: crossbar permutation instructions)
 
   are available by default.
 
