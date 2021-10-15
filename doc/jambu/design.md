@@ -17,13 +17,13 @@ Throughout the following, we
 
 ## Options
 
-| `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
-| :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE1`   | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE2`   | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `jambu`   | `rv32`    | `JAMBU_RV32_TYPE3`   | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
-|           | `jambu`   | `rv64`    | `JAMBU_RV64_TYPE1`   | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `jambu`   | `rv64`    | `JAMBU_RV64_TYPE2`   | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
+| :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
+|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE1`    | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE2`    | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE3`    | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
+|           | `jambu`    | `rv64`    | `JAMBU_RV64_TYPE1`    | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `jambu`    | `rv64`    | `JAMBU_RV64_TYPE2`    | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
 
 <!--- -------------------------------------------------------------------- --->
 

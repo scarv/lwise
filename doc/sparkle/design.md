@@ -75,27 +75,27 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 ## Options
 
-| `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
-| :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `sparkle` |           | `CRAXS10_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
-|           | `sparkle` |           | `CRAXS10_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
-|           | `sparkle` |           | `TRAXL17_ENC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
-|           | `sparkle` |           | `TRAXL17_DEC_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
-|           | `sparkle` |           | `SPARKLE_FWD_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
-|           | `sparkle` |           | `SPARKLE_REV_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE1` | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE2` | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE3` | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
-|           | `sparkle` | `rv32`    | `SPARKLE_RV32_TYPE4` | select 32-bit RISC-V baseline ISA plus custom ISE: option 4, per description below                             |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_ELL`   | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_RCON`  | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE1` | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE2` | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE3` | select 64-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE4` | select 64-bit RISC-V baseline ISA plus custom ISE: option 4, per description below                             |
-|           | `sparkle` | `rv64`    | `SPARKLE_RV64_TYPE5` | select 64-bit RISC-V baseline ISA plus custom ISE: option 5, per description below                             |
+| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
+| :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
+|           | `sparkle`  |           | `CRAXS10_ENC_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
+|           | `sparkle`  |           | `CRAXS10_DEC_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
+|           | `sparkle`  |           | `TRAXL17_ENC_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
+|           | `sparkle`  |           | `TRAXL17_DEC_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
+|           | `sparkle`  |           | `SPARKLE_FWD_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
+|           | `sparkle`  |           | `SPARKLE_REV_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_ELL`    | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_RCON`   | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE1`  | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE2`  | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE3`  | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE4`  | select 32-bit RISC-V baseline ISA plus custom ISE: option 4, per description below                             |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_ELL`    | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_RCON`   | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE1`  | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE2`  | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE3`  | select 64-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE4`  | select 64-bit RISC-V baseline ISA plus custom ISE: option 4, per description below                             |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE5`  | select 64-bit RISC-V baseline ISA plus custom ISE: option 5, per description below                             |
 
 <!--- -------------------------------------------------------------------- --->
 

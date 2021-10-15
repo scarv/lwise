@@ -33,12 +33,12 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 
 ## Options
 
-| `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
-| :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `ascon`   | `rv32`    | `ASCON_RV32_TYPE1`   | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `ascon`   | `rv32`    | `ASCON_RV32_TYPE2`   | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `ascon`   | `rv64`    | `ASCON_RV64_TYPE1`   | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `ascon`   | `rv64`    | `ASCON_RV64_TYPE2`   | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
+| :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
+|           | `ascon`    | `rv32`    | `ASCON_RV32_TYPE1`    | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `ascon`    | `rv32`    | `ASCON_RV32_TYPE2`    | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `ascon`    | `rv64`    | `ASCON_RV64_TYPE1`    | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `ascon`    | `rv64`    | `ASCON_RV64_TYPE2`    | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
 
 <!--- -------------------------------------------------------------------- --->
 

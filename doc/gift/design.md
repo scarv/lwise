@@ -56,11 +56,11 @@ with the bits in question controlled by `n` and `m`.
 
 ## Options
 
-| `${ARCH}` | `${ALG}`  | `${IMP}`  | Symbol               | Meaning                                                                                                        |
-| :-------- | :-------- | :-------- | :------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `gift`    | `rv32`    | `GIFT_RV32_TYPE1`    | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `gift`    | `rv32`    | `GIFT_RV32_TYPE2`    | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `gift`    | `rv64`    | `GIFT_RV64_TYPE1`    | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
+| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
+| :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
+|           | `gift`     | `rv32`    | `GIFT_RV32_TYPE1`     | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
+|           | `gift`     | `rv32`    | `GIFT_RV32_TYPE2`     | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+|           | `gift`     | `rv64`    | `GIFT_RV64_TYPE1`     | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
 
 <!--- -------------------------------------------------------------------- --->
 
