@@ -10,7 +10,7 @@ module xalu_ise (
     ise_oval,         
     ise_out    );
 input           ise_clk, ise_rst;
-input  [ 4:0]   ise_fn;
+input  [ 5:0]   ise_fn;
 input  [ 6:0]   ise_imm;
 input  [63:0]   ise_in1;
 input  [63:0]   ise_in2;

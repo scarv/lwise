@@ -8,6 +8,7 @@
 # Sources
 #--------------------------------------------------------------------
 include ${REPO_HOME}/src/hw/rtl/$(ALG)/$(ARCH)/Makefile.in
+include ${REPO_HOME}/src/hw/rtl/rvzbk/$(ARCH)/Makefile.in
 
 #--------------------------------------------------------------------
 # Build emulator
@@ -27,32 +28,32 @@ export EMULATOR = ${REPO_HOME}/build/$(ALG)_$(ISE)_emulator$(subst rv,,$(ARCH))
 
 emulator : $(EMULATOR)
 
-${REPO_HOME}/build/$(ALG)_cop_emulator64 : $(rtl64_src) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
+${REPO_HOME}/build/$(ALG)_cop_emulator64 : $(rtl64_src) $(zbk_rtl) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
 	cp -f ${REPO_HOME}/src/hw/verilator/bootrom/bootrom.img          $(ROCKETCHIP_REPO)/bootrom/bootrom.img
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF64) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL64) debug
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF64) MODEL=$(EMULATORMODEL)  ISE_RTL=$(RTL64) RVZBK_RTL=$(RV64ZBK) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(COP_CONF64)-debug  $@
 
-${REPO_HOME}/build/$(ALG)_cop_emulator32 : $(rtl32_src) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
+${REPO_HOME}/build/$(ALG)_cop_emulator32 : $(rtl32_src) $(zbk_rtl) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
 	cp -f ${REPO_HOME}/src/hw/verilator/bootrom/bootrom.img          $(ROCKETCHIP_REPO)/bootrom/bootrom.img
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF32) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL32) debug
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(COP_CONF32) MODEL=$(EMULATORMODEL)  ISE_RTL=$(RTL32) RVZBK_RTL=$(RV32ZBK) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(COP_CONF32)-debug  $@
 
-${REPO_HOME}/build/$(ALG)_xalu_emulator32 : $(rtl32_src) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
+${REPO_HOME}/build/$(ALG)_xalu_emulator32 : $(rtl32_src) $(zbk_rtl) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
 	cp -f ${REPO_HOME}/src/hw/verilator/bootrom/bootrom.img          $(ROCKETCHIP_REPO)/bootrom/bootrom.img
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF32) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL32) debug
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF32) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL32) RVZBK_RTL=$(RV32ZBK) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(XALU_CONF32)-debug  $@
 
-${REPO_HOME}/build/$(ALG)_xalu_emulator64 : $(rtl64_src) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
+${REPO_HOME}/build/$(ALG)_xalu_emulator64 : $(rtl64_src) $(zbk_rtl) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
 	cp -f ${REPO_HOME}/src/hw/verilator/bootrom/bootrom.img          $(ROCKETCHIP_REPO)/bootrom/bootrom.img
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF64) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL64) debug
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF64) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL64) RVZBK_RTL=$(RV64ZBK) debug
 	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(XALU_CONF64)-debug  $@
 
   
 #--------------------------------------------------------------------
 # Build software
 #--------------------------------------------------------------------
-EMU_DEF_CONF  = -DSPARKLE_RV64_TYPE1 
-EMU_DEF_CONF += -DDRIVER_TRIALS_WARM=1 -DDRIVER_TRIALS_REAL=2 -DDRIVER_MEASURE=1 
+EMU_DEF_CONF  = -DSPARKLE_RV32_TYPE1 -DDRIVER_TRIALS_BIST
+EMU_DEF_CONF += -DDRIVER_TRIALS_WARM=1 -DDRIVER_TRIALS_REAL=4 -DDRIVER_MEASURE=1 
 EMU_DEF_CONF += -DCRAXS10_ENC_EXTERN -DTRAXL17_ENC_EXTERN -DSPARKLE_FWD_EXTERN 
 EMU_DEF_CONF += -DCRAXS10_DEC_EXTERN -DTRAXL17_DEC_EXTERN -DSPARKLE_REV_EXTERN
 
@@ -80,10 +81,12 @@ ${TARGET}.elf : ${SOURCES} ${HEADERS}
 ${TARGET}.asm : ${TARGET}.elf
 	${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
 
-emulate: ${EMULATOR} ${TARGET}.elf
+emulate: ${EMULATOR} ${TARGET}.elf ${TARGET}.asm
 	${EMULATOR} -c -m 7100000 ${TARGET}.elf
 emulate-debug : ${EMULATOR} ${TARGET}.elf
-	${EMULATOR} -c -x 700000 -v ${REPO_HOME}/build/emu32_eval.vcd -m 2100000 ${<}
+	${EMULATOR} -c -x 500000 -v ${REPO_HOME}/build/emu32_eval.vcd -m 2100000 ${TARGET}.elf
+
+include ${REPO_HOME}/src/hw/verilator/verify/$(ARCH)/Makefile.in
 
 emu-clean : 
 	@rm --force ${TARGET}.elf
