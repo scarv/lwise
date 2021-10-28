@@ -234,13 +234,6 @@ such as execution latency.
 
 ### Toolchain
 
-- Fix path for the installed Vivado Design Suite, e.g., 
-  
-  ```sh
-  export VIVADO_TOOL_DIR="/opt/Xilinx/Vivado/2018.2"
-  source ./bin/Vivado-conf.sh
-  ```
-
 - Fix paths for the Rocket Chip toolchain, e.g., 
   
   ```sh
@@ -266,9 +259,9 @@ such as execution latency.
   
   includes 
   - ISE-enabled Rocket Chip implementation, 
-  - hardware synthesis flow,
   - an emulator for the implementation, 
-  - an FPGA implementation using Vivado.
+  - an FPGA implementation using Vivado,
+  - hardware synthesis flow.
 
 - Get an ISE-enabled
   [Rocket-Chip](https://github.com/chipsalliance/rocket-chip.git)
@@ -277,13 +270,6 @@ such as execution latency.
   ```sh
   make -f ${REPO_HOME}/src/hw/Makefile rocketchip-clone
   make -f ${REPO_HOME}/src/hw/Makefile rocketchip-apply
-  ```
-
-- Run hardware synthesis flow using
-  [yosys](https://github.com/YosysHQ/yosys)
-
-  ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile synthesise ARCH="rv32" ISE="xalu"
   ```
 
 - Build the emulator of the implementation using 
@@ -296,13 +282,27 @@ such as execution latency.
   - Build and execute software on the emulator of the hardware implementation, e.g.,
 
     ```sh
-    make --directory="${REPO_HOME}/src/hardware" ARCH="rv32" IMP="rv32" ISE="xalu" CONF="-DDRIVER_TRIALS_REAL='10'" emu-clean emulate
+    make --directory="${REPO_HOME}/src/hw" ARCH="rv32" IMP="rv32" ISE="xalu" emu-clean emulate
     ```
 
 - Build the bitstream of the Xilinx FPGA and run a software on the FPGA using Vivado:
 
+  - Fix path for the installed Vivado Design Suite, e.g., 
+  
+  ```sh
+  export VIVADO_TOOL_DIR="/opt/Xilinx/Vivado/2018.2"
+  source ./bin/Vivado-conf.sh
+  ```
+
+  - Generate the verilog files for FPGA
+
   ```sh
   make -f ${REPO_HOME}/src/hw/Makefile ARCH="rv32" ISE="xalu" fpga-verilog
+  ```
+  
+  - Make Vivado project, generate bit-stream, and download bit-stream into FPGA
+
+  ```sh
   make -f ${REPO_HOME}/src/hw/Makefile ARCH="rv32" ISE="xalu" program-fpga
   ```
 
@@ -311,6 +311,13 @@ such as execution latency.
     ```sh
     make --directory="${REPO_HOME}/src/hw" ARCH="rv32" IMP="rv32" ISE="xalu" fpga-clean fpga-run
     ```
+
+- Run hardware synthesis flow using
+  [yosys](https://github.com/YosysHQ/yosys)
+
+  ```sh
+  make -f ${REPO_HOME}/src/hw/Makefile synthesise ARCH="rv32" ISE="xalu"
+  ```
 
 <!--- -------------------------------------------------------------------- --->
    
