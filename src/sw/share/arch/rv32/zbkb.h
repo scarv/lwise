@@ -49,13 +49,13 @@
 .macro  rev8  rd, rs1
 .insn i 0x13, 0x5, \rd, \rs1, 0x698
 .endm
-// 0000 1001 1110 | rs1   | 101 | rd | 0010011
-.macro   zip  rd, rs1
-.insn i 0x13, 0x1, \rd, \rs1, 0x09E
+// 0000 1000 1111 | rs1   | 001 | rd | 0010011
+.macro   zip rd, rs1
+.insn i 0x13, 0x1, \rd, \rs1, 0x08F
 .endm
-// 0000 1001 1111 | rs1   | 101 | rd | 0010011
-.macro unzip  rd, rs1
-.insn i 0x13, 0x5, \rd, \rs1, 0x09F
+// 0000 1000 1111 | rs1   | 101 | rd | 0010011
+.macro unzip rd, rs1
+.insn i 0x13, 0x5, \rd, \rs1, 0x08F
 .endm
 
 // ============================================================================
