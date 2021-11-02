@@ -1,6 +1,6 @@
 #include    "zbkb.h"
 #include    "zbkx.h"
-
+#include    "zbkc.h"
 .text
 
 .global test_ror
@@ -98,5 +98,19 @@ test_xperm8:
 .func   test_xperm4
 test_xperm4:
     xperm4 a0, a0,a1
+    ret
+.endfunc
+
+.global test_clmul
+.func   test_clmul
+test_clmul:
+    clmul a0, a0, a1
+    ret
+.endfunc
+
+.global test_clmulh
+.func   test_clmulh
+test_clmulh:
+    clmulh a0, a0,a1
     ret
 .endfunc

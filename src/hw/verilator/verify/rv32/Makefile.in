@@ -4,7 +4,7 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-zbk_dir = ${REPO_HOME}/src/sw/share/arch/${ARCH}
+zbk_dir = ${REPO_HOME}/src/hw/verilator/verify/zbk
 
 INC_DIRS  =-I$(EMU_HAL) -I$(zbk_dir)
 SRCS = ${REPO_HOME}/src/hw/verilator/verify/$(ARCH)/verify.c \
@@ -18,9 +18,17 @@ DISASM  = ${REPO_HOME}/build/emu_verify-${ARCH}.disasm
 
 $(VERIFY) : $(SRCS)
 	${GCC_PREFIX}-gcc ${GCC_FLAGS} ${INC_DIRS} -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
-	
+
 $(DISASM) : $(VERIFY)
 	${GCC_PREFIX}-objdump --disassemble-all -Dt $< > $@
 
 emulate-verify : ${EMULATOR} ${VERIFY} $(DISASM)
 	${EMULATOR} -c -x 200000 -v ${REPO_HOME}/build/emu_verify-${ARCH}.vcd -m 2100000 ${VERIFY}
+
+
+
+VERIFY-DBG  = ${REPO_HOME}/build/emu_verify-${ARCH}-dbg.elf
+$(VERIFY-DBG) : $(SRCS)
+	${GCC_PREFIX}-gcc ${GCC_FLAGS} ${INC_DIRS} -std='gnu99' -g -Og -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+emulate-verify-debug : ${EMULATOR} ${VERIFY-DBG} 
+	${EMULATOR} +jtag_rbb_enable=1 -r 9823 ${VERIFY-DBG}

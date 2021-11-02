@@ -24,9 +24,12 @@ extern uint32_t test_brev8(uint32_t a);
 extern uint32_t test_rev8(uint32_t a);
 extern uint32_t test_zip(uint32_t a);
 extern uint32_t test_unzip(uint32_t a);
+
 extern uint32_t test_xperm8(uint32_t a, uint32_t b);
 extern uint32_t test_xperm4(uint32_t a, uint32_t b);
 
+extern uint32_t test_clmul(uint32_t a, uint32_t b);
+extern uint32_t test_clmulh(uint32_t a, uint32_t b);
 
 uint32_t gold_ror(uint32_t a, uint32_t b){
     return ROR32(a, b & 0x0000001F);
@@ -124,9 +127,27 @@ uint32_t gold_xperm4(uint32_t a,uint32_t b){
     return x;
 }
 
+uint32_t gold_clmul(uint32_t a,uint32_t b){
+    uint32_t x = 0;
+    for (int i = 0; i < 32; i++)
+        if ((b >> i) & 1) x ^= a << i;
+    return x;
+}
+
+uint32_t gold_clmulh(uint32_t a,uint32_t b){
+    uint32_t x = 0;
+    for (int i = 1; i < 32; i++)
+        if ((b >> i) & 1) x ^= a >> (32-i);
+    return x;
+}
+
+
+int fail;
+uint32_t expect, result;
+
 int main() {
     
-    int fail = 0;
+    fail = 0;
 
     uint32_t lhs = 0x23456789;
     uint32_t rhs = 0xDEADBEAD;
@@ -137,8 +158,8 @@ int main() {
     printf("lhs: %04x, rhs: %04x\n", lhs, rhs);
 
     // ror    
-    uint32_t result = test_ror(lhs, rhs);
-    uint32_t expect = gold_ror(lhs, rhs);
+    result = test_ror(lhs, rhs);
+    expect = gold_ror(lhs, rhs);
 
     if(result != expect) {
         printf("test_ror [FAIL]\n");
@@ -274,6 +295,26 @@ int main() {
         printf("Expected: %04x, got: %04x\n", expect, result);
         fail = 1;
     }
+
+    // clmul
+    result = test_clmul(lhs,rhs);
+    expect = gold_clmul(lhs,rhs);
+
+    if(result != expect) {
+        printf("test_clmul [FAIL]\n");
+        printf("Expected: %04x, got: %04x\n", expect, result);
+        fail = 1;
+    }
+    // clmulh
+    result = test_clmulh(lhs,rhs);
+    expect = gold_clmulh(lhs,rhs);
+
+    if(result != expect) {
+        printf("test_clmulh [FAIL]\n");
+        printf("Expected: %04x, got: %04x\n", expect, result);
+        fail = 1;
+    }
+
     rhs = lfsr(lhs);
     lhs = lfsr(rhs);
     }
