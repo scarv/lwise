@@ -6,35 +6,43 @@
 
 - use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
 - use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate,
-- use `LFSR_RC`  to denote the 6-bit, round constant LFSR update function,
-  i.e.,
+- capture the 6-bit, round constant LFSR update function using
 
   ```
-  LFSR_RC( x ) {
+  RC_LFSR_FWD( x ) {
     return < x_4, x_3, x_2, x_1, x_0, x_5 ^ x_4 ^ 1 >
+  }
+
+  RC_LFSR_REV( x ) {
+    return < x_5 ^ x_0 ^ 1, x_4, x_3, x_2, x_1, x_0 >
   }
   ```
 
-- use `LFSR_TK2` to denote the 8-bit, tweakey        LFSR update function,
-  i.e.,
+- capture the the 8-bit, tweakey    LFSR update function using
 
   ```
-  LFSR_TK2( x ) {
+  TK2_LFSR_FWD( x ) {
+    return < x_6, x_5, x_4, x_3, x_2, x_1, x_0, x_5 ^ x_7 >
+  }
+
+  TK2_LFSR_REV( x ) {
+    return < x_6 ^ x_0, x_6, x_5, x_4, x_3, x_2, x_1, x_0 >
+  }
+
+  TK3_LFSR_FWD( x ) {
+    return < x_6 ^ x_0, x_7, x_6, x_5, x_4, x_3, x_2, x_1 >
+  }
+
+  TK3_LFSR_REV( x ) {
     return < x_6, x_5, x_4, x_3, x_2, x_1, x_0, x_5 ^ x_7 >
   }
   ```
 
-- use `LFSR_TK3` to denote the 8-bit, tweakey        LFSR update function,
-  i.e.,
-
-  ```
-  LFSR_TK3( x ) {
-    return < x_0 ^ x_6, x_7, x_6, x_5, x_4, x_3, x_2, x_1 >
-  }
-  ```
-
 - define various look-up tables: 
-  `SBOX`, for example, is the 8-bit Skinny S-box denoted S_8 and defined in
+  `SBOX_ENC` 
+  and 
+  `SBOX_DEC`, 
+  for example, are the 8-bit Skinny encryption and decryption S-boxes defined in
   [Tab. 2.1, 1](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf).
 
 <!--- -------------------------------------------------------------------- --->
@@ -73,6 +81,24 @@
 
     wherein `SubCells` uses an 8-bit S-box denoted S_8.
 
+- There are some chances to improve or strealine the ISE, e.g.,
+
+  - Romulus only makes use of Skinny-based encryption; clearly it's be
+    possible to provide support for decryption, e.g., when aiming for
+    an ISA for Skinny itself vs. Romulus.
+  - Use of the round constants, once generated is the same for both
+    encryption and decryption,
+    so there is a chance to reduce the number of instruction encodings.
+  - The tweakey LFSRs are inverses of each other, e.g., 
+    `TK2_LFSR_FWD`
+    is the inverse of 
+    `TK3_LFSR_REV`
+    so there is a chance to reduce the number of instruction encodings.
+  - Probably it'd make sense to adopt a different approach for 64-bit
+    instances of Skinny; [3] does so, but it could be viewed as being
+    too general purpose (e.g., the Skinny S-box is very light-weight,
+    so the generalised S-box instruction might be viewed as overkill).
+
 <!--- -------------------------------------------------------------------- --->
 
 ## Options
@@ -93,11 +119,13 @@
 - `ROMULUS_RV32_TYPE2`: baseline ISA plus custom ISE.
 
   ```
-  romulus.rstep    rd, rs1, rs2, imm {
+  romulus.rstep.enc    rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
+
     t       <- SBOX[ x_{31..24} ] || SBOX[ x_{23..16} ] ||
                SBOX[ x_{15.. 8} ] || SBOX[ x_{ 7.. 0} ]
+
     t       <- t ^ y
 
     if     ( imm == 0 ) {
@@ -116,27 +144,27 @@
     GPR[rd] <- r
   }
 
-  romulus.rc.upd   rd, rs1           {
+  romulus.rc.upd.enc   rd, rs1           {
     x       <- GPR[rs1]
     r       <- LFSR_RC( x )
     GPR[rd] <- r
   }
 
-  romulus.rc.use.0 rd, rs1, rs2      {
+  romulus.rc.use.enc.0 rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
     r       <- y ^ x_{3..0}
     GPR[rd] <- r
   }
 
-  romulus.rc.use.1 rd, rs1, rs2      {
+  romulus.rc.use.enc.1 rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
     r       <- y ^ x_{6..4}
     GPR[rd] <- r
   }
 
-  romulus.tk.upd.0 rd, rs1, rs2, imm {
+  romulus.tk.upd.enc.0 rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
 
@@ -156,7 +184,7 @@
     GPR[rd] <- r
   }
 
-  romulus.tk.upd.1 rd, rs1, rs2, imm {
+  romulus.tk.upd.enc.1 rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
 
@@ -186,13 +214,15 @@
 - `ROMULUS_RV64_TYPE2`: baseline ISA plus custom ISE.
 
   ```
-  romulus.rstep    rd, rs1, rs2, imm {
+  romulus.rstep.enc    rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
+
     t       <- SBOX[ x_{63..56} ] || SBOX[ x_{55..48} ] ||
                SBOX[ x_{47..40} ] || SBOX[ x_{39..32} ] ||
                SBOX[ x_{31..24} ] || SBOX[ x_{23..16} ] ||
                SBOX[ x_{15.. 8} ] || SBOX[ x_{ 7.. 0} ]
+
     t       <- t ^ y
 
     if     ( imm == 0 ) {
@@ -205,13 +235,15 @@
     GPR[rd] <- r
   }
 
-  romulus.cstep    rd, rs1, rs2, imm {
+  romulus.cstep.enc    rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
+
     t_0     <- y_{39..32} || y_{ 7.. 0} || x_{30..32} || x_{ 7.. 0}
     t_1     <- y_{47..40} || y_{15.. 8} || x_{47..40} || x_{15.. 8}
     t_2     <- y_{55..48} || y_{23..16} || x_{55..48} || x_{23..16}
     t_3     <- y_{63..56} || y_{31..24} || x_{63..56} || x_{31..24}
+
     t_0     <- (                t_0_{23..16} ^                t_0_{ 7.. 0} ) ||
                (                t_0_{23..16} ^ t_0_{15.. 8}                ) ||
                (                                              t_0_{ 7.. 0} ) ||
@@ -241,13 +273,13 @@
     GPR[rd] <- r
   }
 
-  romulus.rc.upd   rd, rs1           {
+  romulus.rc.upd.enc   rd, rs1           {
     x       <- GPR[rs1]
     r       <- LFSR_RC( x )
     GPR[rd] <- r
   }
 
-  romulus.rc.use   rd, rs1, rs2      {
+  romulus.rc.use.enc   rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
     r       <- y ^ ( x_{3..0} <<  0 ) ^ 
@@ -255,7 +287,7 @@
     GPR[rd] <- r
   }
 
-  romulus.tk.upd   rd, rs1,      imm {
+  romulus.tk.upd.enc   rd, rs1,      imm {
     x       <- GPR[rs1]
 
     if     ( imm == 2 ) {
@@ -285,5 +317,8 @@
 [2] C. Beierle, J. Jean, S. Kölbl, G. Leander, A. Moradi,￼T. Peyrin, Y. Sasaki, P. Sasdrich, S.M. Sim.
     [The SKINNY Family of Block Ciphers and its Low-Latency Variant MANTIS](https://link.springer.com/chapter/10.1007/978-3-662-53008-5_5).
     In Advances in Cryptology (CRYPTO), Springer-Verlag LNCS 9815, 123--153, 2016.
+[3] E. Tehrani, T. Graba, A.S. Merabet, and J.-L. Danger.
+    [RISC-V Extension for Lightweight Cryptography](https://ieeexplore.ieee.org/document/9217866).
+    In Digital System Design (DSD), 222--228, 2020.
 
 <!--- -------------------------------------------------------------------- --->

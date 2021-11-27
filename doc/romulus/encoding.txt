@@ -2,67 +2,105 @@
 | class               | instruction          | format   | f7                  | f3      | custom      |
 +=====================+======================+==========+=====================+=========+=============+
 |                     |                      |          |                     |         |             |
-| ROMULUS_RV32_TYPE2  | romulus.rc.upd       | 1R  ->1R | 00 : 00000          | 6 = 110 | 0 = 0001011 | 
-| ROMULUS_RV64_TYPE2  | romulus.rc.upd       | 1R  ->1R | 00 : 00000          | 6 = 110 | 0 = 0001011 | 
+| ROMULUS_RV32_TYPE2  | romulus.rc.upd.enc   | 1R  ->1R | 0000 : 000          | 6 = 110 | 0 = 0001011 | 
+| ROMULUS_RV64_TYPE2  | romulus.rc.upd.enc   | 1R  ->1R | 0000 : 000          | 6 = 110 | 0 = 0001011 |
+| ROMULUS_RV32_TYPE2  | romulus.rc.upd.dec   | 1R  ->1R | 1000 : 000          | 6 = 110 | 0 = 0001011 | 
+| ROMULUS_RV64_TYPE2  | romulus.rc.upd.dec   | 1R  ->1R | 1000 : 000          | 6 = 110 | 0 = 0001011 | 
 |                     |                      |          |                     |         |             |
-| ROMULUS_RV32_TYPE2  | romulus.rc.use.0     | 2R  ->1R | 01 : 00000          | 7 = 111 | 0 = 0001011 | 
-| ROMULUS_RV32_TYPE2  | romulus.rc.use.1     | 2R  ->1R | 10 : 00000          | 7 = 111 | 0 = 0001011 | 
+| ROMULUS_RV64_TYPE2  | romulus.rc.use.enc   | 2R  ->1R | 0001 : 000          | 7 = 111 | 0 = 0001011 | 
+| ROMULUS_RV64_TYPE2  | romulus.rc.use.dec   | 2R  ->1R | 1001 : 000          | 7 = 111 | 0 = 0001011 | 
 |                     |                      |          |                     |         |             |
-| ROMULUS_RV64_TYPE2  | romulus.rc.use       | 2R  ->1R | 11 : 00000          | 7 = 111 | 0 = 0001011 | 
-|                     |                      |          |                     |         |             |
-+=====================+======================+==========+=====================+=========+=============+
-
-.macro romulus.rc.upd       rd, rs1                // romulus.rc.upd          => 0000 0000 0000 rrrr r110 rrrr r000 1011
-.insn r CUSTOM_0, 6,      ( 0*32), \rd, \rs1,   x0 //                         => #define MATCH_ROMULUS_RC_UPD   0x0000600B
-.endm                                              //                         => #define  MASK_ROMULUS_RC_UPD   0xC000707F
-
-.macro romulus.rc.use.0     rd, rs1, rs2           // romulus.rc.use.0        => 0100 000r rrrr rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 7,      ( 1*32), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE_0 0x4000700B
-.endm                                              //                         => #define  MASK_ROMULUS_RC_USE_0 0xC000707F
-.macro romulus.rc.use.1     rd, rs1, rs2           // romulus.rc.use.1        => 1000 000r rrrr rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 7,      ( 2*32), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE_1 0x8000700B
-.endm                                              //                         => #define  MASK_ROMULUS_RC_USE_1 0xC000707F
-
-.macro romulus.rc.use       rd, rs1, rs2           // romulus.rc.use          => 1100 000r rrrr rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 7,      ( 3*32), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE   0xC000700B
-.endm                                              //                         => #define  MASK_ROMULUS_RC_USE   0xC000707F
-
-+=====================+======================+==========+=====================+=========+=============+
-| class               | instruction          | format   | f7                  | f3      | custom      |
-+=====================+======================+==========+=====================+=========+=============+
-|                     |                      |          |                     |         |             |
-| ROMULUS_RV32_TYPE2  | romulus.tk.upd.0     | 2R+I->1R | 00 : imm5           | 7 = 111 | 1 = 0101011 |
-| ROMULUS_RV32_TYPE2  | romulus.tk.upd.1     | 2R+I->1R | 01 : imm5           | 7 = 111 | 1 = 0101011 |
-|                     |                      |          |                     |         |             |
-| ROMULUS_RV64_TYPE2  | romulus.tk.upd       | 1R+I->1R | 10 : imm5           | 6 = 110 | 1 = 0101011 |
+| ROMULUS_RV32_TYPE2  | romulus.rc.use.enc.0 | 2R  ->1R | 0010 : 000          | 7 = 111 | 0 = 0001011 | 
+| ROMULUS_RV32_TYPE2  | romulus.rc.use.dec.0 | 2R  ->1R | 1010 : 000          | 7 = 111 | 0 = 0001011 | 
+| ROMULUS_RV32_TYPE2  | romulus.rc.use.enc.1 | 2R  ->1R | 0011 : 000          | 7 = 111 | 0 = 0001011 | 
+| ROMULUS_RV32_TYPE2  | romulus.rc.use.dec.1 | 2R  ->1R | 1011 : 000          | 7 = 111 | 0 = 0001011 | 
 |                     |                      |          |                     |         |             |
 +=====================+======================+==========+=====================+=========+=============+
 
-.macro romulus.tk.upd.0     rd, rs1, rs2, imm      // romulus.tk.upd.0        => 0000 000r rrrr rrrr r111 rrrr r010 1011
-.insn r CUSTOM_1, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_TK_UPD_0 0x0000702B
-.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD_0 0xC000707F
-.macro romulus.tk.upd.1     rd, rs1, rs2, imm      // romulus.tk.upd.1        => 0100 000r rrrr rrrr r111 rrrr r010 1011
-.insn r CUSTOM_1, 7, \imm+( 1*32), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_TK_UPD_1 0x4000702B
-.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD_1 0xC000707F
+.macro romulus.rc.upd.enc   rd, rs1                // romulus.rc.upd.enc      => 0000 0000 0000 rrrr r110 rrrr r000 1011
+.insn r CUSTOM_0, 6,      ( 0* 8), \rd, \rs1,   x0 //                         => #define MATCH_ROMULUS_RC_UPD_ENC   0x0000600B
+.endm                                              //                         => #define  MASK_ROMULUS_RC_UPD_ENC   0xC000707F
+.macro romulus.rc.upd.dec   rd, rs1                // romulus.rc.upd.dec      => 1000 0000 0000 rrrr r110 rrrr r000 1011
+.insn r CUSTOM_0, 6,      ( 8* 8), \rd, \rs1,   x0 //                         => #define MATCH_ROMULUS_RC_UPD_DEC   0x8000600B
+.endm                                              //                         => #define  MASK_ROMULUS_RC_UPD_DEC   0xC000707F
 
-.macro romulus.tk.upd       rd, rs1,      imm      // romulus.tk.upd          => 1000 0000 0000 rrrr r110 rrrr r010 1011
-.insn r CUSTOM_1, 6, \imm+( 2*32), \rd, \rs1,   x0 //                         => #define MATCH_ROMULUS_TK_UPD   0x8000602B
-.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD   0xC000707F
+.macro romulus.rc.use.enc   rd, rs1, rs2           // romulus.rc.use.enc      => 0001 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 1* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE_ENC   0x1000700B
+.endm                                              //                         => #define  MASK_ROMULUS_RC_USE_ENC   0xC000707F
+.macro romulus.rc.use.dec   rd, rs1, rs2           // romulus.rc.use.dec      => 1001 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 9* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE_DEC   0x9000700B
+.endm                                              //                         => #define  MASK_ROMULUS_RC_USE_DEC   0xC000707F
+
+.macro romulus.rc.use.enc.0 rd, rs1, rs2           // romulus.rc.use.enc.0    => 0010 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 2* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE_ENC_0 0x2000700B
+.endm                                              //                         => #define  MASK_ROMULUS_RC_USE_ENC_0 0xC000707F
+.macro romulus.rc.use.dec.0 rd, rs1, rs2           // romulus.rc.use.dec.0    => 1010 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      (10* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE_DEC_0 0xA000700B
+.endm                                              //                         => #define  MASK_ROMULUS_RC_USE_DEC_0 0xC000707F
+.macro romulus.rc.use.enc.1 rd, rs1, rs2           // romulus.rc.use.enc.1    => 0011 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 3* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE_ENC_1 0x3000700B
+.endm                                              //                         => #define  MASK_ROMULUS_RC_USE_ENC_1 0xC000707F
+.macro romulus.rc.use.dec.1 rd, rs1, rs2           // romulus.rc.use.dec.1    => 1011 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      (11* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RC_USE_DEC_1 0xB000700B
+.endm                                              //                         => #define  MASK_ROMULUS_RC_USE_DEC_1 0xC000707F
 
 +=====================+======================+==========+=====================+=========+=============+
 | class               | instruction          | format   | f7                  | f3      | custom      |
 +=====================+======================+==========+=====================+=========+=============+
 |                     |                      |          |                     |         |             |
-| ROMULUS_RV32_TYPE2  | romulus.rstep        | 2R+I->1R | 00 : imm5           | 7 = 111 | 2 = 1011011 |
-| ROMULUS_RV64_TYPE2  | romulus.rstep        | 2R+I->1R | 00 : imm5           | 7 = 111 | 2 = 1011011 |
+| ROMULUS_RV64_TYPE2  | romulus.tk.upd.enc   | 1R+I->1R | 0000 : imm3         | 6 = 110 | 1 = 0101011 |
+| ROMULUS_RV64_TYPE2  | romulus.tk.upd.dec   | 1R+I->1R | 1000 : imm3         | 6 = 110 | 1 = 0101011 |
 |                     |                      |          |                     |         |             |
-| ROMULUS_RV64_TYPE2  | romulus.cstep        | 2R+I->1R | 01 : imm5           | 7 = 111 | 2 = 1011011 |
+| ROMULUS_RV32_TYPE2  | romulus.tk.upd.enc.0 | 2R+I->1R | 0001 : imm3         | 7 = 111 | 1 = 0101011 |
+| ROMULUS_RV32_TYPE2  | romulus.tk.upd.dec.0 | 2R+I->1R | 1001 : imm3         | 7 = 111 | 1 = 0101011 |
+| ROMULUS_RV32_TYPE2  | romulus.tk.upd.enc.1 | 2R+I->1R | 0010 : imm3         | 7 = 111 | 1 = 0101011 |
+| ROMULUS_RV32_TYPE2  | romulus.tk.upd.dec.1 | 2R+I->1R | 1010 : imm3         | 7 = 111 | 1 = 0101011 |
 |                     |                      |          |                     |         |             |
 +=====================+======================+==========+=====================+=========+=============+
 
-.macro romulus.rstep        rd, rs1, rs2, imm      // romulus.rstep           => 0000 0000 0000 rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RSTEP    0x0000705B
-.endm                                              //                         => #define  MASK_ROMULUS_RSTEP    0xC000707F
-.macro romulus.cstep        rd, rs1, rs2, imm      // romulus.cstep           => 0100 0000 0000 rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 1*32), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_CSTEP    0x4000705B
-.endm                                              //                         => #define  MASK_ROMULUS_CSTEP    0xC000707F
+.macro romulus.tk.upd.enc   rd, rs1,      imm      // romulus.tk.enc.upd      => 0000 0000 0000 rrrr r110 rrrr r010 1011
+.insn r CUSTOM_1, 6, \imm+( 0* 8), \rd, \rs1,   x0 //                         => #define MATCH_ROMULUS_TK_UPD_ENC   0x0000602B
+.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD_ENC   0xC000707F
+.macro romulus.tk.upd.dec   rd, rs1,      imm      // romulus.tk.dec.upd      => 1000 0000 0000 rrrr r110 rrrr r010 1011
+.insn r CUSTOM_1, 6, \imm+( 8* 8), \rd, \rs1,   x0 //                         => #define MATCH_ROMULUS_TK_UPD_DEC   0x8000602B
+.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD_DEC   0xC000707F
+
+.macro romulus.tk.upd.enc.0 rd, rs1, rs2, imm      // romulus.tk.upd.enc.0    => 0001 000r rrrr rrrr r111 rrrr r010 1011
+.insn r CUSTOM_1, 7, \imm+( 1* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_TK_UPD_ENC_0 0x1000702B
+.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD_ENC_0 0xC000707F
+.macro romulus.tk.upd.dec.0 rd, rs1, rs2, imm      // romulus.tk.upd.dec.0    => 1001 000r rrrr rrrr r111 rrrr r010 1011
+.insn r CUSTOM_1, 7, \imm+( 9* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_TK_UPD_DEC_0 0x9000702B
+.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD_DEC_0 0xC000707F
+.macro romulus.tk.upd.enc.1 rd, rs1, rs2, imm      // romulus.tk.upd.enc.1    => 0010 000r rrrr rrrr r111 rrrr r010 1011
+.insn r CUSTOM_1, 7, \imm+( 2* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_TK_UPD_ENC_1 0x2000702B
+.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD_ENC_1 0xC000707F
+.macro romulus.tk.upd.dec.1 rd, rs1, rs2, imm      // romulus.tk.upd.dec.1    => 1010 000r rrrr rrrr r111 rrrr r010 1011
+.insn r CUSTOM_1, 7, \imm+(10* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_TK_UPD_DEC_1 0xA000702B
+.endm                                              //                         => #define  MASK_ROMULUS_TK_UPD_DEC_1 0xC000707F
+
++=====================+======================+==========+=====================+=========+=============+
+| class               | instruction          | format   | f7                  | f3      | custom      |
++=====================+======================+==========+=====================+=========+=============+
+|                     |                      |          |                     |         |             |
+| ROMULUS_RV32_TYPE2  | romulus.rstep.enc    | 2R+I->1R | 0000 : imm3         | 7 = 111 | 2 = 1011011 |
+| ROMULUS_RV64_TYPE2  | romulus.rstep.enc    | 2R+I->1R | 0000 : imm3         | 7 = 111 | 2 = 1011011 |
+| ROMULUS_RV32_TYPE2  | romulus.rstep.dec    | 2R+I->1R | 1000 : imm3         | 7 = 111 | 2 = 1011011 |
+| ROMULUS_RV64_TYPE2  | romulus.rstep.dec    | 2R+I->1R | 1000 : imm3         | 7 = 111 | 2 = 1011011 |
+|                     |                      |          |                     |         |             |
+| ROMULUS_RV64_TYPE2  | romulus.cstep.enc    | 2R+I->1R | 0001 : imm3         | 7 = 111 | 2 = 1011011 |
+| ROMULUS_RV64_TYPE2  | romulus.cstep.dec    | 2R+I->1R | 1001 : imm3         | 7 = 111 | 2 = 1011011 |
+|                     |                      |          |                     |         |             |
++=====================+======================+==========+=====================+=========+=============+
+
+.macro romulus.rstep.enc    rd, rs1, rs2, imm      // romulus.rstep.enc       => 0000 0000 0000 rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+( 0* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RSTEP_ENC    0x0000705B
+.endm                                              //                         => #define  MASK_ROMULUS_RSTEP_ENC    0xC000707F
+.macro romulus.rstep.dec    rd, rs1, rs2, imm      // romulus.rstep.dec       => 1000 0000 0000 rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+( 8* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_RSTEP_DEC    0x8000705B
+.endm                                              //                         => #define  MASK_ROMULUS_RSTEP_DEC    0xC000707F
+.macro romulus.cstep.enc    rd, rs1, rs2, imm      // romulus.cstep.enc       => 0001 0000 0000 rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+( 1* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_CSTEP_ENC    0x1000705B
+.endm                                              //                         => #define  MASK_ROMULUS_CSTEP_ENC    0xC000707F
+.macro romulus.cstep.dec    rd, rs1, rs2, imm      // romulus.cstep.dec       => 1001 0000 0000 rrrr r111 rrrr r101 1011
+.insn r CUSTOM_2, 7, \imm+( 9* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ROMULUS_CSTEP_DEC    0x9000705B
+.endm                                              //                         => #define  MASK_ROMULUS_CSTEP_DEC    0xC000707F
