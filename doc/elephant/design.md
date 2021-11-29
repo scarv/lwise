@@ -42,5 +42,8 @@
 [1] T. Beyne, Y. L. Chen, C. Dobraunig, and B. Mennink.
     [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf).
     Submission to NIST (version 2.0), 2021.
+[2] M. Lemmen.
+    [Optimizing Elephant for RISC-V](https://www.cs.ru.nl/bachelors-theses/2020/Mauk_Lemmen___4798937___Optimizing_Elephant_for_RISC-V.pdf).
+    BSc Thesis, Radboud University, 2020.
 
 <!--- -------------------------------------------------------------------- --->
