@@ -9,7 +9,18 @@ import itertools, share
 # =============================================================================
 
 def rv32( args ) :
-  pass
+  # rv32/generic 
+  for UNROLL in [ False, True ] :
+    CONF  = [ 'DRIVER_TRIALS_WARM=%d' % ( args.trials_warm ) ]
+    CONF += [ 'DRIVER_TRIALS_REAL=%d' % ( args.trials_real ) ]
+    CONF += [ 'DRIVER_TRIALS_KAT'  ]
+    CONF += [ 'DRIVER_TRIALS_BIST' ]
+    CONF += [ 'DRIVER_MEASURE=%d' % ( share.MEASURE.index( args.measure ) ) ]
+
+    if ( UNROLL ) :
+      CONF += [ 'XOODOO_PERM_UNROLL' ]
+
+    share.run( 'xoodyak', 'rv32', 'generic', CONF )
 
 # -----------------------------------------------------------------------------
 

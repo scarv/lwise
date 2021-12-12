@@ -11,4 +11,6 @@
 #include "share.h"
 #include "rdtsc.h"
 
+#include "xoodoo.h"
+
 #endif
