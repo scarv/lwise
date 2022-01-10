@@ -21,9 +21,9 @@ export GCC_LIBS   =
 
 # -----------------------------------------------------------------------------
 
-FORCE :
+run  : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
+	@${<}
 
-${TARGET}.run : ${TARGET}.elf FORCE
-	@${<} | tee ${@}
+scan : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
 
 # =============================================================================

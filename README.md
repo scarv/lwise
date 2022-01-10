@@ -133,10 +133,7 @@ such as execution latency.
   | :------------------- | :-------------------------------------------------------------------------------------------------------------------- |
   | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase (default is   `10`) |
   | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase (default is `1000`) |
-  | `DRIVER_TRIALS_KAT`  | enable verification trials based on Known Answer Tests   (KATs) if available                                          |
-  | `DRIVER_TRIALS_BIST` | enable verification trials based on Built-In Self Tests (BISTs) if available                                          |
   | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                       |
-  | `DRIVER_MEASURE`     | take and dump cycle count measurements etc. (`0` means average, `1` means minimum, and `2` means maximum)             |
 
   plus various algorithm-, architecture-, and/or implementation-specific
   cases documented elsewhere.

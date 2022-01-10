@@ -1,0 +1,1 @@
+﻿Please refer to Changelog (Appendix B) in the specification document for the changes made from the previous version. 

@@ -13,34 +13,48 @@ endif
 
 # =============================================================================
 
-export INCLUDES = ./share ./share/arch/${ARCH} ./${ALG} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP}
+# include build-related content for architecture
+include ./share/arch/${ARCH}/Makefile.in
 
-export SOURCES  = $(wildcard $(addsuffix /*.c, ${INCLUDES}))
-export SOURCES += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
-export HEADERS  = $(wildcard $(addsuffix /*.h, ${INCLUDES}))
+# include build-related content for algorithm
+include ./${ALG}/Makefile.in
 
-export TARGET   = ${REPO_HOME}/build/driver-${ALG}_${ARCH}_${IMP}
+# pass-through environment variable as macros for use in source code
+GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
 
 # -----------------------------------------------------------------------------
 
-include ./share/arch/${ARCH}/Makefile.in
+export INCLUDES  = ./share ./share/nist ./share/arch/${ARCH} ./${ALG} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP} ${REPO_HOME}/build/${ALG} ${NIST_INCLUDES}
 
-${TARGET}.elf : ${SOURCES} ${HEADERS}
+export SOURCES   = $(wildcard $(addsuffix /*.c, ${INCLUDES})) ${REPO_HOME}/build/${ALG}/kat.c ${NIST_SOURCES}
+export SOURCES  += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
+export HEADERS   = $(wildcard $(addsuffix /*.h, ${INCLUDES})) ${REPO_HOME}/build/${ALG}/kat.h ${NIST_HEADERS}
+
+export TARGETS  += ${REPO_HOME}/build/${ALG}
+export TARGETS  += ${REPO_HOME}/build/${ALG}/kat.h
+export TARGETS  += ${REPO_HOME}/build/${ALG}/kat.c
+export TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
+export TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm
+
+# -----------------------------------------------------------------------------
+
+${REPO_HOME}/build/${ALG}       :
+	@mkdir --parents ${@}
+
+${REPO_HOME}/build/${ALG}/kat.h : ${NIST_KAT}
+	@python3 ./share/kat.py --header < ${<} > ${@}
+${REPO_HOME}/build/${ALG}/kat.c : ${NIST_KAT}
+	@python3 ./share/kat.py --source < ${<} > ${@}
+
+${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf : ${SOURCES} 
 	@${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -Wall -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
-${TARGET}.asm : ${TARGET}.elf
+${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
 	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
 
-build : ${TARGET}.elf ${TARGET}.asm
-
-run   : ${TARGET}.run
-
-scan  : ${TARGET}.elf
-	@PYTHONPATH="./share" python3 ./${ALG}/driver.py --rv32 --rv64
+build : ${TARGETS}
 
 clean : 
-	@rm --force ${TARGET}.elf
-	@rm --force ${TARGET}.asm
-	@rm --force ${TARGET}.run
+	@rm --force --recursive ${TARGETS}
 
 # =============================================================================
