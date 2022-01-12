@@ -122,9 +122,9 @@ such as execution latency.
     - default: `generic`
 
   - `${IMP}`
-    - role: specifies the implementation, i.e., select `${REPO_HOME}/src/sw/${ALG}/imp/${IMP}`
-    - values: `generic`, `rv32`, `rv64`
-    - default: `generic`
+    - role: specifies the implementation, e.g., select `${REPO_HOME}/src/sw/${ALG}/nist` or `${REPO_HOME}/src/sw/${ALG}/imp/${IMP}`
+    - values: `nist`, `generic`, `rv32`, `rv64`
+    - default: `nist`
 
 - The `${CONF}` environment variable allows options to be passed to GCC,
   e.g.,

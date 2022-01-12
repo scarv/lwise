@@ -20,7 +20,11 @@ include ./share/arch/${ARCH}/Makefile.in
 include ./${ALG}/Makefile.in
 
 # pass-through environment variable as macros for use in source code
+ifeq "${IMP}" "nist"
 GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
+else
+GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
+endif
 
 # -----------------------------------------------------------------------------
 

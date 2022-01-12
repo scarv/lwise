@@ -16,7 +16,7 @@ endif
 export ALG  ?= sparkle
 
 export ARCH ?= generic
-export IMP  ?= generic
+export IMP  ?= nist
 export CONF ?=
 
 # -----------------------------------------------------------------------------
