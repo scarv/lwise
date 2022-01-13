@@ -1,0 +1,48 @@
+% Copyright (C) 2019 SCARV project <info at scarv.org>
+%
+% Use of this source code is restricted per the MIT license, a copy of which 
+% can be found at https://opensource.org/licenses/MIT (or should be included 
+% as LICENSE.txt within the associated archive or repository).
+
+\documentclass{beamer}
+
+\usepackage{slide}
+
+\begin{document}
+
+% =============================================================================
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+
+\begin{center}
+\begin{scriptsize}
+\begin{tabular}{|lc|l|}
+\hline
+Name          & Specification           & Construction                                                                     \\
+\hline
+Ascon         & \cite{NIST:LW:ascon}    &                                                                                  \\
+Grain128-AEAD & \cite{NIST:LW:grain}    & L/NFSRs                                                                          \\
+ISAP          & \cite{NIST:LW:isap}     &                                                                                  \\
+\hline
+GIFT-COFB     & \cite{NIST:LW:gift}     & GIFT-128                  block cipher                                           \\
+Romulus       & \cite{NIST:LW:romulus}  & Skinny-128-384+ tweakable block cipher                                           \\
+\hline
+Elephant      & \cite{NIST:LW:elephant} & Spongent-$\pi$[n] or Keccak-$f$[m] permutation                                   \\
+Photon-Beetle & \cite{NIST:LW:photon}   & ${\tt PHOTON}_{256}$               permutation                                   \\
+Sparkle       & \cite{NIST:LW:sparkle}  & {\sc Sparkle}                      permutation (involving {\sf Alzette} ARX-box) \\
+TinyJambu     & \cite{NIST:LW:jambu}    & $P_n$                              permutation (involving LFSR)                  \\
+Xoodyak       & \cite{NIST:LW:xoodyak}  & {\sc Xoodoo}                       permutation                                   \\
+\hline
+\end{tabular}
+\end{scriptsize}
+\end{center}
+
+\end{frame}
+
+% =============================================================================
+
+\end{document}
