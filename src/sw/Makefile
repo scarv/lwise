@@ -23,16 +23,21 @@ include ./${ALG}/Makefile.in
 ifeq "${IMP}" "nist"
 GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
 else
-GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
+GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DISE
 endif
 
 # -----------------------------------------------------------------------------
 
-export INCLUDES  = ./share ./share/nist ./share/arch/${ARCH} ./${ALG} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP} ${REPO_HOME}/build/${ALG} ${NIST_INCLUDES}
+ifeq "${IMP}" "nist"
+export INCLUDES += ${REPO_HOME}/build/${ALG} ${NIST_INCLUDES} ./share ./share/nist ./share/arch/${ARCH}
+else
+export INCLUDES += ${REPO_HOME}/build/${ALG} ${NIST_INCLUDES} ./share ./share/nist ./share/arch/${ARCH} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP} ./${ALG}/imp/share
+endif
 
-export SOURCES   = $(wildcard $(addsuffix /*.c, ${INCLUDES})) ${REPO_HOME}/build/${ALG}/kat.c ${NIST_SOURCES}
+export SOURCES  += $(wildcard $(addsuffix /*.c, ${INCLUDES})) ${REPO_HOME}/build/${ALG}/kat.c ${NIST_SOURCES}
+export SOURCES  += $(wildcard $(addsuffix /*.s, ${INCLUDES}))
 export SOURCES  += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
-export HEADERS   = $(wildcard $(addsuffix /*.h, ${INCLUDES})) ${REPO_HOME}/build/${ALG}/kat.h ${NIST_HEADERS}
+export HEADERS  += $(wildcard $(addsuffix /*.h, ${INCLUDES})) ${REPO_HOME}/build/${ALG}/kat.h ${NIST_HEADERS}
 
 export TARGETS  += ${REPO_HOME}/build/${ALG}
 export TARGETS  += ${REPO_HOME}/build/${ALG}/kat.h
@@ -55,6 +60,10 @@ ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf : ${SOURCES}
 
 ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
 	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
+
+# -----------------------------------------------------------------------------
+
+.PHONY : run scan
 
 build : ${TARGETS}
 

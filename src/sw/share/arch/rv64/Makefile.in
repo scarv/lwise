@@ -26,7 +26,7 @@ export GCC_LIBS   =
 # -----------------------------------------------------------------------------
 
 run  : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
-	@${REPO_HOME}/build/sw-toolchain/${ALG}/bin/spike --isa='rv64gc_zbb_zbkb_zbkx' ${REPO_HOME}/build/sw-toolchain/${ALG}/riscv64-unknown-elf/bin/pk ${<} | tee ${@}
+	@${REPO_HOME}/build/sw-toolchain/${ALG}/bin/spike --isa='rv64gc_zbb_zbkb_zbkx' ${REPO_HOME}/build/sw-toolchain/${ALG}/riscv64-unknown-elf/bin/pk ${<}
 
 scan : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
 	@PYTHONPATH="./share" python3 ./${ALG}/scan.py --rv64
