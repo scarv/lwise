@@ -58,7 +58,7 @@ static const uint32_t RCON[MAX_BRANCHES] = {      \
   0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D  \
 };
 
-
+#if !defined( ISE )
 void linear_layer(SparkleState *state, int brans)
 {
   int i, b = brans/2;
@@ -105,7 +105,6 @@ void linear_layer(SparkleState *state, int brans)
   y[b] = tmp;
 }
 
-
 void sparkle_ref(SparkleState *state, int brans, int steps)
 {
   int i, j;  // Step and branch counter
@@ -124,7 +123,6 @@ void sparkle_ref(SparkleState *state, int brans, int steps)
     linear_layer(state, brans);
   }
 }
-
 
 void linear_layer_inv(SparkleState *state, int brans)
 {
@@ -172,7 +170,6 @@ void linear_layer_inv(SparkleState *state, int brans)
     y[i+b] ^= (tmp ^ y[i]);
 }
 
-
 void sparkle_inv_ref(SparkleState *state, int brans, int steps)
 {
   int i, j;  // Step and branch counter
@@ -191,7 +188,9 @@ void sparkle_inv_ref(SparkleState *state, int brans, int steps)
     state->y[0] ^= RCON[i%MAX_BRANCHES];
   }
 }
+#else
 
+#endif
 
 void clear_state_ref(SparkleState *state, int brans)
 {

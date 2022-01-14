@@ -5,8 +5,9 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#include "skinny_imp.h"
+#ifndef __SPARKLE_IMP_H
+#define __SPARKLE_IMP_H
 
-void skinny_128_384_plus_enc( uint8_t* m, uint8_t* k ) {
+#include "share.h"
 
-}
+#endif

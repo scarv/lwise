@@ -5,8 +5,9 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#include "skinny_imp.h"
+#ifndef __ELL_H
+#define __ELL_H
 
-void skinny_128_384_plus_enc( uint8_t* m, uint8_t* k ) {
+#define ELL(x) ( ROR32( ( (x) ^ ( (x) << 16 ) ), 16 ) )
 
-}
+#endif

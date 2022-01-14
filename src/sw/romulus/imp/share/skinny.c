@@ -5,8 +5,4 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#include "skinny_imp.h"
-
-void skinny_128_384_plus_enc( uint8_t* m, uint8_t* k ) {
-
-}
+#include "skinny.h"
