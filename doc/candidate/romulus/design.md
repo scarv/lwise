@@ -123,6 +123,13 @@
     x       <- GPR[rs1]
     y       <- GPR[rs2]
 
+    if     ( imm == 2 ) {
+      y <- 2
+    }
+    else if( imm == 3 ) {
+      y <- 0
+    }
+
     t       <- SBOX[ x_{31..24} ] || SBOX[ x_{23..16} ] ||
                SBOX[ x_{15.. 8} ] || SBOX[ x_{ 7.. 0} ]
 
@@ -217,6 +224,10 @@
   romulus.rstep.enc    rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
+
+    if     ( imm == 1 ) {
+      y <- 2
+    }
 
     t       <- SBOX[ x_{63..56} ] || SBOX[ x_{55..48} ] ||
                SBOX[ x_{47..40} ] || SBOX[ x_{39..32} ] ||

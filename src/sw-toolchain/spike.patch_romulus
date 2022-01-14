@@ -583,16 +583,23 @@ index 0000000..7cdfbc5
 +}
 diff --git a/riscv/insns/romulus_rstep_dec.h b/riscv/insns/romulus_rstep_dec.h
 new file mode 100644
-index 0000000..c56d9c7
+index 0000000..ce21107
 --- /dev/null
 +++ b/riscv/insns/romulus_rstep_dec.h
-@@ -0,0 +1,64 @@
+@@ -0,0 +1,75 @@
 +if     ( xlen == 32 ) {
 +  uint32_t x    = READ_REG( insn.rs1() );
 +  uint32_t y    = READ_REG( insn.rs2() );
 +  uint32_t imm  = insn.funct7() & 0x7;
 +
 +  uint32_t r    = x;
++
++  if     ( imm == 2 ) {
++    y = 2;
++  }
++  else if( imm == 3 ) {
++    y = 0;
++  }
 +
 +  if     ( imm == 0 ) {
 +
@@ -622,6 +629,10 @@ index 0000000..c56d9c7
 +  uint32_t imm  = insn.funct7() & 0x7;
 +
 +  uint64_t r    = x;
++
++  if     ( imm == 1 ) {
++    y = 2;
++  }
 +
 +  if     ( imm == 0 ) {
 +    uint32_t t_0 = ( uint32_t )( r >>  0 );
@@ -653,16 +664,23 @@ index 0000000..c56d9c7
 +}
 diff --git a/riscv/insns/romulus_rstep_enc.h b/riscv/insns/romulus_rstep_enc.h
 new file mode 100644
-index 0000000..42f88f9
+index 0000000..c78eb57
 --- /dev/null
 +++ b/riscv/insns/romulus_rstep_enc.h
-@@ -0,0 +1,64 @@
+@@ -0,0 +1,75 @@
 +if     ( xlen == 32 ) {
 +  uint32_t x    = READ_REG( insn.rs1() );
 +  uint32_t y    = READ_REG( insn.rs2() );
 +  uint32_t imm  = insn.funct7() & 0x7;
 +
 +  uint32_t r    = x;
++
++  if     ( imm == 2 ) {
++    y = 2;
++  }
++  else if( imm == 3 ) {
++    y = 0;
++  }
 +
 +           r    = ( ( uint32_t )( SBOX_ENC( ( r >>  0 ) & 0xFF ) ) <<  0 ) |
 +                  ( ( uint32_t )( SBOX_ENC( ( r >>  8 ) & 0xFF ) ) <<  8 ) |
@@ -692,6 +710,10 @@ index 0000000..42f88f9
 +  uint32_t imm  = insn.funct7() & 0x7;
 +
 +  uint64_t r    = x;
++
++  if     ( imm == 1 ) {
++    y = 2;
++  }
 +
 +           r    = ( ( uint64_t )( SBOX_ENC( ( r >>  0 ) & 0xFF ) ) <<  0 ) |
 +                  ( ( uint64_t )( SBOX_ENC( ( r >>  8 ) & 0xFF ) ) <<  8 ) |
