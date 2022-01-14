@@ -10,8 +10,8 @@ NIST          = ${REPO_HOME}/src/sw/sparkle/nist/Implementations/crypto_aead/sch
 
 NIST_INCLUDES = ${NIST}/ref
 
-NIST_SOURCES  = $(wildcard ${NIST}/ref/*.c)
-NIST_HEADERS  = $(wildcard ${NIST}/ref/*.h)
+NIST_SOURCES  = $(filter-out ${NIST}/ref/genkat_aead.c, $(wildcard ${NIST}/ref/*.c))
+NIST_HEADERS  = $(filter-out ${NIST}/ref/genkat_aead.h, $(wildcard ${NIST}/ref/*.h))
 
 NIST_KAT      = ${NIST}/LWC_AEAD_KAT_128_128.txt
 

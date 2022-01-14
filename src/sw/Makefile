@@ -29,21 +29,26 @@ endif
 # -----------------------------------------------------------------------------
 
 ifeq "${IMP}" "nist"
-export INCLUDES += ${REPO_HOME}/build/${ALG} ${NIST_INCLUDES} ./share ./share/nist ./share/arch/${ARCH}
+export ISE_INCLUDES += ${REPO_HOME}/build/${ALG} ./share ./share/nist ./share/arch/${ARCH}
 else
-export INCLUDES += ${REPO_HOME}/build/${ALG} ${NIST_INCLUDES} ./share ./share/nist ./share/arch/${ARCH} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP} ./${ALG}/imp/share
+export ISE_INCLUDES += ${REPO_HOME}/build/${ALG} ./share ./share/nist ./share/arch/${ARCH} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP} ./${ALG}/imp/share
 endif
 
-export SOURCES  += $(wildcard $(addsuffix /*.c, ${INCLUDES})) ${REPO_HOME}/build/${ALG}/kat.c ${NIST_SOURCES}
-export SOURCES  += $(wildcard $(addsuffix /*.s, ${INCLUDES}))
-export SOURCES  += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
-export HEADERS  += $(wildcard $(addsuffix /*.h, ${INCLUDES})) ${REPO_HOME}/build/${ALG}/kat.h ${NIST_HEADERS}
+export ISE_SOURCES  += $(wildcard $(addsuffix /*.c, ${ISE_INCLUDES})) 
+export ISE_SOURCES  += $(wildcard $(addsuffix /*.s, ${ISE_INCLUDES}))
+export ISE_SOURCES  += $(wildcard $(addsuffix /*.S, ${ISE_INCLUDES}))
+export ISE_HEADERS  += $(wildcard $(addsuffix /*.h, ${ISE_INCLUDES})) 
 
-export TARGETS  += ${REPO_HOME}/build/${ALG}
-export TARGETS  += ${REPO_HOME}/build/${ALG}/kat.h
-export TARGETS  += ${REPO_HOME}/build/${ALG}/kat.c
-export TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
-export TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm
+export     INCLUDES := ${ISE_INCLUDES} ${NIST_INCLUDES}
+
+export     SOURCES  := ${ISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/${ALG}/kat.c 
+export     HEADERS  := ${ISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/${ALG}/kat.h 
+
+export     TARGETS  += ${REPO_HOME}/build/${ALG}
+export     TARGETS  += ${REPO_HOME}/build/${ALG}/kat.h
+export     TARGETS  += ${REPO_HOME}/build/${ALG}/kat.c
+export     TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
+export     TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm
 
 # -----------------------------------------------------------------------------
 
@@ -64,6 +69,12 @@ ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/
 # -----------------------------------------------------------------------------
 
 .PHONY : run scan
+
+debug :
+	@echo "INCLUDES = ${INCLUDES}"
+	@echo "SOURCES  = ${SOURCES}"
+	@echo "HEADERS  = ${HEADERS}"
+	@echo "TARGETS  = ${TARGETS}"
 
 build : ${TARGETS}
 
