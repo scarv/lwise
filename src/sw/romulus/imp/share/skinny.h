@@ -10,4 +10,14 @@
 
 #include "share.h"
 
+extern uint8_t     SBOX_ENC[];
+extern uint8_t     SBOX_DEC[];
+
+extern uint8_t  RC_LFSR_FWD[];
+extern uint8_t  RC_LFSR_REV[];
+extern uint8_t TK2_LFSR_FWD[];
+extern uint8_t TK2_LFSR_REV[];
+extern uint8_t TK3_LFSR_FWD[];
+extern uint8_t TK3_LFSR_REV[];
+
 #endif
