@@ -14,19 +14,20 @@ index dffa41713..9defc4d32 100644
  emu = emulator-$(PROJECT)-$(CONFIG)
  emu_debug = emulator-$(PROJECT)-$(CONFIG)-debug
 diff --git a/emulator/Makefrag-verilator b/emulator/Makefrag-verilator
-index d6423ada0..5dc835e7b 100644
+index d6423ada0..a0189775e 100644
 --- a/emulator/Makefrag-verilator
 +++ b/emulator/Makefrag-verilator
-@@ -5,6 +5,7 @@ firrtl = $(generated_dir)/$(long_name).fir
+@@ -5,6 +5,8 @@ firrtl = $(generated_dir)/$(long_name).fir
  verilog = \
    $(generated_dir)/$(long_name).v \
    $(generated_dir)/$(long_name).behav_srams.v \
 +  $(wildcard $(ISE_RTL)/*.v) \
++  $(wildcard $(RVZBK_RTL)/*.v) \
  
  .SECONDARY: $(firrtl) $(verilog)
  
 diff --git a/src/main/scala/rocket/ALU.scala b/src/main/scala/rocket/ALU.scala
-index 537ffa511..4dd883575 100644
+index 537ffa511..03fc588f9 100644
 --- a/src/main/scala/rocket/ALU.scala
 +++ b/src/main/scala/rocket/ALU.scala
 @@ -5,12 +5,12 @@ package freechips.rocketchip.rocket
@@ -40,12 +41,12 @@ index 537ffa511..4dd883575 100644
  {
 -  val SZ_ALU_FN = 4
 -  def FN_X    = BitPat("b????")
-+  val SZ_ALU_FN = 5
-+  def FN_X    = BitPat("b?????")
++  val SZ_ALU_FN = 6
++  def FN_X    = BitPat("b??????")
    def FN_ADD  = UInt(0)
    def FN_SL   = UInt(1)
    def FN_SEQ  = UInt(2)
-@@ -36,6 +36,11 @@ object ALU
+@@ -36,6 +36,30 @@ object ALU
    def FN_MULHSU = FN_SEQ
    def FN_MULHU  = FN_SNE
  
@@ -54,10 +55,29 @@ index 537ffa511..4dd883575 100644
 +  def FN_XALU2 = UInt(18)
 +  def FN_XALU3 = UInt(19)
 +
++  def FN_ROR   = UInt(32)
++  def FN_ROL   = UInt(33)
++  def FN_RORI  = UInt(34)
++  def FN_ANDN  = UInt(35)
++  def FN_ORN   = UInt(36)
++  def FN_XNOR  = UInt(37)
++  def FN_PACK  = UInt(38)
++  def FN_PACKH = UInt(39)
++  def FN_RORW  = UInt(40)
++  def FN_ROLW  = UInt(41)
++  def FN_RORIW = UInt(42)
++  def FN_PACKW = UInt(43)
++  def FN_BREV8 = UInt(44)
++  def FN_REV8  = UInt(45)
++  def FN_ZIP   = UInt(46)
++  def FN_UNZIP = UInt(47)
++  def FN_XPERM8= UInt(48)
++  def FN_XPERM4= UInt(49)
++
    def isMulFN(fn: UInt, cmp: UInt) = fn(1,0) === cmp(1,0)
    def isSub(cmd: UInt) = cmd(3)
    def isCmp(cmd: UInt) = cmd >= FN_SLT
-@@ -97,3 +102,16 @@ class ALU(implicit p: Parameters) extends CoreModule()(p) {
+@@ -97,3 +121,28 @@ class ALU(implicit p: Parameters) extends CoreModule()(p) {
      when (io.dw === DW_32) { io.out := Cat(Fill(32, out(31)), out(31,0)) }
    }
  }
@@ -74,12 +94,24 @@ index 537ffa511..4dd883575 100644
 +    val ise_out   = Bits(OUTPUT,width = xLen)
 +    val ise_oval  = Bool(OUTPUT) }
 +}
++
++class balu_ise(xLen:Int) extends BlackBox {
++  val io = new Bundle() {
++    val ise_clk   = Clock(INPUT)
++    val ise_rst   = Bool(INPUT)
++    val ise_fn    = Bits(INPUT, SZ_ALU_FN)
++    val ise_in1   = Bits(INPUT ,width = xLen)
++    val ise_in2   = Bits(INPUT ,width = xLen)
++    val ise_val   = Bool(INPUT)
++    val ise_out   = Bits(OUTPUT,width = xLen)
++    val ise_oval  = Bool(OUTPUT) }
++}
 \ No newline at end of file
 diff --git a/src/main/scala/rocket/IDecode.scala b/src/main/scala/rocket/IDecode.scala
-index 94594aec2..e8bb9e9bb 100644
+index 94594aec2..b25a2cb74 100644
 --- a/src/main/scala/rocket/IDecode.scala
 +++ b/src/main/scala/rocket/IDecode.scala
-@@ -365,3 +365,34 @@ class RoCCDecode(implicit val p: Parameters) extends DecodeConstants
+@@ -365,3 +365,64 @@ class RoCCDecode(implicit val p: Parameters) extends DecodeConstants
      CUSTOM3_RD_RS1->    List(Y,N,Y,N,N,N,N,Y,N,A2_ZERO,A1_RS1, IMM_X, DW_XPR,FN_ADD,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
      CUSTOM3_RD_RS1_RS2->List(Y,N,Y,N,N,N,Y,Y,N,A2_ZERO,A1_RS1, IMM_X, DW_XPR,FN_ADD,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N))
  }
@@ -113,30 +145,100 @@ index 94594aec2..e8bb9e9bb 100644
 +    CUSTOM3_RD_RS1->    List(Y,N,N,N,N,N,N,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU3,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
 +    CUSTOM3_RD_RS1_RS2->List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR,FN_XALU3,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N))
 +}
++//ZbKb Decode for a subset of BitManip and Scalar Crypto
++class ZBKBDecode(implicit val p: Parameters) extends DecodeConstants {
++  val table: Array[(BitPat, List[BitPat])] = Array(
++    ROR ->              List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_ROR,    N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    ROL ->              List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_ROL,    N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    RORI ->             List(Y,N,N,N,N,N,N,Y,N,A2_IMM,A1_RS1, IMM_I, DW_XPR, FN_RORI,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    ANDN ->             List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_ANDN,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    ORN ->              List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_ORN,    N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    XNOR ->             List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_XNOR,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    PACK ->             List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_PACK,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    PACKH ->            List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_PACKH,  N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    BREV8 ->            List(Y,N,N,N,N,N,N,Y,N,A2_X  ,A1_RS1, IMM_X, DW_XPR, FN_BREV8,  N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    REV8 ->             List(Y,N,N,N,N,N,N,Y,N,A2_X  ,A1_RS1, IMM_X, DW_XPR, FN_REV8,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    ZIP ->              List(Y,N,N,N,N,N,N,Y,N,A2_X  ,A1_RS1, IMM_X, DW_XPR, FN_ZIP,    N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    UNZIP ->            List(Y,N,N,N,N,N,N,Y,N,A2_X  ,A1_RS1, IMM_X, DW_XPR, FN_UNZIP,  N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N))
 +
++}
++class ZBKB64Decode(implicit val p: Parameters) extends DecodeConstants {
++  val table: Array[(BitPat, List[BitPat])] = Array(
++    ROLW ->             List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_32,  FN_ROLW,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    RORW ->             List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_32,  FN_RORW,   N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    RORIW->             List(Y,N,N,N,N,N,N,Y,N,A2_IMM,A1_RS1, IMM_I, DW_32,  FN_RORIW,  N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    PACKW ->            List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_32,  FN_PACKW,  N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N))
++}
++
++//ZbKx Decode for a subset of BitManip and Scalar Crypto
++class ZBKXDecode(implicit val p: Parameters) extends DecodeConstants {
++  val table: Array[(BitPat, List[BitPat])] = Array(
++    XPERM8 ->           List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_XPERM8, N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N),
++    XPERM4 ->           List(Y,N,N,N,N,N,Y,Y,N,A2_RS2,A1_RS1, IMM_X, DW_XPR, FN_XPERM4, N,M_X,        N,N,N,N,N,N,Y,CSR.N,N,N,N,N))
++}
+\ No newline at end of file
+diff --git a/src/main/scala/rocket/Instructions.scala b/src/main/scala/rocket/Instructions.scala
+index f433fc067..622473935 100644
+--- a/src/main/scala/rocket/Instructions.scala
++++ b/src/main/scala/rocket/Instructions.scala
+@@ -691,6 +691,25 @@ object Instructions {
+   def FMV_S_X            = BitPat("b111100000000?????000?????1010011")
+   def FENCE_TSO          = BitPat("b100000110011?????000?????0001111")
+   def PAUSE              = BitPat("b00000001000000000000000000001111")
++  def ROR                = BitPat("b0110000??????????101?????0110011")
++  def ROL                = BitPat("b0110000??????????001?????0110011")
++  def RORI               = BitPat("b011000???????????101?????0010011")
++  def ANDN               = BitPat("b0100000??????????111?????0110011")
++  def ORN                = BitPat("b0100000??????????110?????0110011")
++  def XNOR               = BitPat("b0100000??????????100?????0110011")
++  def PACK               = BitPat("b0000100??????????100?????0110011")
++  def PACKH              = BitPat("b0000100??????????111?????0110011")
++  def ROLW               = BitPat("b0110000??????????001?????0111011")
++  def RORW               = BitPat("b0110000??????????101?????0111011")
++  def RORIW              = BitPat("b0110000??????????101?????0011011")
++  def PACKW              = BitPat("b0000100??????????100?????0111011")
++  def BREV8              = BitPat("b011010000111?????101?????0010011")
++  def REV8               = BitPat("b011010011000?????101?????0010011")
++  def ZIP                = BitPat("b000010001111?????001?????0010011")
++  def UNZIP              = BitPat("b000010001111?????101?????0010011")
++  def XPERM8             = BitPat("b0010100??????????100?????0110011")
++  def XPERM4             = BitPat("b0010100??????????010?????0110011")
++
+ }
+ object Causes {
+   val misaligned_fetch = 0x0
 diff --git a/src/main/scala/rocket/RocketCore.scala b/src/main/scala/rocket/RocketCore.scala
-index abdbdf93e..ba27a5b5c 100644
+index abdbdf93e..bd27d8a6c 100644
 --- a/src/main/scala/rocket/RocketCore.scala
 +++ b/src/main/scala/rocket/RocketCore.scala
-@@ -42,7 +42,8 @@ case class RocketCoreParams(
+@@ -42,7 +42,11 @@ case class RocketCoreParams(
    mvendorid: Int = 0, // 0 means non-commercial implementation
    mimpid: Int = 0x20181004, // release date in BCD
    mulDiv: Option[MulDivParams] = Some(MulDivParams()),
 -  fpu: Option[FPUParams] = Some(FPUParams())
 +  fpu: Option[FPUParams] = Some(FPUParams()),
-+  useXALU: Boolean = false  // configure to use XALU for ISE
++  useXALU: Boolean = false,  // configure to use XALU for ISE
++  useZBKB: Boolean = false,   // configure to use Zbkb
++  useZBKX: Boolean = false    // configure to use Zbkx
++
  ) extends CoreParams {
    val lgPauseCycles = 5
    val haveFSDirty = false
-@@ -169,6 +170,7 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
+@@ -165,10 +169,13 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
+   val decode_table = {
+     require(!usingRoCC || !rocketParams.useSCIE)
+     (if (usingMulDiv) new MDecode(pipelinedMul) +: (xLen > 32).option(new M64Decode(pipelinedMul)).toSeq else Nil) ++:
++    (if (usingZBKB) new ZBKBDecode +: (xLen > 32).option(new ZBKB64Decode).toSeq else Nil) ++:
+     (if (usingAtomics) new ADecode +: (xLen > 32).option(new A64Decode).toSeq else Nil) ++:
      (if (fLen >= 32) new FDecode +: (xLen > 32).option(new F64Decode).toSeq else Nil) ++:
      (if (fLen >= 64) new DDecode +: (xLen > 32).option(new D64Decode).toSeq else Nil) ++:
      (usingRoCC.option(new RoCCDecode)) ++:
 +    (usingXALU.option(new XALUDecode)) ++:
++    (usingZBKX.option(new ZBKXDecode)) ++:
      (rocketParams.useSCIE.option(new SCIEDecode)) ++:
      (if (xLen == 32) new I32Decode else new I64Decode) +:
      (usingVM.option(new SDecode)) ++:
-@@ -377,6 +379,25 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
+@@ -377,6 +384,43 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
    alu.io.in2 := ex_op2.asUInt
    alu.io.in1 := ex_op1.asUInt
  
@@ -147,7 +249,7 @@ index abdbdf93e..ba27a5b5c 100644
 +    ise_bb.io.ise_clk := clock
 +    ise_bb.io.ise_rst := reset
 +    ise_bb.io.ise_val := ex_ctrl.alu_fn(4)
-+    ise_bb.io.ise_fn := ex_ctrl.alu_fn
++    ise_bb.io.ise_fn  := ex_ctrl.alu_fn
 +    ise_bb.io.ise_imm := ex_reg_inst(31, 25)
 +    ise_bb.io.ise_in1 := ex_op1.asUInt
 +    ise_bb.io.ise_in2 := ex_op2.asUInt
@@ -159,24 +261,42 @@ index abdbdf93e..ba27a5b5c 100644
 +    xalu_ise_out := 0
 +  }
 +
++  val balu_valid = Wire(Bool())
++  val balu_out = Wire(Bits(width = xLen))
++  if (usingZBKB || usingZBKX == true) {
++    val balu_bb = Module(new balu_ise(xLen))
++    balu_bb.io.ise_clk := clock
++    balu_bb.io.ise_rst := reset
++    balu_bb.io.ise_val := ex_ctrl.alu_fn(5)
++    balu_bb.io.ise_fn  := ex_ctrl.alu_fn
++    balu_bb.io.ise_in1 := ex_op1.asUInt
++    balu_bb.io.ise_in2 := ex_op2.asUInt
++    balu_valid := balu_bb.io.ise_oval
++    balu_out := balu_bb.io.ise_out
++  }
++  else{
++    balu_valid := false
++    balu_out := 0
++  }
++
    val ex_scie_unpipelined_wdata = if (!rocketParams.useSCIE) 0.U else {
      val u = Module(new SCIEUnpipelined(xLen))
      u.io.insn := ex_reg_inst
-@@ -538,7 +559,7 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
+@@ -538,7 +582,7 @@ class Rocket(tile: RocketTile)(implicit p: Parameters) extends CoreModule()(p)
      mem_reg_raw_inst := ex_reg_raw_inst
      mem_reg_mem_size := ex_reg_mem_size
      mem_reg_pc := ex_reg_pc
 -    mem_reg_wdata := Mux(ex_scie_unpipelined, ex_scie_unpipelined_wdata, alu.io.out)
-+    mem_reg_wdata := Mux(ex_scie_unpipelined, ex_scie_unpipelined_wdata, Mux(xalu_ise_valid,xalu_ise_out,alu.io.out))
++    mem_reg_wdata := Mux(ex_scie_unpipelined, ex_scie_unpipelined_wdata, Mux(balu_valid, balu_out, Mux(xalu_ise_valid,xalu_ise_out,alu.io.out)))
      mem_br_taken := alu.io.cmp_out
  
      when (ex_ctrl.rxs2 && (ex_ctrl.mem || ex_ctrl.rocc || ex_sfence)) {
 diff --git a/src/main/scala/system/SCARVRocketCoPConfig.scala b/src/main/scala/system/SCARVRocketCoPConfig.scala
 new file mode 100644
-index 000000000..4dbbb4f98
+index 000000000..b1f2aa196
 --- /dev/null
 +++ b/src/main/scala/system/SCARVRocketCoPConfig.scala
-@@ -0,0 +1,47 @@
+@@ -0,0 +1,80 @@
 +// See LICENSE.SiFive for license details.
 +// See LICENSE.Berkeley for license details.
 +
@@ -223,13 +343,46 @@ index 000000000..4dbbb4f98
 +	new WithNBigCores(1) ++
 +	new BaseConfig)
 +
++class WithXLEN64 extends Config((site, here, up) => {
++  case XLen => 64
++})
++
++class SCARVRocketFPGACoPConf64 extends Config(
++	new WithISERoCC ++
++    new WithNBreakpoints(2)	++
++	new WithJtagDTM  ++
++    new WithXLEN64 ++
++	new WithNBigCores(1) ++
++	new BaseConfig)
++
++class SCARVRocketFPGACoPConf32 extends Config(
++	new WithISERoCC ++
++    new WithNBreakpoints(2)	++
++	new WithJtagDTM  ++
++	new DefaultRV32Config ++
++	new BaseConfig)
++
++class SCARVRocketFPGAXALUConf32 extends Config(
++	new WithXALU ++
++    new WithNBreakpoints(2)	++
++	new WithJtagDTM  ++
++	new DefaultRV32Config ++
++	new BaseConfig)
++
++class SCARVRocketFPGAXALUConf64 extends Config(
++	new WithXALU ++
++    new WithNBreakpoints(2)	++
++	new WithJtagDTM  ++
++    new WithXLEN64 ++
++	new WithNBigCores(1) ++
++	new BaseConfig)
 +
 diff --git a/src/main/scala/system/SCARVRocketSystem.scala b/src/main/scala/system/SCARVRocketSystem.scala
 new file mode 100644
-index 000000000..a15b83fce
+index 000000000..e2cd39855
 --- /dev/null
 +++ b/src/main/scala/system/SCARVRocketSystem.scala
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,43 @@
 +
 +package freechips.rocketchip.system
 +
@@ -244,7 +397,7 @@ index 000000000..a15b83fce
 +/** Example Top with periphery devices and ports, and a Rocket subsystem */
 +class SCARVRocketSystem(implicit p: Parameters) extends RocketSubsystem
 +    with HasHierarchicalBusTopology
-+	  with HasAsyncExtInterrupts
++    with HasAsyncExtInterrupts
 +    with CanHaveMasterAXI4MemPort
 +    with CanHaveMasterAXI4MMIOPort
 +    with CanHaveSlaveAXI4Port
@@ -252,7 +405,6 @@ index 000000000..a15b83fce
 +
 +  override lazy val module = new SCARVRocketSystemModuleImp(this)
 +}
-+
 +class SCARVRocketSystemModuleImp[+L <: SCARVRocketSystem](_outer: L) extends RocketSubsystemModuleImp(_outer)
 +	with HasRTCModuleImp
 +    with HasExtInterruptsModuleImp
@@ -260,6 +412,20 @@ index 000000000..a15b83fce
 +    with DontTouch
 +
 +
++class SCARVRocketFPGASystem(implicit p: Parameters) extends RocketSubsystem
++    with HasHierarchicalBusTopology
++    with HasAsyncExtInterrupts
++    with CanHaveMasterAXI4MemPort
++    with CanHaveMasterAXI4MMIOPort
++    with HasPeripheryBootROM {
++
++  override lazy val module = new SCARVRocketFPGASystemModuleImp(this)
++}
++class SCARVRocketFPGASystemModuleImp[+L <: SCARVRocketFPGASystem](_outer: L) extends RocketSubsystemModuleImp(_outer)
++	with HasRTCModuleImp
++    with HasExtInterruptsModuleImp
++    with HasPeripheryBootROMModuleImp
++    with DontTouch
 diff --git a/src/main/scala/system/SCARVRocketTest.scala b/src/main/scala/system/SCARVRocketTest.scala
 new file mode 100644
 index 000000000..0c01c85f0
@@ -295,22 +461,26 @@ index 000000000..0c01c85f0
 +  Debug.connectDebug(dut.debug, dut.psd, clock, reset, io.success)
 +}
 diff --git a/src/main/scala/tile/Core.scala b/src/main/scala/tile/Core.scala
-index 0e82e7dd8..bd881ac1c 100644
+index 0e82e7dd8..c8eb1726d 100644
 --- a/src/main/scala/tile/Core.scala
 +++ b/src/main/scala/tile/Core.scala
-@@ -20,6 +20,7 @@ trait CoreParams {
+@@ -20,6 +20,9 @@ trait CoreParams {
    val useAtomicsOnlyForIO: Boolean
    val useCompressed: Boolean
    val useVector: Boolean = false
++  val useZBKB: Boolean
++  val useZBKX: Boolean
 +  val useXALU: Boolean
    val useSCIE: Boolean
    val useRVE: Boolean
    val mulDiv: Option[MulDivParams]
-@@ -68,6 +69,8 @@ trait HasCoreParameters extends HasTileParameters {
+@@ -68,6 +71,10 @@ trait HasCoreParameters extends HasTileParameters {
    val usingCompressed = coreParams.useCompressed
    val usingVector = coreParams.useVector
    val usingSCIE = coreParams.useSCIE
 +  val usingXALU = coreParams.useXALU
++  val usingZBKB = coreParams.useZBKB
++  val usingZBKX = coreParams.useZBKX
 +
  
    val retireWidth = coreParams.retireWidth
