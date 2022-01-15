@@ -10,6 +10,11 @@
 #include "zbkx.h"
 #include  "ise.h"
 
+// TODO: 
+// - improve register allocation (and so reduce prelude/epilogue)
+// - support part unrolling, which might avoid some moves
+// - support full unrolling
+
 // ----------------------------------------------------------------------------	
 // register allocation
 
@@ -48,18 +53,18 @@
 
 .macro SKINNY_PROLOGUE
                           addi                 sp,  sp, -48     // adjust SP
-                          sd                   s0,        0(sp) // push s0
-                          sd                   s1,        4(sp) // push s1
-                          sd                   s2,        8(sp) // push s2
-                          sd                   s3,       12(sp) // push s3
-                          sd                   s4,       16(sp) // push s4
-                          sd                   s5,       20(sp) // push s5
-                          sd                   s6,       24(sp) // push s6
-                          sd                   s7,       28(sp) // push s7
-                          sd                   s8,       32(sp) // push s8
-                          sd                   s9,       36(sp) // push s9
-                          sd                   s10,      40(sp) // push s10
-                          sd                   s11,      44(sp) // push s11
+                          sw                   s0,        0(sp) // push s0
+                          sw                   s1,        4(sp) // push s1
+                          sw                   s2,        8(sp) // push s2
+                          sw                   s3,       12(sp) // push s3
+                          sw                   s4,       16(sp) // push s4
+                          sw                   s5,       20(sp) // push s5
+                          sw                   s6,       24(sp) // push s6
+                          sw                   s7,       28(sp) // push s7
+                          sw                   s8,       32(sp) // push s8
+                          sw                   s9,       36(sp) // push s9
+                          sw                   s10,      40(sp) // push s10
+                          sw                   s11,      44(sp) // push s11
 
                           li                   a2,        0     // i     =  0
                           li                   a3,       40     // n     = 40
@@ -92,18 +97,18 @@
                           sw                   t2,        8(a0) // MEM[ a0 +  8 ] = s_2
                           sw                   t3,       12(a0) // MEM[ a0 + 12 ] = s_3 
 
-                          sd                   s0,        0(sp) // pop  s0
-                          sd                   s1,        4(sp) // pop  s1
-                          sd                   s2,        8(sp) // pop  s2
-                          sd                   s3,       12(sp) // pop  s3
-                          sd                   s4,       16(sp) // pop  s4
-                          sd                   s5,       20(sp) // pop  s5
-                          sd                   s6,       24(sp) // pop  s6
-                          sd                   s7,       28(sp) // pop  s7
-                          sd                   s8,       32(sp) // pop  s8
-                          sd                   s9,       36(sp) // pop  s9
-                          sd                   s10,      40(sp) // pop  s10
-                          sd                   s11,      44(sp) // pop  s11
+                          lw                   s0,        0(sp) // pop  s0
+                          lw                   s1,        4(sp) // pop  s1
+                          lw                   s2,        8(sp) // pop  s2
+                          lw                   s3,       12(sp) // pop  s3
+                          lw                   s4,       16(sp) // pop  s4
+                          lw                   s5,       20(sp) // pop  s5
+                          lw                   s6,       24(sp) // pop  s6
+                          lw                   s7,       28(sp) // pop  s7
+                          lw                   s8,       32(sp) // pop  s8
+                          lw                   s9,       36(sp) // pop  s9
+                          lw                   s10,      40(sp) // pop  s10
+                          lw                   s11,      44(sp) // pop  s11
                           addi                 sp,  sp,  48     // adjust SP
 
                           ret                                   // return
@@ -112,14 +117,14 @@
 // ----------------------------------------------------------------------------
 // Skinny-128-384+ implementation => round TYPE_1
 
-#if ( ROMULUS_RV64_TYPE1 )
+#if ( ROMULUS_RV32_TYPE1 )
 #error "can't use ROMULUS_RV64_TYPE1: not yet implemented!"
 #endif
 
 // ----------------------------------------------------------------------------
 // Skinny-128-384+ implementation => round TYPE_2
 
-#if ( ROMULUS_RV64_TYPE2 )
+#if ( ROMULUS_RV32_TYPE2 )
 .macro SKINNY_ROUND
                           romulus.rc.upd.enc   a4,  a4          // rc    = romulus.rc.upd.enc( rc )
 
@@ -156,7 +161,16 @@
                           mv                   s10, s8          // tk3_2 = tk3_0
                           mv                   s9,  a6          // tk3_1 = t_1
                           mv                   s8,  a5          // tk3_0 = t_0
-.endf
+
+                          mv                   a5,  t0          // t_0  =       s_0;
+                          xor                  a6,  t1, t2      // t_1  = s_1 ^ s_2;
+                          xor                  a7,  t0, t2      // t_2  = s_0 ^ s_2;
+	
+                          xor                  t0,  a7, t3      // s_0  = t_2 ^ s_3 = s_0 ^       s_2 ^ s_3
+                          mv                   t1,  a5          // s_1  = t_0       = s_0
+                          mv                   t2,  a6          // s_2  = t_1       =       s_1 ^ s_2
+                          mv                   t3,  a7          // s_3  = t_2       = s_0 ^       s_2
+.endm
 #endif
 
 // ----------------------------------------------------------------------------

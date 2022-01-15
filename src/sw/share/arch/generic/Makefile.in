@@ -21,9 +21,12 @@ export GCC_LIBS   =
 
 # -----------------------------------------------------------------------------
 
-run  : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
+run   : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
 	@${<}
 
-scan : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
+debug : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
+	@${<}
+
+scan  : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
 
 # =============================================================================

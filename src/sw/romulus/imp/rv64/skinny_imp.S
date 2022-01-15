@@ -10,6 +10,11 @@
 #include "zbkx.h"
 #include  "ise.h"
 
+// TODO: 
+// - improve register allocation (and so reduce prelude/epilogue)
+// - support part unrolling, which might avoid some moves
+// - support full unrolling
+
 // ----------------------------------------------------------------------------	
 // register allocation
 
@@ -98,7 +103,7 @@
                           xor                  a5,  s0,  s2     // t_0   = tk1_0 ^ tk2_0
                           xor                  a5,  a5,  s3     // t_0   = tk1_0 ^ tk2_0 ^ tk3_0
 
-                          romulus.rc.use.enc   a5,  a5          // t_0   = romulus.rc.use.enc( t_0 )
+                          romulus.rc.use.enc   a5,  a4, a5      // t_0   = romulus.rc.use.enc( rc, t_0 )
 
                           romulus.rstep.enc    a6,  t0,  a5, 0  // t_1   = romulus.rstep.enc( s_0, t_0, 0 )
                           romulus.rstep.enc    a7,  t1,  x0, 1  // t_2   = romulus.rstep.enc( s_1,   0, 1 )
@@ -117,7 +122,7 @@
                           romulus.tk.upd.enc   a5,  s5,      3  // t_0   = romulus.tk.upd.enc( tk3_1, 3 )
                           mv                   s5,  s4          // tk3_1 = tk3_0
                           mv                   s4,  a5          // tk3_0 = t_0
-.endf
+.endm
 #endif
 
 // ----------------------------------------------------------------------------

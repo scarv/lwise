@@ -6,7 +6,7 @@
 
 // ============================================================================
 
-#if ( ASCON_RV64_TYPE2 )
+#if ( ROMULUS_RV64_TYPE2 )
 .macro romulus.rc.upd.enc   rd, rs1
 .insn r CUSTOM_0, 6,      ( 0* 8), \rd, \rs1,   x0
 .endm

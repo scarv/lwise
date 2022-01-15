@@ -68,13 +68,24 @@ ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/
 
 # -----------------------------------------------------------------------------
 
-.PHONY : run scan
+.PHONY : run debug scan
 
-debug :
-	@echo "INCLUDES = ${INCLUDES}"
-	@echo "SOURCES  = ${SOURCES}"
-	@echo "HEADERS  = ${HEADERS}"
-	@echo "TARGETS  = ${TARGETS}"
+dump  :
+	@echo "ALG        = ${ALG}"
+	@echo "ARCH       = ${ARCH}"
+	@echo "IMP        = ${IMP}"
+
+	@echo "CONF       = ${CONF}"
+
+	@echo "GCC_PREFIX = ${GCC_PREFIX}"
+	@echo "GCC_PATHS  = ${GCC_PATHS}"
+	@echo "GCC_FLAGS  = ${GCC_FLAGS}"
+	@echo "GCC_LIBS   = ${GCC_LIBS}"
+
+	@echo "INCLUDES   = ${INCLUDES}"
+	@echo "SOURCES    = ${SOURCES}"
+	@echo "HEADERS    = ${HEADERS}"
+	@echo "TARGETS    = ${TARGETS}"
 
 build : ${TARGETS}
 
