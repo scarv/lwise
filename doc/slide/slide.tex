@@ -22,7 +22,7 @@
 \begin{scriptsize}
 \begin{tabular}{|lc|l|}
 \hline
-Name          & Specification           & Construction                                                                     \\
+Name          & Specification           & Component(s)                                                                     \\
 \hline
 Ascon         & \cite{NIST:LW:ascon}    &                                                                                  \\
 Grain128-AEAD & \cite{NIST:LW:grain}    & L/NFSRs                                                                          \\
@@ -42,6 +42,12 @@ Xoodyak       & \cite{NIST:LW:xoodyak}  & {\sc Xoodoo}                       per
 \end{center}
 
 \end{frame}
+
+% design criteria
+% - strictly $3$-address (i.e., $2$-input, $1$ output) instructions
+
+% design consideration
+% - ``partial'' component (e.g., only encryption, or only forward permutation)
 
 % =============================================================================
 
