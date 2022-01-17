@@ -26,13 +26,12 @@
 #define ROT(x, n) (((x) >> (n)) | ((x) << (32-(n))))
 #define ELL(x) (ROT(((x) ^ ((x) << 16)), 16))
 
-
+#if !defined( ISE )
 // Round constants
 static const uint32_t RCON[MAX_BRANCHES] = {      \
   0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, \
   0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D  \
 };
-
 
 void sparkle_opt(uint32_t *state, int brans, int steps)
 {
@@ -130,6 +129,9 @@ void sparkle_inv_opt(uint32_t *state, int brans, int steps)
   }
 }
 
+#else
+
+#endif
 
 void clear_state_opt(uint32_t *state, int brans)
 {

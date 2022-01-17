@@ -55,7 +55,7 @@
               sw           s11, 44(sp)                    // push s11
 
               li           t2,   0                        // t2 =  0              => i = 0
-              li           t3,   7                        // t3 =  7              => n = 7	
+              mv           t3,   a2                       // t3 =  7              => n = 7	
 .endm
 
 .macro SPARKLE_FWD_EPILOGUE
@@ -91,7 +91,7 @@
               sw           s10, 40(sp)                    // push s10
               sw           s11, 44(sp)                    // push s11
 
-              li           t2,      7                    // t2 =   7             
+              mv           t2,     a2                     // t2 =   7             
 .endm
 
 .macro SPARKLE_REV_EPILOGUE
@@ -308,8 +308,9 @@
 // ----------------------------------------------------------------------------
 // SPARKLE    implementation => forward/ inverse add step counter
 
-.macro SPARKLE_FWD_ADDCNT rc, st, y0, y1, t0
-              lw          \t0,    0(\rc)
+.macro SPARKLE_FWD_ADDCNT rcb, rc, st, y0, y1, t0
+              add         \t0, \rc, \rcb
+              lw          \t0,    0(\t0)
               xor         \y0, \y0, \t0                  // y0 ^= rc
 #if  ( SPARKLE_FWD_UNROLL )
               xori        \y1, \y1, \st                  // y1 ^= i
@@ -318,8 +319,9 @@
 #endif
 .endm
 
-.macro SPARKLE_REV_ADDCNT rc, st, y0, y1, t0
-              lw          \t0,    0(\rc)
+.macro SPARKLE_REV_ADDCNT rcb, rc, st, y0, y1, t0
+              add         \t0, \rc, \rcb
+              lw          \t0,    0(\t0)
               xor         \y0, \y0, \t0                  // y0 ^= rc
 #if  ( SPARKLE_REV_UNROLL )
               xori        \y1, \y1, \st                  // y1 ^= i
@@ -333,11 +335,12 @@
 #if ( SPARKLE_RV32_TYPE1 ) || ( SPARKLE_RV32_TYPE2 ) || ( SPARKLE_RV32_TYPE3 ) || ( SPARKLE_RV32_TYPE4 )
 .macro SPARKLE_FWD_STEP           rcb,  rc,  st,  x0,  x1,  x2,  x3,  x4,  x5,  y0,  y1,  y2,  y3,  y4,  y5,  t0,  t1,  t2
 
-              SPARKLE_FWD_ADDCNT       \rc, \st,                               \y0, \y1,                     \t0
+              SPARKLE_FWD_ADDCNT \rcb, \rc, \st,                               \y0, \y1,                     \t0
               SPARKLE_FWD_ARXBOX \rcb,           \x0, \x1, \x2, \x3, \x4, \x5, \y0, \y1, \y2, \y3, \y4, \y5, \t0, \t1, \t2
               SPARKLE_FWD_LINEAR                 \x0, \x1, \x2, \x3, \x4, \x5, \y0, \y1, \y2, \y3, \y4, \y5, \t0, \t1, \t2
 
               addi                     \rc, \rc,   4          //          => rc +=  4
+              andi                     \rc, \rc,  31          //             rc  =  rc  % (SPARKLE_BRANS*4)
 #if !( SPARKLE_FWD_UNROLL )
               addi                     \st, \st,   1          //  t2 = t2 + 1  => step++
 #endif
@@ -349,8 +352,9 @@
 #endif
               SPARKLE_REV_LINEAR                 \x0, \x1, \x2, \x3, \x4, \x5, \y0, \y1, \y2, \y3, \y4, \y5, \t0, \t1, \t2
               SPARKLE_REV_ARXBOX \rcb,           \x0, \x1, \x2, \x3, \x4, \x5, \y0, \y1, \y2, \y3, \y4, \y5, \t0, \t1, \t2
-              SPARKLE_REV_ADDCNT       \rc, \st,                               \y0, \y1,                     \t0
+              SPARKLE_REV_ADDCNT \rcb, \rc, \st,                               \y0, \y1,                     \t0
               addi                     \rc, \rc,  -4          //           => rc -=  4
+              andi                     \rc, \rc,  31          //             rc  =  rc  % (SPARKLE_BRANS*4)
 .endm       
 
 #endif
@@ -360,11 +364,11 @@
 
 .section .text  
 
-.global sparkle_fwd
+.global sparkle_opt
 
-sparkle_fwd:  SPARKLE_FWD_PROLOGUE
+sparkle_opt:  SPARKLE_FWD_PROLOGUE
               la           t0, SPARKLE_RCON              // t0 = &SPARKLE_RCON_POINTER
-              mv           t1, t0                        // t1 = &SPARKLE_RCON_INDEX
+              mv           t1, x0                        // t1 = &SPARKLE_RCON_INDEX
               //               rcb  rc  st  x0  x1  x2  x3  x4  x5   y0   y1   y2   y3    y4   y5  t0  t1  t2
               SPARKLE_RD_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9,  s10, s11
 #if ( SPARKLE_FWD_UNROLL )          
@@ -395,9 +399,9 @@ sparkle_fwd:  SPARKLE_FWD_PROLOGUE
 
 .section .text  
 
-.global sparkle_rev
+.global sparkle_inv_opt
 
-sparkle_rev:  SPARKLE_REV_PROLOGUE                      
+sparkle_inv_opt:  SPARKLE_REV_PROLOGUE
               la           t0, SPARKLE_RCON              // t0 = &SPARKLE_RCON_POINTER
               addi         t1, t0, 4*6                   // t1 = &SPARKLE_RCON_INDEX
               //               rcb  rc  st  x0  x1  x2  x3  x4  x5   y0   y1   y2   y3   y4   y5  t0  t1  t2

@@ -7,7 +7,7 @@
 
 #include "sparkle_imp.h"
 
-void sparkle_fwd( uint32_t* state, int brans, int steps ) { // brans \in { 4, 6, 8 }
+void sparkle_opt( uint32_t* state, int brans, int steps ) { // brans \in { 4, 6, 8 }
   uint32_t x, y, tmpx, tmpy;
 
   for( int i = 0; i < steps; i++ ) {
@@ -43,7 +43,7 @@ void sparkle_fwd( uint32_t* state, int brans, int steps ) { // brans \in { 4, 6,
   }
 }
 
-void sparkle_rev( uint32_t* state, int brans, int steps ) { // brans \in { 4, 6, 8 }
+void sparkle_inv_opt( uint32_t* state, int brans, int steps ) { // brans \in { 4, 6, 8 }
   uint32_t x, y, tmpx, tmpy;
   
   for( int i = ( steps - 1 ); i >= 0; i-- ) {
