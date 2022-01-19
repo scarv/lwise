@@ -16,6 +16,4 @@ typedef uint32_t tXoodooLane;
 
 extern const uint32_t RC[MAXROUNDS];
 
-void Xoodoo_Permute_Nrounds(void * state, uint32_t nr);
-
 #endif

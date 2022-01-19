@@ -222,9 +222,6 @@ void Xoodoo_Permute_Nrounds( void * state, uint32_t nr )
     fromWordsToBytes((unsigned char *)state, a);
 
 }
-#else 
-extern void Xoodoo_Permute_Nrounds( void * state, uint32_t nr );
-#endif
 
 void Xoodoo_Permute_6rounds( uint32_t * state)
 {
@@ -236,3 +233,7 @@ void Xoodoo_Permute_12rounds( uint32_t * state)
     Xoodoo_Permute_Nrounds( state, 12 );
 }
 
+#else 
+// extern void Xoodoo_Permute_Nrounds( void * state, uint32_t nr );
+extern void Xoodoo_Permute_12rounds( void * state);
+#endif

@@ -158,3 +158,8 @@ void Xoodoo_Permute_Nrounds(void * state, uint32_t nr)
 
   fromWordsToBytes((unsigned char *) state, a);
 }
+
+void Xoodoo_Permute_12rounds( void * state)
+{
+    Xoodoo_Permute_Nrounds( state, 12 );
+}
