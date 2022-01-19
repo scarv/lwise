@@ -218,7 +218,7 @@ index 7028c85..ab3ddd6 100644
    int64_t shamt() { return x(20, 6); }
    int64_t s_imm() { return x(7, 5) + (xs(25, 7) << 5); }
 diff --git a/riscv/encoding.h b/riscv/encoding.h
-index b216296..53cf591 100644
+index b216296..5e1b7bb 100644
 --- a/riscv/encoding.h
 +++ b/riscv/encoding.h
 @@ -281,6 +281,44 @@
@@ -227,41 +227,41 @@ index b216296..53cf591 100644
  #define RISCV_ENCODING_H
 +// ++ romulus
 +#define MATCH_ROMULUS_RC_UPD_ENC   0x0000600B
-+#define  MASK_ROMULUS_RC_UPD_ENC   0xC000707F
++#define  MASK_ROMULUS_RC_UPD_ENC   0xF000707F
 +#define MATCH_ROMULUS_RC_UPD_DEC   0x8000600B
-+#define  MASK_ROMULUS_RC_UPD_DEC   0xC000707F
++#define  MASK_ROMULUS_RC_UPD_DEC   0xF000707F
 +#define MATCH_ROMULUS_RC_USE_ENC   0x1000700B
-+#define  MASK_ROMULUS_RC_USE_ENC   0xC000707F
++#define  MASK_ROMULUS_RC_USE_ENC   0xF000707F
 +#define MATCH_ROMULUS_RC_USE_DEC   0x9000700B
-+#define  MASK_ROMULUS_RC_USE_DEC   0xC000707F
++#define  MASK_ROMULUS_RC_USE_DEC   0xF000707F
 +#define MATCH_ROMULUS_RC_USE_ENC_0 0x2000700B
-+#define  MASK_ROMULUS_RC_USE_ENC_0 0xC000707F
++#define  MASK_ROMULUS_RC_USE_ENC_0 0xF000707F
 +#define MATCH_ROMULUS_RC_USE_DEC_0 0xA000700B
-+#define  MASK_ROMULUS_RC_USE_DEC_0 0xC000707F
++#define  MASK_ROMULUS_RC_USE_DEC_0 0xF000707F
 +#define MATCH_ROMULUS_RC_USE_ENC_1 0x3000700B
-+#define  MASK_ROMULUS_RC_USE_ENC_1 0xC000707F
++#define  MASK_ROMULUS_RC_USE_ENC_1 0xF000707F
 +#define MATCH_ROMULUS_RC_USE_DEC_1 0xB000700B
-+#define  MASK_ROMULUS_RC_USE_DEC_1 0xC000707F
++#define  MASK_ROMULUS_RC_USE_DEC_1 0xF000707F
 +#define MATCH_ROMULUS_TK_UPD_ENC   0x0000602B
-+#define  MASK_ROMULUS_TK_UPD_ENC   0xC000707F
++#define  MASK_ROMULUS_TK_UPD_ENC   0xF000707F
 +#define MATCH_ROMULUS_TK_UPD_DEC   0x8000602B
-+#define  MASK_ROMULUS_TK_UPD_DEC   0xC000707F
++#define  MASK_ROMULUS_TK_UPD_DEC   0xF000707F
 +#define MATCH_ROMULUS_TK_UPD_ENC_0 0x1000702B
-+#define  MASK_ROMULUS_TK_UPD_ENC_0 0xC000707F
++#define  MASK_ROMULUS_TK_UPD_ENC_0 0xF000707F
 +#define MATCH_ROMULUS_TK_UPD_DEC_0 0x9000702B
-+#define  MASK_ROMULUS_TK_UPD_DEC_0 0xC000707F
++#define  MASK_ROMULUS_TK_UPD_DEC_0 0xF000707F
 +#define MATCH_ROMULUS_TK_UPD_ENC_1 0x2000702B
-+#define  MASK_ROMULUS_TK_UPD_ENC_1 0xC000707F
++#define  MASK_ROMULUS_TK_UPD_ENC_1 0xF000707F
 +#define MATCH_ROMULUS_TK_UPD_DEC_1 0xA000702B
-+#define  MASK_ROMULUS_TK_UPD_DEC_1 0xC000707F
++#define  MASK_ROMULUS_TK_UPD_DEC_1 0xF000707F
 +#define MATCH_ROMULUS_RSTEP_ENC    0x0000705B
-+#define  MASK_ROMULUS_RSTEP_ENC    0xC000707F
++#define  MASK_ROMULUS_RSTEP_ENC    0xF000707F
 +#define MATCH_ROMULUS_RSTEP_DEC    0x8000705B
-+#define  MASK_ROMULUS_RSTEP_DEC    0xC000707F
++#define  MASK_ROMULUS_RSTEP_DEC    0xF000707F
 +#define MATCH_ROMULUS_CSTEP_ENC    0x1000705B
-+#define  MASK_ROMULUS_CSTEP_ENC    0xC000707F
++#define  MASK_ROMULUS_CSTEP_ENC    0xF000707F
 +#define MATCH_ROMULUS_CSTEP_DEC    0x9000705B
-+#define  MASK_ROMULUS_CSTEP_DEC    0xC000707F
++#define  MASK_ROMULUS_CSTEP_DEC    0xF000707F
 +// -- romulus
  #define MATCH_SLLI_RV32 0x1013
  #define MASK_SLLI_RV32  0xfe00707f
@@ -537,7 +537,7 @@ index 0000000..7cdfbc5
 +}
 diff --git a/riscv/insns/romulus_rc_use_enc.h b/riscv/insns/romulus_rc_use_enc.h
 new file mode 100644
-index 0000000..a5ebdf9
+index 0000000..824a767
 --- /dev/null
 +++ b/riscv/insns/romulus_rc_use_enc.h
 @@ -0,0 +1,10 @@
@@ -547,7 +547,7 @@ index 0000000..a5ebdf9
 +
 +  uint64_t t = ( ( ( x >> 0 ) & 0xF ) <<  0 ) |
 +               ( ( ( x >> 4 ) & 0x3 ) << 32 ) ;
-+  uint32_t r = y ^ t;
++  uint64_t r = y ^ t;
 +
 +  WRITE_REG( insn.rd(), r );  
 +}
@@ -583,7 +583,7 @@ index 0000000..7cdfbc5
 +}
 diff --git a/riscv/insns/romulus_rstep_dec.h b/riscv/insns/romulus_rstep_dec.h
 new file mode 100644
-index 0000000..ce21107
+index 0000000..3523907
 --- /dev/null
 +++ b/riscv/insns/romulus_rstep_dec.h
 @@ -0,0 +1,75 @@
@@ -624,9 +624,9 @@ index 0000000..ce21107
 +  WRITE_REG( insn.rd(), r );  
 +}
 +else if( xlen == 64 ) {
-+  uint32_t x    = READ_REG( insn.rs1() );
-+  uint32_t y    = READ_REG( insn.rs2() );
-+  uint32_t imm  = insn.funct7() & 0x7;
++  uint64_t x    = READ_REG( insn.rs1() );
++  uint64_t y    = READ_REG( insn.rs2() );
++  uint64_t imm  = insn.funct7() & 0x7;
 +
 +  uint64_t r    = x;
 +
@@ -664,7 +664,7 @@ index 0000000..ce21107
 +}
 diff --git a/riscv/insns/romulus_rstep_enc.h b/riscv/insns/romulus_rstep_enc.h
 new file mode 100644
-index 0000000..c78eb57
+index 0000000..133f99f
 --- /dev/null
 +++ b/riscv/insns/romulus_rstep_enc.h
 @@ -0,0 +1,75 @@
@@ -705,9 +705,9 @@ index 0000000..c78eb57
 +  WRITE_REG( insn.rd(), r );  
 +}
 +else if( xlen == 64 ) {
-+  uint32_t x    = READ_REG( insn.rs1() );
-+  uint32_t y    = READ_REG( insn.rs2() );
-+  uint32_t imm  = insn.funct7() & 0x7;
++  uint64_t x    = READ_REG( insn.rs1() );
++  uint64_t y    = READ_REG( insn.rs2() );
++  uint64_t imm  = insn.funct7() & 0x7;
 +
 +  uint64_t r    = x;
 +

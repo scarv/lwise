@@ -68,6 +68,7 @@
 
                           li                   a2,        0     // i     =  0
                           li                   a3,       40     // n     = 40
+                          li                   a4,        0     // rc    =  0
 
                           lw                   t0,        0(a0) // s_0   = MEM[ a0 +  0 ]
                           lw                   t1,        4(a0) // s_1   = MEM[ a0 +  8 ]
@@ -133,7 +134,7 @@
                           xor                  a6,  s1,  s5     // t_1   = tk1_1 ^ tk2_1
                           xor                  a6,  a6,  s9     // t_1   = tk1_1 ^ tk2_1 ^ tk3_1
 
-                          romulus.rc.use.enc.0 a5,  a4,  a5     // t_0   = romulus.rc.use.enc.0( rc, t_0 )
+                          romulus.rc.use.enc.0 a5,  a4,  a5     // t_0   = romulus.rc.use.enc.0( rc, t_0 ) !
                           romulus.rc.use.enc.1 a6,  a4,  a6     // t_1   = romulus.rc.use.enc.0( rc, t_1 )
 
                           romulus.rstep.enc    t0,  t0,  a5,  0 // s_0   = romulus.rstep.enc( s_0, t_0, 0 )
@@ -180,7 +181,7 @@
   
 .global skinny_128_384_plus_enc
 
-skinny_128_384_plus_enc : SKINNY_EPILOGUE
+skinny_128_384_plus_enc : SKINNY_PROLOGUE
 
 0:                        SKINNY_ROUND
 
