@@ -10,11 +10,6 @@
 #include "zbkx.h"
 #include  "ise.h"
 
-// TODO: 
-// - improve register allocation (and so reduce prelude/epilogue)
-// - support part unrolling, which might avoid some moves
-// - support full unrolling
-
 // ----------------------------------------------------------------------------	
 // register allocation
 
@@ -66,8 +61,10 @@
                           sw                   s10,      40(sp) // push s10
                           sw                   s11,      44(sp) // push s11
 
+#if !( ROMULUS_UNROLL )
                           li                   a2,        0     // i     =  0
                           li                   a3,       40     // n     = 40
+#endif
                           li                   a4,        0     // rc    =  0
 
                           lw                   t0,        0(a0) // s_0   = MEM[ a0 +  0 ]
@@ -118,14 +115,14 @@
 // ----------------------------------------------------------------------------
 // Skinny-128-384+ implementation => round TYPE_1
 
-#if ( ROMULUS_RV32_TYPE1 )
+#if  ( ROMULUS_RV32_TYPE1 )
 #error "can't use ROMULUS_RV64_TYPE1: not yet implemented!"
 #endif
 
 // ----------------------------------------------------------------------------
 // Skinny-128-384+ implementation => round TYPE_2
 
-#if ( ROMULUS_RV32_TYPE2 )
+#if  ( ROMULUS_RV32_TYPE2 )
 .macro SKINNY_ROUND
                           romulus.rc.upd.enc   a4,  a4          // rc    = romulus.rc.upd.enc( rc )
 
@@ -183,12 +180,18 @@
 
 skinny_128_384_plus_enc : SKINNY_PROLOGUE
 
+#if !( ROMULUS_UNROLL )
 0:                        SKINNY_ROUND
 
                           addi                 a2,  a2,   1     // i     = i + 1
                           bgeu                 a2,  a3,   1f    // if i >= n, goto 1
                           
                           j                               0b    //            goto 0
+#else
+                          .rept 40
+                          SKINNY_ROUND
+                          .endr
+#endif
 
 1:                        SKINNY_EPILOGUE
 

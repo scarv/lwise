@@ -105,6 +105,7 @@
 
 | `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
 | :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
+|           | `romulus`  |           | `ROMULUS_UNROLL`      | use fully (vs. partially, by a factor of two) unrolled implementation                                          |
 |           | `romulus`  | `rv32`    | `ROMULUS_RV32_TYPE1`  | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
 |           | `romulus`  | `rv32`    | `ROMULUS_RV32_TYPE2`  | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
 |           | `romulus`  | `rv64`    | `ROMULUS_RV64_TYPE1`  | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
