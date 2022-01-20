@@ -69,6 +69,7 @@
    ((uint64_t)(ASCON_HASHA_PA_ROUNDS) << 40) | \
    ((uint64_t)(ASCON_HASHA_PA_ROUNDS - ASCON_HASHA_PB_ROUNDS) << 32))
 
+#if !defined( ISE )
 static inline void P12(state_t* s) {
   printstate(" permutation input", s);
   ROUND(s, 0xf0);
@@ -106,5 +107,20 @@ static inline void P6(state_t* s) {
   ROUND(s, 0x5a);
   ROUND(s, 0x4b);
 }
+
+#else
+extern void Ascon_Permute_6rounds(void * state);
+extern void Ascon_Permute_12rounds(void * state);
+
+static inline void P12(void* s)
+{
+  Ascon_Permute_12rounds(s);
+}
+
+static inline void P6(void* s)
+{
+  Ascon_Permute_6rounds(s);
+}
+#endif
 
 #endif /* PERMUTATIONS_H_ */
