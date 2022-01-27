@@ -58,7 +58,7 @@ static const uint32_t RCON[MAX_BRANCHES] = {      \
   0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D  \
 };
 
-#if !defined( ISE )
+#if !defined( LWISE )
 void linear_layer(SparkleState *state, int brans)
 {
   int i, b = brans/2;

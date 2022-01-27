@@ -69,7 +69,7 @@
    ((uint64_t)(ASCON_HASHA_PA_ROUNDS) << 40) | \
    ((uint64_t)(ASCON_HASHA_PA_ROUNDS - ASCON_HASHA_PB_ROUNDS) << 32))
 
-#if !defined( ISE )
+#if !defined( LWISE )
 static inline void P12(state_t* s) {
   printstate(" permutation input", s);
   ROUND(s, 0xf0);

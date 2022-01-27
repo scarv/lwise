@@ -122,7 +122,7 @@ static void Dump(char * text, tXoodooLane * a, unsigned int level)
 
 #endif
 
-#if !defined( ISE )
+#if !defined( LWISE )
 static void fromBytesToWords(tXoodooLane *stateAsWords, const unsigned char *state)
 {
     unsigned int i, j;

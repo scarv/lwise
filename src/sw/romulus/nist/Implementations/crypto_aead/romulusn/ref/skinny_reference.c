@@ -240,7 +240,7 @@ void enc(unsigned char* input, const unsigned char* userkey)
 		input[i] = state[i>>2][i&0x3] & 0xFF;
 }
 
-#if !defined( ISE )
+#if !defined( LWISE )
 void skinny_128_384_plus_enc (unsigned char* input, const unsigned char* userkey) {
  	enc(input,userkey); 
 }

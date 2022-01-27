@@ -23,32 +23,32 @@ include ./${ALG}/Makefile.in
 ifeq "${IMP}" "nist"
 GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
 else
-GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DISE
+GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
 endif
 
 # -----------------------------------------------------------------------------
 
 ifeq "${IMP}" "nist"
-export ISE_INCLUDES += ${REPO_HOME}/build/${ALG} ./share ./share/nist ./share/arch/${ARCH}
+export LWISE_INCLUDES += ${REPO_HOME}/build/${ALG} ./share ./share/nist ./share/arch/${ARCH}
 else
-export ISE_INCLUDES += ${REPO_HOME}/build/${ALG} ./share ./share/nist ./share/arch/${ARCH} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP} ./${ALG}/imp/share
+export LWISE_INCLUDES += ${REPO_HOME}/build/${ALG} ./share ./share/nist ./share/arch/${ARCH} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP} ./${ALG}/imp/share
 endif
 
-export ISE_SOURCES  += $(wildcard $(addsuffix /*.c, ${ISE_INCLUDES})) 
-export ISE_SOURCES  += $(wildcard $(addsuffix /*.s, ${ISE_INCLUDES}))
-export ISE_SOURCES  += $(wildcard $(addsuffix /*.S, ${ISE_INCLUDES}))
-export ISE_HEADERS  += $(wildcard $(addsuffix /*.h, ${ISE_INCLUDES})) 
+export LWISE_SOURCES  += $(wildcard $(addsuffix /*.c, ${LWISE_INCLUDES})) 
+export LWISE_SOURCES  += $(wildcard $(addsuffix /*.s, ${LWISE_INCLUDES}))
+export LWISE_SOURCES  += $(wildcard $(addsuffix /*.S, ${LWISE_INCLUDES}))
+export LWISE_HEADERS  += $(wildcard $(addsuffix /*.h, ${LWISE_INCLUDES})) 
 
-export     INCLUDES := ${ISE_INCLUDES} ${NIST_INCLUDES}
+export       INCLUDES := ${LWISE_INCLUDES} ${NIST_INCLUDES}
 
-export     SOURCES  := ${ISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/${ALG}/kat.c 
-export     HEADERS  := ${ISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/${ALG}/kat.h 
+export       SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/${ALG}/kat.c 
+export       HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/${ALG}/kat.h 
 
-export     TARGETS  += ${REPO_HOME}/build/${ALG}
-export     TARGETS  += ${REPO_HOME}/build/${ALG}/kat.h
-export     TARGETS  += ${REPO_HOME}/build/${ALG}/kat.c
-export     TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
-export     TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm
+export       TARGETS  += ${REPO_HOME}/build/${ALG}
+export       TARGETS  += ${REPO_HOME}/build/${ALG}/kat.h
+export       TARGETS  += ${REPO_HOME}/build/${ALG}/kat.c
+export       TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
+export       TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm
 
 # -----------------------------------------------------------------------------
 

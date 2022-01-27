@@ -26,7 +26,7 @@
 #define ROT(x, n) (((x) >> (n)) | ((x) << (32-(n))))
 #define ELL(x) (ROT(((x) ^ ((x) << 16)), 16))
 
-#if !defined( ISE )
+#if !defined( LWISE )
 // Round constants
 static const uint32_t RCON[MAX_BRANCHES] = {      \
   0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, \
