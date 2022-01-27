@@ -42,8 +42,7 @@
   `SBOX_ENC` 
   and 
   `SBOX_DEC`, 
-  for example, are the 8-bit Skinny encryption and decryption S-boxes defined in
-  [Tab. 2.1, 1](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf).
+  for example, are the 8-bit Skinny encryption and decryption S-boxes.
 
 <!--- -------------------------------------------------------------------- --->
 

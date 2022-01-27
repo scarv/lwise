@@ -16,26 +16,30 @@
 \titlepage
 \end{frame}
 
+$56$ round-$1$ candidates
+$32$ round-$2$ candidates
+$10$           finalists
+
 \begin{frame}
 
 \begin{center}
 \begin{scriptsize}
 \begin{tabular}{|lc|l|}
 \hline
-Name          & Specification           & Component(s)                                                                     \\
+Name          & Specification           & AEAD & Hash & Component(s)                        
 \hline
-Ascon         & \cite{NIST:LW:ascon}    &                                                                                  \\
-Grain128-AEAD & \cite{NIST:LW:grain}    & L/NFSRs                                                                          \\
-ISAP          & \cite{NIST:LW:isap}     &                                                                                  \\
+Grain128-AEAD & \cite{NIST:LW:grain}    & X    &      &             Stream cipher => L/NFSRs
 \hline
-GIFT-COFB     & \cite{NIST:LW:gift}     & GIFT-128                  block cipher                                           \\
-Romulus       & \cite{NIST:LW:romulus}  & Skinny-128-384+ tweakable block cipher                                           \\
+GIFT-COFB     & \cite{NIST:LW:gift}     & X    &      &             Block  cipher => GIFT-128
+Romulus       & \cite{NIST:LW:romulus}  & X    & X    & (Tweakable) Block  cipher => Skinny-128-384+
 \hline
-Elephant      & \cite{NIST:LW:elephant} & Spongent-$\pi$[n] or Keccak-$f$[m] permutation                                   \\
-Photon-Beetle & \cite{NIST:LW:photon}   & ${\tt PHOTON}_{256}$               permutation                                   \\
-Sparkle       & \cite{NIST:LW:sparkle}  & {\sc Sparkle}                      permutation (involving {\sf Alzette} ARX-box) \\
-TinyJambu     & \cite{NIST:LW:jambu}    & $P_n$                              permutation (involving LFSR)                  \\
-Xoodyak       & \cite{NIST:LW:xoodyak}  & {\sc Xoodoo}                       permutation                                   \\
+Ascon         & \cite{NIST:LW:ascon}    & X    & X    &             Permutation
+Elephant      & \cite{NIST:LW:elephant} & X    &      &             Permutation   => Spongent-$\pi$[n] or Keccak-$f$[m]
+Photon-Beetle & \cite{NIST:LW:photon}   & X    & X    &             Permutation   => ${\tt PHOTON}_{256}$
+Sparkle       & \cite{NIST:LW:sparkle}  & X    & X    &             Permutation   => {\sc Sparkle}                      (involving {\sf Alzette} ARX-box) \\
+Xoodyak       & \cite{NIST:LW:xoodyak}  & X    & X    &             Permutation   => {\sc Xoodoo}
+ISAP          & \cite{NIST:LW:isap}     & X    &      &             Permutation                                                                                      \\
+TinyJambu     & \cite{NIST:LW:jambu}    & X    &      & (Keyed)     Permutation   => $P_n$                              (involving LFSR)                  \\
 \hline
 \end{tabular}
 \end{scriptsize}
@@ -45,9 +49,18 @@ Xoodyak       & \cite{NIST:LW:xoodyak}  & {\sc Xoodoo}                       per
 
 % design criteria
 % - strictly $3$-address (i.e., $2$-input, $1$ output) instructions
-
 % design consideration
 % - ``partial'' component (e.g., only encryption, or only forward permutation)
+
+% special-purpose
+% - there are some cases where an interface change helps a lot (e.g., Photon initialises a state matrix row-wise but the natural representation/implementation is column-wise)
+% - there are some cases where a 32-bit ISE doesn't ``scale'' naturally to 64-bit (e.g., the AES-like approach for Photon)
+
+% general-purpose
+% - several shift/rotate + X for X in \SET{ XOR, ... }
+% - SWAPMOVE is a generic primitive used in several implementations based on fix-slicing
+% - there are a few cases where ``small'' LFSRs are involved
+
 
 % =============================================================================
 
