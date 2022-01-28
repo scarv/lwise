@@ -39,6 +39,7 @@
 
 | `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
 | :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
+|           | `photon`   |           | `PHOTON_UNROLL`       | use fully (vs. partially, by a factor of two) unrolled implementation                                          |
 |           | `photon`   | `rv32`    | `PHOTON_RV32_TYPE1`   | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
 |           | `photon`   | `rv32`    | `PHOTON_RV32_TYPE2`   | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
 |           | `photon`   | `rv64`    | `PHOTON_RV64_TYPE1`   | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |

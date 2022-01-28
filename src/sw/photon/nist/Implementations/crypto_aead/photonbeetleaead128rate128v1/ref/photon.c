@@ -187,6 +187,7 @@ void Permutation(byte state[D][D], int R)
 	}
 }
 
+#if !defined( LWISE )
 void PHOTON_Permutation(unsigned char *State_in)
 {
     byte state[D][D];
@@ -205,3 +206,4 @@ void PHOTON_Permutation(unsigned char *State_in)
 		State_in[i / 2] |= (state[i / D][i % D] & 0xf) << (4 * (i & 1));
 	}
 }
+#endif

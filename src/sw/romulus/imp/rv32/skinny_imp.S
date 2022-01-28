@@ -116,7 +116,7 @@
 // Skinny-128-384+ implementation => round TYPE_1
 
 #if  ( ROMULUS_RV32_TYPE1 )
-#error "can't use ROMULUS_RV64_TYPE1: not yet implemented!"
+#error "can't use ROMULUS_RV32_TYPE1: not yet implemented!"
 #endif
 
 // ----------------------------------------------------------------------------

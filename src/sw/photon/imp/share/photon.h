@@ -5,11 +5,14 @@
  * as LICENSE.txt within the associated archive or repository).
  */
 
-#ifndef __PHOTON_IMP_H
-#define __PHOTON_IMP_H
+#ifndef __PHOTON_H
+#define __PHOTON_H
 
 #include "share.h"
 
-#include "photon.h"
+extern uint8_t M[ 8 ][ 8 ];
+extern uint8_t SBOX[ 16 ];
+
+extern uint8_t GF2N_MUL( uint8_t x, uint8_t y );
 
 #endif
