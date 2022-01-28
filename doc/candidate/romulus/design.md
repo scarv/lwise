@@ -46,7 +46,7 @@
 
 <!--- -------------------------------------------------------------------- --->
 
-## Context
+## Discussion
 
 - There are 4 varients of Romulus [1], namely
 
@@ -67,8 +67,8 @@
 
 - The design of Skinny is SP-like:
 
-  - The state is a $( 4 \times 4 )$-element matrix of $8$-bit cells, which
-    means a total size of $128$ bits.
+  - The state is a ( 4 x 4 )-element matrix of 8-bit cells, which means 
+    a total size of 128 bits.
 
   - The computation involves 40 rounds of
 
@@ -80,7 +80,7 @@
 
     wherein `SubCells` uses an 8-bit S-box denoted S_8.
 
-- There are some chances to improve or strealine the ISE, e.g.,
+- Some implementation notes:
 
   - Romulus only makes use of Skinny-based encryption; clearly it's be
     possible to provide support for decryption, e.g., when aiming for

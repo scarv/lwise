@@ -31,7 +31,43 @@
 
 <!--- -------------------------------------------------------------------- --->
 
-## Context
+## Discussion
+
+- PHOTON-Beetle makes use of the PHOTON_256 permutation, defined in [2].
+
+- The design of PHOTON_256 is SP-like, and indeed explicitly AES-like:
+
+  - The state is a ( 8 x 8 )-element matrix of 4-bit cells, which means 
+    a total size of 256 bits.
+
+  - The computation involves 12 rounds of
+
+    - `AddConstants`
+    - `SubCells`
+    - `ShiftRows`
+    - `MixColumnSerial`
+
+    wherein `SubCells` uses an 4-bit S-box (more specifically, the same 
+    one as PRESENT); note that the `MixColumnSerial` round function has
+    a slightly involved design (vs. AES), which aims to allow efficient
+    (e.g., wrt. area) hardware implementations.
+
+- Some implementation notes:
+
+  - It doesn't *seem* explicit in the design, but PHOTON_256 populates
+    the state matrix row-wise.  Implementations that use a column-wise 
+    packed representation seem to pay a high overhead when converting
+    to and from a byte array; it *seems* this could change.
+  - The AES-like design suggests an AES-like ISE; in a sense it seems
+    a pity the paramterisation doesn't use 8-bit cells and hence the
+    AES S-box, since then there's even more overlap wrt. the standard
+    RISC-V ISE for AES.
+  - Much like the standard RISC-V ISE for AES, a different approach is
+    needed for 64-bit platforms: it's hard to capture the `ShiftRows`,
+    round function, for example, if more than one column is packed in
+    each 64-bit word.  However, the state is larger: this means the
+    same approach used by the standard RISC-V ISE for AES doesn't seem
+    possible.
 
 <!--- -------------------------------------------------------------------- --->
 

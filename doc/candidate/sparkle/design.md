@@ -25,7 +25,7 @@ Throughout the following, we
 
 <!--- -------------------------------------------------------------------- --->
 
-## Context
+## Discussion
 
 Focusing on encryption, the Alzette function is described in [Appx. C, 2] 
 as follows
@@ -77,10 +77,6 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
 
 | `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
 | :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `sparkle`  |           | `CRAXS10_ENC_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX encryption                       |
-|           | `sparkle`  |           | `CRAXS10_DEC_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of CRAX decryption                       |
-|           | `sparkle`  |           | `TRAXL17_ENC_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX encryption                       |
-|           | `sparkle`  |           | `TRAXL17_DEC_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of TRAX decryption                       |
 |           | `sparkle`  |           | `SPARKLE_FWD_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
 |           | `sparkle`  |           | `SPARKLE_REV_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
 |           | `sparkle`  | `rv32`    | `SPARKLE_RV32_ELL`    | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |

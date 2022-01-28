@@ -17,7 +17,7 @@ Throughout the following, we
 
 <!--- -------------------------------------------------------------------- --->
 
-## Context
+## Discussion
 
 The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 
