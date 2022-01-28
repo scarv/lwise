@@ -6,13 +6,13 @@
 
 # =============================================================================
 
-NIST          = ${REPO_HOME}/src/sw/sparkle/nist/Implementations/crypto_aead/schwaemm256128v2
+NIST_HOME     ?= ${REPO_HOME}/src/sw/sparkle/nist/Implementations/crypto_aead/schwaemm256128v2
+NIST_IMP      ?= opt
+NIST_KAT      ?= ${NIST_HOME}/LWC_AEAD_KAT_128_256.txt
 
-NIST_INCLUDES = ${NIST}/opt
+NIST_INCLUDES  = ${NIST_HOME}/${NIST_IMP}
 
-NIST_SOURCES  = $(filter-out ${NIST}/opt/genkat_aead.c, $(wildcard ${NIST}/opt/*.c))
-NIST_HEADERS  = $(filter-out ${NIST}/opt/genkat_aead.h, $(wildcard ${NIST}/opt/*.h))
-
-NIST_KAT      = ${NIST}/LWC_AEAD_KAT_128_256.txt
+NIST_SOURCES   = $(filter-out ${NIST_HOME}/${NIST_IMP}/genkat_aead.c, $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c))
+NIST_HEADERS   = $(filter-out ${NIST_HOME}/${NIST_IMP}/genkat_aead.h, $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h))
 
 # =============================================================================

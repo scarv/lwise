@@ -6,13 +6,13 @@
 
 # =============================================================================
 
-NIST          = ${REPO_HOME}/src/sw/photon/nist/Implementations/crypto_aead/photonbeetleaead128rate128v1
+NIST_HOME     ?= ${REPO_HOME}/src/sw/photon/nist/Implementations/crypto_aead/photonbeetleaead128rate128v1
+NIST_IMP      ?= ref
+NIST_KAT      ?= ${NIST_HOME}/LWC_AEAD_KAT_128_128.txt
 
-NIST_INCLUDES = ${NIST}/ref
+NIST_INCLUDES  = ${NIST_HOME}/${NIST_IMP}
 
-NIST_SOURCES  = $(wildcard ${NIST}/ref/*.c)
-NIST_HEADERS  = $(wildcard ${NIST}/ref/*.h)
-
-NIST_KAT      = ${NIST}/LWC_AEAD_KAT_128_128.txt
+NIST_SOURCES   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c)
+NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h)
 
 # =============================================================================
