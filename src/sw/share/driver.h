@@ -27,47 +27,42 @@
 #define DRIVER_TRIALS_REAL 1000
 #endif
 
-#if !defined( DRIVER_SIZEOF_K    )
-#define DRIVER_SIZEOF_K    (     CRYPTO_KEYBYTES )
-#endif
-#if !defined( DRIVER_SIZEOF_N    )
-#define DRIVER_SIZEOF_N MIN( 16, CRYPTO_PUBBYTES )
-#endif
 #if !defined( DRIVER_SIZEOF_A    )
-#define DRIVER_SIZEOF_A MIN( 16, CRYPTO_ABYTES   )
+#define DRIVER_SIZEOF_A ( 16 )
 #endif
 #if !defined( DRIVER_SIZEOF_M    )
-#define DRIVER_SIZEOF_M    ( 16                  )
+#define DRIVER_SIZEOF_M ( 16 )
 #endif
-#if !defined( DRIVER_SIZEOF_C    )
-#define DRIVER_SIZEOF_C    ( 16                  )
-#endif
+
+#define DRIVER_SIZEOF_K ( CRYPTO_KEYBYTES )
+#define DRIVER_SIZEOF_N ( CRYPTO_NSECBYTES + CRYPTO_NPUBBYTES )
+#define DRIVER_SIZEOF_C ( DRIVER_SIZEOF_M + CRYPTO_ABYTES )
 
 // ----------------------------------------------------------------------------
 
-#define MEASURE_PROLOGUE(id)                                                         \
-  uint32_t id ## _tsc_b      =  0;                                                   \
-  uint32_t id ## _tsc_a      =  0;                                                   \
-                                                                                     \
-  uint32_t id ## _tsc_t_mean =  0;                                                   \
-  uint32_t id ## _tsc_t_min  = -1;                                                   \
+#define MEASURE_PROLOGUE(id)                                                              \
+  uint32_t id ## _tsc_b      =  0;                                                        \
+  uint32_t id ## _tsc_a      =  0;                                                        \
+                                                                                          \
+  uint32_t id ## _tsc_t_mean =  0;                                                        \
+  uint32_t id ## _tsc_t_min  = -1;                                                        \
   uint32_t id ## _tsc_t_max  =  0;
 
-#define MEASURE_STEP(id,...)                                                         \
-  id ## _tsc_b = rdtsc();                                                            \
-  id( __VA_ARGS__ );                                                                 \
-  id ## _tsc_a = rdtsc();                                                            \
-                                                                                     \
-  if( i >= trials_warm ) {                                                           \
-    id ## _tsc_t_mean +=    (                   id ## _tsc_a - id ## _tsc_b );       \
-    id ## _tsc_t_min   = MIN( id ## _tsc_t_min, id ## _tsc_a - id ## _tsc_b );       \
-    id ## _tsc_t_max   = MAX( id ## _tsc_t_max, id ## _tsc_a - id ## _tsc_b );       \
+#define MEASURE_STEP(id,...)                                                              \
+  id ## _tsc_b = rdtsc();                                                                 \
+  id( __VA_ARGS__ );                                                                      \
+  id ## _tsc_a = rdtsc();                                                                 \
+                                                                                          \
+  if( i >= trials_warm ) {                                                                \
+    id ## _tsc_t_mean +=    (                   id ## _tsc_a - id ## _tsc_b );            \
+    id ## _tsc_t_min   = MIN( id ## _tsc_t_min, id ## _tsc_a - id ## _tsc_b );            \
+    id ## _tsc_t_max   = MAX( id ## _tsc_t_max, id ## _tsc_a - id ## _tsc_b );            \
   }
 
-#define MEASURE_EPILOGUE(id,n)                                                       \
-    printf( "tsc (mean)    : %s => %f\n", #id, ( float )( id ## _tsc_t_mean ) / n ); \
-    printf( "tsc (minimum) : %s => %f\n", #id, ( float )( id ## _tsc_t_min )      ); \
-    printf( "tsc (maximum) : %s => %f\n", #id, ( float )( id ## _tsc_t_max )      );
+#define MEASURE_EPILOGUE(id)                                                              \
+    printf( "tsc (mean)    : %s => %f\n", #id, ( float )( id ## _tsc_t_mean ) / trials ); \
+    printf( "tsc (minimum) : %s => %f\n", #id, ( float )( id ## _tsc_t_min )           ); \
+    printf( "tsc (maximum) : %s => %f\n", #id, ( float )( id ## _tsc_t_max )           );
 
 // ============================================================================
 

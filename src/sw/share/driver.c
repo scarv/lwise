@@ -124,11 +124,67 @@ void test_decrypt() {
 // ----------------------------------------------------------------------------
 
 void time_encrypt() {
+  unsigned long long k_n = DRIVER_SIZEOF_K; uint8_t k[ k_n ];
+  unsigned long long n_n = DRIVER_SIZEOF_N; uint8_t n[ n_n ];
+  unsigned long long a_n = DRIVER_SIZEOF_A; uint8_t a[ a_n ];
+  unsigned long long m_n = DRIVER_SIZEOF_M; uint8_t m[ m_n ];
+  unsigned long long c_n = DRIVER_SIZEOF_C; uint8_t c[ c_n ];
 
+  int trials_warm = DRIVER_TRIALS_WARM;
+  int trials_real = DRIVER_TRIALS_REAL;
+
+  int trials      = trials_warm + trials_real;
+
+  printf( "sizeof( k ) = %llu\n", k_n );
+  printf( "sizeof( n ) = %llu\n", n_n );
+  printf( "sizeof( a ) = %llu\n", a_n );
+  printf( "sizeof( m ) = %llu\n", m_n );
+  printf( "sizeof( c ) = %llu\n", c_n );
+
+  MEASURE_PROLOGUE( crypto_aead_encrypt );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( k, k_n );
+    rand_bytes( n, n_n );
+    rand_bytes( a, a_n );
+    rand_bytes( m, m_n );
+
+    MEASURE_STEP( crypto_aead_encrypt, c, &c_n, m, m_n, a, a_n, NULL, n, k );
+  }
+
+  MEASURE_EPILOGUE( crypto_aead_encrypt );
 }
 
 void time_decrypt() {
+  unsigned long long k_n = DRIVER_SIZEOF_K; uint8_t k[ k_n ];
+  unsigned long long n_n = DRIVER_SIZEOF_N; uint8_t n[ n_n ];
+  unsigned long long a_n = DRIVER_SIZEOF_A; uint8_t a[ a_n ];
+  unsigned long long m_n = DRIVER_SIZEOF_M; uint8_t m[ m_n ];
+  unsigned long long c_n = DRIVER_SIZEOF_C; uint8_t c[ c_n ];
 
+  int trials_warm = DRIVER_TRIALS_WARM;
+  int trials_real = DRIVER_TRIALS_REAL;
+
+  int trials      = trials_warm + trials_real;
+
+  printf( "sizeof( k ) = %llu\n", k_n );
+  printf( "sizeof( n ) = %llu\n", n_n );
+  printf( "sizeof( a ) = %llu\n", a_n );
+  printf( "sizeof( m ) = %llu\n", m_n );
+  printf( "sizeof( c ) = %llu\n", c_n );
+
+  MEASURE_PROLOGUE( crypto_aead_decrypt );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( k, k_n );
+    rand_bytes( n, n_n );
+    rand_bytes( a, a_n );
+    rand_bytes( c, c_n );
+
+    MEASURE_STEP( crypto_aead_decrypt, m, &m_n, NULL, c, c_n, a, a_n, n, k );
+  }
+
+  MEASURE_EPILOGUE( crypto_aead_decrypt );
 }
 
 // ----------------------------------------------------------------------------

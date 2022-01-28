@@ -136,10 +136,8 @@ such as execution latency.
   | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness (rather than `rand`)                                                      |
   | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase (default is   `10`) |
   | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase (default is `1000`) |
-  | `DRIVER_SIZEOF_N`    | number of bytes in `n`, i.e., nonce                                                               (default is   `16`) |
-  | `DRIVER_SIZEOF_A`    | number of bytes in `n`, i.e., additional data                                                     (default is   `16`) |
-  | `DRIVER_SIZEOF_M`    | number of bytes in `n`, i.e.,  plaintext data                                                     (default is   `16`) |
-  | `DRIVER_SIZEOF_C`    | number of bytes in `n`, i.e., ciphertext data                                                     (default is   `16`) |
+  | `DRIVER_SIZEOF_A`    | number of bytes in `a`, i.e., additional data                                                     (default is   `16`) |
+  | `DRIVER_SIZEOF_M`    | number of bytes in `m`, i.e.,  plaintext data                                                     (default is   `16`) |
 
   plus various algorithm-, architecture-, and/or implementation-specific
   cases documented elsewhere.
