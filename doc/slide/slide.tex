@@ -34,7 +34,7 @@ GIFT-COFB     & \cite{NIST:LW:gift}     & X    &      &             Block  ciphe
 Romulus       & \cite{NIST:LW:romulus}  & X    & X    & (Tweakable) Block  cipher => Skinny-128-384+
 \hline
 Ascon         & \cite{NIST:LW:ascon}    & X    & X    &             Permutation
-Elephant      & \cite{NIST:LW:elephant} & X    &      &             Permutation   => Spongent-$\pi$[n] or Keccak-$f$[m]
+Elephant      & \cite{NIST:LW:elephant} & X    &      &             Permutation   => Spongent-$\pi[n]$ or Keccak-$f[m]$
 Photon-Beetle & \cite{NIST:LW:photon}   & X    & X    &             Permutation   => ${\tt PHOTON}_{256}$
 Sparkle       & \cite{NIST:LW:sparkle}  & X    & X    &             Permutation   => {\sc Sparkle}                      (involving {\sf Alzette} ARX-box) \\
 Xoodyak       & \cite{NIST:LW:xoodyak}  & X    & X    &             Permutation   => {\sc Xoodoo}
@@ -46,6 +46,13 @@ TinyJambu     & \cite{NIST:LW:jambu}    & X    &      & (Keyed)     Permutation 
 \end{center}
 
 \end{frame}
+
+% -----------------------------------------------------------------------------
+
+% scope
+% - RV32 and RV64, but focus on the former initially
+% - broad and shallow analysis of AEAD only
+% - ignore ISAP (since this uses Ascon-$p$ or Keccak-$f[m]$ permutation
 
 % design criteria
 % - strictly $3$-address (i.e., $2$-input, $1$ output) instructions
@@ -60,7 +67,6 @@ TinyJambu     & \cite{NIST:LW:jambu}    & X    &      & (Keyed)     Permutation 
 % - several shift/rotate + X for X in \SET{ XOR, ... }
 % - SWAPMOVE is a generic primitive used in several implementations based on fix-slicing
 % - there are a few cases where ``small'' LFSRs are involved
-
 
 % =============================================================================
 

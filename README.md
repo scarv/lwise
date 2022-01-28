@@ -59,8 +59,8 @@ such as execution latency.
   | [TinyJambu](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/tinyjambu-spec-final.pdf)         | `jambu`    | [o](./doc/candidate/jambu/design.md)   | [o](./doc/candidate/jambu/encoding.txt)   | o         |          | o        |
   | [Xoodyak](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/xoodyak-spec-final.pdf)             | `xoodyak`  | [o](./doc/candidate/xoodyak/design.md) | [o](./doc/candidate/xoodyak/encoding.txt) | o         |          | o        |
   
-  noting that we ignore ISAP: this construction is more like a generic mode
-  of operation, so there *seems* less scope for use of ISEs.
+  noting that we ignore ISAP because it uses building blocks (e.g., the
+  Ascon permutation) already covered by other candidates.
 
 <!--- ==================================================================== --->
 
@@ -133,9 +133,13 @@ such as execution latency.
 
   | Symbol               | Meaning                                                                                                               |
   | :------------------- | :-------------------------------------------------------------------------------------------------------------------- |
+  | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness (rather than `rand`)                                                      |
   | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase (default is   `10`) |
   | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase (default is `1000`) |
-  | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness, rather than `rand`                                                       |
+  | `DRIVER_SIZEOF_N`    | number of bytes in `n`, i.e., nonce                                                               (default is   `16`) |
+  | `DRIVER_SIZEOF_A`    | number of bytes in `n`, i.e., additional data                                                     (default is   `16`) |
+  | `DRIVER_SIZEOF_M`    | number of bytes in `n`, i.e.,  plaintext data                                                     (default is   `16`) |
+  | `DRIVER_SIZEOF_C`    | number of bytes in `n`, i.e., ciphertext data                                                     (default is   `16`) |
 
   plus various algorithm-, architecture-, and/or implementation-specific
   cases documented elsewhere.

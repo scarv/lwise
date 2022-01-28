@@ -9,6 +9,64 @@
 
 // ============================================================================
 
+void parse_bytes( uint8_t* r, char* x, int n ) {
+  char* p = x;
+
+  for( int i = 0; i < n; i += 1, p += 2 ) {
+    int t;
+
+    if( sscanf( p, "%02X", &t ) != 1 ) {
+      abort();
+    }
+
+    r[ i ] = ( uint8_t )( t );
+  }
+}
+
+void dump_bytes( uint8_t* x, int n ) {
+  for( int i = ( n - 1 ); i >= 0; i-- ) {
+    printf( "%02X", x[ i ] );
+  }
+
+  printf( "\n" );
+}
+
+#if  defined( DRIVER_RANDOM )
+FILE* rand_bytes_prg = NULL;
+
+void rand_bytes_init() {
+  if( NULL == ( rand_bytes_prg = fopen( "/dev/urandom", "rb" ) ) ) {
+    abort();
+  }
+}
+
+void rand_bytes_fini() {
+  fclose( rand_bytes_prg );
+}
+
+void rand_bytes(           uint8_t* x, int n ) {
+  if( n != fread( x, sizeof( uint8_t ), n, rand_bytes_prg ) ) {
+    abort();
+  }
+}
+#else
+void rand_bytes_init() {
+  srand( 0 );
+}
+
+void rand_bytes_fini() {
+
+}
+
+void rand_bytes(           uint8_t* x, int n ) {
+  for( int i = 0; i < n; i++ ) {
+    x[ i ] = rand() & 0xFF;
+  }
+}
+#endif
+
+// ============================================================================
+
 void test_encrypt() {
   for( int i = 0; KAT[ i ].i >= 0; i++ ) {
     unsigned long long k_n = KAT[ i ].k_n; uint8_t k[ k_n ]; parse_bytes( k, KAT[ i ].k, KAT[ i ].k_n );
@@ -76,6 +134,8 @@ void time_decrypt() {
 // ----------------------------------------------------------------------------
 
 int main( int argc, char* argv[] ) {
+  rand_bytes_init();
+
   printf( "++ [ALG=%s, ARCH=%s, IMP=%s] test : encrypt\n", ALG, ARCH, IMP );
   test_encrypt();
   printf( "-- [ALG=%s, ARCH=%s, IMP=%s] test : encrypt\n", ALG, ARCH, IMP );
@@ -91,6 +151,8 @@ int main( int argc, char* argv[] ) {
   printf( "++ [ALG=%s, ARCH=%s, IMP=%s] time : decrypt\n", ALG, ARCH, IMP );
   time_decrypt();
   printf( "-- [ALG=%s, ARCH=%s, IMP=%s] time : decrypt\n", ALG, ARCH, IMP );
+
+  rand_bytes_fini();
 
   return 0;
 }
