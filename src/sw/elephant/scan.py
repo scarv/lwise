@@ -4,9 +4,14 @@
 # can be found at https://opensource.org/licenses/MIT (or should be included 
 # as LICENSE.txt within the associated archive or repository).
 
-import itertools, scan
+import driver, itertools
 
 # =============================================================================
+
+def nist( args ) :
+  pass
+
+# -----------------------------------------------------------------------------
 
 def rv32( args ) :
   pass
@@ -19,6 +24,6 @@ def rv64( args ) :
 # -----------------------------------------------------------------------------
 
 if ( __name__ == '__main__' ) :
-  scan.main( rv32, rv64 )
+  driver.main( nist, rv32, rv64 )
 
 # =============================================================================

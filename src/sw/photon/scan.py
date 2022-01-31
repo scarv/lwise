@@ -11,33 +11,34 @@ import driver, itertools
 def nist( args ) :
   CONF = []
 
-  driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'ref'            )
-  driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'opt32t'         )
-  driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'fixslice_opt32' )
+  driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'ref'           )
+  driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'table2'        )
+  driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'table3'        )
+  driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'bitslice_sb32' )
 
 # -----------------------------------------------------------------------------
 
 def rv32( args ) :
-  for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE2' ] :
+  for TYPE in [ 'PHOTON_RV32_TYPE1', 'PHOTON_RV32_TYPE2' ] :
     for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
 
       if ( UNROLL ) :
-        CONF += [ 'ROMULUS_UNROLL' ]
+        CONF += [ 'PHOTON_UNROLL' ]
 
-      driver.run( args, 'romulus', CONF, 'rv32', 'rv32' )
+      driver.run( args, 'photon', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
 
 def rv64( args ) :
-  for TYPE in [ 'ROMULUS_RV64_TYPE1', 'ROMULUS_RV64_TYPE2' ] :
+  for TYPE in [ 'PHOTON_RV64_TYPE1', 'PHOTON_RV64_TYPE2' ] :
     for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
 
       if ( UNROLL ) :
-        CONF += [ 'ROMULUS_UNROLL' ]
+        CONF += [ 'PHOTON_UNROLL' ]
 
-      driver.run( args, 'romulus', CONF, 'rv64', 'rv64' )
+      driver.run( args, 'photon', CONF, 'rv64', 'rv64' )
 
 # -----------------------------------------------------------------------------
 

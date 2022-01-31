@@ -192,21 +192,21 @@ void time_decrypt() {
 int main( int argc, char* argv[] ) {
   rand_bytes_init();
 
-  printf( "++ [ALG=%s, ARCH=%s, IMP=%s] test : encrypt\n", ALG, ARCH, IMP );
+  printf( "++ test : encrypt\n" );
   test_encrypt();
-  printf( "-- [ALG=%s, ARCH=%s, IMP=%s] test : encrypt\n", ALG, ARCH, IMP );
+  printf( "-- test : encrypt\n" );
 
-  printf( "++ [ALG=%s, ARCH=%s, IMP=%s] test : decrypt\n", ALG, ARCH, IMP );
+  printf( "++ test : decrypt\n" );
   test_decrypt();
-  printf( "-- [ALG=%s, ARCH=%s, IMP=%s] test : decrypt\n", ALG, ARCH, IMP );
+  printf( "-- test : decrypt\n" );
 
-  printf( "++ [ALG=%s, ARCH=%s, IMP=%s] time : encrypt\n", ALG, ARCH, IMP );
+  printf( "++ time : encrypt\n" );
   time_encrypt();
-  printf( "-- [ALG=%s, ARCH=%s, IMP=%s] time : encrypt\n", ALG, ARCH, IMP );
+  printf( "-- time : encrypt\n" );
 
-  printf( "++ [ALG=%s, ARCH=%s, IMP=%s] time : decrypt\n", ALG, ARCH, IMP );
+  printf( "++ time : decrypt\n" );
   time_decrypt();
-  printf( "-- [ALG=%s, ARCH=%s, IMP=%s] time : decrypt\n", ALG, ARCH, IMP );
+  printf( "-- time : decrypt\n" );
 
   rand_bytes_fini();
 

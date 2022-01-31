@@ -6,13 +6,13 @@
 
 # =============================================================================
 
-NIST_HOME     ?= ${REPO_HOME}/src/sw/gift/nist/Implementations/crypto_aead/giftcofb128v1
-NIST_IMP      ?= ref
-NIST_KAT      ?= ${NIST_HOME}/LWC_AEAD_KAT_128_128.txt
+export NIST_HOME     ?= ${REPO_HOME}/src/sw/gift/nist/Implementations/crypto_aead/giftcofb128v1
+export NIST_IMP      ?= ref
+export NIST_KAT      ?= ${NIST_HOME}/LWC_AEAD_KAT_128_128.txt
 
-NIST_INCLUDES  = ${NIST_HOME}/${NIST_IMP}
+export NIST_INCLUDES  = ${NIST_HOME}/${NIST_IMP}
 
-NIST_SOURCES   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c)
-NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h)
+export NIST_SOURCES   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c)
+export NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h)
 
 # =============================================================================

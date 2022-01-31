@@ -13,17 +13,17 @@ endif
 
 # =============================================================================
 
-# include build-related content for architecture
-include ./share/arch/${ARCH}/Makefile.in
-
 # include build-related content for algorithm
 include ./${ALG}/Makefile.in
 
+# include build-related content for architecture
+include ./share/arch/${ARCH}/Makefile.in
+
 # pass-through environment variable as macros for use in source code
 ifeq "${IMP}" "nist"
-GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
+GCC_FLAGS += -DALG="\"${ALG}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
 else
-GCC_FLAGS += -DALG="\"${ALG}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
+GCC_FLAGS += -DALG="\"${ALG}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
 endif
 
 # -----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ ${REPO_HOME}/build/${ALG}/kat.c : ${NIST_KAT}
 	@python3 ./share/kat.py --source < ${<} > ${@}
 
 ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf : ${SOURCES} 
-	@${GCC_PREFIX}-gcc ${CONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -Wall -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+	@${GCC_PREFIX}-gcc ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
 	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
@@ -72,10 +72,13 @@ ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/
 
 dump  :
 	@echo "ALG        = ${ALG}"
+	@echo "CONF       = ${CONF}"
 	@echo "ARCH       = ${ARCH}"
 	@echo "IMP        = ${IMP}"
 
-	@echo "CONF       = ${CONF}"
+	@echo "NIST_HOME  = ${NIST_HOME}"
+	@echo "NIST_IMP   = ${NIST_IMP}"
+	@echo "NIST_KAT   = ${NIST_KAT}"
 
 	@echo "GCC_PREFIX = ${GCC_PREFIX}"
 	@echo "GCC_PATHS  = ${GCC_PATHS}"
