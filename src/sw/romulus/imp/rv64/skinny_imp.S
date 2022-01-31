@@ -95,7 +95,7 @@
 // Skinny-128-384+ implementation => round TYPE_2
 
 #if  ( ROMULUS_RV64_TYPE2 )
-.macro SKINNY_ROUND
+.macro SKINNY_ROUND I
                           romulus.rc.upd.enc   a4,  a4          // rc    = romulus.rc.upd.enc( rc )
 
                           xor                  a5,  s0,  s2     // t_0   = tk1_0 ^ tk2_0
@@ -129,18 +129,22 @@
   
 .global skinny_128_384_plus_enc
 
-skinny_128_384_plus_enc : SKINNY_PROLOGUE
+skinny_128_384_plus_enc:  SKINNY_PROLOGUE
 
 #if !( ROMULUS_UNROLL )
 0:                        SKINNY_ROUND
+                          SKINNY_ROUND
 
-                          addi                 a2,  a2,   1     // i     = i + 1
+                          addi                 a2,  a2,   2     // i     = i + 2
                           bgeu                 a2,  a3,   1f    // if i >= n, goto 1
                           
                           j                               0b    //            goto 0
 #else
-                          .rept 40
-                          SKINNY_ROUND
+                          .set I,     0
+                          .rept 20
+                          SKINNY_ROUND I + 0
+                          SKINNY_ROUND I + 1
+                          .set I, I + 2
                           .endr
 #endif
 
