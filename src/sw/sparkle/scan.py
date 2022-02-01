@@ -8,15 +8,13 @@ import driver, itertools
 
 # =============================================================================
 
-def nist( args ) :
-  CONF = []
-
-  driver.run( args, 'sparkle', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
-  driver.run( args, 'sparkle', CONF, 'rv32', 'nist', NIST_IMP = 'opt' )
-
-# -----------------------------------------------------------------------------
-
 def rv32( args ) :
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'sparkle', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
+    driver.run( args, 'sparkle', CONF, 'rv32', 'nist', NIST_IMP = 'opt' )
+
   for TYPE in [ 'SPARKLE_RV32_TYPE1', 'SPARKLE_RV32_TYPE2', 'SPARKLE_RV32_TYPE3', 'SPARKLE_RV32_TYPE4'                       ] :
     for UNROLL in [ False, True ] :
       for ( ELL, RCON ) in itertools.product( [ False, True ], repeat = 2 ) :
@@ -35,6 +33,12 @@ def rv32( args ) :
 # -----------------------------------------------------------------------------
 
 def rv64( args ) :
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'sparkle', CONF, 'rv64', 'nist', NIST_IMP = 'ref' )
+    driver.run( args, 'sparkle', CONF, 'rv64', 'nist', NIST_IMP = 'opt' )
+
   for TYPE in [ 'SPARKLE_RV64_TYPE1', 'SPARKLE_RV64_TYPE2', 'SPARKLE_RV64_TYPE3', 'SPARKLE_RV64_TYPE4', 'SPARKLE_RV64_TYPE5' ] :
     for UNROLL in [ False, True ] :
       for ( ELL, RCON ) in itertools.product( [ False, True ], repeat = 2 ) :
@@ -53,6 +57,6 @@ def rv64( args ) :
 # -----------------------------------------------------------------------------
 
 if ( __name__ == '__main__' ) :
-  driver.main( nist, rv32, rv64 )
+  driver.main( rv32, rv64 )
 
 # =============================================================================

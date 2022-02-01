@@ -8,16 +8,14 @@ import driver, itertools
 
 # =============================================================================
 
-def nist( args ) :
-  CONF = []
-
-  driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'ref'            )
-  driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'opt32t'         )
-  driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'fixslice_opt32' )
-
-# -----------------------------------------------------------------------------
-
 def rv32( args ) :
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'ref'            )
+    driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'opt32t'         )
+    driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'fixslice_opt32' )
+
   for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE2' ] :
     for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
@@ -30,6 +28,13 @@ def rv32( args ) :
 # -----------------------------------------------------------------------------
 
 def rv64( args ) :
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'romulus', CONF, 'rv64', 'nist', NIST_IMP = 'ref'            )
+    driver.run( args, 'romulus', CONF, 'rv64', 'nist', NIST_IMP = 'opt32t'         )
+    driver.run( args, 'romulus', CONF, 'rv64', 'nist', NIST_IMP = 'fixslice_opt32' )
+
   for TYPE in [ 'ROMULUS_RV64_TYPE1', 'ROMULUS_RV64_TYPE2' ] :
     for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
@@ -42,6 +47,6 @@ def rv64( args ) :
 # -----------------------------------------------------------------------------
 
 if ( __name__ == '__main__' ) :
-  driver.main( nist, rv32, rv64 )
+  driver.main( rv32, rv64 )
 
 # =============================================================================

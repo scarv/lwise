@@ -38,20 +38,19 @@ def run( args, ALG, CONF, ARCH, IMP, NIST_IMP = None ) :
 
 # -----------------------------------------------------------------------------
 
-def main( nist, rv32, rv64 ) :
+def main( rv32, rv64 ) :
   parser = argparse.ArgumentParser()
 
-  parser.add_argument( '--nist',        dest = 'nist',        action = 'store_true',                           default = False     )
-  parser.add_argument( '--rv32',        dest = 'rv32',        action = 'store_true',                           default = False     )
-  parser.add_argument( '--rv64',        dest = 'rv64',        action = 'store_true',                           default = False     )
+  parser.add_argument( '--rv32',        dest = 'rv32',        action = 'store_true',        default = False )
+  parser.add_argument( '--rv64',        dest = 'rv64',        action = 'store_true',        default = False )
 
-  parser.add_argument( '--trials-warm', dest = 'trials_warm', action = 'store', type = int,                    default =   10      )
-  parser.add_argument( '--trials-real', dest = 'trials_real', action = 'store', type = int,                    default = 1000      )
+  parser.add_argument( '--nist',        dest = 'nist',        action = 'store_true',        default = False )
+
+  parser.add_argument( '--trials-warm', dest = 'trials_warm', action = 'store', type = int, default =   10  )
+  parser.add_argument( '--trials-real', dest = 'trials_real', action = 'store', type = int, default = 1000  )
 
   args = parser.parse_args()
 
-  if ( args.nist ) :
-    nist( args )
   if ( args.rv32 ) :
     rv32( args )
   if ( args.rv64 ) :

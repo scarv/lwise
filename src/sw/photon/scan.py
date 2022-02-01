@@ -8,17 +8,15 @@ import driver, itertools
 
 # =============================================================================
 
-def nist( args ) :
-  CONF = []
-
-  driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'ref'           )
-  driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'table2'        )
-  driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'table3'        )
-  driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'bitslice_sb32' )
-
-# -----------------------------------------------------------------------------
-
 def rv32( args ) :
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'ref'           )
+    driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'table2'        )
+    driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'table3'        )
+    driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'bitslice_sb32' )
+
   for TYPE in [ 'PHOTON_RV32_TYPE1', 'PHOTON_RV32_TYPE2' ] :
     for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
@@ -31,6 +29,14 @@ def rv32( args ) :
 # -----------------------------------------------------------------------------
 
 def rv64( args ) :
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'photon', CONF, 'rv64', 'nist', NIST_IMP = 'ref'           )
+    driver.run( args, 'photon', CONF, 'rv64', 'nist', NIST_IMP = 'table2'        )
+    driver.run( args, 'photon', CONF, 'rv64', 'nist', NIST_IMP = 'table3'        )
+    driver.run( args, 'photon', CONF, 'rv64', 'nist', NIST_IMP = 'bitslice_sb64' )
+
   for TYPE in [ 'PHOTON_RV64_TYPE1', 'PHOTON_RV64_TYPE2' ] :
     for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
@@ -43,6 +49,6 @@ def rv64( args ) :
 # -----------------------------------------------------------------------------
 
 if ( __name__ == '__main__' ) :
-  driver.main( nist, rv32, rv64 )
+  driver.main( rv32, rv64 )
 
 # =============================================================================
