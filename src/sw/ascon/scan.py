@@ -9,12 +9,41 @@ import driver, itertools
 # =============================================================================
 
 def rv32( args ) :
-  pass
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'ascon', CONF, 'rv32', 'nist', NIST_IMP = 'ref'           )
+    driver.run( args, 'ascon', CONF, 'rv32', 'nist', NIST_IMP = 'bi32'          )
+    driver.run( args, 'ascon', CONF, 'rv32', 'nist', NIST_IMP = 'bi32_lowreg'   )
+    driver.run( args, 'ascon', CONF, 'rv32', 'nist', NIST_IMP = 'bi32_lowsize'  )
+
+  for TYPE in [ 'ASCON_RV32_TYPE1', 'ASCON_RV32_TYPE2' ] :
+    for UNROLL in [ False, True ] :
+      CONF = [ TYPE ]
+
+      if ( UNROLL ) :
+        CONF += [ 'ASCON_UNROLL' ]
+  
+      driver.run( args, 'ascon', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
 
 def rv64( args ) :
-  pass
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'ascon', CONF, 'rv64', 'nist', NIST_IMP = 'ref'           )
+    driver.run( args, 'ascon', CONF, 'rv64', 'nist', NIST_IMP = 'opt64'         )
+    driver.run( args, 'ascon', CONF, 'rv64', 'nist', NIST_IMP = 'opt64_lowsize' )
+
+  for TYPE in [ 'ASCON_RV64_TYPE1', 'ASCON_RV64_TYPE2' ] :
+    for UNROLL in [ False, True ] :
+      CONF = [ TYPE ]
+
+      if ( UNROLL ) :
+        CONF += [ 'ASCON_UNROLL' ]
+  
+      driver.run( args, 'ascon', CONF, 'rv64', 'rv64' )
 
 # -----------------------------------------------------------------------------
 
