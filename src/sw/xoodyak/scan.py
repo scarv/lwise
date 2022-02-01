@@ -9,12 +9,36 @@ import driver, itertools
 # =============================================================================
 
 def rv32( args ) :
-  pass
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'xoodyak', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
+
+  for TYPE in [ 'XOODYAK_RV32_TYPE1', 'XOODYAK_RV32_TYPE2' ] :
+    for UNROLL in [ False, True ] :
+      CONF = [ TYPE, 'ENABLE_ZBKB_ZBKX' ]
+
+      if ( UNROLL ) :
+        CONF += [ 'XOODYAK_UNROLL' ]
+  
+      driver.run( args, 'xoodyak', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
 
 def rv64( args ) :
-  pass
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'xoodyak', CONF, 'rv64', 'nist', NIST_IMP = 'ref' )
+
+  for TYPE in [ 'XOODYAK_RV64_TYPE1', 'XOODYAK_RV64_TYPE2' ] :
+    for UNROLL in [ False, True ] :
+      CONF = [ TYPE, 'ENABLE_ZBKB_ZBKX' ]
+
+      if ( UNROLL ) :
+        CONF += [ 'XOODYAK_UNROLL' ]
+  
+      driver.run( args, 'xoodyak', CONF, 'rv64', 'rv64' )
 
 # -----------------------------------------------------------------------------
 
