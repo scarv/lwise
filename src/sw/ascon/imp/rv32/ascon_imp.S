@@ -21,6 +21,7 @@
   ret
 .endm
 
+
 // load state + store state  
 
 .macro ASCON_LDSTATE x0l, x0h, x1l, x1h, x2l, x2h, x3l, x3h, x4l, x4h
@@ -121,23 +122,7 @@
 
 // linear diffusion
 
-#if (ASCON_RV32_TYPE2)
-//  x0l, x0h, x1l, x1h, x2l, x2h, x3l, x3h, x4l, x4h -> 
-//  t0l, t0h, x0l, x0h, x1l, x1h, x2l, x2h, x3l, x3h 
-
-.macro ASCON_PL x0l, x0h, x1l, x1h, x2l, x2h, x3l, x3h, x4l, x4h, t0l, t0h, t2
-  ascon.sigma.lo \t0l, \x0l, \x0h, 0
-  ascon.sigma.hi \t0h, \x0l, \x0h, 0
-  ascon.sigma.lo \x0l, \x1l, \x1h, 1
-  ascon.sigma.hi \x0h, \x1l, \x1h, 1
-  ascon.sigma.lo \x1l, \x2l, \x2h, 2
-  ascon.sigma.hi \x1h, \x2l, \x2h, 2
-  ascon.sigma.lo \x2l, \x3l, \x3h, 3
-  ascon.sigma.hi \x2h, \x3l, \x3h, 3
-  ascon.sigma.lo \x3l, \x4l, \x4h, 4
-  ascon.sigma.hi \x3h, \x4l, \x4h, 4
-.endm
-#else
+#if (ASCON_RV32_TYPE1)
 // 64-bit rotate right (immediate)
 
 .macro ASCON_RORI64L dl, sl, sh, imm, t0
@@ -180,7 +165,6 @@
   xor  \dh, \t0, \t1
 .endm 
 
-
 .macro ASCON_PL_STEP_0 xl, xh, imm0, imm1, t0, t1, t2 
   ASCON_RORI64L   \t1, \xl, \xh, \imm0, \t0 
   ASCON_RORI64L   \t2, \xl, \xh, \imm1, \t0 
@@ -218,7 +202,24 @@
   ASCON_PL_STEP_0 \x3l, \x3h, 10, 17, \t0, \t1, \t2
   ASCON_PL_STEP_2 \x4l, \x4h,  7, 23, \t0, \t1, \t2
 .endm
+#elif (ASCON_RV32_TYPE2)
+//  x0l, x0h, x1l, x1h, x2l, x2h, x3l, x3h, x4l, x4h -> 
+//  t0l, t0h, x0l, x0h, x1l, x1h, x2l, x2h, x3l, x3h 
+
+.macro ASCON_PL x0l, x0h, x1l, x1h, x2l, x2h, x3l, x3h, x4l, x4h, t0l, t0h, t2
+  ascon.sigma.lo \t0l, \x0l, \x0h, 0
+  ascon.sigma.hi \t0h, \x0l, \x0h, 0
+  ascon.sigma.lo \x0l, \x1l, \x1h, 1
+  ascon.sigma.hi \x0h, \x1l, \x1h, 1
+  ascon.sigma.lo \x1l, \x2l, \x2h, 2
+  ascon.sigma.hi \x1h, \x2l, \x2h, 2
+  ascon.sigma.lo \x2l, \x3l, \x3h, 3
+  ascon.sigma.hi \x2h, \x3l, \x3h, 3
+  ascon.sigma.lo \x3l, \x4l, \x4h, 4
+  ascon.sigma.hi \x3h, \x4l, \x4h, 4
+.endm
 #endif
+
 
 // operations in each round 
 
@@ -240,14 +241,14 @@ Ascon_Permute_6rounds:
   ASCON_PROLOGUE
   ASCON_LDSTATE a2, a3, a4, a5, a6, a7, t2, t3, t4, t5
   //
-#if !(ASCON_RV32_TYPE2)
+#if (ASCON_RV32_TYPE1)
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x00000096, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x00000087, t0, t1, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x00000078, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x00000069, t0, t1, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x0000005A, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x0000004B, t0, t1, t6 
-#else
+#elif (ASCON_RV32_TYPE2)
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x00000096, t0, t1, t6 
   ASCON_ROUND   t0, t1, t2, t3, a4, a5, a6, a7, a2, a3, 0x00000087, t4, t5, t6 
   ASCON_ROUND   t4, t5, a6, a7, t2, t3, a4, a5, t0, t1, 0x00000078, a2, a3, t6 
@@ -268,7 +269,7 @@ Ascon_Permute_12rounds:
   ASCON_PROLOGUE
   ASCON_LDSTATE a2, a3, a4, a5, a6, a7, t2, t3, t4, t5
   //
-#if !(ASCON_RV32_TYPE2)
+#if (ASCON_RV32_TYPE1)
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x000000F0, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x000000E1, t0, t1, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x000000D2, t0, t1, t6 
@@ -281,7 +282,7 @@ Ascon_Permute_12rounds:
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x00000069, t0, t1, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x0000005A, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x0000004B, t0, t1, t6 
-#else
+#elif (ASCON_RV32_TYPE2)
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x000000F0, t0, t1, t6 
   ASCON_ROUND   t0, t1, t2, t3, a4, a5, a6, a7, a2, a3, 0x000000E1, t4, t5, t6 
   ASCON_ROUND   t4, t5, a6, a7, t2, t3, a4, a5, t0, t1, 0x000000D2, a2, a3, t6 

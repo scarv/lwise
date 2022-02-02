@@ -19,6 +19,7 @@
   ret
 .endm
 
+
 // load state + store state  
 
 .macro ASCON_LDSTATE x0, x1, x2, x3, x4
@@ -36,6 +37,7 @@
   sd   \x3, 24(a0)
   sd   \x4, 32(a0)
 .endm
+
 
 // operations in the permutation: PC + PS + PL
 
@@ -100,17 +102,7 @@
 
 // linear diffusion
 
-#if (ASCON_RV64_TYPE2)
-
-.macro ASCON_PL x0, x1, x2, x3, x4, t0
-  ascon.sigma \x0, \x0, 0
-  ascon.sigma \x1, \x1, 1
-  ascon.sigma \x2, \x2, 2
-  ascon.sigma \x3, \x3, 3
-  ascon.sigma \x4, \x4, 4
-.endm
-#else
-
+#if (ASCON_RV64_TYPE1)
 .macro ASCON_PL_STEP x0, imm0, imm1, t0
   rori \t0, \x0, \imm0
   xor  \t0, \x0, \t0
@@ -125,7 +117,16 @@
   ASCON_PL_STEP \x3, 10, 17, \t0
   ASCON_PL_STEP \x4,  7, 41, \t0
 .endm
+#elif (ASCON_RV64_TYPE2)
+.macro ASCON_PL x0, x1, x2, x3, x4, t0
+  ascon.sigma \x0, \x0, 0
+  ascon.sigma \x1, \x1, 1
+  ascon.sigma \x2, \x2, 2
+  ascon.sigma \x3, \x3, 3
+  ascon.sigma \x4, \x4, 4
+.endm
 #endif
+
 
 // operations in each round 
 
@@ -134,6 +135,7 @@
   ASCON_PS \x0, \x1, \x2, \x3, \x4, \t0, \t1, \t2
   ASCON_PL \x3, \x1, \x2, \x0, \x4, \t0
 .endm 
+
 
 // Ascon permutation 
 

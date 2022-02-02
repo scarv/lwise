@@ -18,12 +18,15 @@ def rv32( args ) :
     driver.run( args, 'ascon', CONF, 'rv32', 'nist', NIST_IMP = 'bi32_lowsize'  )
 
   for TYPE in [ 'ASCON_RV32_TYPE1', 'ASCON_RV32_TYPE2' ] :
-    for UNROLL in [ False, True ] :
+    # for UNROLL in [ False, True ] :
+    for ZBKB_ZBKX in [ False, True ] :
       CONF = [ TYPE ]
 
-      if ( UNROLL ) :
-        CONF += [ 'ASCON_UNROLL' ]
-  
+      # if ( UNROLL ) :
+        # CONF += [ 'ASCON_UNROLL' ]
+      if ( ZBKB_ZBKX ):
+        CONF += [ 'ENABLE_ZBKB_ZBKX' ]   
+
       driver.run( args, 'ascon', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
@@ -37,11 +40,14 @@ def rv64( args ) :
     driver.run( args, 'ascon', CONF, 'rv64', 'nist', NIST_IMP = 'opt64_lowsize' )
 
   for TYPE in [ 'ASCON_RV64_TYPE1', 'ASCON_RV64_TYPE2' ] :
-    for UNROLL in [ False, True ] :
+    # for UNROLL in [ False, True ] :
+    for ZBKB_ZBKX in [ False, True ] :
       CONF = [ TYPE ]
 
-      if ( UNROLL ) :
-        CONF += [ 'ASCON_UNROLL' ]
+      # if ( UNROLL ) :
+        # CONF += [ 'ASCON_UNROLL' ]
+      if ( ZBKB_ZBKX ):
+        CONF += [ 'ENABLE_ZBKB_ZBKX' ] 
   
       driver.run( args, 'ascon', CONF, 'rv64', 'rv64' )
 
