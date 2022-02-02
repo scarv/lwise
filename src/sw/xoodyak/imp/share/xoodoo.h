@@ -3,8 +3,6 @@
 
 #include "share.h"
 
-#include "xoodoo_imp.h"
-
 #define MAXROUNDS 12
 #define NROWS 3
 #define NCOLUMS 4

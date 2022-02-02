@@ -63,7 +63,7 @@
 // addition of constants
 
 .macro ASCON_PC x2l, rci
-  xor  \x2l, \x2l, \rci
+  xori \x2l, \x2l, \rci
 .endm
 
 // sbox: x0 x1 x2 x3 x4 -> x3 x1 x2 x0 x4

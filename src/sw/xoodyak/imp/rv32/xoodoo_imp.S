@@ -89,77 +89,77 @@
 // operations in the permutation: theta + rho_west + iota + chi + rho_east
 
 .macro XOODOO_THETA a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, t00, t01, t02
-  xor  \t00, \a03, \a13   //  t00 = a03 ^ a13
-  xor  \t00, \t00, \a23   //  t00 = a03 ^ a13 ^ a23
+  xor  \t00, \a03, \a13   // t00 = a03 ^ a13
+  xor  \t00, \t00, \a23   // t00 = a03 ^ a13 ^ a23
 
   // sheet 0
-  xor  \t01, \a00, \a10   //  t01 = a00 ^ a10
-  xor  \t01, \t01, \a20   //  t01 = a00 ^ a10 ^ a20
+  xor  \t01, \a00, \a10   // t01 = a00 ^ a10
+  xor  \t01, \t01, \a20   // t01 = a00 ^ a10 ^ a20
 
 #if (XOODYAK_RV32_TYPE2)
   xoodyak.xorrol \t00, \t00, \t00
 #else
-  roli \t02, \t00, 5      //  t02 = t00 <<< 5
-  roli \t00, \t00, 14     //  t00 = t00 <<< 14
-  xor  \t00, \t02, \t00   //  t00 = t00 ^ t02
+  roli \t02, \t00,    5   // t02 = t00 <<< 5
+  roli \t00, \t00,   14   // t00 = t00 <<< 14
+  xor  \t00, \t02, \t00   // t00 = t00 ^ t02
 #endif
 
-  xor  \a00, \a00, \t00   //  a00 = a00 ^ t00
-  xor  \a10, \a10, \t00   //  a10 = a10 ^ t00
-  xor  \a20, \a20, \t00   //  a20 = a20 ^ t00 
+  xor  \a00, \a00, \t00   // a00 = a00 ^ t00
+  xor  \a10, \a10, \t00   // a10 = a10 ^ t00
+  xor  \a20, \a20, \t00   // a20 = a20 ^ t00 
 
   // sheet 1
-  xor  \t00, \a01, \a11   //  t00 = a01 ^ a11
-  xor  \t00, \t00, \a21   //  t00 = a01 ^ a11 ^ a21
+  xor  \t00, \a01, \a11   // t00 = a01 ^ a11
+  xor  \t00, \t00, \a21   // t00 = a01 ^ a11 ^ a21
 
 #if (XOODYAK_RV32_TYPE2)
   xoodyak.xorrol \t01, \t01, \t01
 #else
-  roli \t02, \t01, 5      //  t02 = t01 <<< 5
-  roli \t01, \t01, 14     //  t01 = t01 <<< 14
-  xor  \t01, \t02, \t01   //  t01 = t01 ^ t02
+  roli \t02, \t01,    5   // t02 = t01 <<< 5
+  roli \t01, \t01,   14   // t01 = t01 <<< 14
+  xor  \t01, \t02, \t01   // t01 = t01 ^ t02
 #endif
 
-  xor  \a01, \a01, \t01   //  a01 = a01 ^ t01
-  xor  \a11, \a11, \t01   //  a11 = a11 ^ t01
-  xor  \a21, \a21, \t01   //  a21 = a21 ^ t01 
+  xor  \a01, \a01, \t01   // a01 = a01 ^ t01
+  xor  \a11, \a11, \t01   // a11 = a11 ^ t01
+  xor  \a21, \a21, \t01   // a21 = a21 ^ t01 
 
   // sheet 2 
-  xor  \t01, \a02, \a12   //  t01 = a02 ^ a12
-  xor  \t01, \t01, \a22   //  t01 = a02 ^ a12 ^ a22
+  xor  \t01, \a02, \a12   // t01 = a02 ^ a12
+  xor  \t01, \t01, \a22   // t01 = a02 ^ a12 ^ a22
 
 #if (XOODYAK_RV32_TYPE2)
   xoodyak.xorrol \t00, \t00, \t00
 #else
-  roli \t02, \t00, 5      //  t02 = t00 <<< 5
-  roli \t00, \t00, 14     //  t00 = t00 <<< 14
-  xor  \t00, \t02, \t00   //  t00 = t00 ^ t02
+  roli \t02, \t00,    5   // t02 = t00 <<< 5
+  roli \t00, \t00,   14   // t00 = t00 <<< 14
+  xor  \t00, \t02, \t00   // t00 = t00 ^ t02
 #endif
 
-  xor  \a02, \a02, \t00   //  a02 = a02 ^ t00
-  xor  \a12, \a12, \t00   //  a12 = a12 ^ t00
-  xor  \a22, \a22, \t00   //  a22 = a22 ^ t00       
+  xor  \a02, \a02, \t00   // a02 = a02 ^ t00
+  xor  \a12, \a12, \t00   // a12 = a12 ^ t00
+  xor  \a22, \a22, \t00   // a22 = a22 ^ t00       
 
   // sheet 3 
 #if (XOODYAK_RV32_TYPE2)
   xoodyak.xorrol \t01, \t01, \t01
 #else
-  roli \t02, \t01, 5      //  t02 = t01 <<< 5
-  roli \t01, \t01, 14     //  t01 = t01 <<< 14
-  xor  \t01, \t02, \t01   //  t01 = t01 ^ t02
+  roli \t02, \t01,    5   // t02 = t01 <<< 5
+  roli \t01, \t01,   14   // t01 = t01 <<< 14
+  xor  \t01, \t02, \t01   // t01 = t01 ^ t02
 #endif
 
-  xor  \a03, \a03, \t01   //  a03 = a03 ^ t01
-  xor  \a13, \a13, \t01   //  a13 = a13 ^ t01
-  xor  \a23, \a23, \t01   //  a23 = a23 ^ t01 
+  xor  \a03, \a03, \t01   // a03 = a03 ^ t01
+  xor  \a13, \a13, \t01   // a13 = a13 ^ t01
+  xor  \a23, \a23, \t01   // a23 = a23 ^ t01 
 .endm
 
 .macro XOODOO_RHOWEST a10, a11, a12, a13, a20, a21, a22, a23, t00
-  mv \t00, \a10
-  mv \a10, \a13
-  mv \a13, \a12
-  mv \a12, \a11
-  mv \a11, \t00
+  mv   \t00, \a10
+  mv   \a10, \a13
+  mv   \a13, \a12
+  mv   \a12, \a11
+  mv   \a11, \t00
 
   roli \a20, \a20, 11
   roli \a21, \a21, 11
