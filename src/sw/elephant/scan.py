@@ -9,12 +9,36 @@ import driver, itertools
 # =============================================================================
 
 def rv32( args ) :
-  pass
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'elephant', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
+
+  for TYPE in [ 'ELEPHANT_RV32_TYPE1', 'ELEPHANT_RV32_TYPE2' ] :
+    for UNROLL in [ False, True ] :
+      CONF = [ TYPE ]
+
+      if ( UNROLL ) :
+        CONF += [ 'ELEPHANT_UNROLL' ]
+  
+      driver.run( args, 'elephant', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
 
 def rv64( args ) :
-  pass
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'elephant', CONF, 'rv64', 'nist', NIST_IMP = 'ref' )
+
+  for TYPE in [ 'ELEPHANT_RV64_TYPE1', 'ELEPHANT_RV64_TYPE2' ] :
+    for UNROLL in [ False, True ] :
+      CONF = [ TYPE ]
+
+      if ( UNROLL ) :
+        CONF += [ 'ELEPHANT_UNROLL' ]
+  
+      driver.run( args, 'elephant', CONF, 'rv64', 'rv64' )
 
 # -----------------------------------------------------------------------------
 

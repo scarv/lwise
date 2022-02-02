@@ -12,7 +12,10 @@ export NIST_KAT      ?= ${NIST_HOME}/${NIST_IMP}/LWC_AEAD_KAT_128_96.txt
 
 export NIST_INCLUDES  = ${NIST_HOME}/${NIST_IMP}
 
-export NIST_SOURCES   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c)
-export NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h)
+export NIST_SOURCES   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c  )
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.cpp) 
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.s  ) 
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.S  )
+export NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h  )
 
 # =============================================================================

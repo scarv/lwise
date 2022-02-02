@@ -34,10 +34,11 @@ else
 export LWISE_INCLUDES += ${REPO_HOME}/build/${ALG} ./share ./share/nist ./share/arch/${ARCH} ./${ALG}/arch/${ARCH} ./${ALG}/imp/${IMP} ./${ALG}/imp/share
 endif
 
-export LWISE_SOURCES  += $(wildcard $(addsuffix /*.c, ${LWISE_INCLUDES})) 
-export LWISE_SOURCES  += $(wildcard $(addsuffix /*.s, ${LWISE_INCLUDES}))
-export LWISE_SOURCES  += $(wildcard $(addsuffix /*.S, ${LWISE_INCLUDES}))
-export LWISE_HEADERS  += $(wildcard $(addsuffix /*.h, ${LWISE_INCLUDES})) 
+export LWISE_SOURCES  += $(wildcard $(addsuffix /*.c,   ${LWISE_INCLUDES})) 
+export LWISE_SOURCES  += $(wildcard $(addsuffix /*.cpp, ${LWISE_INCLUDES})) 
+export LWISE_SOURCES  += $(wildcard $(addsuffix /*.s,   ${LWISE_INCLUDES}))
+export LWISE_SOURCES  += $(wildcard $(addsuffix /*.S,   ${LWISE_INCLUDES}))
+export LWISE_HEADERS  += $(wildcard $(addsuffix /*.h,   ${LWISE_INCLUDES}))
 
 export       INCLUDES := ${LWISE_INCLUDES} ${NIST_INCLUDES}
 

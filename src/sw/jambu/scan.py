@@ -9,12 +9,38 @@ import driver, itertools
 # =============================================================================
 
 def rv32( args ) :
-  pass
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'jambu', CONF, 'rv64', 'nist', NIST_IMP = 'ref' )
+    driver.run( args, 'jambu', CONF, 'rv64', 'nist', NIST_IMP = 'opt' )
+
+  for TYPE in [ 'JAMBU_RV32_TYPE1', 'JAMBU_RV32_TYPE2' ] :
+    for UNROLL in [ False, True ] :
+      CONF = [ TYPE ]
+
+      if ( UNROLL ) :
+        CONF += [ 'JAMBU_UNROLL' ]
+  
+      driver.run( args, 'jambu', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
 
 def rv64( args ) :
-  pass
+  if ( args.nist ) :
+    CONF = []
+
+    driver.run( args, 'jambu', CONF, 'rv64', 'nist', NIST_IMP = 'ref' )
+    driver.run( args, 'jambu', CONF, 'rv64', 'nist', NIST_IMP = 'opt' )
+
+  for TYPE in [ 'JAMBU_RV64_TYPE1', 'JAMBU_RV64_TYPE2' ] :
+    for UNROLL in [ False, True ] :
+      CONF = [ TYPE ]
+
+      if ( UNROLL ) :
+        CONF += [ 'JAMBU_UNROLL' ]
+  
+      driver.run( args, 'jambu', CONF, 'rv64', 'rv64' )
 
 # -----------------------------------------------------------------------------
 
