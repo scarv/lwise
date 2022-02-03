@@ -27,7 +27,7 @@
 
 // pack 
 
-.macro blnd rd, lo, hi
+.macro blend rd, lo, hi
 #if (ENABLE_ZBKB_ZBKX)
   pack  \rd, \lo, \hi
 #else
@@ -97,7 +97,7 @@
   roliw \t04, \t01,   14   // t04 = lo(t01) <<< 14
   xor   \t03, \t04, \t03   // t03 = t04 ^ t03 
   
-  blnd  \t02, \t02, \t03   // t02 = t03, t02
+  blend \t02, \t02, \t03   // t02 = t03, t02
   xor   \a00, \a00, \t02   // a00 = a00 ^ t02
   xor   \a10, \a10, \t02   // a10 = a10 ^ t02
   xor   \a20, \a20, \t02   // a20 = a20 ^ t02
@@ -112,7 +112,7 @@
   roliw \t04, \t00,   14   // t04 = lo(t00) <<< 14
   xor   \t03, \t04, \t03   // t03 = t04 ^ t03 
 
-  blnd  \t02, \t02, \t03   // t02 = t03, t02
+  blend \t02, \t02, \t03   // t02 = t03, t02
   xor   \a02, \a02, \t02   // a02 = a02 ^ t02
   xor   \a12, \a12, \t02   // a12 = a12 ^ t02
   xor   \a22, \a22, \t02   // a22 = a22 ^ t02
@@ -136,12 +136,12 @@
   srli  \t00, \a20,   32   // t00 = a21
   roliw \t00, \t00,   11   // t00 = a21 <<< 11
   roliw \a20, \a20,   11   // a20 = a20 <<< 11
-  blnd  \a20, \a20, \t00   // a20 = t00, a20
+  blend \a20, \a20, \t00   // a20 = t00, a20
 
   srli  \t00, \a22,   32   // t00 = a23
   roliw \t00, \t00,   11   // t00 = a23 <<< 11
   roliw \a22, \a22,   11   // a22 = a22 <<< 11
-  blnd  \a22, \a22, \t00   // a22 = t00, a22
+  blend \a22, \a22, \t00   // a22 = t00, a22
 .endm
 
 .macro XOODOO_IOTA a00, rci
@@ -212,12 +212,12 @@
   srli  \t00, \a10,   32   // t00 = a11
   roliw \t00, \t00,    1   // t00 = a11 <<< 1
   roliw \a10, \a10,    1   // a10 = a10 <<< 1
-  blnd  \a10, \a10, \t00   // a10 = t00, a10
+  blend \a10, \a10, \t00   // a10 = t00, a10
 
   srli  \t00, \a12,   32   // t00 = a13
   roliw \t00, \t00,    1   // t00 = a13 <<< 1
   roliw \a12, \a12,    1   // a12 = a12 <<< 1
-  blnd  \a12, \a12, \t00   // a12 = t00, a12
+  blend \a12, \a12, \t00   // a12 = t00, a12
 
   srli  \t00, \a20,   32   // t00 = a21
   roliw \t00, \t00,    8   // t00 = a21 <<< 8
@@ -225,8 +225,8 @@
   srli  \t02, \a22,   32   // t02 = a23 
   roliw \t02, \t02,    8   // t02 = a23 <<< 8
   roliw \a20, \a22,    8   // a20 = a22 <<< 8 
-  blnd  \a20, \a20, \t02   // a20 = t02, a20
-  blnd  \a22, \t01, \t00   // a22 = t00, t01
+  blend \a20, \a20, \t02   // a20 = t02, a20
+  blend \a22, \t01, \t00   // a22 = t00, t01
 .endm
 
 
