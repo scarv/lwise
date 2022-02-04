@@ -1,3 +1,6 @@
+diff --git a/bootrom/bootrom.img b/bootrom/bootrom.img
+index b9eb2bc7a..57af68279 100644
+Binary files a/bootrom/bootrom.img and b/bootrom/bootrom.img differ
 diff --git a/emulator/Makefile b/emulator/Makefile
 index dffa41713..9defc4d32 100644
 --- a/emulator/Makefile
@@ -293,10 +296,10 @@ index abdbdf93e..bd27d8a6c 100644
      when (ex_ctrl.rxs2 && (ex_ctrl.mem || ex_ctrl.rocc || ex_sfence)) {
 diff --git a/src/main/scala/system/SCARVRocketCoPConfig.scala b/src/main/scala/system/SCARVRocketCoPConfig.scala
 new file mode 100644
-index 000000000..b1f2aa196
+index 000000000..f4a1d031e
 --- /dev/null
 +++ b/src/main/scala/system/SCARVRocketCoPConfig.scala
-@@ -0,0 +1,80 @@
+@@ -0,0 +1,97 @@
 +// See LICENSE.SiFive for license details.
 +// See LICENSE.Berkeley for license details.
 +
@@ -323,23 +326,36 @@ index 000000000..b1f2aa196
 +	}
 +})
 +
++class WithZBKB extends Config((site, here, up) => {
++	case RocketTilesKey => up(RocketTilesKey, site) map { r =>
++		r.copy(core = r.core.copy(
++			useZBKB = true,
++			useZBKX = true)
++		)
++	}
++})
++
 +class SCARVRocketCoPConf64 extends Config(
 +	new WithISERoCC ++
++	new WithZBKB ++
 +	new WithNBigCores(1) ++
 +	new BaseConfig)
 +
 +class SCARVRocketCoPConf32 extends Config(
 +	new WithISERoCC ++
++	new WithZBKB ++
 +	new DefaultRV32Config ++
 +	new BaseConfig)
 +
 +class SCARVRocketXALUConf32 extends Config(
 +	new WithXALU ++
++	new WithZBKB ++
 +	new DefaultRV32Config ++
 +	new BaseConfig)
 +
 +class SCARVRocketXALUConf64 extends Config(
 +	new WithXALU ++
++	new WithZBKB ++
 +	new WithNBigCores(1) ++
 +	new BaseConfig)
 +
@@ -349,31 +365,35 @@ index 000000000..b1f2aa196
 +
 +class SCARVRocketFPGACoPConf64 extends Config(
 +	new WithISERoCC ++
-+    new WithNBreakpoints(2)	++
++	new WithZBKB ++
++  new WithNBreakpoints(2)	++
 +	new WithJtagDTM  ++
-+    new WithXLEN64 ++
++  new WithXLEN64 ++
 +	new WithNBigCores(1) ++
 +	new BaseConfig)
 +
 +class SCARVRocketFPGACoPConf32 extends Config(
 +	new WithISERoCC ++
-+    new WithNBreakpoints(2)	++
++	new WithZBKB ++
++  new WithNBreakpoints(2)	++
 +	new WithJtagDTM  ++
 +	new DefaultRV32Config ++
 +	new BaseConfig)
 +
 +class SCARVRocketFPGAXALUConf32 extends Config(
 +	new WithXALU ++
-+    new WithNBreakpoints(2)	++
++	new WithZBKB ++
++  new WithNBreakpoints(2)	++
 +	new WithJtagDTM  ++
 +	new DefaultRV32Config ++
 +	new BaseConfig)
 +
 +class SCARVRocketFPGAXALUConf64 extends Config(
 +	new WithXALU ++
-+    new WithNBreakpoints(2)	++
++	new WithZBKB ++
++  new WithNBreakpoints(2)	++
 +	new WithJtagDTM  ++
-+    new WithXLEN64 ++
++  new WithXLEN64 ++
 +	new WithNBigCores(1) ++
 +	new BaseConfig)
 +
