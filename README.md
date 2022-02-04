@@ -248,8 +248,8 @@ such as execution latency.
   into `${RISCV_ROCKET}`:
 
   ```sh
-  make -f ${REPO_HOME}/src/toolchain-rocket/Makefile clone
-  make -f ${REPO_HOME}/src/toolchain-rocket/Makefile build
+  make -f ${REPO_HOME}/src/hw-toolchain/Makefile clone
+  make -f ${REPO_HOME}/src/hw-toolchain/Makefile build
   ```
 
 - The build system in
@@ -277,13 +277,13 @@ such as execution latency.
   [verilator](https://www.veripool.org/verilator): 
 
   ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile ARCH="rv32" ISE="xalu" emulator
+  make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" ISE="xalu" emulator
   ```
 
   - Build and execute software on the emulator of the hardware implementation, e.g.,
 
     ```sh
-    make --directory="${REPO_HOME}/src/hw" ARCH="rv32" IMP="rv32" ISE="xalu" emu-clean emulate
+    make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" emu-clean emulate
     ```
 
 - Build the bitstream of the Xilinx FPGA and run a software on the FPGA using Vivado:
@@ -298,26 +298,26 @@ such as execution latency.
   - Generate the verilog files for FPGA
 
   ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile ARCH="rv32" ISE="xalu" fpga-verilog
+  make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" ISE="xalu" fpga-verilog
   ```
   
   - Make Vivado project, generate bit-stream, and download bit-stream into FPGA
 
   ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile ARCH="rv32" ISE="xalu" program-fpga
+  make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" ISE="xalu" program-fpga
   ```
 
   - Build and execute software on the hardware implementation on the FPGA, e.g.,
 
     ```sh
-    make --directory="${REPO_HOME}/src/hw" ARCH="rv32" IMP="rv32" ISE="xalu" fpga-clean fpga-run
+    make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" fpga-clean fpga-run
     ```
 
 - Run hardware synthesis flow using
   [yosys](https://github.com/YosysHQ/yosys)
 
   ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile synthesise ARCH="rv32" ISE="xalu"
+  make -f ${REPO_HOME}/src/hw/Makefile synthesise ALG="sparkle" ARCH="rv32" ISE="xalu"
   ```
 
 <!--- -------------------------------------------------------------------- --->
