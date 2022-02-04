@@ -10,7 +10,6 @@
 RTL32 =$(REPO_HOME)/src/hw/rtl/$(ALG)/rv32
 
 rtl32_ise_src= \
-        $(RTL32)/rv32b_ise.v \
         $(RTL32)/rv32ell_ise.v \
         $(RTL32)/alzette_ise_v2.v \
         $(RTL32)/alzette_ise_v3.v \

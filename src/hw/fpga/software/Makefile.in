@@ -7,38 +7,70 @@
 #--------------------------------------------------------------------
 # Build software
 #--------------------------------------------------------------------
-FPGA_DEF_CONF  = -DSPARKLE_RV32_TYPE4
-#FPGA_DEF_CONF  = -DSPARKLE_RV64_TYPE4
+
+export SOC_HAL  = ${REPO_HOME}/src/hw/fpga/soc/${SOC}/hal
+export SW = ${REPO_HOME}/src/sw
+
+# include build-related content for algorithm
+include ${SW}/${ALG}/Makefile.in
+
+FPGA_DEF_CONF  = -DSPARKLE_RV32_TYPE1
+FPGA_DEF_CONF += -DSPARKLE_UNROLL 
 FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-FPGA_DEF_CONF += -DSPARKLE_RV32B -DSPARKLE_RV32_ELL 
-#FPGA_DEF_CONF += -DSPARKLE_RV64B -DSPARKLE_RV64_ELL 
-FPGA_DEF_CONF += -DCRAXS10_ENC_UNROLL -DTRAXL17_ENC_UNROLL -DSPARKLE_FWD_UNROLL 
-FPGA_DEF_CONF += -DCRAXS10_DEC_UNROLL -DTRAXL17_DEC_UNROLL -DSPARKLE_REV_UNROLL
-FPGA_DEF_CONF += -DCRAXS10_ENC_EXTERN -DTRAXL17_ENC_EXTERN -DSPARKLE_FWD_EXTERN 
-FPGA_DEF_CONF += -DCRAXS10_DEC_EXTERN -DTRAXL17_DEC_EXTERN -DSPARKLE_REV_EXTERN
+FPGA_DEF_CONF += -DSPARKLE_RV32_ELL 
+FPGA_DEF_CONF += -DSPARKLE_REV_EXTERN -DSPARKLE_FWD_EXTERN 
+
 
 export FPGA_SWCONF = $(FPGA_DEF_CONF)
 
-export SOC_HAL  = ${REPO_HOME}/src/hw/fpga/soc/${SOC}/hal
-export SOFTWARE = ${REPO_HOME}/src/sw
-export FPGA_INCLUDES = ${SOFTWARE}/share ${SOFTWARE}/share/arch/${ARCH} ${SOFTWARE}/${ALG} ${SOFTWARE}/${ALG}/arch/${ARCH} ${SOFTWARE}/${ALG}/imp/${IMP} ${SOC_HAL}
+# -----------------------------------------------------------------------------
+ifeq "${IMP}" "nist"
+export LWISE_INCLUDES += ${SOC_HAL} ${REPO_HOME}/build/fpga/${ALG} ${SW}/share ${SW}/share/nist ${SW}/share/arch/${ARCH} 
+else
+export LWISE_INCLUDES += ${SOC_HAL} ${REPO_HOME}/build/fpga/${ALG} ${SW}/share ${SW}/share/nist ${SW}/share/arch/${ARCH} ${SW}/${ALG}/arch/${ARCH} ${SW}/${ALG}/imp/${IMP} ${SW}/${ALG}/imp/share
+endif
 
-export FPGA_SOURCES  = $(wildcard $(addsuffix /*.c, ${FPGA_INCLUDES}))
-export FPGA_SOURCES += $(wildcard $(addsuffix /*.S, ${FPGA_INCLUDES}))
-export FPGA_HEADERS  = $(wildcard $(addsuffix /*.h, ${FPGA_INCLUDES}))
+#export FPGA_INCLUDES = ${SW}/share ${SW}/share/arch/${ARCH} ${SW}/${ALG} ${SW}/${ALG}/arch/${ARCH} ${SW}/${ALG}/imp/${IMP} ${SOC_HAL}
+
+export LWISE_SOURCES  = $(wildcard $(addsuffix /*.c,   ${LWISE_INCLUDES}))
+export LWISE_SOURCES += $(wildcard $(addsuffix /*.cpp, ${LWISE_INCLUDES}))
+export LWISE_SOURCES += $(wildcard $(addsuffix /*.s,   ${LWISE_INCLUDES}))
+export LWISE_SOURCES += $(wildcard $(addsuffix /*.S,   ${LWISE_INCLUDES}))
+export LWISE_HEADERS  = $(wildcard $(addsuffix /*.h,   ${LWISE_INCLUDES}))
+
+export FPGA_INCLUDES := ${LWISE_INCLUDES} ${NIST_INCLUDES}
+export FPGA_SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/fpga/${ALG}/kat.c 
+export FPGA_HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/fpga/${ALG}/kat.h 
 
 MABI       = $(findstring i,$(ARCH:rv32=i))lp$(ARCH:rv%=%)
 FPGA_GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany
 FPGA_GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T$(SOC_HAL)/lscript.ld
 GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
 
-FPGA_TARGET   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.elf
-FPGA_OUTBIN   = ${REPO_HOME}/build/fpga/fpga_${ALG}_${ARCH}_${ISE}.bin
+# pass-through environment variable as macros for use in source code
+ifeq "${IMP}" "nist"
+FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
+else
+FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
+endif
+
+
+FPGA_TARGET   = ${REPO_HOME}/build/fpga/${ALG}/fpga_${ARCH}_${ISE}.elf
+FPGA_OUTBIN   = ${REPO_HOME}/build/fpga/${ALG}/fpga_${ARCH}_${ISE}.bin
 
 # -----------------------------------------------------------------------------
 
-${FPGA_TARGET} : ${FPGA_SOURCES} ${FPGA_HEADERS}
-	@${GCC_PREFIX}-gcc ${FPGA_SWCONF} ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+${REPO_HOME}/build/fpga/${ALG}       :
+	@mkdir --parents ${@}
+
+${REPO_HOME}/build/fpga/${ALG}/kat.h : ${NIST_KAT} ${REPO_HOME}/build/fpga/${ALG}
+	@python3 ${SW}/share/kat.py --header < ${<} > ${@}
+
+${REPO_HOME}/build/fpga/${ALG}/kat.c : ${NIST_KAT} ${REPO_HOME}/build/fpga/${ALG}
+	@python3 ${SW}/share/kat.py --source < ${<} > ${@}
+
+${FPGA_TARGET} : ${FPGA_SOURCES} ${FPGA_HEADERS} 
+	@${GCC_PREFIX}-gcc ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 $(FPGA_OUTBIN) : $(FPGA_TARGET)
 	@${GCC_PREFIX}-objcopy -O binary $< $@

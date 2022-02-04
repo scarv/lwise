@@ -19,6 +19,7 @@ UPDMEM = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && updatemem
 #--------------------------------------------------------------------
 # ISE Implementation
 #--------------------------------------------------------------------
+include ${REPO_HOME}/src/hw/rtl/rvzbk/$(ARCH)/Makefile.in
 include ${REPO_HOME}/src/hw/rtl/$(ALG)/$(ARCH)/Makefile.in
 
 #--------------------------------------------------------------------
@@ -47,7 +48,7 @@ rtl_sources = $(wildcard $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/*.v)
 #--------------------------------------------------------------------
 fpga-verilog: $(ISE)_verilog
 
-.PHONY: fpga-verilog
+.PHONY: fpga-verilog rocket-withcop rocket-withxalu
 
 #--------------------------------------------------------------------
 # Project generation

@@ -22,7 +22,7 @@ input  [31:0]   cop_rs1;
 input  [31:0]   cop_rs2;
 output [31:0]   cop_rd;  
 
-parameter [4:0] ISE_V  = 5'b11111;
+parameter [4:0] ISE_V  = 5'b11110;
 
 localparam [6:0] CUSTOM_0 = 7'b0001011;
 localparam [6:0] CUSTOM_1 = 7'b0101011;
@@ -31,25 +31,6 @@ localparam [6:0] CUSTOM_3 = 7'b1111011;
 
 assign     cop_wait = 1'b0;
 wire [6:0] funct    = cop_insn[31:25];
-
-//decode rv32b_ise
-wire        rv32b_sel;
-wire [31:0] rv32b_rd;  
-generate 
-    if (ISE_V[0] == 1'b1) begin : RB32B
-wire   op_rori     = (funct[6:5] == 2'b00) && (cop_insn[6:0] == CUSTOM_0);
-assign rv32b_sel = op_rori;
-rv32b_ise rv32b_ins(
-    .rs1(cop_rs1),
-    .rd (rv32b_rd ),
-    .imm(funct[4:0]),
-    .op_rori(op_rori)
-);
-end else begin            : No_RB32B
-assign  rv32b_sel =  1'b0;
-assign  rv32b_rd  = 32'd0;  
-    end
-endgenerate
 
 //decode rv32ell_ise
 wire        rv32ell_sel;
@@ -165,8 +146,7 @@ assign v04_rd  = 32'd0;
     end
 endgenerate
 
-wire [31:0] dout = {32{  rv32b_sel}} &   rv32b_rd | 
-                   {32{rv32ell_sel}} & rv32ell_rd |
+wire [31:0] dout = {32{rv32ell_sel}} & rv32ell_rd |
                    {32{    v02_sel}} &     v02_rd |
                    {32{    v03_sel}} &     v03_rd |
                    {32{    v04_sel}} &     v04_rd ;
@@ -174,7 +154,7 @@ wire [31:0] dout = {32{  rv32b_sel}} &   rv32b_rd |
 wire   stallResp = cop_wr && (~cop_rdywr);
 assign cop_ready = ~stallResp;
 
-assign cop_wr = cop_valid && (rv32b_sel | rv32ell_sel | v02_sel | v03_sel | v04_sel);
+assign cop_wr = cop_valid && (rv32ell_sel | v02_sel | v03_sel | v04_sel);
 assign cop_rd = dout;
 
 endmodule

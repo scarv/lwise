@@ -8,7 +8,7 @@ MEMORY {
        - Readable
        - Writable
        - Executable */
-    PL_BRAM (wx) : ORIGIN = 0x80000000, LENGTH = 128K
+    PL_BRAM (wx) : ORIGIN = 0x80000000, LENGTH = 512K
 }
 
 SECTIONS {

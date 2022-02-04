@@ -54,7 +54,8 @@ def upload(args,port):
     data_length = len(data_tosend).to_bytes(4, byteorder='little')
     
     sent = 0
-#    print("-- Sending %d bytes to %s" % (len(data_tosend),port.port))
+    print("-- Programming is sending %d bytes to %s" % (len(data_tosend),port.port))
+    #print(data_length)
     sent += port.write(CMD_LOAD)
     time.sleep(0.1)
     sent += port.write(data_length)
@@ -66,7 +67,7 @@ def upload(args,port):
     time.sleep(0.1)
     sent += port.write(data_tosend[hp:])
     port.flush()
-#    print("-- Sent %d bytes in total" % sent)
+    #print("-- Sent %d bytes in total" % sent)
     time.sleep(2)
     sent += port.write(CMD_RUN)
     port.flush()

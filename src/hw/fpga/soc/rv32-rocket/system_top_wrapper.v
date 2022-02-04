@@ -213,7 +213,7 @@ axi_bram_ctrl_0 bram_ctrl_ins (
   .s_axi_aclk(      clk_50M),                       // input wire s_axi_aclk
   .s_axi_aresetn(   sys_rstn),                        // input wire s_axi_aresetn
   .s_axi_awid(      mem_axi4_0_aw_bits_id),         // input wire [3 : 0] s_axi_awid
-  .s_axi_awaddr(    mem_axi4_0_aw_bits_addr[16:0]), // input wire [16 : 0] s_axi_awaddr
+  .s_axi_awaddr(    mem_axi4_0_aw_bits_addr[18:0]), // input wire [18 : 0] s_axi_awaddr
   .s_axi_awlen(     mem_axi4_0_aw_bits_len),        // input wire [7 : 0] s_axi_awlen
   .s_axi_awsize(    mem_axi4_0_aw_bits_size),       // input wire [2 : 0] s_axi_awsize
   .s_axi_awburst(   mem_axi4_0_aw_bits_burst),      // input wire [1 : 0] s_axi_awburst
@@ -232,7 +232,7 @@ axi_bram_ctrl_0 bram_ctrl_ins (
   .s_axi_bvalid(    mem_axi4_0_b_valid),            // output wire s_axi_bvalid
   .s_axi_bready(    mem_axi4_0_b_ready),            // input wire s_axi_bready
   .s_axi_arid(      mem_axi4_0_ar_bits_id),         // input wire [3 : 0] s_axi_arid
-  .s_axi_araddr(    mem_axi4_0_ar_bits_addr[16:0]), // input wire [16 : 0] s_axi_araddr
+  .s_axi_araddr(    mem_axi4_0_ar_bits_addr[18:0]), // input wire [18 : 0] s_axi_araddr
   .s_axi_arlen(     mem_axi4_0_ar_bits_len),        // input wire [7 : 0] s_axi_arlen
   .s_axi_arsize(    mem_axi4_0_ar_bits_size),       // input wire [2 : 0] s_axi_arsize
   .s_axi_arburst(   mem_axi4_0_ar_bits_burst),      // input wire [1 : 0] s_axi_arburst

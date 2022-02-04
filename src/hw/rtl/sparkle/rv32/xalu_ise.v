@@ -18,7 +18,7 @@ input           ise_val;
 output          ise_oval;
 output [31:0]   ise_out;  
 
-parameter [4:0] ISE_V  = 5'b11111;
+parameter [4:0] ISE_V  = 5'b11110;
 
 localparam [1:0] CUSTOM_0 = 2'b00;
 localparam [1:0] CUSTOM_1 = 2'b01;
@@ -27,25 +27,6 @@ localparam [1:0] CUSTOM_3 = 2'b11;
 
 wire [6:0] funct    = ise_imm;
 
-//decode rv32b_ise
-wire        rv32b_sel;
-wire [31:0] rv32b_rd;  
-generate 
-    if (ISE_V[0] == 1'b1) begin : RB32B
-wire   op_rori     = ise_val && (funct[6:5] == 2'b00) && (ise_fn[1:0] == CUSTOM_0);
-assign rv32b_sel = op_rori;
-rv32b_ise rv32b_ins(
-    .rs1(ise_in1),
-    .rd (rv32b_rd ),
-    .imm(funct[4:0]),
-    .op_rori(op_rori)
-);
-end else begin            : No_RB32B
-assign  rv32b_sel =  1'b0;
-assign  rv32b_rd  = 32'd0;  
-    end
-endgenerate
- 
 //decode rv32ell_ise
 wire        rv32ell_sel;
 wire [31:0] rv32ell_rd;  
@@ -160,13 +141,12 @@ assign v04_rd  = 32'd0;
     end
 endgenerate
 
-wire [31:0] dout = {32{  rv32b_sel}} &   rv32b_rd | 
-                   {32{rv32ell_sel}} & rv32ell_rd |
+wire [31:0] dout = {32{rv32ell_sel}} & rv32ell_rd |
                    {32{    v02_sel}} &     v02_rd |
                    {32{    v03_sel}} &     v03_rd |
                    {32{    v04_sel}} &     v04_rd ;
 
-assign ise_oval = ise_val && (rv32b_sel | rv32ell_sel | v02_sel | v03_sel | v04_sel);
+assign ise_oval = ise_val && (rv32ell_sel | v02_sel | v03_sel | v04_sel);
 assign ise_out  = dout;
 
 endmodule

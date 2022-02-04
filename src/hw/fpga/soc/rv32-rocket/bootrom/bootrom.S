@@ -40,7 +40,7 @@ _start:
   csrs mstatus, t0
 
   // Setup the stack pointer to the top of the shared memory.
-  li   sp, 0x80018000
+  li   sp, 0x8007FF00
   la   s0, bootloader
   csrr a0, mhartid
   la   a1, _dtb

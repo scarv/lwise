@@ -36,14 +36,14 @@ output [31:0]   ise_out;
             assign rb``l[i] = x[d-i-1]; \
         end
 
-`define zip32(x, l)  {zh``l, zl``l}; \
+`define unzip32(x, l)  {zh``l, zl``l}; \
         wire [15:0]   zh``l, zl``l; \
         for (genvar i = 0;  i < 16; i = i + 1) begin: zip32``l \
             assign zh``l[i] = x[2*i + 1]; \
             assign zl``l[i] = x[2*i    ]; \
         end
 
-`define unzip32(x, l) uz``l; \
+`define zip32(x, l) uz``l; \
         wire [31:0]   uz``l; \
         for (genvar i = 0;  i < 16; i = i + 1) begin: unzip32``l \
             assign uz``l[2*i  ] = x[i]; \
@@ -109,10 +109,15 @@ wire [31:0] wxnor  = ise_in1 ^ (~ise_in2);
 wire [31:0] wpack  = {       ise_in2[15:0], ise_in1[15:0]};
 wire [31:0] wpackh = {16'd0, ise_in2[ 7:0], ise_in1[ 7:0]};
 
-wire [ 7:0] brev8_0 = `rev(ise_in1[ 7: 0], 8, irev8_0)
-wire [ 7:0] brev8_1 = `rev(ise_in1[15: 8], 8, irev8_1)
-wire [ 7:0] brev8_2 = `rev(ise_in1[23:16], 8, irev8_2)
-wire [ 7:0] brev8_3 = `rev(ise_in1[31:24], 8, irev8_3)
+wire [ 7:0] in1_b0  = ise_in1[ 7: 0];
+wire [ 7:0] in1_b1  = ise_in1[15: 8];
+wire [ 7:0] in1_b2  = ise_in1[23:16];
+wire [ 7:0] in1_b3  = ise_in1[31:24];
+
+wire [ 7:0] brev8_0 = `rev(in1_b0, 8, irev8_0)
+wire [ 7:0] brev8_1 = `rev(in1_b1, 8, irev8_1)
+wire [ 7:0] brev8_2 = `rev(in1_b2, 8, irev8_2)
+wire [ 7:0] brev8_3 = `rev(in1_b3, 8, irev8_3)
 wire [31:0] wbrev8  = {brev8_3, brev8_2, brev8_1, brev8_0};
 
 wire [31:0] wrev8 = {ise_in1[ 7: 0], ise_in1[15: 8], ise_in1[23:16], ise_in1[31:24]};

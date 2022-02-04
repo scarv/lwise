@@ -9,16 +9,24 @@ FPGAMODEL       = SCARVRocketFPGASystem
 COP_FPGACONFIG  = SCARVRocketFPGACoPConf32
 XALU_FPGACONFIG = SCARVRocketFPGAXALUConf32
 
+
+ROCKET_SRC = $(ROCKETCHIP_REPO)/src/main/scala/*/*.scala
+
 #--------------------------------------------------------------------
 # Build Rocket-Chip Verilog
 #--------------------------------------------------------------------
 fpga-rocketchip-cop-verilog = $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(COP_FPGACONFIG).v
-$(fpga-rocketchip-cop-verilog) : 
+
+rocket-withcop: $(fpga-rocketchip-cop-verilog)
+$(fpga-rocketchip-cop-verilog): $(ROCKET_SRC)
 	cp -f $(FPGA)/soc/$(SOC)/bootrom/bootrom.img             $(ROCKETCHIP_REPO)/bootrom/bootrom.img
 	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog MODEL=$(FPGAMODEL) CONFIG=$(COP_FPGACONFIG)
 
 fpga-rocketchip-xalu-verilog = $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(XALU_FPGACONFIG).v
-$(fpga-rocketchip-xalu-verilog) : 
+
+rocket-withxalu: $(fpga-rocketchip-xalu-verilog)
+
+$(fpga-rocketchip-xalu-verilog): $(ROCKET_SRC)
 	cp -f $(FPGA)/soc/$(SOC)/bootrom/bootrom.img             $(ROCKETCHIP_REPO)/bootrom/bootrom.img
 	$(MAKE) -C $(ROCKETCHIP_REPO)/vsim verilog MODEL=$(FPGAMODEL) CONFIG=$(XALU_FPGACONFIG)
 
@@ -31,6 +39,7 @@ cop_verilog: $(fpga-rocketchip-cop-verilog) $(FPGA)/soc/$(SOC)/system_top_wrappe
 	cp -f $(rocketchip_support_src)                 $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
 	cp -f $(rtl32_cop_src)                          $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
 	cp -f $(rtl32_ise_src)                          $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
+	cp -f $(zbk_rtl)                                $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
 
 xalu_verilog: $(fpga-rocketchip-xalu-verilog) $(FPGA)/soc/$(SOC)/system_top_wrapper.v $(rtl32_xalu_src) $(rtl32_ise_src)
 	mkdir -p $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources
@@ -41,5 +50,6 @@ xalu_verilog: $(fpga-rocketchip-xalu-verilog) $(FPGA)/soc/$(SOC)/system_top_wrap
 	cp -f $(rocketchip_support_src)                 $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
 	cp -f $(rtl32_xalu_src)                         $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
 	cp -f $(rtl32_ise_src)                          $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
+	cp -f $(zbk_rtl)                                $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/
 
 
