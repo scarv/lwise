@@ -96,12 +96,12 @@
   xor  \t01, \a00, \a10   // t01 = a00 ^ a10
   xor  \t01, \t01, \a20   // t01 = a00 ^ a10 ^ a20
 
-#if (XOODYAK_RV32_TYPE2)
-  xoodyak.xorrol \t00, \t00, \t00
-#else
+#if (XOODYAK_RV32_TYPE1)
   roli \t02, \t00,    5   // t02 = t00 <<< 5
   roli \t00, \t00,   14   // t00 = t00 <<< 14
   xor  \t00, \t02, \t00   // t00 = t00 ^ t02
+#elif (XOODYAK_RV32_TYPE2)
+  xoodyak.xorrol \t00, \t00, \t00
 #endif
 
   xor  \a00, \a00, \t00   // a00 = a00 ^ t00
@@ -112,12 +112,12 @@
   xor  \t00, \a01, \a11   // t00 = a01 ^ a11
   xor  \t00, \t00, \a21   // t00 = a01 ^ a11 ^ a21
 
-#if (XOODYAK_RV32_TYPE2)
-  xoodyak.xorrol \t01, \t01, \t01
-#else
+#if (XOODYAK_RV32_TYPE1)
   roli \t02, \t01,    5   // t02 = t01 <<< 5
   roli \t01, \t01,   14   // t01 = t01 <<< 14
   xor  \t01, \t02, \t01   // t01 = t01 ^ t02
+#elif (XOODYAK_RV32_TYPE2)
+  xoodyak.xorrol \t01, \t01, \t01
 #endif
 
   xor  \a01, \a01, \t01   // a01 = a01 ^ t01
@@ -128,12 +128,12 @@
   xor  \t01, \a02, \a12   // t01 = a02 ^ a12
   xor  \t01, \t01, \a22   // t01 = a02 ^ a12 ^ a22
 
-#if (XOODYAK_RV32_TYPE2)
-  xoodyak.xorrol \t00, \t00, \t00
-#else
+#if (XOODYAK_RV32_TYPE1)
   roli \t02, \t00,    5   // t02 = t00 <<< 5
   roli \t00, \t00,   14   // t00 = t00 <<< 14
   xor  \t00, \t02, \t00   // t00 = t00 ^ t02
+#elif (XOODYAK_RV32_TYPE2)
+  xoodyak.xorrol \t00, \t00, \t00
 #endif
 
   xor  \a02, \a02, \t00   // a02 = a02 ^ t00
@@ -141,12 +141,12 @@
   xor  \a22, \a22, \t00   // a22 = a22 ^ t00       
 
   // sheet 3 
-#if (XOODYAK_RV32_TYPE2)
-  xoodyak.xorrol \t01, \t01, \t01
-#else
+#if (XOODYAK_RV32_TYPE1)
   roli \t02, \t01,    5   // t02 = t01 <<< 5
   roli \t01, \t01,   14   // t01 = t01 <<< 14
   xor  \t01, \t02, \t01   // t01 = t01 ^ t02
+#elif (XOODYAK_RV32_TYPE2)
+  xoodyak.xorrol \t01, \t01, \t01
 #endif
 
   xor  \a03, \a03, \t01   // a03 = a03 ^ t01
