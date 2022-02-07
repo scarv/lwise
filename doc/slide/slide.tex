@@ -16,30 +16,37 @@
 \titlepage
 \end{frame}
 
-$56$ round-$1$ candidates
-$32$ round-$2$ candidates
-$10$           finalists
+% =============================================================================
+
+% disclaimer: involvement with SPARKLE candidate
+
+% =============================================================================
 
 \begin{frame}
 
+%$56$ round-$1$ candidates
+%$32$ round-$2$ candidates
+%$10$           finalists
+
 \begin{center}
 \begin{scriptsize}
-\begin{tabular}{|lc|l|}
+\begin{tabular}{|l@{\;}c|cc|p{4cm}|}
 \hline
-Name              & Specification           & AEAD & Hash & Component(s)                        
+Name              & Specification           & AEAD       & Hash       & Component(s)                                                                                                               \\
 \hline
-Grain128-AEAD     & \cite{NIST:LW:grain}    & X    &      &             Stream cipher => L/NFSRs                                                         \\
 \hline
-GIFT-COFB         & \cite{NIST:LW:gift}     & X    &      &             Block  cipher => GIFT-128                                                        \\
-Romulus           & \cite{NIST:LW:romulus}  & X    & X    & (Tweakable) Block  cipher => Skinny-128-384+                                                 \\
+Grain128-AEAD     & \cite{NIST:LW:grain}    & \checkmark &            & \only<1>{\adjustbox{right}{            Stream cipher}}\only<2>{L/NFSRs                                                   } \\
 \hline
-Ascon             & \cite{NIST:LW:ascon}    & X    & X    &             Permutation   => Ascon-$p$                                                       \\
-Elephant          & \cite{NIST:LW:elephant} & X    &      &             Permutation   => Spongent-$\pi[n]$ or Keccak-$f[m]$                              \\
-PHOTON-Beetle     & \cite{NIST:LW:photon}   & X    & X    &             Permutation   => ${\tt PHOTON}_{256}$                                            \\
-Schwaemm and Esch & \cite{NIST:LW:sparkle}  & X    & X    &             Permutation   => Sparkle                             (involving Alzette ARX-box) \\
-Xoodyak           & \cite{NIST:LW:xoodyak}  & X    & X    &             Permutation   => Xoodoo                                                          \\
-ISAP              & \cite{NIST:LW:isap}     & X    &      &             Permutation   => Ascon-$p$         or  Keccak-$f[m]$                             \\
-TinyJambu         & \cite{NIST:LW:jambu}    & X    &      & (Keyed)     Permutation   => $P_n$                               (involving LFSR)            \\
+GIFT-COFB         & \cite{NIST:LW:gift}     & \checkmark &            & \only<1>{\adjustbox{right}{            Block  cipher}}\only<2>{GIFT-128                                                  } \\
+Romulus           & \cite{NIST:LW:romulus}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{(Tweakable) Block  cipher}}\only<2>{Skinny-128-384+                                           } \\
+\hline
+Ascon             & \cite{NIST:LW:ascon}    & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Ascon-$p$                                                 } \\
+Elephant          & \cite{NIST:LW:elephant} & \checkmark &            & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Spongent-$\pi[n]$ or Keccak-$f[m]$                        } \\
+PHOTON-Beetle     & \cite{NIST:LW:photon}   & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{${\tt PHOTON}_{256}$                                      } \\
+Schwaemm and Esch & \cite{NIST:LW:sparkle}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Sparkle                             (inc. Alzette ARX-box)} \\
+Xoodyak           & \cite{NIST:LW:xoodyak}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Xoodoo                                                    } \\
+ISAP              & \cite{NIST:LW:isap}     & \checkmark &            & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Ascon-$p$         or  Keccak-$f[m]$                       } \\
+TinyJAMBU         & \cite{NIST:LW:jambu}    & \checkmark &            & \only<1>{\adjustbox{right}{(Keyed)       Permutation}}\only<2>{$P_n$                               (inc. LFSR)           } \\
 \hline
 \end{tabular}
 \end{scriptsize}
@@ -49,21 +56,21 @@ TinyJambu         & \cite{NIST:LW:jambu}    & X    &      & (Keyed)     Permutat
 
 % -----------------------------------------------------------------------------
 
+% scope
+% - consider RV32 {\em and} RV64, so focus on Rocket-based hardware
+% - ignore hash API
+% - ignore ISAP (since this uses Ascon-$p$ or Keccak-$f[m]$ permutation)
+% - use ``partial'' component (e.g., only encryption) where possible
+
 % strategy
 % - for each candidate
 %   - analysis, then on-paper ISE design
-%   - software implementation using stock tool-chain plus .insn
+%   - software implementation using stock tool-chain plus {\tt .insn}
 %   - simulate using (patched) Spike
 %   - hardware implementation using Rocket
 
-% scope
-% - RV32 and RV64, but focus on the former initially
-% - broad and shallow analysis of AEAD only
-% - ignore ISAP (since this uses Ascon-$p$ or Keccak-$f[m]$ permutation)
-% - ``partial'' component (e.g., only encryption) where possible
-
-% design criteria
-% - strictly $3$-address (i.e., $2$-input, $1$ output) instructions
+% design criteria ~= CFU specification (https://cfu.readthedocs.io/en/latest)
+% - strictly $3$-address (i.e., $2$-input, $1$-output) instructions
 % - minimise additional state (e.g., CSRs)
 
 % special-purpose
@@ -74,6 +81,14 @@ TinyJambu         & \cite{NIST:LW:jambu}    & X    &      & (Keyed)     Permutat
 % - several shift/rotate + X for X in \SET{ XOR, ... }
 % - SWAPMOVE is a generic primitive used in several implementations based on fix-slicing
 % - there are a few cases where ``small'' LFSRs are involved
+
+% =============================================================================
+
+\begin{frame}[allowframebreaks]{References}{}
+
+\nocite{*} \printbibliography[heading=none]
+
+\end{frame}
 
 % =============================================================================
 

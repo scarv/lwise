@@ -6,10 +6,40 @@
 
 % =============================================================================
 
+\usepackage{adjustbox}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage[backend=biber,style=numeric,defernumbers=true]{biblatex}
+\usepackage[T1]{fontenc} 
 \usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{pxfonts} 
 \usepackage{xargs}
+\usepackage{xcolor} 
 
 \usetheme{Boadilla}
+
+\setbeamertemplate{frametitle continuation}[from second]
+\setbeamertemplate{note page}[plain]
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{section in toc}[square]
+\setbeamertemplate{subsection in toc}[square]
+
+\setbeamercolor{bibliography entry author}{fg=black}
+\setbeamercolor{bibliography entry title}{fg=blue}
+\setbeamercolor{bibliography entry location}{fg=black}
+\setbeamercolor{bibliography entry note}{fg=black}
+\setbeamercolor{bibliography item}{fg=black}
+
+\setbeamerfont{frametitle}{size=\normalsize}
+\setbeamerfont{framesubtitle}{size=\scriptsize}
+\setbeamerfont{block title}{size=\small}
+
+\addbibresource{slide.bib}
+\ExecuteBibliographyOptions{hyperref=true,defernumbers=true,mincrossrefs=99}
+\renewcommand*{\bibfont}{\normalfont\tiny}
 
 \title{Exploring ISEs for NIST LWC candidates}
 \author[Cheng et. al]{
