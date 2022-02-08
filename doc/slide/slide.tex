@@ -4,7 +4,7 @@
 % can be found at https://opensource.org/licenses/MIT (or should be included 
 % as LICENSE.txt within the associated archive or repository).
 
-\documentclass{beamer}
+\documentclass[9pt]{beamer}
 
 \usepackage{slide}
 
@@ -24,32 +24,54 @@
 
 \begin{frame}
 
+\begin{block}{Definition}
+NIST define~\cite[Section 3.4]{NIST:LWC:call}
+\[
+\mbox{lightweight cryptography $\simeq$ ``tailored for resource-constrained devices''}
+\]
+e.g.,
+
+\begin{itemize}
+\item efficient on constrained hard/software platforms (vs. existing standards),
+\item efficient for short messages,
+\item ameanable to countermeasures against implementation attacks,
+\item ...
+\end{itemize}
+
+\noindent
+with ``efficient'' read as low-latency, low-footprint, low-power, etc.
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+
 %$56$ round-$1$ candidates
 %$32$ round-$2$ candidates
 %$10$           finalists
 
 \begin{center}
-\begin{scriptsize}
+\begin{small}
 \begin{tabular}{|l@{\;}c|cc|p{4cm}|}
 \hline
-Name              & Specification           & AEAD       & Hash       & Component(s)                                                                                                               \\
+Name              & Specification            & AEAD       & Hash       & Component(s)                                                                                                              \\
 \hline
 \hline
-Grain128-AEAD     & \cite{NIST:LW:grain}    & \checkmark &            & \only<1>{\adjustbox{right}{            Stream cipher}}\only<2>{L/NFSRs                                                   } \\
+Grain128-AEAD     & \cite{NIST:LWC:grain}    & \checkmark &            & \only<1>{\adjustbox{right}{            Stream cipher}}\only<2>{L/NFSRs                                                  } \\
 \hline
-GIFT-COFB         & \cite{NIST:LW:gift}     & \checkmark &            & \only<1>{\adjustbox{right}{            Block  cipher}}\only<2>{GIFT-128                                                  } \\
-Romulus           & \cite{NIST:LW:romulus}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{(Tweakable) Block  cipher}}\only<2>{Skinny-128-384+                                           } \\
+GIFT-COFB         & \cite{NIST:LWC:gift}     & \checkmark &            & \only<1>{\adjustbox{right}{            Block  cipher}}\only<2>{GIFT-128                                                 } \\
+Romulus           & \cite{NIST:LWC:romulus}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{(Tweakable) Block  cipher}}\only<2>{Skinny-128-384+                                          } \\
 \hline
-Ascon             & \cite{NIST:LW:ascon}    & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Ascon-$p$                                                 } \\
-Elephant          & \cite{NIST:LW:elephant} & \checkmark &            & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Spongent-$\pi[n]$ or Keccak-$f[m]$                        } \\
-PHOTON-Beetle     & \cite{NIST:LW:photon}   & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{${\tt PHOTON}_{256}$                                      } \\
-Schwaemm and Esch & \cite{NIST:LW:sparkle}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Sparkle                             (inc. Alzette ARX-box)} \\
-Xoodyak           & \cite{NIST:LW:xoodyak}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Xoodoo                                                    } \\
-ISAP              & \cite{NIST:LW:isap}     & \checkmark &            & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Ascon-$p$         or  Keccak-$f[m]$                       } \\
-TinyJAMBU         & \cite{NIST:LW:jambu}    & \checkmark &            & \only<1>{\adjustbox{right}{(Keyed)       Permutation}}\only<2>{$P_n$                               (inc. LFSR)           } \\
+Ascon             & \cite{NIST:LWC:ascon}    & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Ascon-$p$                                                } \\
+Elephant          & \cite{NIST:LWC:elephant} & \checkmark &            & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Spongent-$\pi[n]$ or Keccak-$f[m]$                       } \\
+PHOTON-Beetle     & \cite{NIST:LWC:photon}   & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{${\tt PHOTON}_{256}$                                     } \\
+Schwaemm and Esch & \cite{NIST:LWC:sparkle}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Sparkle                            (inc. Alzette ARX-box)} \\
+Xoodyak           & \cite{NIST:LWC:xoodyak}  & \checkmark & \checkmark & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Xoodoo                                                   } \\
+ISAP              & \cite{NIST:LWC:isap}     & \checkmark &            & \only<1>{\adjustbox{right}{              Permutation}}\only<2>{Ascon-$p$         or Keccak-$f[m]$                       } \\
+TinyJAMBU         & \cite{NIST:LWC:jambu}    & \checkmark &            & \only<1>{\adjustbox{right}{(Keyed)       Permutation}}\only<2>{$P_n$                              (inc. LFSR)           } \\
 \hline
 \end{tabular}
-\end{scriptsize}
+\end{small}
 \end{center}
 
 \end{frame}
