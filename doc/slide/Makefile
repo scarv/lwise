@@ -18,9 +18,11 @@ BUILD = ${REPO_HOME}/build/slide
 %.pdf : %.tex %.sty %.bib
 	@mkdir --parents ${BUILD}
 
-	@pdflatex -output-directory ${BUILD} ${<}
-	@pdflatex -output-directory ${BUILD} ${<}
-	@pdflatex -output-directory ${BUILD} ${<}
+	pdflatex -output-directory ${BUILD} ${*}.tex
+	biber --input-directory ${BUILD} --output-directory ${BUILD} ${*}
+	pdflatex -output-directory ${BUILD} ${*}.tex
+	biber --input-directory ${BUILD} --output-directory ${BUILD} ${*}
+	pdflatex -output-directory ${BUILD} ${*}.tex
 
 all   : slide.pdf
 
