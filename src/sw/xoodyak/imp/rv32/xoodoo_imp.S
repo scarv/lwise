@@ -30,15 +30,15 @@
 // prologue + epilogue 
 
 .macro XOODOO_PROLOGUE
-  addi sp,  sp, -8
-  sw   s0,  0(sp)
-  sw   s1,  4(sp)
+  addi sp, sp, -8
+  sw   s0, 0(sp)
+  sw   s1, 4(sp)
 .endm
 
 .macro XOODOO_EPILOGUE
-  lw   s0,   0(sp)
-  lw   s1,   4(sp)
-  addi sp,  sp, 8
+  lw   s0, 0(sp)
+  lw   s1, 4(sp)
+  addi sp, sp, 8
   ret
 .endm
 

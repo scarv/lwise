@@ -7,6 +7,9 @@ Date: 23 Mar 2019
 #include <stdint.h>
 #include <stdio.h>
 
+
+#if !defined( LWISE )
+
 /*Round constants*/
 const unsigned char GIFT_RC[40] = {
     0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3E, 0x3D, 0x3B, 0x37, 0x2F,
@@ -105,3 +108,5 @@ void giftb128(uint8_t P[16], const uint8_t K[16], uint8_t C[16]){
     C[15] = S[3];
 
 return;}
+
+#endif
