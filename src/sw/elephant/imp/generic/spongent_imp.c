@@ -1,3 +1,9 @@
+// This implementation reuses some code from: 
+// https://github.com/rweather/lightweight-crypto/blob/master/src/individual/Elephant/internal-spongent.c
+
+// The current code in this file is efficient for rv32 only, and it needs some 
+// further modifications for rv64. 
+
 #include <string.h>
 #include <stdint.h>
 #include "spongent_imp.h"
@@ -31,14 +37,33 @@ static const uint8_t RC[] = {
   0x57, 0xea, 0x2f, 0xf4, 0x5f, 0xfa, 0x3f, 0xfc,
 };
 
+#define SWAPMOVE32(x, m, n) { \
+  uint32_t z = x ^ (x>>n);    \
+  z = z & m;                  \
+  z = z ^ (z<<n);             \
+  x = z ^ x;                  \
+}
+
+// permute the 32-bit word bit[31:0] to 
+// bit[31:24]  28 24 20 16 12  8  4  0 
+// bit[23:16]  29 25 21 17 13  9  5  1 
+// bit[15: 8]  30 26 22 18 14 10  6  2 
+// bit[ 7: 0]  31 27 23 19 15 11  7  3 
+
+#define pLayer_STEP(x)      {      \
+  SWAPMOVE32(x, 0x0A0A0A0AUL,  3); \
+  SWAPMOVE32(x, 0x00CC00CCUL,  6); \
+  SWAPMOVE32(x, 0x0000F0F0UL, 12); \
+  SWAPMOVE32(x, 0x000000FFUL, 24); \
+}
+
 void Spongent_160(BYTE *state)
 {
   const uint8_t *rc = RC;
-  uint32_t s[8] = { 0 }, t[8], u[4];
+  uint32_t s[8] = { 0 }, t[8], u[4], z;
   int i;
 
-  // Convert the state to 40-bit limbs 
-  // The state is in four 40-bit limbs (each limb composed of two uint32_t words). 
+  // The state is in four 40-bit limbs (each limb is composed of two uint32_t words). 
 
   memcpy(&s[0], state,    5);
   memcpy(&s[2], state+5,  5);
@@ -52,74 +77,63 @@ void Spongent_160(BYTE *state)
     s[0] ^= rc[0];
     s[7] ^= rc[1];
 
-    // We perform first the pLayer then a new bitsliced sBoxLayer, but this 
-    // doesn't affect the correctness. 
+    // Our implementation swaps the order of pLayer and sBoxLayer, i.e. we 
+    // perform first the pLayer then a new bitsliced sBoxLayer. Because the 
+    // pLayer actually permutes the current state to a form which is ideal for a 
+    // bitsliced sBoxLayer. This swap doesn't affect the correctness and can 
+    // reduce the number of performing SBox. 
 
     // pLayer
 
-    t[0] =  BCP(s[0],  0)     ^ BDN(s[0],  4,  1) ^ BDN(s[0],  8,  2) ^
-            BDN(s[0], 12,  3) ^ BDN(s[0], 16,  4) ^ BDN(s[0], 20,  5) ^
-            BDN(s[0], 24,  6) ^ BDN(s[0], 28,  7) ^ BUP(s[1],  0,  8) ^
-            BUP(s[1],  4,  9) ^ BUP(s[2],  0, 10) ^ BUP(s[2],  4, 11) ^ 
-            BUP(s[2],  8, 12) ^ BUP(s[2], 12, 13) ^ BDN(s[2], 16, 14) ^ 
-            BDN(s[2], 20, 15) ^ BDN(s[2], 24, 16) ^ BDN(s[2], 28, 17) ^ 
-            BUP(s[3],  0, 18) ^ BUP(s[3],  4, 19) ^ BUP(s[4],  0, 20) ^ 
-            BUP(s[4],  4, 21) ^ BUP(s[4],  8, 22) ^ BUP(s[4], 12, 23) ^ 
-            BUP(s[4], 16, 24) ^ BUP(s[4], 20, 25) ^ BUP(s[4], 24, 26) ^
-            BDN(s[4], 28, 27) ^ BUP(s[5],  0, 28) ^ BUP(s[5],  4, 29) ^
-            BUP(s[6],  0, 30) ^ BUP(s[6],  4, 31);
-    t[1] =  BDN(s[6],  8,  0) ^ BDN(s[6], 12,  1) ^ BDN(s[6], 16,  2) ^
-            BDN(s[6], 20,  3) ^ BDN(s[6], 24,  4) ^ BDN(s[6], 28,  5) ^
-            BUP(s[7],  0,  6) ^ BUP(s[7],  4,  7);
+    t[0] =  BUP(s[1],  0,  8) ^ BUP(s[1],  4,  9) ^ BUP(s[3],  0, 18) ^ 
+            BUP(s[3],  4, 19) ^ BUP(s[5],  0, 28) ^ BUP(s[5],  4, 29); 
+    t[1] =  BUP(s[7],  0,  6) ^ BUP(s[7],  4,  7);
 
-    t[2] =  BDN(s[0],  1,  0) ^ BDN(s[0],  5,  1) ^ BDN(s[0],  9,  2) ^
-            BDN(s[0], 13,  3) ^ BDN(s[0], 17,  4) ^ BDN(s[0], 21,  5) ^
-            BDN(s[0], 25,  6) ^ BDN(s[0], 29,  7) ^ BUP(s[1],  1,  8) ^
-            BUP(s[1],  5,  9) ^ BUP(s[2],  1, 10) ^ BUP(s[2],  5, 11) ^ 
-            BUP(s[2],  9, 12) ^ BCP(s[2], 13)     ^ BDN(s[2], 17, 14) ^ 
-            BDN(s[2], 21, 15) ^ BDN(s[2], 25, 16) ^ BDN(s[2], 29, 17) ^ 
-            BUP(s[3],  1, 18) ^ BUP(s[3],  5, 19) ^ BUP(s[4],  1, 20) ^ 
-            BUP(s[4],  5, 21) ^ BUP(s[4],  9, 22) ^ BUP(s[4], 13, 23) ^ 
-            BUP(s[4], 17, 24) ^ BUP(s[4], 21, 25) ^ BUP(s[4], 25, 26) ^
-            BDN(s[4], 29, 27) ^ BUP(s[5],  1, 28) ^ BUP(s[5],  5, 29) ^
-            BUP(s[6],  1, 30) ^ BUP(s[6],  5, 31);
-    t[3] =  BDN(s[6],  9,  0) ^ BDN(s[6], 13,  1) ^ BDN(s[6], 17,  2) ^
-            BDN(s[6], 21,  3) ^ BDN(s[6], 25,  4) ^ BDN(s[6], 29,  5) ^
-            BUP(s[7],  1,  6) ^ BUP(s[7],  5,  7);
+    t[2] =  BUP(s[1],  1,  8) ^ BUP(s[1],  5,  9) ^ BUP(s[3],  1, 18) ^ 
+            BUP(s[3],  5, 19) ^ BUP(s[5],  1, 28) ^ BUP(s[5],  5, 29); 
+    t[3] =  BUP(s[7],  1,  6) ^ BUP(s[7],  5,  7);  
 
-    t[4] =  BDN(s[0],  2,  0) ^ BDN(s[0],  6,  1) ^ BDN(s[0], 10,  2) ^
-            BDN(s[0], 14,  3) ^ BDN(s[0], 18,  4) ^ BDN(s[0], 22,  5) ^
-            BDN(s[0], 26,  6) ^ BDN(s[0], 30,  7) ^ BUP(s[1],  2,  8) ^
-            BUP(s[1],  6,  9) ^ BUP(s[2],  2, 10) ^ BUP(s[2],  6, 11) ^ 
-            BUP(s[2], 10, 12) ^ BDN(s[2], 14, 13) ^ BDN(s[2], 18, 14) ^ 
-            BDN(s[2], 22, 15) ^ BDN(s[2], 26, 16) ^ BDN(s[2], 30, 17) ^ 
-            BUP(s[3],  2, 18) ^ BUP(s[3],  6, 19) ^ BUP(s[4],  2, 20) ^ 
-            BUP(s[4],  6, 21) ^ BUP(s[4], 10, 22) ^ BUP(s[4], 14, 23) ^ 
-            BUP(s[4], 18, 24) ^ BUP(s[4], 22, 25) ^ BCP(s[4], 26)     ^
-            BDN(s[4], 30, 27) ^ BUP(s[5],  2, 28) ^ BUP(s[5],  6, 29) ^
-            BUP(s[6],  2, 30) ^ BUP(s[6],  6, 31);
-    t[5] =  BDN(s[6], 10,  0) ^ BDN(s[6], 14,  1) ^ BDN(s[6], 18,  2) ^
-            BDN(s[6], 22,  3) ^ BDN(s[6], 26,  4) ^ BDN(s[6], 30,  5) ^
-            BUP(s[7],  2,  6) ^ BUP(s[7],  6,  7);
+    t[4] =  BUP(s[1],  2,  8) ^ BUP(s[1],  6,  9) ^ BUP(s[3],  2, 18) ^ 
+            BUP(s[3],  6, 19) ^ BUP(s[5],  2, 28) ^ BUP(s[5],  6, 29); 
+    t[5] =  BUP(s[7],  2,  6) ^ BUP(s[7],  6,  7);
+    
+    t[6] =  BUP(s[1],  3,  8) ^ BUP(s[1],  7,  9) ^ BUP(s[3],  3, 18) ^ 
+            BUP(s[3],  7, 19) ^ BUP(s[5],  3, 28) ^ BUP(s[5],  7, 29); 
+    t[7] =  BUP(s[7],  3,  6) ^ BCP(s[7],  7);
 
-    t[6] =  BDN(s[0],  3,  0) ^ BDN(s[0],  7,  1) ^ BDN(s[0], 11,  2) ^
-            BDN(s[0], 15,  3) ^ BDN(s[0], 19,  4) ^ BDN(s[0], 23,  5) ^
-            BDN(s[0], 27,  6) ^ BDN(s[0], 31,  7) ^ BUP(s[1],  3,  8) ^
-            BUP(s[1],  7,  9) ^ BUP(s[2],  3, 10) ^ BUP(s[2],  7, 11) ^ 
-            BUP(s[2], 11, 12) ^ BDN(s[2], 15, 13) ^ BDN(s[2], 19, 14) ^ 
-            BDN(s[2], 23, 15) ^ BDN(s[2], 27, 16) ^ BDN(s[2], 31, 17) ^ 
-            BUP(s[3],  3, 18) ^ BUP(s[3],  7, 19) ^ BUP(s[4],  3, 20) ^ 
-            BUP(s[4],  7, 21) ^ BUP(s[4], 11, 22) ^ BUP(s[4], 15, 23) ^ 
-            BUP(s[4], 19, 24) ^ BUP(s[4], 23, 25) ^ BDN(s[4], 27, 26) ^
-            BDN(s[4], 31, 27) ^ BUP(s[5],  3, 28) ^ BUP(s[5],  7, 29) ^
-            BUP(s[6],  3, 30) ^ BUP(s[6],  7, 31);
-    t[7] =  BDN(s[6], 11,  0) ^ BDN(s[6], 15,  1) ^ BDN(s[6], 19,  2) ^
-            BDN(s[6], 23,  3) ^ BDN(s[6], 27,  4) ^ BDN(s[6], 31,  5) ^
-            BUP(s[7],  3,  6) ^ BCP(s[7],  7);
+    pLayer_STEP(s[0]); 
+    pLayer_STEP(s[2]); 
+    pLayer_STEP(s[4]); 
+    pLayer_STEP(s[6]);
 
-    // sBoxLayer
+    t[0] ^=  (s[0]>>24) & 0xFF;
+    t[2] ^=  (s[0]>>16) & 0xFF;
+    t[4] ^=  (s[0]>>8)  & 0xFF;
+    t[6] ^=  (s[0])     & 0xFF;
+
+    t[0] ^= ((s[2]>>24) & 0xFF) << 10; 
+    t[2] ^= ((s[2]>>16) & 0xFF) << 10;
+    t[4] ^= ((s[2]>>8)  & 0xFF) << 10;  
+    t[6] ^=  (s[2]      & 0xFF) << 10;
+
+    t[0] ^= ((s[4]>>24) & 0xFF) << 20;
+    t[2] ^= ((s[4]>>16) & 0xFF) << 20;
+    t[4] ^= ((s[4]>>8)  & 0xFF) << 20; 
+    t[6] ^=  (s[4]      & 0xFF) << 20;
+
+    t[0] ^= ((s[6]>>24) & 0xFF) << 30;
+    t[2] ^= ((s[6]>>16) & 0xFF) << 30;
+    t[4] ^= ((s[6]>>8)  & 0xFF) << 30;  
+    t[6] ^=  (s[6]      & 0xFF) << 30;
+
+    t[1] ^= (s[6]>>26)  & 0x3F; 
+    t[3] ^= (s[6]>>18)  & 0x3F; 
+    t[5] ^= (s[6]>>10)  & 0x3F; 
+    t[7] ^= (s[6]>>2)   & 0x3F; 
+  
+    // sBoxLayer (bitsliced)
     // works on the 40-bit limbs.  
-    // The formulas for the SBox: 
+    // Our formulas for the SBox (31 bitwise logical operations): 
     // y0 = x0 + x1 + x3 + x1x2 
     // y1 = x0 + x0x3 + x1x2 + x1x3 + x2x3 + x1x2x3 + 1
     // y2 = x1 + x2 + x0x3 + x1x2x3 + 1
