@@ -57,7 +57,7 @@ static const uint8_t RC[] = {
   SWAPMOVE32(x, 0x000000FFUL, 24); \
 }
 
-void Spongent_160(BYTE *state)
+void Spongent_160(void *state)
 {
   const uint8_t *rc = RC;
   uint32_t s[8] = { 0 }, t[8], u[4], z;
@@ -85,6 +85,7 @@ void Spongent_160(BYTE *state)
 
     // pLayer
 
+    // step 0
     t[0] =  BUP(s[1],  0,  8) ^ BUP(s[1],  4,  9) ^ BUP(s[3],  0, 18) ^ 
             BUP(s[3],  4, 19) ^ BUP(s[5],  0, 28) ^ BUP(s[5],  4, 29); 
     t[1] =  BUP(s[7],  0,  6) ^ BUP(s[7],  4,  7);
@@ -101,11 +102,13 @@ void Spongent_160(BYTE *state)
             BUP(s[3],  7, 19) ^ BUP(s[5],  3, 28) ^ BUP(s[5],  7, 29); 
     t[7] =  BUP(s[7],  3,  6) ^ BCP(s[7],  7);
 
+    // step 1
     pLayer_STEP(s[0]); 
     pLayer_STEP(s[2]); 
     pLayer_STEP(s[4]); 
     pLayer_STEP(s[6]);
 
+    // step 2
     t[0] ^=  (s[0]>>24) & 0xFF;
     t[2] ^=  (s[0]>>16) & 0xFF;
     t[4] ^=  (s[0]>>8)  & 0xFF;
