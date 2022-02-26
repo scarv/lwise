@@ -214,7 +214,7 @@
 
 .macro SPONGENT_PL r0, r1, r2, r3, r4, r5, r6, r7, s0, s1, s2, s3, s4, s5, s6, s7, t0, t1
   // There are three steps in the pLayer. See details in the generic C code:
-  // ../generic/spngent_imp.c 
+  // ../generic/spongent_imp.c 
 
   // step 0
   SONPGENT_PL_STEP00 \r0, \s1, \s3, \s5, \t0, \t1, 8, 18, 28

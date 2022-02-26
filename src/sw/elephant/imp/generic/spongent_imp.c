@@ -60,10 +60,14 @@ static const uint8_t RC[] = {
 void Spongent_160(void *state)
 {
   const uint8_t *rc = RC;
-  uint32_t s[8] = { 0 }, t[8], u[4], z;
+  uint32_t s[8] = { 0 }, t[8], u[4];
   int i;
 
   // The state is in four 40-bit limbs (each limb is composed of two uint32_t words). 
+  // s1 | s0:  39  38  ...  33  32 |  31  30  ...   1   0
+  // s3 | s2:  79  78  ...  73  72 |  71  70  ...  41  40
+  // s5 | s4: 119 118  ... 113 112 | 111 110  ...  81  80
+  // s7 | s5: 159 158  ... 153 152 | 151 150  ... 121 120
 
   memcpy(&s[0], state,    5);
   memcpy(&s[2], state+5,  5);
@@ -83,7 +87,21 @@ void Spongent_160(void *state)
     // bitsliced sBoxLayer. This swap doesn't affect the correctness and can 
     // reduce the number of performing SBox. 
 
-    // pLayer
+    // pLayer     
+    // 40 * index mod 159
+    // permutes the state like this: 
+
+    // s1 | s0:  39  38  ...  33  32 |  31  30  ...   1   0
+    // s3 | s2:  79  78  ...  73  72 |  71  70  ...  41  40
+    // s5 | s4: 119 118  ... 113 112 | 111 110  ...  81  80
+    // s7 | s5: 159 158  ... 153 152 | 151 150  ... 121 120
+    
+    // from the above form to the below form
+    
+    // s1 | s0: 156 152  ... 132 128 | 124 120  ...   4   0
+    // s3 | s2: 157 153  ... 133 129 | 125 121  ...   5   1
+    // s5 | s4: 158 154  ... 134 130 | 126 122  ...   6   2
+    // s7 | s5: 159 155  ... 135 131 | 127 123  ...   7   3
 
     // step 0
     t[0] =  BUP(s[1],  0,  8) ^ BUP(s[1],  4,  9) ^ BUP(s[3],  0, 18) ^ 
@@ -129,10 +147,10 @@ void Spongent_160(void *state)
     t[4] ^= ((s[6]>>8)  & 0xFF) << 30;  
     t[6] ^=  (s[6]      & 0xFF) << 30;
 
-    t[1] ^= (s[6]>>26)  & 0x3F; 
-    t[3] ^= (s[6]>>18)  & 0x3F; 
-    t[5] ^= (s[6]>>10)  & 0x3F; 
-    t[7] ^= (s[6]>>2)   & 0x3F; 
+    t[1] ^=  (s[6]>>26) & 0x3F; 
+    t[3] ^=  (s[6]>>18) & 0x3F; 
+    t[5] ^=  (s[6]>>10) & 0x3F; 
+    t[7] ^=  (s[6]>>2)  & 0x3F; 
   
     // sBoxLayer (bitsliced)
     // works on the 40-bit limbs.  
