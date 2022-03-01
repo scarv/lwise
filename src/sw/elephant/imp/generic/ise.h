@@ -17,6 +17,4 @@ uint32_t spongent_pLayer_step2_16(uint32_t rs1, uint32_t rs2, uint32_t imm);
 uint32_t spongent_pLayer_step2_8 (uint32_t rs1, uint32_t rs2, uint32_t imm);
 uint32_t spongent_pLayer_step2_0 (uint32_t rs1, uint32_t rs2, uint32_t imm);
 
-// v3
-
 #endif

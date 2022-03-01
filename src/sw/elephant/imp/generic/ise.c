@@ -1,17 +1,5 @@
 #include "ise.h"
 
-// Q: is it correct that design a custom instruction in the following way? 
-//    (especially about rs2)
-uint32_t spongent_BUP(uint32_t rs1, uint32_t rs2, uint32_t imm)
-{
-  uint32_t t0 = imm - rs2;
-  uint32_t t1 = rs1 << t0;
-  uint32_t t2 = (uint32_t) 1 << imm;
-  uint32_t rd = t1 & t2;
-
-  return rd;
-}
-
 #define SWAPMOVE32(x, m, n) { \
   uint32_t z = x ^ (x>>n);    \
   z = z & m;                  \
@@ -39,6 +27,20 @@ uint32_t spongent_pLayer_step1(uint32_t rs1)
 
 // -----------------------------------------------------------------------------
 
+// v1
+
+// Q: is it correct that design a custom instruction in the following way? 
+//    (especially about rs2)
+uint32_t spongent_BUP(uint32_t rs1, uint32_t rs2, uint32_t imm)
+{
+  uint32_t t0 = imm - rs2;
+  uint32_t t1 = rs1 << t0;
+  uint32_t t2 = (uint32_t) 1 << imm;
+  uint32_t rd = t1 & t2;
+
+  return rd;
+}
+
 uint32_t spongent_BSLLXOR(uint32_t rs1, uint32_t rs2, uint32_t imm)
 {
   uint32_t t0 = rs2 & 0xFF;
@@ -49,6 +51,8 @@ uint32_t spongent_BSLLXOR(uint32_t rs1, uint32_t rs2, uint32_t imm)
 }
 
 // -----------------------------------------------------------------------------
+
+// v2
 
 uint32_t spongent_DBUP(uint32_t rs1, uint32_t rs2, uint32_t imm)
 {
