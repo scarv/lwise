@@ -14,4 +14,5 @@ extern void Spongent160_5x32b(void *state);
 // 4x40b asm: 143257
 // 5x32b asm:  89082
 
+
 #endif
