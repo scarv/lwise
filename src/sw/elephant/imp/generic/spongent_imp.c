@@ -766,7 +766,7 @@ void Spongent160_5x32b_ISEv1(void *state)
     s[4] ^= ((uint32_t)(rc[1])) << 24;
 
     // sBoxLayer
-    // TODO: design a custom instruction for SBox 
+    // use xperm4? 2*xperm4 + and + xor: 5*4 = 20 cc
     for (j = 0; j < 20; j++) 
       t8[j] = SBox[s8[j]];
 
@@ -865,7 +865,7 @@ void Spongent160_5x32b_ISEv2(void *state)
     s[4] ^= ((uint32_t)(rc[1])) << 24;
 
     // sBoxLayer
-    // TODO: design a custom instruction for SBox 
+    // use xperm4? 2*xperm4 + and + xor: 5*4 = 20 cc
     for (j = 0; j < 20; j++) 
       t8[j] = SBox[s8[j]];
 

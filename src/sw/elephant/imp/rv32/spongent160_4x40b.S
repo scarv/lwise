@@ -261,9 +261,9 @@
 
 .section .text
 
-.global Spongent_160
+.global Spongent160_4x40b
 
-Spongent_160:
+Spongent160_4x40b:
   SPONGENT_PROLOGUE
   SPONGENT_LDSTATE  s0, s1, s2, s3, s4, s5, s6, s7
   li t1, 0x0A0A0A0A
