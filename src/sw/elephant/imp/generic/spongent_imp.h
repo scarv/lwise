@@ -12,14 +12,14 @@ void Spongent160_5x32b_ISEv2(void *state);
 
 #define Spongent_160 Spongent160_5x32b_Cv2
 
-// Discussions 
+// Info 
 // 4x40b Cv1:   AddRC(table) + pLayer(swapmove) + sBoxLayer(bitsliced) -> our generic C imp? 
-// 4x40b ISEv1: "general"   custom instructions + based on 4x40b Cv1
+// 4x40b ISEv1: "generic"   custom instructions + based on 4x40b Cv1
 // 4x40b ISEv2: "dedicated" custom instructions + based on 4x40b Cv1
 
 // 5x32b Cv1:   AddRC(table) + sBoxLayer(table) + pLayer(macros)
 // 5x32b Cv2:   AddRC(table) + sBoxLayer(table) + pLayer(swapmove) 
-// 5x32b ISEv1: "general"   custom instructions + based on 5x32b Cv2
+// 5x32b ISEv1: "generic"   custom instructions + based on 5x32b Cv2
 // 5x32b ISEv2: "dedicated" custom instructions + based on 5x32b Cv2
 
 
@@ -29,6 +29,9 @@ void Spongent160_5x32b_ISEv2(void *state);
 // 4x40b Cv1: 151597
 // 5x32b Cv1: 497337
 // 5x32b Cv2: 137297
+
+// Discussion:
+// 
 
 
 #endif

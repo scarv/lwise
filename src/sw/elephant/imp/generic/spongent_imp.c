@@ -191,7 +191,7 @@ void Spongent160_4x40b_Cv1(void *state)
 
 // -----------------------------------------------------------------------------
 
-// This variant uses "general" custom instructions and is based on 4x40b Cv1.
+// This variant uses "generic" custom instructions and is based on 4x40b Cv1.
 
 void Spongent160_4x40b_ISEv1(void *state)
 {
@@ -747,7 +747,7 @@ void Spongent160_5x32b_Cv2(void *state)
 
 // -----------------------------------------------------------------------------
 
-// This variant uses "general" custom instructions and is based on 5x32b Cv2.
+// This variant uses "generic" custom instructions and is based on 5x32b Cv2.
 
 void Spongent160_5x32b_ISEv1(void *state)
 {
