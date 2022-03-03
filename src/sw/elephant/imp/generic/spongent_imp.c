@@ -7,10 +7,10 @@
 #include <string.h>
 #include <stdint.h>
 #include "spongent_imp.h"
+#include "ise.h"
 
 #define BCP(x, bit) ((x) & (((uint32_t)1) << (bit)))
 #define BUP(x, from, to) (((x) << ((to) - (from))) & (((uint32_t)1) << (to)))
-#define BDN(x, from, to) (((x) >> ((from) - (to))) & (((uint32_t)1) << (to)))
 
 // Round constants for Spongent-pi[160]
 
@@ -50,24 +50,28 @@ static const uint8_t RC[] = {
 // bit[15: 8]  30 26 22 18 14 10  6  2 
 // bit[ 7: 0]  31 27 23 19 15 11  7  3 
 
-#define pLayer_STEP(x)      {      \
+#define pLayer_STEP1(x)     {      \
   SWAPMOVE32(x, 0x0A0A0A0AUL,  3); \
   SWAPMOVE32(x, 0x00CC00CCUL,  6); \
   SWAPMOVE32(x, 0x0000F0F0UL, 12); \
   SWAPMOVE32(x, 0x000000FFUL, 24); \
 }
 
-void Spongent_160(void *state)
+// -----------------------------------------------------------------------------
+
+// 4x40b C code v1: AddRC(table) + pLayer(swapmove) + sBoxLayer(bitsliced)
+
+void Spongent160_4x40b_Cv1(void *state)
 {
   const uint8_t *rc = RC;
   uint32_t s[8] = { 0 }, t[8], u[4];
   int i;
 
-  // The state is in four 40-bit limbs (each limb is composed of two uint32_t words). 
+  // The state is in four 40-bit slices (each slice is composed of two uint32_t words). 
   // s1 | s0:  39  38  ...  33  32 |  31  30  ...   1   0
   // s3 | s2:  79  78  ...  73  72 |  71  70  ...  41  40
   // s5 | s4: 119 118  ... 113 112 | 111 110  ...  81  80
-  // s7 | s5: 159 158  ... 153 152 | 151 150  ... 121 120
+  // s7 | s6: 159 158  ... 153 152 | 151 150  ... 121 120
 
   memcpy(&s[0], state,    5);
   memcpy(&s[2], state+5,  5);
@@ -91,17 +95,17 @@ void Spongent_160(void *state)
     // 40 * index mod 159
     // permutes the state like this: 
 
-    // s1 | s0:  39  38  ...  33  32 |  31  30  ...   1   0
-    // s3 | s2:  79  78  ...  73  72 |  71  70  ...  41  40
-    // s5 | s4: 119 118  ... 113 112 | 111 110  ...  81  80
-    // s7 | s5: 159 158  ... 153 152 | 151 150  ... 121 120
+    // s1 | s0:  39  38  ...  33  32 |  31  30  ... ...   1   0
+    // s3 | s2:  79  78  ...  73  72 |  71  70  ... ...  41  40
+    // s5 | s4: 119 118  ... 113 112 | 111 110  ... ...  81  80
+    // s7 | s6: 159 158  ... 153 152 | 151 150  ... ... 121 120
     
     // from the above form to the below form
     
-    // s1 | s0: 156 152  ... 132 128 | 124 120  ...   4   0
-    // s3 | s2: 157 153  ... 133 129 | 125 121  ...   5   1
-    // s5 | s4: 158 154  ... 134 130 | 126 122  ...   6   2
-    // s7 | s5: 159 155  ... 135 131 | 127 123  ...   7   3
+    // s1 | s0: 156 152  ... 132 128 | 124 120  ... ...   4   0
+    // s3 | s2: 157 153  ... 133 129 | 125 121  ... ...   5   1
+    // s5 | s4: 158 154  ... 134 130 | 126 122  ... ...   6   2
+    // s7 | s6: 159 155  ... 135 131 | 127 123  ... ...   7   3
 
     // step 0
     t[0] =  BUP(s[1],  0,  8) ^ BUP(s[1],  4,  9) ^ BUP(s[3],  0, 18) ^ 
@@ -121,10 +125,10 @@ void Spongent_160(void *state)
     t[7] =  BUP(s[7],  3,  6) ^ BCP(s[7],  7);
 
     // step 1
-    pLayer_STEP(s[0]); 
-    pLayer_STEP(s[2]); 
-    pLayer_STEP(s[4]); 
-    pLayer_STEP(s[6]);
+    pLayer_STEP1(s[0]); 
+    pLayer_STEP1(s[2]); 
+    pLayer_STEP1(s[4]); 
+    pLayer_STEP1(s[6]);
 
     // step 2
     t[0] ^=  (s[0]>>24) & 0xFF;
@@ -153,7 +157,7 @@ void Spongent_160(void *state)
     t[7] ^=  (s[6]>>2)  & 0x3F; 
   
     // sBoxLayer (bitsliced)
-    // works on the 40-bit limbs.  
+    // works on the 40-bit slices.  
     // Our formulas for the SBox (31 bitwise logical operations): 
     // y0 = x0 + x1 + x3 + x1x2 
     // y1 = x0 + x0x3 + x1x2 + x1x3 + x2x3 + x1x2x3 + 1
@@ -184,3 +188,756 @@ void Spongent_160(void *state)
   memcpy(state+10, &s[4], 5);
   memcpy(state+15, &s[6], 5);
 }
+
+// -----------------------------------------------------------------------------
+
+// This variant uses "general" custom instructions and is based on 4x40b Cv1.
+
+void Spongent160_4x40b_ISEv1(void *state)
+{
+  const uint8_t *rc = RC;
+  uint32_t s[8] = { 0 }, t[8], u[4];
+  int i;
+
+  // The state is in four 40-bit slices (each slice is composed of two uint32_t words). 
+  // s1 | s0:  39  38  ...  33  32 |  31  30  ...   1   0
+  // s3 | s2:  79  78  ...  73  72 |  71  70  ...  41  40
+  // s5 | s4: 119 118  ... 113 112 | 111 110  ...  81  80
+  // s7 | s6: 159 158  ... 153 152 | 151 150  ... 121 120
+
+  memcpy(&s[0], state,    5);
+  memcpy(&s[2], state+5,  5);
+  memcpy(&s[4], state+10, 5);
+  memcpy(&s[6], state+15, 5);
+
+  for (i = 0; i < 80; i++, rc += 2) {
+
+    // add round constants
+
+    s[0] ^= rc[0];
+    s[7] ^= rc[1];
+
+    // Our implementation swaps the order of pLayer and sBoxLayer, i.e. we 
+    // perform first the pLayer then a new bitsliced sBoxLayer. Because the 
+    // pLayer actually permutes the current state to a form which is ideal for a 
+    // bitsliced sBoxLayer. This swap doesn't affect the correctness and can 
+    // reduce the number of performing SBox. 
+
+    // pLayer     
+    // 40 * index mod 159
+    // permutes the state like this: 
+
+    // s1 | s0:  39  38  ...  33  32 |  31  30  ... ...   1   0
+    // s3 | s2:  79  78  ...  73  72 |  71  70  ... ...  41  40
+    // s5 | s4: 119 118  ... 113 112 | 111 110  ... ...  81  80
+    // s7 | s6: 159 158  ... 153 152 | 151 150  ... ... 121 120
+    
+    // from the above form to the below form
+    
+    // s1 | s0: 156 152  ... 132 128 | 124 120  ... ...   4   0
+    // s3 | s2: 157 153  ... 133 129 | 125 121  ... ...   5   1
+    // s5 | s4: 158 154  ... 134 130 | 126 122  ... ...   6   2
+    // s7 | s6: 159 155  ... 135 131 | 127 123  ... ...   7   3
+
+    // step 0
+    // ------ generic C -------
+    // t[0] =  BUP(s[1],  0,  8) ^ BUP(s[1],  4,  9) ^ BUP(s[3],  0, 18) ^ 
+    //         BUP(s[3],  4, 19) ^ BUP(s[5],  0, 28) ^ BUP(s[5],  4, 29); 
+    // t[1] =  BUP(s[7],  0,  6) ^ BUP(s[7],  4,  7);
+    // t[2] =  BUP(s[1],  1,  8) ^ BUP(s[1],  5,  9) ^ BUP(s[3],  1, 18) ^ 
+    //         BUP(s[3],  5, 19) ^ BUP(s[5],  1, 28) ^ BUP(s[5],  5, 29); 
+    // t[3] =  BUP(s[7],  1,  6) ^ BUP(s[7],  5,  7); 
+    // t[4] =  BUP(s[1],  2,  8) ^ BUP(s[1],  6,  9) ^ BUP(s[3],  2, 18) ^ 
+    //         BUP(s[3],  6, 19) ^ BUP(s[5],  2, 28) ^ BUP(s[5],  6, 29); 
+    // t[5] =  BUP(s[7],  2,  6) ^ BUP(s[7],  6,  7);
+    // t[6] =  BUP(s[1],  3,  8) ^ BUP(s[1],  7,  9) ^ BUP(s[3],  3, 18) ^ 
+    //         BUP(s[3],  7, 19) ^ BUP(s[5],  3, 28) ^ BUP(s[5],  7, 29); 
+    // t[7] =  BUP(s[7],  3,  6) ^ BCP(s[7],  7);
+    // ---------- ISE ---------
+    uint32_t pos = 0;
+    t[0]  = spongent_BUP(s[1], pos,  8) ^ spongent_BUP(s[3], pos, 18) ^ spongent_BUP(s[5], pos, 28);
+    t[1]  = spongent_BUP(s[7], pos,  6);
+    pos  += 1;
+    t[2]  = spongent_BUP(s[1], pos,  8) ^ spongent_BUP(s[3], pos, 18) ^ spongent_BUP(s[5], pos, 28);
+    t[3]  = spongent_BUP(s[7], pos,  6);
+    pos  += 1;
+    t[4]  = spongent_BUP(s[1], pos,  8) ^ spongent_BUP(s[3], pos, 18) ^ spongent_BUP(s[5], pos, 28);
+    t[5]  = spongent_BUP(s[7], pos,  6);
+    pos  += 1;
+    t[6]  = spongent_BUP(s[1], pos,  8) ^ spongent_BUP(s[3], pos, 18) ^ spongent_BUP(s[5], pos, 28);
+    t[7]  = spongent_BUP(s[7], pos,  6);
+    pos  += 1;
+    t[0] ^= spongent_BUP(s[1], pos,  9) ^ spongent_BUP(s[3], pos, 19) ^ spongent_BUP(s[5], pos, 29);
+    t[1] ^= spongent_BUP(s[7], pos,  7);
+    pos  += 1;
+    t[2] ^= spongent_BUP(s[1], pos,  9) ^ spongent_BUP(s[3], pos, 19) ^ spongent_BUP(s[5], pos, 29); 
+    t[3] ^= spongent_BUP(s[7], pos,  7);  
+    pos  += 1;
+    t[4] ^= spongent_BUP(s[1], pos,  9) ^ spongent_BUP(s[3], pos, 19) ^ spongent_BUP(s[5], pos, 29);
+    t[5] ^= spongent_BUP(s[7], pos,  7);
+    pos  += 1;
+    t[6] ^= spongent_BUP(s[1], pos,  9) ^ spongent_BUP(s[3], pos, 19) ^ spongent_BUP(s[5], pos, 29); 
+    t[7] ^= spongent_BUP(s[7], pos,  7);  
+
+    // step 1
+    // ------ generic C -------
+    // pLayer_STEP1(s[0]); 
+    // pLayer_STEP1(s[2]); 
+    // pLayer_STEP1(s[4]); 
+    // pLayer_STEP1(s[6]);
+    // ---------- ISE ---------
+    s[0] = spongent_pLayer_step1(s[0]);
+    s[2] = spongent_pLayer_step1(s[2]);
+    s[4] = spongent_pLayer_step1(s[4]);
+    s[6] = spongent_pLayer_step1(s[6]);
+
+    // step 2
+    // ------ generic C -------
+    // t[0] ^=  (s[0]>>24) & 0xFF;
+    // t[2] ^=  (s[0]>>16) & 0xFF;
+    // t[4] ^=  (s[0]>>8)  & 0xFF;
+    // t[6] ^=  (s[0])     & 0xFF;
+    //
+    // t[0] ^= ((s[2]>>24) & 0xFF) << 10; 
+    // t[2] ^= ((s[2]>>16) & 0xFF) << 10;
+    // t[4] ^= ((s[2]>>8)  & 0xFF) << 10;  
+    // t[6] ^=  (s[2]      & 0xFF) << 10;
+    //
+    // t[0] ^= ((s[4]>>24) & 0xFF) << 20;
+    // t[2] ^= ((s[4]>>16) & 0xFF) << 20;
+    // t[4] ^= ((s[4]>>8)  & 0xFF) << 20; 
+    // t[6] ^=  (s[4]      & 0xFF) << 20;
+    //
+    // t[0] ^= ((s[6]>>24) & 0xFF) << 30;
+    // t[2] ^= ((s[6]>>16) & 0xFF) << 30;
+    // t[4] ^= ((s[6]>>8)  & 0xFF) << 30;  
+    // t[6] ^=  (s[6]      & 0xFF) << 30;
+    //
+    // t[1] ^=  (s[6]>>26) & 0x3F; 
+    // t[3] ^=  (s[6]>>18) & 0x3F; 
+    // t[5] ^=  (s[6]>>10) & 0x3F; 
+    // t[7] ^=  (s[6]>>2)  & 0x3F; 
+    // ---------- ISE ---------
+    t[6] = spongent_BSLLXOR(t[6], s[0], 0);
+    s[0] >>= 8;
+    t[4] = spongent_BSLLXOR(t[4], s[0], 0);
+    s[0] >>= 8;
+    t[2] = spongent_BSLLXOR(t[2], s[0], 0);
+    s[0] >>= 8;
+    t[0] = spongent_BSLLXOR(t[0], s[0], 0);
+
+    t[6] = spongent_BSLLXOR(t[6], s[2], 10);
+    s[2] >>= 8;
+    t[4] = spongent_BSLLXOR(t[4], s[2], 10);
+    s[2] >>= 8;
+    t[2] = spongent_BSLLXOR(t[2], s[2], 10);
+    s[2] >>= 8;
+    t[0] = spongent_BSLLXOR(t[0], s[2], 10);
+
+    t[6] = spongent_BSLLXOR(t[6], s[4], 20);
+    s[4] >>= 8;
+    t[4] = spongent_BSLLXOR(t[4], s[4], 20);
+    s[4] >>= 8;
+    t[2] = spongent_BSLLXOR(t[2], s[4], 20);
+    s[4] >>= 8;
+    t[0] = spongent_BSLLXOR(t[0], s[4], 20);
+
+    uint32_t tmp = s[6] & 0xFCFCFCFCUL;
+    t[6] = spongent_BSLLXOR(t[6], s[6], 30);
+    s[6] >>= 8;
+    t[4] = spongent_BSLLXOR(t[4], s[6], 30);
+    s[6] >>= 8;
+    t[2] = spongent_BSLLXOR(t[2], s[6], 30);
+    s[6] >>= 8;
+    t[0] = spongent_BSLLXOR(t[0], s[6], 30);
+
+    tmp >>= 2;
+    t[7] = spongent_BSLLXOR(t[7], tmp, 0);
+    tmp >>= 8;
+    t[5] = spongent_BSLLXOR(t[5], tmp, 0);
+    tmp >>= 8;
+    t[3] = spongent_BSLLXOR(t[3], tmp, 0);
+    tmp >>= 8;
+    t[1] = spongent_BSLLXOR(t[1], tmp, 0);
+  
+    // sBoxLayer (bitsliced)
+    // works on the 40-bit slices.  
+    // Our formulas for the SBox (31 bitwise logical operations): 
+    // y0 = x0 + x1 + x3 + x1x2 
+    // y1 = x0 + x0x3 + x1x2 + x1x3 + x2x3 + x1x2x3 + 1
+    // y2 = x1 + x2 + x0x3 + x1x2x3 + 1
+    // y3 = x2 + x3 + x0x1 + x0x3 + x1x3 + x0x1x3 + x0x2x3 + 1
+
+    u[0] = t[0] ^ (t[2]&t[4]);
+    u[1] = t[1] ^ (t[3]&t[5]);
+
+    u[2] = (t[0]&t[6]) ^ (t[2]&t[4]&t[6]);
+    u[3] = (t[1]&t[7]) ^ (t[3]&t[5]&t[7]);
+
+    s[0] = t[2] ^ t[6] ^ u[0];
+    s[1] = t[3] ^ t[7] ^ u[1];
+
+    s[2] = ~((t[2]&t[6]) ^ (t[4]&t[6]) ^ u[0] ^ u[2]);
+    s[3] = ~((t[3]&t[7]) ^ (t[5]&t[7]) ^ u[1] ^ u[3]);
+    
+    s[4] = ~(t[2] ^ t[4] ^ u[2]);
+    s[5] = ~(t[3] ^ t[5] ^ u[3]);
+
+    s[6] = ~(t[4] ^ t[6] ^ (t[0]&t[2]) ^ (t[0]&t[6]) ^ (t[2]&t[6]) ^ (t[0]&t[2]&t[6]) ^ (t[0]&t[4]&t[6]));
+    s[7] = ~(t[5] ^ t[7] ^ (t[1]&t[3]) ^ (t[1]&t[7]) ^ (t[3]&t[7]) ^ (t[1]&t[3]&t[7]) ^ (t[1]&t[5]&t[7]));
+  }
+
+  memcpy(state,     s,    5);
+  memcpy(state+5,  &s[2], 5);
+  memcpy(state+10, &s[4], 5);
+  memcpy(state+15, &s[6], 5);
+}
+
+// -----------------------------------------------------------------------------
+
+// This variant uses "dedicated" custom instructions and is based on 4x40b Cv1.
+
+void Spongent160_4x40b_ISEv2(void *state)
+{
+  const uint8_t *rc = RC;
+  uint32_t s[8] = { 0 }, t[8], u[4];
+  int i;
+
+  // The state is in four 40-bit slices (each slice is composed of two uint32_t words). 
+  // s1 | s0:  39  38  ...  33  32 |  31  30  ...   1   0
+  // s3 | s2:  79  78  ...  73  72 |  71  70  ...  41  40
+  // s5 | s4: 119 118  ... 113 112 | 111 110  ...  81  80
+  // s7 | s6: 159 158  ... 153 152 | 151 150  ... 121 120
+
+  memcpy(&s[0], state,    5);
+  memcpy(&s[2], state+5,  5);
+  memcpy(&s[4], state+10, 5);
+  memcpy(&s[6], state+15, 5);
+
+  for (i = 0; i < 80; i++, rc += 2) {
+
+    // add round constants
+
+    s[0] ^= rc[0];
+    s[7] ^= rc[1];
+
+    // Our implementation swaps the order of pLayer and sBoxLayer, i.e. we 
+    // perform first the pLayer then a new bitsliced sBoxLayer. Because the 
+    // pLayer actually permutes the current state to a form which is ideal for a 
+    // bitsliced sBoxLayer. This swap doesn't affect the correctness and can 
+    // reduce the number of performing SBox. 
+
+    // pLayer     
+    // 40 * index mod 159
+    // permutes the state like this: 
+
+    // s1 | s0:  39  38  ...  33  32 |  31  30  ... ...   1   0
+    // s3 | s2:  79  78  ...  73  72 |  71  70  ... ...  41  40
+    // s5 | s4: 119 118  ... 113 112 | 111 110  ... ...  81  80
+    // s7 | s6: 159 158  ... 153 152 | 151 150  ... ... 121 120
+    
+    // from the above form to the below form
+    
+    // s1 | s0: 156 152  ... 132 128 | 124 120  ... ...   4   0
+    // s3 | s2: 157 153  ... 133 129 | 125 121  ... ...   5   1
+    // s5 | s4: 158 154  ... 134 130 | 126 122  ... ...   6   2
+    // s7 | s6: 159 155  ... 135 131 | 127 123  ... ...   7   3
+
+    // step 0
+    // ------ generic C -------
+    // t[0] =  BUP(s[1],  0,  8) ^ BUP(s[1],  4,  9) ^ BUP(s[3],  0, 18) ^ 
+    //         BUP(s[3],  4, 19) ^ BUP(s[5],  0, 28) ^ BUP(s[5],  4, 29); 
+    // t[1] =  BUP(s[7],  0,  6) ^ BUP(s[7],  4,  7);
+    // t[2] =  BUP(s[1],  1,  8) ^ BUP(s[1],  5,  9) ^ BUP(s[3],  1, 18) ^ 
+    //         BUP(s[3],  5, 19) ^ BUP(s[5],  1, 28) ^ BUP(s[5],  5, 29); 
+    // t[3] =  BUP(s[7],  1,  6) ^ BUP(s[7],  5,  7); 
+    // t[4] =  BUP(s[1],  2,  8) ^ BUP(s[1],  6,  9) ^ BUP(s[3],  2, 18) ^ 
+    //         BUP(s[3],  6, 19) ^ BUP(s[5],  2, 28) ^ BUP(s[5],  6, 29); 
+    // t[5] =  BUP(s[7],  2,  6) ^ BUP(s[7],  6,  7);
+    // t[6] =  BUP(s[1],  3,  8) ^ BUP(s[1],  7,  9) ^ BUP(s[3],  3, 18) ^ 
+    //         BUP(s[3],  7, 19) ^ BUP(s[5],  3, 28) ^ BUP(s[5],  7, 29); 
+    // t[7] =  BUP(s[7],  3,  6) ^ BCP(s[7],  7);
+    // ---------- ISE ---------
+    uint32_t pos = 0;
+    t[0]  = spongent_DBUP(s[1], pos,  8) ^ spongent_DBUP(s[3], pos, 18) ^ spongent_DBUP(s[5], pos, 28);
+    t[1]  = spongent_DBUP(s[7], pos,  6);
+    pos  += 1;
+    t[2]  = spongent_DBUP(s[1], pos,  8) ^ spongent_DBUP(s[3], pos, 18) ^ spongent_DBUP(s[5], pos, 28);
+    t[3]  = spongent_DBUP(s[7], pos,  6);
+    pos  += 1;
+    t[4]  = spongent_DBUP(s[1], pos,  8) ^ spongent_DBUP(s[3], pos, 18) ^ spongent_DBUP(s[5], pos, 28);
+    t[5]  = spongent_DBUP(s[7], pos,  6);
+    pos  += 1;
+    t[6]  = spongent_DBUP(s[1], pos,  8) ^ spongent_DBUP(s[3], pos, 18) ^ spongent_DBUP(s[5], pos, 28);
+    t[7]  = spongent_DBUP(s[7], pos,  6);
+
+    // step 1
+    // ------ generic C -------
+    // pLayer_STEP1(s[0]); 
+    // pLayer_STEP1(s[2]); 
+    // pLayer_STEP1(s[4]); 
+    // pLayer_STEP1(s[6]);
+    // ---------- ISE ---------
+    s[0] = spongent_pLayer_step1(s[0]);
+    s[2] = spongent_pLayer_step1(s[2]);
+    s[4] = spongent_pLayer_step1(s[4]);
+    s[6] = spongent_pLayer_step1(s[6]);
+
+    // step 2
+    // ------ generic C -------
+    // t[0] ^=  (s[0]>>24) & 0xFF;
+    // t[2] ^=  (s[0]>>16) & 0xFF;
+    // t[4] ^=  (s[0]>>8)  & 0xFF;
+    // t[6] ^=  (s[0])     & 0xFF;
+    //
+    // t[0] ^= ((s[2]>>24) & 0xFF) << 10; 
+    // t[2] ^= ((s[2]>>16) & 0xFF) << 10;
+    // t[4] ^= ((s[2]>>8)  & 0xFF) << 10;  
+    // t[6] ^=  (s[2]      & 0xFF) << 10;
+    //
+    // t[0] ^= ((s[4]>>24) & 0xFF) << 20;
+    // t[2] ^= ((s[4]>>16) & 0xFF) << 20;
+    // t[4] ^= ((s[4]>>8)  & 0xFF) << 20; 
+    // t[6] ^=  (s[4]      & 0xFF) << 20;
+    //
+    // t[0] ^= ((s[6]>>24) & 0xFF) << 30;
+    // t[2] ^= ((s[6]>>16) & 0xFF) << 30;
+    // t[4] ^= ((s[6]>>8)  & 0xFF) << 30;  
+    // t[6] ^=  (s[6]      & 0xFF) << 30;
+    //
+    // t[1] ^=  (s[6]>>26) & 0x3F; 
+    // t[3] ^=  (s[6]>>18) & 0x3F; 
+    // t[5] ^=  (s[6]>>10) & 0x3F; 
+    // t[7] ^=  (s[6]>>2)  & 0x3F; 
+    // ---------- ISE ---------
+    t[0] = spongent_pLayer_step2_24(t[0], s[0], 0);
+    t[2] = spongent_pLayer_step2_16(t[2], s[0], 0);
+    t[4] = spongent_pLayer_step2_8 (t[4], s[0], 0);
+    t[6] = spongent_pLayer_step2_0 (t[6], s[0], 0);
+
+    t[0] = spongent_pLayer_step2_24(t[0], s[2], 10);
+    t[2] = spongent_pLayer_step2_16(t[2], s[2], 10);
+    t[4] = spongent_pLayer_step2_8 (t[4], s[2], 10);
+    t[6] = spongent_pLayer_step2_0 (t[6], s[2], 10);
+
+    t[0] = spongent_pLayer_step2_24(t[0], s[4], 20);
+    t[2] = spongent_pLayer_step2_16(t[2], s[4], 20);
+    t[4] = spongent_pLayer_step2_8 (t[4], s[4], 20);
+    t[6] = spongent_pLayer_step2_0 (t[6], s[4], 20);
+
+    t[0] = spongent_pLayer_step2_24(t[0], s[6], 30);
+    t[2] = spongent_pLayer_step2_16(t[2], s[6], 30);
+    t[4] = spongent_pLayer_step2_8 (t[4], s[6], 30);
+    t[6] = spongent_pLayer_step2_0 (t[6], s[6], 30);
+
+    s[6] = s[6]>>2; s[6] &= 0x3F3F3F3FUL;
+    t[1] = spongent_pLayer_step2_24(t[1], s[6], 0);
+    t[3] = spongent_pLayer_step2_16(t[3], s[6], 0);
+    t[5] = spongent_pLayer_step2_8 (t[5], s[6], 0);
+    t[7] = spongent_pLayer_step2_0 (t[7], s[6], 0);
+  
+    // sBoxLayer (bitsliced)
+    // works on the 40-bit slices.  
+    // Our formulas for the SBox (31 bitwise logical operations): 
+    // y0 = x0 + x1 + x3 + x1x2 
+    // y1 = x0 + x0x3 + x1x2 + x1x3 + x2x3 + x1x2x3 + 1
+    // y2 = x1 + x2 + x0x3 + x1x2x3 + 1
+    // y3 = x2 + x3 + x0x1 + x0x3 + x1x3 + x0x1x3 + x0x2x3 + 1
+
+    u[0] = t[0] ^ (t[2]&t[4]);
+    u[1] = t[1] ^ (t[3]&t[5]);
+
+    u[2] = (t[0]&t[6]) ^ (t[2]&t[4]&t[6]);
+    u[3] = (t[1]&t[7]) ^ (t[3]&t[5]&t[7]);
+
+    s[0] = t[2] ^ t[6] ^ u[0];
+    s[1] = t[3] ^ t[7] ^ u[1];
+
+    s[2] = ~((t[2]&t[6]) ^ (t[4]&t[6]) ^ u[0] ^ u[2]);
+    s[3] = ~((t[3]&t[7]) ^ (t[5]&t[7]) ^ u[1] ^ u[3]);
+    
+    s[4] = ~(t[2] ^ t[4] ^ u[2]);
+    s[5] = ~(t[3] ^ t[5] ^ u[3]);
+
+    s[6] = ~(t[4] ^ t[6] ^ (t[0]&t[2]) ^ (t[0]&t[6]) ^ (t[2]&t[6]) ^ (t[0]&t[2]&t[6]) ^ (t[0]&t[4]&t[6]));
+    s[7] = ~(t[5] ^ t[7] ^ (t[1]&t[3]) ^ (t[1]&t[7]) ^ (t[3]&t[7]) ^ (t[1]&t[3]&t[7]) ^ (t[1]&t[5]&t[7]));
+  }
+
+  memcpy(state,     s,    5);
+  memcpy(state+5,  &s[2], 5);
+  memcpy(state+10, &s[4], 5);
+  memcpy(state+15, &s[6], 5);
+}
+
+// -----------------------------------------------------------------------------
+
+// 5x32b C code v1: AddRC(table) + sBoxLayer(table) + pLayer(macros)
+
+// This is an optimized implementation based on Rhys Weatherley's implementation,
+// https://github.com/rweather/lightweight-crypto/blob/master/src/individual/Elephant/internal-spongent.c
+// But it uses a look-up table for sBoxLayer instead of a bitsliced one. 
+
+#define BDN(x, from, to) (((x) >> ((from) - (to))) & (((uint32_t)1) << (to)))
+
+uint8_t SBox[256] = {
+  0xee, 0xed, 0xeb, 0xe0, 0xe2, 0xe1, 0xe4, 0xef, 0xe7, 0xea, 0xe8, 0xe5, 0xe9, 0xec, 0xe3, 0xe6, 
+  0xde, 0xdd, 0xdb, 0xd0, 0xd2, 0xd1, 0xd4, 0xdf, 0xd7, 0xda, 0xd8, 0xd5, 0xd9, 0xdc, 0xd3, 0xd6, 
+  0xbe, 0xbd, 0xbb, 0xb0, 0xb2, 0xb1, 0xb4, 0xbf, 0xb7, 0xba, 0xb8, 0xb5, 0xb9, 0xbc, 0xb3, 0xb6, 
+  0x0e, 0x0d, 0x0b, 0x00, 0x02, 0x01, 0x04, 0x0f, 0x07, 0x0a, 0x08, 0x05, 0x09, 0x0c, 0x03, 0x06, 
+  0x2e, 0x2d, 0x2b, 0x20, 0x22, 0x21, 0x24, 0x2f, 0x27, 0x2a, 0x28, 0x25, 0x29, 0x2c, 0x23, 0x26, 
+  0x1e, 0x1d, 0x1b, 0x10, 0x12, 0x11, 0x14, 0x1f, 0x17, 0x1a, 0x18, 0x15, 0x19, 0x1c, 0x13, 0x16, 
+  0x4e, 0x4d, 0x4b, 0x40, 0x42, 0x41, 0x44, 0x4f, 0x47, 0x4a, 0x48, 0x45, 0x49, 0x4c, 0x43, 0x46, 
+  0xfe, 0xfd, 0xfb, 0xf0, 0xf2, 0xf1, 0xf4, 0xff, 0xf7, 0xfa, 0xf8, 0xf5, 0xf9, 0xfc, 0xf3, 0xf6, 
+  0x7e, 0x7d, 0x7b, 0x70, 0x72, 0x71, 0x74, 0x7f, 0x77, 0x7a, 0x78, 0x75, 0x79, 0x7c, 0x73, 0x76, 
+  0xae, 0xad, 0xab, 0xa0, 0xa2, 0xa1, 0xa4, 0xaf, 0xa7, 0xaa, 0xa8, 0xa5, 0xa9, 0xac, 0xa3, 0xa6, 
+  0x8e, 0x8d, 0x8b, 0x80, 0x82, 0x81, 0x84, 0x8f, 0x87, 0x8a, 0x88, 0x85, 0x89, 0x8c, 0x83, 0x86, 
+  0x5e, 0x5d, 0x5b, 0x50, 0x52, 0x51, 0x54, 0x5f, 0x57, 0x5a, 0x58, 0x55, 0x59, 0x5c, 0x53, 0x56, 
+  0x9e, 0x9d, 0x9b, 0x90, 0x92, 0x91, 0x94, 0x9f, 0x97, 0x9a, 0x98, 0x95, 0x99, 0x9c, 0x93, 0x96, 
+  0xce, 0xcd, 0xcb, 0xc0, 0xc2, 0xc1, 0xc4, 0xcf, 0xc7, 0xca, 0xc8, 0xc5, 0xc9, 0xcc, 0xc3, 0xc6, 
+  0x3e, 0x3d, 0x3b, 0x30, 0x32, 0x31, 0x34, 0x3f, 0x37, 0x3a, 0x38, 0x35, 0x39, 0x3c, 0x33, 0x36, 
+  0x6e, 0x6d, 0x6b, 0x60, 0x62, 0x61, 0x64, 0x6f, 0x67, 0x6a, 0x68, 0x65, 0x69, 0x6c, 0x63, 0x66 
+};
+
+void Spongent160_5x32b_Cv1(void *state)
+{
+  const uint8_t *rc = RC;
+  uint32_t s[5], t[5];
+  uint8_t *s8 = (uint8_t *)s, *t8 = (uint8_t *)t;
+  int i, j;
+
+  memcpy(s, state, 20);
+
+  for (i = 0; i < 80; i++, rc += 2) {
+    
+    // add round constants 
+
+    s[0] ^= rc[0];
+    s[4] ^= ((uint32_t)(rc[1])) << 24;
+
+    // sBoxLayer
+    
+    for (j = 0; j < 20; j++) 
+      t8[j] = SBox[s8[j]];
+
+    // pLayer 
+
+    s[0] =  BCP(t[0],  0)     ^ BDN(t[0],  4,  1) ^ BDN(t[0],  8,  2) ^
+            BDN(t[0], 12,  3) ^ BDN(t[0], 16,  4) ^ BDN(t[0], 20,  5) ^
+            BDN(t[0], 24,  6) ^ BDN(t[0], 28,  7) ^ BUP(t[1],  0,  8) ^
+            BUP(t[1],  4,  9) ^ BUP(t[1],  8, 10) ^ BDN(t[1], 12, 11) ^
+            BDN(t[1], 16, 12) ^ BDN(t[1], 20, 13) ^ BDN(t[1], 24, 14) ^
+            BDN(t[1], 28, 15) ^ BUP(t[2],  0, 16) ^ BUP(t[2],  4, 17) ^
+            BUP(t[2],  8, 18) ^ BUP(t[2], 12, 19) ^ BUP(t[2], 16, 20) ^
+            BUP(t[2], 20, 21) ^ BDN(t[2], 24, 22) ^ BDN(t[2], 28, 23) ^
+            BUP(t[3],  0, 24) ^ BUP(t[3],  4, 25) ^ BUP(t[3],  8, 26) ^
+            BUP(t[3], 12, 27) ^ BUP(t[3], 16, 28) ^ BUP(t[3], 20, 29) ^
+            BUP(t[3], 24, 30) ^ BUP(t[3], 28, 31);
+    s[1] =  BUP(t[0],  1,  8) ^ BUP(t[0],  5,  9) ^ BUP(t[0],  9, 10) ^
+            BDN(t[0], 13, 11) ^ BDN(t[0], 17, 12) ^ BDN(t[0], 21, 13) ^
+            BDN(t[0], 25, 14) ^ BDN(t[0], 29, 15) ^ BUP(t[1],  1, 16) ^
+            BUP(t[1],  5, 17) ^ BUP(t[1],  9, 18) ^ BUP(t[1], 13, 19) ^
+            BUP(t[1], 17, 20) ^ BCP(t[1], 21)     ^ BDN(t[1], 25, 22) ^
+            BDN(t[1], 29, 23) ^ BUP(t[2],  1, 24) ^ BUP(t[2],  5, 25) ^
+            BUP(t[2],  9, 26) ^ BUP(t[2], 13, 27) ^ BUP(t[2], 17, 28) ^
+            BUP(t[2], 21, 29) ^ BUP(t[2], 25, 30) ^ BUP(t[2], 29, 31) ^
+            BCP(t[4],  0)     ^ BDN(t[4],  4,  1) ^ BDN(t[4],  8,  2) ^
+            BDN(t[4], 12,  3) ^ BDN(t[4], 16,  4) ^ BDN(t[4], 20,  5) ^
+            BDN(t[4], 24,  6) ^ BDN(t[4], 28,  7);
+    s[2] =  BUP(t[0],  2, 16) ^ BUP(t[0],  6, 17) ^ BUP(t[0], 10, 18) ^
+            BUP(t[0], 14, 19) ^ BUP(t[0], 18, 20) ^ BDN(t[0], 22, 21) ^
+            BDN(t[0], 26, 22) ^ BDN(t[0], 30, 23) ^ BUP(t[1],  2, 24) ^
+            BUP(t[1],  6, 25) ^ BUP(t[1], 10, 26) ^ BUP(t[1], 14, 27) ^
+            BUP(t[1], 18, 28) ^ BUP(t[1], 22, 29) ^ BUP(t[1], 26, 30) ^
+            BUP(t[1], 30, 31) ^ BDN(t[3],  1,  0) ^ BDN(t[3],  5,  1) ^
+            BDN(t[3],  9,  2) ^ BDN(t[3], 13,  3) ^ BDN(t[3], 17,  4) ^
+            BDN(t[3], 21,  5) ^ BDN(t[3], 25,  6) ^ BDN(t[3], 29,  7) ^
+            BUP(t[4],  1,  8) ^ BUP(t[4],  5,  9) ^ BUP(t[4],  9, 10) ^
+            BDN(t[4], 13, 11) ^ BDN(t[4], 17, 12) ^ BDN(t[4], 21, 13) ^
+            BDN(t[4], 25, 14) ^ BDN(t[4], 29, 15);
+    s[3] =  BUP(t[0],  3, 24) ^ BUP(t[0],  7, 25) ^ BUP(t[0], 11, 26) ^
+            BUP(t[0], 15, 27) ^ BUP(t[0], 19, 28) ^ BUP(t[0], 23, 29) ^
+            BUP(t[0], 27, 30) ^ BCP(t[0], 31)     ^ BDN(t[2],  2,  0) ^
+            BDN(t[2],  6,  1) ^ BDN(t[2], 10,  2) ^ BDN(t[2], 14,  3) ^
+            BDN(t[2], 18,  4) ^ BDN(t[2], 22,  5) ^ BDN(t[2], 26,  6) ^
+            BDN(t[2], 30,  7) ^ BUP(t[3],  2,  8) ^ BUP(t[3],  6,  9) ^
+            BCP(t[3], 10)     ^ BDN(t[3], 14, 11) ^ BDN(t[3], 18, 12) ^
+            BDN(t[3], 22, 13) ^ BDN(t[3], 26, 14) ^ BDN(t[3], 30, 15) ^
+            BUP(t[4],  2, 16) ^ BUP(t[4],  6, 17) ^ BUP(t[4], 10, 18) ^
+            BUP(t[4], 14, 19) ^ BUP(t[4], 18, 20) ^ BDN(t[4], 22, 21) ^
+            BDN(t[4], 26, 22) ^ BDN(t[4], 30, 23);
+    s[4] =  BDN(t[1],  3,  0) ^ BDN(t[1],  7,  1) ^ BDN(t[1], 11,  2) ^
+            BDN(t[1], 15,  3) ^ BDN(t[1], 19,  4) ^ BDN(t[1], 23,  5) ^
+            BDN(t[1], 27,  6) ^ BDN(t[1], 31,  7) ^ BUP(t[2],  3,  8) ^
+            BUP(t[2],  7,  9) ^ BDN(t[2], 11, 10) ^ BDN(t[2], 15, 11) ^
+            BDN(t[2], 19, 12) ^ BDN(t[2], 23, 13) ^ BDN(t[2], 27, 14) ^
+            BDN(t[2], 31, 15) ^ BUP(t[3],  3, 16) ^ BUP(t[3],  7, 17) ^
+            BUP(t[3], 11, 18) ^ BUP(t[3], 15, 19) ^ BUP(t[3], 19, 20) ^
+            BDN(t[3], 23, 21) ^ BDN(t[3], 27, 22) ^ BDN(t[3], 31, 23) ^
+            BUP(t[4],  3, 24) ^ BUP(t[4],  7, 25) ^ BUP(t[4], 11, 26) ^
+            BUP(t[4], 15, 27) ^ BUP(t[4], 19, 28) ^ BUP(t[4], 23, 29) ^
+            BUP(t[4], 27, 30) ^ BCP(t[4], 31);
+  }
+
+  memcpy(state, s, 20);
+}
+
+// -----------------------------------------------------------------------------
+
+// 5x32b C code v2: AddRC(table) + sBoxLayer(table) + pLayer(swapmove)
+
+void Spongent160_5x32b_Cv2(void *state)
+{
+  const uint8_t *rc = RC;
+  uint32_t s[5], t[5];
+  uint8_t *s8 = (uint8_t *)s, *t8 = (uint8_t *)t;
+  int i, j;
+
+  memcpy(s, state, 20);
+
+  for (i = 0; i < 80; i++, rc += 2) {
+    
+    // add round constants 
+
+    s[0] ^= rc[0];
+    s[4] ^= ((uint32_t)(rc[1])) << 24;
+
+    // sBoxLayer
+
+    for (j = 0; j < 20; j++) 
+      t8[j] = SBox[s8[j]];
+
+    // pLayer 
+
+    // step 1
+    pLayer_STEP1(t[0]); 
+    pLayer_STEP1(t[1]); 
+    pLayer_STEP1(t[2]); 
+    pLayer_STEP1(t[3]);
+    pLayer_STEP1(t[4]);
+
+    // step 2
+    s[0]  =  (t[0]>>24) & 0xFF;
+    s[0] ^= ((t[1]>>24) & 0xFF) << 8;
+    s[0] ^= ((t[2]>>24) & 0xFF) << 16;
+    s[0] ^= ((t[3]>>24) & 0xFF) << 24;
+    
+    s[1]  =  (t[4]>>24) & 0xFF;
+    s[1] ^= ((t[0]>>16) & 0xFF) << 8;
+    s[1] ^= ((t[1]>>16) & 0xFF) << 16;
+    s[1] ^= ((t[2]>>16) & 0xFF) << 24;
+    
+    s[2]  =  (t[3]>>16) & 0xFF;
+    s[2] ^= ((t[4]>>16) & 0xFF) << 8;
+    s[2] ^= ((t[0]>>8)  & 0xFF) << 16;
+    s[2] ^= ((t[1]>>8)  & 0xFF) << 24;
+    
+    s[3]  =  (t[2]>>8)  & 0xFF;
+    s[3] ^= ((t[3]>>8)  & 0xFF) << 8;
+    s[3] ^= ((t[4]>>8)  & 0xFF) << 16;
+    s[3] ^= ((t[0])     & 0xFF) << 24;
+    
+    s[4]  =  (t[1])     & 0xFF;
+    s[4] ^= ((t[2])     & 0xFF) << 8;
+    s[4] ^= ((t[3])     & 0xFF) << 16;
+    s[4] ^= ((t[4])     & 0xFF) << 24;
+  }
+
+  memcpy(state, s, 20);
+}
+
+// -----------------------------------------------------------------------------
+
+// This variant uses "general" custom instructions and is based on 5x32b Cv2.
+
+void Spongent160_5x32b_ISEv1(void *state)
+{
+  const uint8_t *rc = RC;
+  uint32_t s[5], t[5];
+  uint8_t *s8 = (uint8_t *)s, *t8 = (uint8_t *)t;
+  int i, j;
+
+  memcpy(s, state, 20);
+
+  for (i = 0; i < 80; i++, rc += 2) {
+    
+    // add round constants 
+
+    s[0] ^= rc[0];
+    s[4] ^= ((uint32_t)(rc[1])) << 24;
+
+    // sBoxLayer
+    // use xperm4? 2*xperm4 + and + xor: 5*4 = 20 cc
+    for (j = 0; j < 20; j++) 
+      t8[j] = SBox[s8[j]];
+
+    // pLayer 
+
+    // step 1
+    // ------ generic C -------
+    // pLayer_STEP1(t[0]); 
+    // pLayer_STEP1(t[1]); 
+    // pLayer_STEP1(t[2]); 
+    // pLayer_STEP1(t[3]);
+    // pLayer_STEP1(t[4]);
+    // ---------- ISE ---------
+    t[0] = spongent_pLayer_step1(t[0]);
+    t[1] = spongent_pLayer_step1(t[1]);
+    t[2] = spongent_pLayer_step1(t[2]);
+    t[3] = spongent_pLayer_step1(t[3]);
+    t[4] = spongent_pLayer_step1(t[4]);
+
+    // step 2
+    // ------ generic C -------
+    // s[0]  =  (t[0]>>24) & 0xFF;
+    // s[0] ^= ((t[1]>>24) & 0xFF) << 8;
+    // s[0] ^= ((t[2]>>24) & 0xFF) << 16;
+    // s[0] ^= ((t[3]>>24) & 0xFF) << 24;
+    //
+    // s[1]  =  (t[4]>>24) & 0xFF;
+    // s[1] ^= ((t[0]>>16) & 0xFF) << 8;
+    // s[1] ^= ((t[1]>>16) & 0xFF) << 16;
+    // s[1] ^= ((t[2]>>16) & 0xFF) << 24;
+    //
+    // s[2]  =  (t[3]>>16) & 0xFF;
+    // s[2] ^= ((t[4]>>16) & 0xFF) << 8;
+    // s[2] ^= ((t[0]>>8)  & 0xFF) << 16;
+    // s[2] ^= ((t[1]>>8)  & 0xFF) << 24;
+    //
+    // s[3]  =  (t[2]>>8)  & 0xFF;
+    // s[3] ^= ((t[3]>>8)  & 0xFF) << 8;
+    // s[3] ^= ((t[4]>>8)  & 0xFF) << 16;
+    // s[3] ^= ((t[0])     & 0xFF) << 24;
+    //
+    // s[4]  =  (t[1])     & 0xFF;
+    // s[4] ^= ((t[2])     & 0xFF) << 8;
+    // s[4] ^= ((t[3])     & 0xFF) << 16;
+    // s[4] ^= ((t[4])     & 0xFF) << 24;
+    // ---------- ISE ---------
+    s[3] = spongent_BSLLXOR(  0 , t[0], 24);
+    s[4] = spongent_BSLLXOR(  0 , t[1], 0);
+    s[4] = spongent_BSLLXOR(s[4], t[2], 8);
+    s[4] = spongent_BSLLXOR(s[4], t[3], 16);
+    s[4] = spongent_BSLLXOR(s[4], t[4], 24);
+
+    t[0] >>= 8; t[1] >>= 8; t[2] >>= 8; t[3] >>= 8; t[4] >>= 8;
+    s[2] = spongent_BSLLXOR(  0 , t[0], 16);
+    s[2] = spongent_BSLLXOR(s[2], t[1], 24);
+    s[3] = spongent_BSLLXOR(s[3], t[2], 0);
+    s[3] = spongent_BSLLXOR(s[3], t[3], 8);
+    s[3] = spongent_BSLLXOR(s[3], t[4], 16);
+
+    t[0] >>= 8; t[1] >>= 8; t[2] >>= 8; t[3] >>= 8; t[4] >>= 8;
+    s[1] = spongent_BSLLXOR(  0 , t[0], 8);
+    s[1] = spongent_BSLLXOR(s[1], t[1], 16);
+    s[1] = spongent_BSLLXOR(s[1], t[2], 24);
+    s[2] = spongent_BSLLXOR(s[2], t[3], 0);
+    s[2] = spongent_BSLLXOR(s[2], t[4], 8);
+
+    t[0] >>= 8; t[1] >>= 8; t[2] >>= 8; t[3] >>= 8; t[4] >>= 8;
+    s[0] = spongent_BSLLXOR(  0 , t[0], 0);
+    s[0] = spongent_BSLLXOR(s[0], t[1], 8);
+    s[0] = spongent_BSLLXOR(s[0], t[2], 16);
+    s[0] = spongent_BSLLXOR(s[0], t[3], 24);
+    s[1] = spongent_BSLLXOR(s[1], t[4], 0);
+  }
+
+  memcpy(state, s, 20);
+}
+
+// -----------------------------------------------------------------------------
+
+// This variant uses "dedicated" custom instructions and is based on 5x32b Cv2.
+
+void Spongent160_5x32b_ISEv2(void *state)
+{
+  const uint8_t *rc = RC;
+  uint32_t s[5], t[5];
+  uint8_t *s8 = (uint8_t *)s, *t8 = (uint8_t *)t;
+  int i, j;
+
+  memcpy(s, state, 20);
+
+  for (i = 0; i < 80; i++, rc += 2) {
+    
+    // add round constants 
+
+    s[0] ^= rc[0];
+    s[4] ^= ((uint32_t)(rc[1])) << 24;
+
+    // sBoxLayer
+    // use xperm4? 2*xperm4 + and + xor: 5*4 = 20 cc
+    for (j = 0; j < 20; j++) 
+      t8[j] = SBox[s8[j]];
+
+    // pLayer 
+
+    // step 1
+    // ------ generic C -------
+    // pLayer_STEP1(t[0]); 
+    // pLayer_STEP1(t[1]); 
+    // pLayer_STEP1(t[2]); 
+    // pLayer_STEP1(t[3]);
+    // pLayer_STEP1(t[4]);
+    // ---------- ISE ---------
+    t[0] = spongent_pLayer_step1(t[0]);
+    t[1] = spongent_pLayer_step1(t[1]);
+    t[2] = spongent_pLayer_step1(t[2]);
+    t[3] = spongent_pLayer_step1(t[3]);
+    t[4] = spongent_pLayer_step1(t[4]);
+
+    // step 2
+    // ------ generic C -------
+    // s[0]  =  (t[0]>>24) & 0xFF;
+    // s[0] ^= ((t[1]>>24) & 0xFF) << 8;
+    // s[0] ^= ((t[2]>>24) & 0xFF) << 16;
+    // s[0] ^= ((t[3]>>24) & 0xFF) << 24;
+    //
+    // s[1]  =  (t[4]>>24) & 0xFF;
+    // s[1] ^= ((t[0]>>16) & 0xFF) << 8;
+    // s[1] ^= ((t[1]>>16) & 0xFF) << 16;
+    // s[1] ^= ((t[2]>>16) & 0xFF) << 24;
+    //
+    // s[2]  =  (t[3]>>16) & 0xFF;
+    // s[2] ^= ((t[4]>>16) & 0xFF) << 8;
+    // s[2] ^= ((t[0]>>8)  & 0xFF) << 16;
+    // s[2] ^= ((t[1]>>8)  & 0xFF) << 24;
+    //
+    // s[3]  =  (t[2]>>8)  & 0xFF;
+    // s[3] ^= ((t[3]>>8)  & 0xFF) << 8;
+    // s[3] ^= ((t[4]>>8)  & 0xFF) << 16;
+    // s[3] ^= ((t[0])     & 0xFF) << 24;
+    //
+    // s[4]  =  (t[1])     & 0xFF;
+    // s[4] ^= ((t[2])     & 0xFF) << 8;
+    // s[4] ^= ((t[3])     & 0xFF) << 16;
+    // s[4] ^= ((t[4])     & 0xFF) << 24;
+    // ---------- ISE ---------
+    s[0] = spongent_pLayer_step2_24(  0 , t[0], 0);
+    s[0] = spongent_pLayer_step2_24(s[0], t[1], 8);
+    s[0] = spongent_pLayer_step2_24(s[0], t[2], 16);
+    s[0] = spongent_pLayer_step2_24(s[0], t[3], 24);
+
+    s[1] = spongent_pLayer_step2_24(  0 , t[4], 0);
+    s[1] = spongent_pLayer_step2_16(s[1], t[0], 8);
+    s[1] = spongent_pLayer_step2_16(s[1], t[1], 16);
+    s[1] = spongent_pLayer_step2_16(s[1], t[2], 24);
+
+    s[2] = spongent_pLayer_step2_16(  0 , t[3], 0);
+    s[2] = spongent_pLayer_step2_16(s[2], t[4], 8);
+    s[2] = spongent_pLayer_step2_8 (s[2], t[0], 16);
+    s[2] = spongent_pLayer_step2_8 (s[2], t[1], 24);
+
+    s[3] = spongent_pLayer_step2_8 (  0 , t[2], 0);
+    s[3] = spongent_pLayer_step2_8 (s[3], t[3], 8);
+    s[3] = spongent_pLayer_step2_8 (s[3], t[4], 16);
+    s[3] = spongent_pLayer_step2_0 (s[3], t[0], 24);
+
+    s[4] = spongent_pLayer_step2_0 (  0 , t[1], 0);
+    s[4] = spongent_pLayer_step2_0 (s[4], t[2], 8);
+    s[4] = spongent_pLayer_step2_0 (s[4], t[3], 16);
+    s[4] = spongent_pLayer_step2_0 (s[4], t[4], 24);
+  }
+
+  memcpy(state, s, 20);
+}
+
