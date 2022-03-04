@@ -10,27 +10,27 @@ output wire [31:0]  rd
 );
 
 //rotation amount look-up
-reg [4:0] ramt0;
+reg [5:0] ramt0;
 always @(*) begin
     case(imm)
-            0  : ramt0 = 5'd19;
-            1  : ramt0 = 5'd61;
-            2  : ramt0 = 5'd01;
-            3  : ramt0 = 5'd10;
-            4  : ramt0 = 5'd07;
-		default: ramt0 = 5'hXX;
+            0  : ramt0 = 6'd19;
+            1  : ramt0 = 6'd61;
+            2  : ramt0 = 6'd01;
+            3  : ramt0 = 6'd10;
+            4  : ramt0 = 6'd07;
+        default: ramt0 = 6'h00;
     endcase
 end
 
-reg [4:0] ramt1;
+reg [5:0] ramt1;
 always @(*) begin
     case(imm)
-            0  : ramt1 = 5'd28;
-            1  : ramt1 = 5'd39;
-            2  : ramt1 = 5'd06;
-            3  : ramt1 = 5'd17;
-            4  : ramt1 = 5'd41;
-		default: ramt1 = 5'hXX;
+            0  : ramt1 = 6'd28;
+            1  : ramt1 = 6'd39;
+            2  : ramt1 = 6'd06;
+            3  : ramt1 = 6'd17;
+            4  : ramt1 = 6'd41;
+        default: ramt1 = 6'h00;
     endcase
 end
 
@@ -48,7 +48,7 @@ endmodule
 
 module rot64 (
 input  wire [63:0]  datin,
-input  wire [ 4:0]  shamt,
+input  wire [ 5:0]  shamt,
 output wire [63:0]  datout
 );
 
@@ -63,6 +63,7 @@ wire [63:0]    l8 = {64{ shamt[3]}} & {l4[ 7:0], l4[63: 8]} |
                     {64{!shamt[3]}} &  l4[63:0];
 wire [63:0]   l16 = {64{ shamt[4]}} & {l8[15:0], l8[63:16]} |
                     {64{!shamt[4]}} &  l8[63:0];
-
-assign datout = l16;
+wire [63:0]   l32 = {64{ shamt[5]}} & {l16[31:0], l16[63:32]} |
+                    {64{!shamt[5]}} &  l16[63:0];
+assign datout = l32;
 endmodule
