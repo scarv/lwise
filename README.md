@@ -2,23 +2,24 @@
 
 <!--- ==================================================================== --->
 
-## Overview
-
-The NIST
+*The NIST
 [lightweight cryptography process](https://csrc.nist.gov/projects/lightweight-cryptography)
 is an attempt to
-"solicit, evaluate, and standardize lightweight cryptographic algorithms that are suitable for use in constrained environments",
-e.g., where even 
-[AES](https://en.wikipedia.org/wiki/Advanced_)
-might be deemed (too) heavyweight.  From an initial 57 submissions, 10 
+"solicit, evaluate, and standardize lightweight cryptographic algorithms that are suitable for use in constrained environments".
+From an initial 57 submissions, 10 
 [final-round candidates](https://csrc.nist.gov/Projects/lightweight-cryptography/finalists) 
-were selected.  This repo. captures an exploration of 
+were selected.  
+The `lwise` project and repo. capture an exploration of 
 Instruction Set Extensions (ISEs)
 for (a subset of) these candidates, based on the use of 
-[RISC-V](https://en.wikipedia.org/wiki/RISC-V).
+[RISC-V](https://en.wikipedia.org/wiki/RISC-V):
 the goal is to add understanding to and so inform selection 
 of any resulting standard, with respect to implementation-related criteria
-such as execution latency.  
+such as execution latency.*
+
+<!--- ==================================================================== --->
+
+## Overview
 
 - We consider the RISC-V baseline ISA as being
   `rv32gc_Zbkb_Zbkx` in the 32-bit case
