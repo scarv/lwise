@@ -8,8 +8,7 @@ is an attempt to
 "solicit, evaluate, and standardize lightweight cryptographic algorithms that are suitable for use in constrained environments".
 From an initial 57 submissions, 10 
 [final-round candidates](https://csrc.nist.gov/Projects/lightweight-cryptography/finalists) 
-were selected.  
-The `lwise` project and repo. capture an exploration of 
+were selected.  The `lwise` project and repo. capture an exploration of 
 Instruction Set Extensions (ISEs)
 for (a subset of) these candidates, based on the use of 
 [RISC-V](https://en.wikipedia.org/wiki/RISC-V):
