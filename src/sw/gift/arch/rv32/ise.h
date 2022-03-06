@@ -6,4 +6,30 @@
 
 // ============================================================================
 
+#if ( GIFT_RV32_TYPE2 )
+.macro gift.swapmove        rd, rs1,      imm
+.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0
+.endm
+
+.macro gift.rori.n          rd, rs1,      imm
+.insn r CUSTOM_0, 6, \imm+( 1*32), \rd, \rs1,   x0
+.endm
+.macro gift.rori.b          rd, rs1,      imm
+.insn r CUSTOM_0, 6, \imm+( 2*32), \rd, \rs1,   x0
+.endm
+.macro gift.rori.h          rd, rs1,      imm
+.insn r CUSTOM_0, 6, \imm+( 3*32), \rd, \rs1,   x0
+.endm
+
+.macro gift.key.reorg       rd, rs1,      imm
+.insn r CUSTOM_1, 6, \imm+( 0*32), \rd, \rs1,   x0
+.endm
+.macro gift.key.updstd      rd, rs1
+.insn r CUSTOM_1, 6,      ( 1*32), \rd, \rs1,   x0
+.endm
+.macro gift.key.updfix      rd, rs1,      imm
+.insn r CUSTOM_1, 6, \imm+( 2*32), \rd, \rs1,   x0
+.endm
+#endif
+
 // ============================================================================
