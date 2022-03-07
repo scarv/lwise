@@ -148,7 +148,14 @@ static int cofb_crypt(unsigned char *out, unsigned char *k, unsigned char *n,
     for(i=0;i<16;i++)
         input[i] = n[i];
 
+#if !defined( GIFT_FIXSLICING )
     giftb128(input,k,Y);
+#else 
+    uint32_t rkey[80]; 
+    precompute_rkeys(rkey, k);
+    giftb128(input, rkey, Y);
+#endif
+
     for(i=0;i<8;i++)
         offset[i] = Y[i];
 
@@ -163,7 +170,11 @@ static int cofb_crypt(unsigned char *out, unsigned char *k, unsigned char *n,
         double_half_block(offset,offset);
         xor_topbar_block(input, input, offset);
         /* Y[i] = E(X[i]) */
-        giftb128(input, k, Y);
+#if !defined( GIFT_FIXSLICING )
+    giftb128(input,k,Y);
+#else 
+    giftb128(input, rkey, Y);
+#endif 
 
         a = a + 16;
         alen -= 16;
@@ -188,8 +199,11 @@ static int cofb_crypt(unsigned char *out, unsigned char *k, unsigned char *n,
 
     xor_topbar_block(input, input, offset);
     /* Y[a] = E(X[a]) */
-    giftb128(input, k, Y);
-
+#if !defined( GIFT_FIXSLICING )
+    giftb128(input,k,Y);
+#else 
+    giftb128(input, rkey, Y);
+#endif 
 
     /* Process M */
     /* full blocks */
@@ -206,7 +220,11 @@ static int cofb_crypt(unsigned char *out, unsigned char *k, unsigned char *n,
 
         xor_topbar_block(input,input,offset);
         /* Y[i] = E(X[i+a]) */
-        giftb128(input, k, Y);
+#if !defined( GIFT_FIXSLICING )
+        giftb128(input,k,Y);
+#else 
+        giftb128(input, rkey, Y);
+#endif 
 
         in = in + 16;
         out = out + 16;
@@ -235,7 +253,11 @@ static int cofb_crypt(unsigned char *out, unsigned char *k, unsigned char *n,
 
         xor_topbar_block(input,input,offset);
         /* T = E(X[m+a]) */
-        giftb128(input, k, Y);
+#if !defined( GIFT_FIXSLICING )
+        giftb128(input,k,Y);
+#else 
+        giftb128(input, rkey, Y);
+#endif 
     }
 
     if (encrypting) {
