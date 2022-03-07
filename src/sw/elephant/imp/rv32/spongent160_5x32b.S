@@ -1,6 +1,6 @@
 #include "zbkb.h"
 #include "zbkx.h"
-//#include "ise.h"
+#include "ise.h"
 
 
 // ----------------------------------------------------------------------------
@@ -86,26 +86,47 @@
 
 // pLayer
 
-.macro SPONGENT_SWAPMOVE32 s0, mask, imm, t0, t1
-  srli \t0, \s0, \imm
-  xor  \t0, \s0, \t0
-  and  \t0, \t0, \mask
-  slli \t1, \t0, \imm
-  xor  \t0, \t0, \t1
-  xor  \s0, \t0, \s0
-.endm
+# .macro SPONGENT_SWAPMOVE32 s0, mask, imm, t0, t1
+#   srli \t0, \s0, \imm
+#   xor  \t0, \s0, \t0
+#   and  \t0, \t0, \mask
+#   slli \t1, \t0, \imm
+#   xor  \t0, \t0, \t1
+#   xor  \s0, \t0, \s0
+# .endm
 
-// permute the 32-bit word bit[31:0] to 
-// bit[31:24]  28 24 20 16 12  8  4  0 
-// bit[23:16]  29 25 21 17 13  9  5  1 
-// bit[15: 8]  30 26 22 18 14 10  6  2 
-// bit[ 7: 0]  31 27 23 19 15 11  7  3 
+# .macro SPONGENT_PL_STEP1 s0, t0, t1
+#   SPONGENT_SWAPMOVE32 \s0, t1,  3, \t0, \t1
+#   SPONGENT_SWAPMOVE32 \s0, t2,  6, \t0, \t1
+#   SPONGENT_SWAPMOVE32 \s0, t3, 12, \t0, \t1
+#   SPONGENT_SWAPMOVE32 \s0, t4, 24, \t0, \t1
+# .endm
+
+// This step1 can be easily implemented with "unzip" and "rev8" instructions 
+// from ZBKB.
+
+// The 1st "unzip" permutes the 32-bit state word as follows: 
+// bits[31:24] 31 29 27 25 23 21 19 17
+// bits[23:16] 15 13 11  9  7  5  3  1
+// bits[15: 8] 30 28 26 24 22 20 18 16 
+// bits[ 7: 0] 14 12 10  8  6  4  2  0 
+
+// The 2nd "unzip" permutes the 32-bit state word as follows:
+// bits[31:24] 31 27 23 19 15 11  7  3
+// bits[23:16] 30 26 22 18 14 10  6  2
+// bits[15: 8] 29 25 21 17 13  9  5  1 
+// bits[ 7: 0] 28 24 20 16 12  8  4  0 
+
+// The "rev8" then makes the 32-bit state word as follows:
+// bits[31:24] 28 24 20 16 12  8  4  0
+// bits[23:16] 29 25 21 17 13  9  5  1
+// bits[16: 8] 30 26 22 18 14 10  6  2 
+// bits[ 7: 0] 31 27 23 19 15 11  7  3
 
 .macro SPONGENT_PL_STEP1 s0, t0, t1
-  SPONGENT_SWAPMOVE32 \s0, t1,  3, \t0, \t1
-  SPONGENT_SWAPMOVE32 \s0, t2,  6, \t0, \t1
-  SPONGENT_SWAPMOVE32 \s0, t3, 12, \t0, \t1
-  SPONGENT_SWAPMOVE32 \s0, t4, 24, \t0, \t1
+  unzip \s0, \s0 
+  unzip \s0, \s0 
+  rev8  \s0, \s0
 .endm
 
 .macro SPONGENT_BSLLXOR r0, s0, s1, imm, t0

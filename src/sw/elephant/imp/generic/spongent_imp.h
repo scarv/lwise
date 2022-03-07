@@ -10,7 +10,7 @@ void Spongent160_5x32b_Cv2(void *state);
 void Spongent160_5x32b_ISEv1(void *state);
 void Spongent160_5x32b_ISEv2(void *state);
 
-#define Spongent_160 Spongent160_5x32b_Cv2
+#define Spongent_160 Spongent160_4x40b_Cv1
 
 // Info 
 // 4x40b Cv1:   AddRC(table) + pLayer(swapmove) + sBoxLayer(bitsliced) -> our generic C imp? 
@@ -29,9 +29,5 @@ void Spongent160_5x32b_ISEv2(void *state);
 // 4x40b Cv1: 151597
 // 5x32b Cv1: 497337
 // 5x32b Cv2: 137297
-
-// Discussion:
-// 
-
 
 #endif
