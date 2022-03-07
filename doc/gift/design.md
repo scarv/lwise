@@ -25,7 +25,7 @@ Throughout the following, we
 
 <!--- -------------------------------------------------------------------- --->
 
-## Discussionx
+## Discussion
 
 SWAPMOVE *seems* to have been first defined in [Sec. 3.1, 2], although
 even that cites prior art (e.g., libdes).  Either way, that definition 
