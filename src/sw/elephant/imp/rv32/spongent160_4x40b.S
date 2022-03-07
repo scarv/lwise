@@ -17,7 +17,7 @@
 // prologue + epilogue 
 
 .macro SPONGENT_PROLOGUE
-  addi sp, sp, -36
+  addi sp, sp, -40
   sw   s0,  0(sp)
   sw   s1,  4(sp)
   sw   s2,  8(sp)
@@ -27,6 +27,7 @@
   sw   s6, 24(sp)
   sw   s7, 28(sp)
   sw   s8, 32(sp)
+  sw   s9, 36(sp)
 .endm
 
 .macro SPONGENT_EPILOGUE
@@ -39,7 +40,8 @@
   lw   s6, 24(sp)
   lw   s7, 28(sp)
   lw   s8, 32(sp)
-  addi sp, sp, 36 
+  lw   s9, 36(sp)
+  addi sp, sp, 40 
   ret
 .endm
 
@@ -128,6 +130,7 @@
 
 // pLayer
 
+#if (ELEPHANT_RV32_TYPE1)
 .macro BUP r0, s0, t0, imm0, imm1 
   slli \r0, \s0, \imm0  
   slli \t0,  s8, \imm1
@@ -153,6 +156,55 @@
   BUP  \t1, \s7, \t0, \imm-3,   7       
   xor  \r1, \r1, \t1
 .endm
+#elif (ELEPHANT_RV32_TYPE2)
+
+.macro BUP r0, s0, pos, imm
+  elephant.bup \r0, \s0, \pos, \imm
+.endm
+
+.macro SONPGENT_PL_STEP00 r0, s1, s3, s5, pos, t0
+  BUP  \r0, \s1, \pos, 8
+  BUP  \t0, \s3, \pos, 18
+  xor  \r0, \r0, \t0
+  BUP  \t0, \s5, \pos, 28
+  xor  \r0, \r0, \t0
+.endm
+
+.macro SONPGENT_PL_STEP01 r1, s7, pos, t0 
+  BUP  \r1, \s7, \pos, 6           
+.endm
+
+.macro SONPGENT_PL_STEP02 r0, s1, s3, s5, pos, t0
+  BUP  \t0, \s1, \pos, 9
+  xor  \r0, \r0, \t0
+  BUP  \t0, \s3, \pos, 19
+  xor  \r0, \r0, \t0
+  BUP  \t0, \s5, \pos, 29
+  xor  \r0, \r0, \t0
+.endm
+
+.macro SONPGENT_PL_STEP03 r1, s7, pos, t0
+  BUP  \t0, \s7, \pos, 7
+  xor  \r1, \r1, \t0           
+.endm
+#elif (ELEPHANT_RV32_TYPE3)
+
+.macro BUPD r0, s0, pos, imm
+  elephant.bupd \r0, \s0, \pos, \imm
+.endm
+
+.macro SONPGENT_PL_STEP00 r0, s1, s3, s5, pos, t0
+  BUPD \r0, \s1, \pos, 8
+  BUPD \t0, \s3, \pos, 18
+  xor  \r0, \r0, \t0
+  BUPD \t0, \s5, \pos, 28
+  xor  \r0, \r0, \t0
+.endm
+
+.macro SONPGENT_PL_STEP01 r1, s7, pos, t0 
+  BUPD \r1, \s7, \pos, 6           
+.endm
+#endif 
 
 # .macro SPONGENT_SWAPMOVE32 s0, mask, imm, t0, t1
 #   srli \t0, \s0, \imm
@@ -191,49 +243,37 @@
 // bits[16: 8] 30 26 22 18 14 10  6  2 
 // bits[ 7: 0] 31 27 23 19 15 11  7  3
 
+#if (ELEPHANT_RV32_TYPE1)
 .macro SPONGENT_PL_STEP1 s0, t0, t1
   unzip \s0, \s0 
   unzip \s0, \s0 
   rev8  \s0, \s0
 .endm
-
-.macro SPONGENT_PL_STEP20 r0, r2, r4, r6, s0, t0, t1, mask
-  andi  \t0, \s0, \mask
-  xor   \r6, \r6, \t0
-  srli  \t1, \s0, 8
-  andi  \t0, \t1, \mask
-  xor   \r4, \r4, \t0
-  srli  \t1, \t1, 8
-  andi  \t0, \t1, \mask
-  xor   \r2, \r2, \t0
-  srli  \t1, \t1, 8
-  andi  \t0, \t1, \mask
-  xor   \r0, \r0, \t0
+#elif  (ELEPHANT_RV32_TYPE2)|(ELEPHANT_RV32_TYPE3)
+.macro SPONGENT_PL_STEP1 s0, t0, t1
+  elephant.pstep1 \s0, \s0
 .endm
+#endif
 
-.macro SPONGENT_PL_STEP21 r0, r2, r4, r6, s0, t0, t1, imm
-  andi  \t0, \s0, 0xFF
-  slli  \t0, \t0, \imm
-  xor   \r6, \r6, \t0
-  srli  \t1, \s0, 8
-  andi  \t0, \t1, 0xFF 
-  slli  \t0, \t0, \imm
-  xor   \r4, \r4, \t0
-  srli  \t1, \t1, 8
-  andi  \t0, \t1, 0xFF
-  slli  \t0, \t0, \imm 
-  xor   \r2, \r2, \t0
-  srli  \t1, \t1, 8
-  andi  \t0, \t1, 0xFF
-  slli  \t0, \t0, \imm 
-  xor   \r0, \r0, \t0
+#if (ELEPHANT_RV32_TYPE1)
+.macro SPONGENT_BSLLXOR r0, s0, s1, imm, t0
+  andi \t0, \s1, 0xFF
+  slli \t0, \t0, \imm
+  xor  \r0, \s0, \t0 
 .endm
+#elif (ELEPHANT_RV32_TYPE2)
+.macro SPONGENT_BSLLXOR r0, s0, s1, imm, t0
+  elephant.bsllxor \r0, \s0, \s1, \imm
+.endm
+#endif 
 
 .macro SPONGENT_PL r0, r1, r2, r3, r4, r5, r6, r7, s0, s1, s2, s3, s4, s5, s6, s7, t0, t1
   // There are three steps in the pLayer. See details in the generic C code:
   // ../generic/spongent_imp.c 
 
   // step 0
+#if   (ELEPHANT_RV32_TYPE1)
+
   SONPGENT_PL_STEP00 \r0, \s1, \s3, \s5, \t0, \t1, 8, 18, 28
   SONPGENT_PL_STEP00 \r2, \s1, \s3, \s5, \t0, \t1, 7, 17, 27
   SONPGENT_PL_STEP00 \r4, \s1, \s3, \s5, \t0, \t1, 6, 16, 26 
@@ -242,11 +282,35 @@
   SONPGENT_PL_STEP01 \r1, \s7, \t0, \t1, 6
   SONPGENT_PL_STEP01 \r3, \s7, \t0, \t1, 5
   SONPGENT_PL_STEP01 \r5, \s7, \t0, \t1, 4
-  // r7 uses fewer instructions compared to r1 r3 r5
-  BUP  \r7, \s7, \t0,  3,  6
-  slli \t0,  s8,   7
-  and  \t1, \s7, \t0     
-  xor  \r7, \r7, \t1
+  SONPGENT_PL_STEP01 \r7, \s7, \t0, \t1, 3
+#elif (ELEPHANT_RV32_TYPE2)|(ELEPHANT_RV32_TYPE3)
+
+  SONPGENT_PL_STEP00 \r0, \s1, \s3, \s5,  x0, \t0
+  SONPGENT_PL_STEP01 \r1, \s7,            x0, \t0
+  addi \t1,  x0, 1
+  SONPGENT_PL_STEP00 \r2, \s1, \s3, \s5, \t1, \t0
+  SONPGENT_PL_STEP01 \r3, \s7,           \t1, \t0
+  addi \t1, \t1, 1
+  SONPGENT_PL_STEP00 \r4, \s1, \s3, \s5, \t1, \t0
+  SONPGENT_PL_STEP01 \r5, \s7,           \t1, \t0
+  addi \t1, \t1, 1
+  SONPGENT_PL_STEP00 \r6, \s1, \s3, \s5, \t1, \t0
+  SONPGENT_PL_STEP01 \r7, \s7,           \t1, \t0
+  addi \t1, \t1, 1
+#if (ELEPHANT_RV32_TYPE2)
+  SONPGENT_PL_STEP02 \r0, \s1, \s3, \s5, \t1, \t0
+  SONPGENT_PL_STEP03 \r1, \s7,           \t1, \t0
+  addi \t1, \t1, 1
+  SONPGENT_PL_STEP02 \r2, \s1, \s3, \s5, \t1, \t0
+  SONPGENT_PL_STEP03 \r3, \s7,           \t1, \t0
+  addi \t1, \t1, 1
+  SONPGENT_PL_STEP02 \r4, \s1, \s3, \s5, \t1, \t0
+  SONPGENT_PL_STEP03 \r5, \s7,           \t1, \t0
+  addi \t1, \t1, 1
+  SONPGENT_PL_STEP02 \r6, \s1, \s3, \s5, \t1, \t0
+  SONPGENT_PL_STEP03 \r7, \s7,           \t1, \t0
+#endif
+#endif 
 
   // step 1
   SPONGENT_PL_STEP1 \s0, \t0, \t1
@@ -255,12 +319,78 @@
   SPONGENT_PL_STEP1 \s6, \t0, \t1
 
   // step 2
-  SPONGENT_PL_STEP20 \r0, \r2, \r4, \r6, \s0, \t0, \t1, 0xFF
-  SPONGENT_PL_STEP21 \r0, \r2, \r4, \r6, \s2, \t0, \t1, 10
-  SPONGENT_PL_STEP21 \r0, \r2, \r4, \r6, \s4, \t0, \t1, 20
-  SPONGENT_PL_STEP21 \r0, \r2, \r4, \r6, \s6, \t0, \t1, 30
-  srli  \s6, \s6, 2
-  SPONGENT_PL_STEP20 \r1, \r3, \r5, \r7, \s6, \t0, \t1, 0x3F
+#if (ELEPHANT_RV32_TYPE1)|(ELEPHANT_RV32_TYPE2)
+
+  SPONGENT_BSLLXOR \r6, \r6, \s0,  0, \t0
+  srli \s0, \s0, 8
+  SPONGENT_BSLLXOR \r4, \r4, \s0,  0, \t0
+  srli \s0, \s0, 8
+  SPONGENT_BSLLXOR \r2, \r2, \s0,  0, \t0
+  srli \s0, \s0, 8
+  SPONGENT_BSLLXOR \r0, \r0, \s0,  0, \t0
+
+  SPONGENT_BSLLXOR \r6, \r6, \s2, 10, \t0
+  srli \s2, \s2, 8
+  SPONGENT_BSLLXOR \r4, \r4, \s2, 10, \t0
+  srli \s2, \s2, 8
+  SPONGENT_BSLLXOR \r2, \r2, \s2, 10, \t0
+  srli \s2, \s2, 8
+  SPONGENT_BSLLXOR \r0, \r0, \s2, 10, \t0
+
+  SPONGENT_BSLLXOR \r6, \r6, \s4, 20, \t0
+  srli \s4, \s4, 8
+  SPONGENT_BSLLXOR \r4, \r4, \s4, 20, \t0
+  srli \s4, \s4, 8
+  SPONGENT_BSLLXOR \r2, \r2, \s4, 20, \t0
+  srli \s4, \s4, 8
+  SPONGENT_BSLLXOR \r0, \r0, \s4, 20, \t0
+
+  and  \t1, \s6, s9
+  SPONGENT_BSLLXOR \r6, \r6, \s6, 30, \t0
+  srli \s6, \s6, 8
+  SPONGENT_BSLLXOR \r4, \r4, \s6, 30, \t0
+  srli \s6, \s6, 8
+  SPONGENT_BSLLXOR \r2, \r2, \s6, 30, \t0
+  srli \s6, \s6, 8
+  SPONGENT_BSLLXOR \r0, \r0, \s6, 30, \t0  
+
+  srli \t1, \t1, 2
+  SPONGENT_BSLLXOR \r7, \r7, \t1,  0, \t0
+  srli \t1, \t1, 8
+  SPONGENT_BSLLXOR \r5, \r5, \t1,  0, \t0
+  srli \t1, \t1, 8
+  SPONGENT_BSLLXOR \r3, \r3, \t1,  0, \t0
+  srli \t1, \t1, 8
+  SPONGENT_BSLLXOR \r1, \r1, \t1,  0, \t0
+#elif (ELEPHANT_RV32_TYPE3)
+
+  elephant.pstep2.24 \r0, \r0, \s0, 0 
+  elephant.pstep2.16 \r2, \r2, \s0, 0 
+  elephant.pstep2.8  \r4, \r4, \s0, 0 
+  elephant.pstep2.0  \r6, \r6, \s0, 0
+
+  elephant.pstep2.24 \r0, \r0, \s2, 10 
+  elephant.pstep2.16 \r2, \r2, \s2, 10 
+  elephant.pstep2.8  \r4, \r4, \s2, 10 
+  elephant.pstep2.0  \r6, \r6, \s2, 10
+
+  elephant.pstep2.24 \r0, \r0, \s4, 20 
+  elephant.pstep2.16 \r2, \r2, \s4, 20 
+  elephant.pstep2.8  \r4, \r4, \s4, 20 
+  elephant.pstep2.0  \r6, \r6, \s4, 20
+
+  elephant.pstep2.24 \r0, \r0, \s6, 20 
+  elephant.pstep2.16 \r2, \r2, \s6, 20 
+  elephant.pstep2.8  \r4, \r4, \s6, 20 
+  elephant.pstep2.0  \r6, \r6, \s6, 20
+
+  srli \s6, \s6, 2
+  and  \s6, \s6, s9
+  elephant.pstep2.24 \r1, \r1, \s6, 0 
+  elephant.pstep2.16 \r3, \r3, \s6, 0 
+  elephant.pstep2.8  \r5, \r5, \s6, 0 
+  elephant.pstep2.0  \r7, \r7, \s6, 0
+#endif
 .endm
 
 
@@ -288,6 +418,11 @@ Spongent160_4x40b:
   li t3, 0x0000F0F0
   li t4, 0x000000FF
   li s8, 1
+#if   (ELEPHANT_RV32_TYPE2)
+  li s9, 0xFCFCFCFC
+#elif (ELEPHANT_RV32_TYPE3)
+  li s9, 0x3F3F3F3F
+#endif 
   //
   SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x75, 0xae, t5, t6
   SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x6a, 0x56, t5, t6

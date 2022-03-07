@@ -123,17 +123,29 @@
 // bits[16: 8] 30 26 22 18 14 10  6  2 
 // bits[ 7: 0] 31 27 23 19 15 11  7  3
 
+#if (ELEPHANT_RV32_TYPE1)
 .macro SPONGENT_PL_STEP1 s0, t0, t1
   unzip \s0, \s0 
   unzip \s0, \s0 
   rev8  \s0, \s0
 .endm
+#elif  (ELEPHANT_RV32_TYPE2)|(ELEPHANT_RV32_TYPE3)
+.macro SPONGENT_PL_STEP1 s0, t0, t1
+  elephant.pstep1 \s0, \s0
+.endm
+#endif
 
+#if (ELEPHANT_RV32_TYPE1)
 .macro SPONGENT_BSLLXOR r0, s0, s1, imm, t0
   andi \t0, \s1, 0xFF
   slli \t0, \t0, \imm
   xor  \r0, \s0, \t0 
 .endm
+#elif (ELEPHANT_RV32_TYPE2)
+.macro SPONGENT_BSLLXOR r0, s0, s1, imm, t0
+  elephant.bsllxor \r0, \s0, \s1, \imm
+.endm
+#endif 
 
 .macro SPONGENT_PL r0, r1, r2, r3, r4, s0, s1, s2, s3, s4, t0, t1
   // step 1
@@ -144,6 +156,8 @@
   SPONGENT_PL_STEP1 \s4, \t0, \t1
 
   // step 2
+#if (ELEPHANT_RV32_TYPE1)|(ELEPHANT_RV32_TYPE2)
+
   spongent_BSLLXOR \r3,  x0, \s0, 24, \t0
   spongent_BSLLXOR \r4,  x0, \s1, 0 , \t0 
   spongent_BSLLXOR \r4, \r4, \s2, 8 , \t0
@@ -185,6 +199,33 @@
   spongent_BSLLXOR \r0, \r0, \s2, 16, \t0
   spongent_BSLLXOR \r0, \r0, \s3, 24, \t0
   spongent_BSLLXOR \r1, \r1, \s4, 0 , \t0
+#elif (ELEPHANT_RV32_TYPE3)
+
+  elephant.pstep2.24 \r0,  x0, \s0, 0 
+  elephant.pstep2.24 \r0, \r0, \s1, 8
+  elephant.pstep2.24 \r0, \r0, \s2, 16
+  elephant.pstep2.24 \r0, \r0, \s3, 24
+
+  elephant.pstep2.24 \r1,  x0, \s4, 0 
+  elephant.pstep2.16 \r1, \r1, \s0, 8
+  elephant.pstep2.16 \r1, \r1, \s1, 16
+  elephant.pstep2.16 \r1, \r1, \s2, 24
+
+  elephant.pstep2.16 \r2,  x0, \s3, 0 
+  elephant.pstep2.16 \r2, \r2, \s4, 8
+  elephant.pstep2.8  \r2, \r2, \s0, 16
+  elephant.pstep2.8  \r2, \r2, \s1, 24
+
+  elephant.pstep2.8  \r3,  x0, \s2, 0 
+  elephant.pstep2.8  \r3, \r3, \s3, 8
+  elephant.pstep2.8  \r3, \r3, \s4, 16
+  elephant.pstep2.0  \r3, \r3, \s0, 24
+
+  elephant.pstep2.0  \r4,  x0, \s1, 0 
+  elephant.pstep2.0  \r4, \r4, \s2, 8
+  elephant.pstep2.0  \r4, \r4, \s3, 16
+  elephant.pstep2.0  \r4, \r4, \s4, 24
+#endif
 .endm
 
 // operations in each round
