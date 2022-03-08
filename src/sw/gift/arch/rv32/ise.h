@@ -7,8 +7,8 @@
 // ============================================================================
 
 #if ( GIFT_RV32_TYPE2 )
-.macro gift.swapmove        rd, rs1,      imm
-.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0
+.macro gift.swapmove        rd, rs1, rs2, imm
+.insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2
 .endm
 
 .macro gift.rori.n          rd, rs1,      imm

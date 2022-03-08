@@ -10,8 +10,8 @@
 |                     |                      |          |                     |         |             |
 +=====================+======================+==========+=====================+=========+=============+
 
-.macro gift.swapmove        rd, rs1,      imm      // gift.rori.n             => 00ii iii0 0000 rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 6, \imm+( 0*32), \rd, \rs1,   x0 //                         => #define MATCH_GIFT_SWAPMOVE   0x0000700B
+.macro gift.swapmove        rd, rs1, rs2, imm      // gift.rori.n             => 00ii iii0 0000 rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_GIFT_SWAPMOVE   0x0000700B
 .endm                                              //                         => #define  MASK_GIFT_SWAPMOVE   0xC000707F
 
 .macro gift.rori.n          rd, rs1,      imm      // gift.rori.n             => 01ii iii0 0000 rrrr r110 rrrr r000 1011
