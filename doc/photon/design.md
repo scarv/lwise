@@ -122,6 +122,7 @@
 [1] Z. Bao, A. Chakraborti, N. Datta, J. Guo, M. Nandi, T. Peyrin, and K. Yasuda.
     [PHOTON-Beetle Authenticated Encryption and Hash Family](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/photon-spec-final.pdf).
     Submission to NIST (version 2.0), 2021.
+    
 [2] J. Guo, Thomas Peyrin, and A. Poschmann.
     [The PHOTON Family of Lightweight Hash Functions](https://eprint.iacr.org/2011/609.pdf).
     Cryptology ePrint Archive, Report 2011/609, 2011.
