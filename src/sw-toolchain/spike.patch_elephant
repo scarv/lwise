@@ -46,7 +46,7 @@ index 7028c855..8437b36f 100644
    int64_t shamt() { return x(20, 6); }
    int64_t s_imm() { return x(7, 5) + (xs(25, 7) << 5); }
 diff --git a/riscv/encoding.h b/riscv/encoding.h
-index b2162963..6a641fd3 100644
+index b2162963..8db6e637 100644
 --- a/riscv/encoding.h
 +++ b/riscv/encoding.h
 @@ -281,6 +281,24 @@
@@ -62,13 +62,13 @@ index b2162963..6a641fd3 100644
 +#define  MASK_ELEPHANT_BUPD      0xC000707F
 +#define MATCH_ELEPHANT_PSTEP1    0x0000602B
 +#define  MASK_ELEPHANT_PSTEP1    0xC000707F
-+#define MATCH_ELEPHANT_PSTEP2_0  0x0000605B
++#define MATCH_ELEPHANT_PSTEP2_0  0x0000705B
 +#define  MASK_ELEPHANT_PSTEP2_0  0xC000707F
-+#define MATCH_ELEPHANT_PSTEP2_8  0x4000605B
++#define MATCH_ELEPHANT_PSTEP2_8  0x4000705B
 +#define  MASK_ELEPHANT_PSTEP2_8  0xC000707F
-+#define MATCH_ELEPHANT_PSTEP2_16 0x8000605B
++#define MATCH_ELEPHANT_PSTEP2_16 0x8000705B
 +#define  MASK_ELEPHANT_PSTEP2_16 0xC000707F
-+#define MATCH_ELEPHANT_PSTEP2_24 0xC000605B
++#define MATCH_ELEPHANT_PSTEP2_24 0xC000705B
 +#define  MASK_ELEPHANT_PSTEP2_24 0xC000707F
 +// -- lwise
  #define MATCH_SLLI_RV32 0x1013

@@ -45,14 +45,14 @@
 +=====================+======================+==========+=====================+=========+=============+
 
 .macro elephant.pstep2.0    rd, rs1, rs2, imm      // elephant.pstep2.0       => 00ii iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_0  0x0000605B
+.insn r CUSTOM_2, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_0  0x0000705B
 .endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_0  0xC000707F
 .macro elephant.pstep2.8    rd, rs1, rs2, imm      // elephant.pstep2.8       => 01ii iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 1*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_8  0x4000605B
+.insn r CUSTOM_2, 7, \imm+( 1*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_8  0x4000705B
 .endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_8  0xC000707F
 .macro elephant.pstep2.16   rd, rs1, rs2, imm      // elephant.pstep2.16      => 10ii iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 2*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_16 0x8000605B
+.insn r CUSTOM_2, 7, \imm+( 2*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_16 0x8000705B
 .endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_16 0xC000707F
 .macro elephant.pstep2.24   rd, rs1, rs2, imm      // elephant.pstep2.24      => 11ii iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 3*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_24 0xC000605B
+.insn r CUSTOM_2, 7, \imm+( 3*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_24 0xC000705B
 .endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_24 0xC000707F
