@@ -379,10 +379,10 @@
   elephant.pstep2.8  \r4, \r4, \s4, 20 
   elephant.pstep2.0  \r6, \r6, \s4, 20
 
-  elephant.pstep2.24 \r0, \r0, \s6, 20 
-  elephant.pstep2.16 \r2, \r2, \s6, 20 
-  elephant.pstep2.8  \r4, \r4, \s6, 20 
-  elephant.pstep2.0  \r6, \r6, \s6, 20
+  elephant.pstep2.24 \r0, \r0, \s6, 30 
+  elephant.pstep2.16 \r2, \r2, \s6, 30 
+  elephant.pstep2.8  \r4, \r4, \s6, 30 
+  elephant.pstep2.0  \r6, \r6, \s6, 30
 
   srli \s6, \s6, 2
   and  \s6, \s6, s9
