@@ -325,9 +325,11 @@
 [1] C. Guo, T. Iwata, M. Khairallah, K. Minematsu, and Thomas Peyrin.
     [Romulus](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf).
     Submission to NIST (version 1.3), 2021.
+    
 [2] C. Beierle, J. Jean, S. Kölbl, G. Leander, A. Moradi,￼T. Peyrin, Y. Sasaki, P. Sasdrich, S.M. Sim.
     [The SKINNY Family of Block Ciphers and its Low-Latency Variant MANTIS](https://link.springer.com/chapter/10.1007/978-3-662-53008-5_5).
     In Advances in Cryptology (CRYPTO), Springer-Verlag LNCS 9815, 123--153, 2016.
+
 [3] E. Tehrani, T. Graba, A.S. Merabet, and J.-L. Danger.
     [RISC-V Extension for Lightweight Cryptography](https://ieeexplore.ieee.org/document/9217866).
     In Digital System Design (DSD), 222--228, 2020.
