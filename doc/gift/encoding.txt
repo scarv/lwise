@@ -10,17 +10,17 @@
 |                     |                      |          |                     |         |             |
 +=====================+======================+==========+=====================+=========+=============+
 
-.macro gift.swapmove        rd, rs1, rs2, imm      // gift.rori.n             => 00ii iii0 0000 rrrr r111 rrrr r000 1011
+.macro gift.swapmove        rd, rs1, rs2, imm      // gift.swapmove           => 00ii iii0 0000 rrrr r111 rrrr r000 1011
 .insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_GIFT_SWAPMOVE   0x0000700B
 .endm                                              //                         => #define  MASK_GIFT_SWAPMOVE   0xC000707F
 
 .macro gift.rori.n          rd, rs1,      imm      // gift.rori.n             => 01ii iii0 0000 rrrr r110 rrrr r000 1011
 .insn r CUSTOM_0, 6, \imm+( 1*32), \rd, \rs1,   x0 //                         => #define MATCH_GIFT_RORI_N     0x4000600B
 .endm                                              //                         => #define  MASK_GIFT_RORI_N     0xC000707F
-.macro gift.rori.b          rd, rs1,      imm      // gift.rori.n             => 10ii iii0 0000 rrrr r110 rrrr r000 1011
+.macro gift.rori.b          rd, rs1,      imm      // gift.rori.b             => 10ii iii0 0000 rrrr r110 rrrr r000 1011
 .insn r CUSTOM_0, 6, \imm+( 2*32), \rd, \rs1,   x0 //                         => #define MATCH_GIFT_RORI_B     0x8000600B
 .endm                                              //                         => #define  MASK_GIFT_RORI_B     0xC000707F
-.macro gift.rori.h          rd, rs1,      imm      // gift.rori.n             => 11ii iii0 0000 rrrr r110 rrrr r000 1011
+.macro gift.rori.h          rd, rs1,      imm      // gift.rori.h             => 11ii iii0 0000 rrrr r110 rrrr r000 1011
 .insn r CUSTOM_0, 6, \imm+( 3*32), \rd, \rs1,   x0 //                         => #define MATCH_GIFT_RORI_H     0xC000600B
 .endm                                              //                         => #define  MASK_GIFT_RORI_H     0xC000707F
 
