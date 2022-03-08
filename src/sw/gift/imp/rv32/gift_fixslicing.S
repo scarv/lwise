@@ -83,7 +83,7 @@
 // swapmove32
 
 .macro GIFT_SPMV s0, m0, imm, t0, t1
-# if (GIFT_RV32_TYPE2)
+#if (GIFT_RV32_TYPE2)
   gift.swapmove \s0, \s0, \m0, \imm
 #else
   srli \t0, \s0, \imm
