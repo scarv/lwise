@@ -425,11 +425,14 @@ giftb128_fixslicing:
   and  \t1, \k0, \m2
   slli \t1, \t1, 2
   or   \k0, \t0, \t1
-# endif
+#endif
   sw   \k0, \imm(a0)
 .endm
 
 .macro GIFT_KTPL1 k0, m0, m1, m2, m3, t0, t1, imm
+#if (GIFT_RV32_TYPE2)
+  gift.key.updfix \k0, \k0, 3
+#else
   srli \t0, \k0, 6
   and  \t0, \t0, \m0
   and  \t1, \k0, \m1
@@ -441,6 +444,7 @@ giftb128_fixslicing:
   and  \t1, \k0, \m3
   slli \t1, \t1, 3
   or   \k0, \t0, \t1
+#endif
   sw   \k0, \imm(a0)
 .endm
 
@@ -453,20 +457,27 @@ giftb128_fixslicing:
   rori \t0, \t0, 24
   rori \k0, \k0, 16
   or   \k0, \k0, \t0
-# endif
+#endif
   sw   \k0, \imm(a0)
 .endm
 
 .macro GIFT_KTPL2 k0, m0, m1, t0, imm
+#if (GIFT_RV32_TYPE2)
+  gift.key.updfix \k0, \k0, 5
+#else
   and  \t0, \k0, \m0
   and  \k0, \k0, \m1
   rori \t0, \t0, 24
   rori \k0, \k0, 20
   or   \k0, \k0, \t0
+#endif
   sw   \k0, \imm(a0)
 .endm
 
 .macro GIFT_KDBL3 k0, m0, m1, m2, t0, t1, imm
+#if (GIFT_RV32_TYPE2)
+  gift.key.updfix \k0, \k0, 6
+#else
   srli \t0, \k0, 2
   and  \t0, \t0, \m0
   and  \t1, \k0, \m0
@@ -478,10 +489,14 @@ giftb128_fixslicing:
   and  \t1, \k0, \m2
   slli \t1, \t1, 3
   or   \k0, \t0, \t1
+#endif
   sw   \k0, \imm(a0)
 .endm
 
 .macro GIFT_KTPL3 k0, m0, m1, m2, m3, m4, m5, t0, t1, imm
+#if (GIFT_RV32_TYPE2)
+  gift.key.updfix \k0, \k0, 7
+#else
   srli \t0, \k0, 18
   and  \t0, \t0, \m0
   and  \t1, \k0, \m1
@@ -499,10 +514,14 @@ giftb128_fixslicing:
   and  \t1, \k0, \m5
   slli \t1, \t1, 19
   or   \k0, \t0, \t1
+#endif
   sw   \k0, \imm(a0)
 .endm
 
 .macro GIFT_KDBL4 k0, m0, m1, m2, t0, t1, imm
+#if (GIFT_RV32_TYPE2)
+  gift.key.updfix \k0, \k0, 8
+#else
   srli \t0, \k0, 4
   and  \t0, \t0, \m0
   and  \t1, \k0, \m1
@@ -514,10 +533,14 @@ giftb128_fixslicing:
   and  \t1, \k0, \m2
   slli \t1, \t1, 8
   or   \k0, \t0, \t1
+#endif
   sw   \k0, \imm(a0)
 .endm
 
 .macro GIFT_KTPL4 k0, m0, m1, m2, m3, t0, t1, imm
+#if (GIFT_RV32_TYPE2)
+  gift.key.updfix \k0, \k0, 9
+#else
   srli \t0, \k0, 6
   and  \t0, \t0, \m0
   and  \t1, \k0, \m1
@@ -528,7 +551,8 @@ giftb128_fixslicing:
   or   \t0, \t0, \t1
   and  \t1, \k0, \m3
   slli \t1, \t1, 12
-  or   \k0, \t0, \t1 
+  or   \k0, \t0, \t1
+#endif 
   sw   \k0, \imm(a0) 
 .endm
 
@@ -671,22 +695,37 @@ precompute_rkeys:
   sw   a4, 244(a0)
   lw   a4, 40(a0)
   lw   a5, 44(a0)
+#if (GIFT_RV32_TYPE2)  
+  gift.key.updfix a5, a5, 0
+  gift.key.updfix a4, a4, 1
+#else  
   GIFT_SPMV  a5, t0, 16, t5, t6
   GIFT_SPMV  a5, t1,  1, t5, t6
   GIFT_KTPL0 a4, t3, t4, t5
   GIFT_SPMV  a4, t2,  1, t5, t6
+#endif
   sw   a5, 120(a0)
   sw   a4, 124(a0)
+#if (GIFT_RV32_TYPE2)  
+  gift.key.updfix a4, a4, 0
+  gift.key.updfix a5, a5, 1
+#else 
   GIFT_SPMV  a4, t0, 16, t5, t6
   GIFT_SPMV  a4, t1,  1, t5, t6
   GIFT_KTPL0 a5, t3, t4, t5
   GIFT_SPMV  a5, t2,  1, t5, t6
+#endif
   sw   a4, 200(a0)
   sw   a5, 204(a0)
+#if (GIFT_RV32_TYPE2)  
+  gift.key.updfix a5, a5, 0
+  gift.key.updfix a4, a4, 1
+#else 
   GIFT_SPMV  a5, t0, 16, t5, t6
   GIFT_SPMV  a5, t1,  1, t5, t6
   GIFT_KTPL0 a4, t3, t4, t5
   GIFT_SPMV  a4, t2,  1, t5, t6
+#endif
   sw   a5, 280(a0)
   sw   a4, 284(a0)
 

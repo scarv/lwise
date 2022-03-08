@@ -12,4 +12,4 @@
 | `imp`        | `cycles`   | `notes` |
 | :--------:   | :---------:|:--------|
 | `bitslicing` |  3820      |  only two custom instructions `gift.key.reorg (imm = 3)` and `gift.key.updstd` were used |
-| `fixslicing` |            |         | 
+| `fixslicing` |  3984      |  TODO: clean code and could have a small improvement (< 100 cycles)     | 

@@ -14,6 +14,6 @@
 | `state`   | `imp`                         |   `type` | `cycles`   |
 | :--------:| :----------------------------:|  :------:|  ---------:|
 | `4x40b`   | pLayer(ISE) + SBox(bitsliced) |  `TYPE2` |  71677     | 
-| `4x40b`   | pLayer(ISE) + SBox(bitsliced) |  `TYPE3` |  n/a       | 
+| `4x40b`   | pLayer(ISE) + SBox(bitsliced) |  `TYPE3` |  51677     | 
 | `5x32b`   | SBox(LUT) + pLayer(ISE)       |  `TYPE2` |  27082     |         
-| `5x32b`   | SBox(LUT) + pLayer(ISE)       |  `TYPE3` |  n/a       | 
+| `5x32b`   | SBox(LUT) + pLayer(ISE)       |  `TYPE3` |  21082     | 
