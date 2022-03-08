@@ -1,6 +1,6 @@
 # Notes on Spongent-160 rv32 implementations
 
-### Comparison between 4x40b and 5x32b for pure-sw Elephant (TYPE1 only)
+### Comparison between `4x40b` and `5x32b` for pure-sw Elephant (TYPE1 only)
 
 | `state`    | `imp`                               | `cycles`   | `notes` |
 | :--------: |  :---------------------------------:|  ---------:|:--------|
@@ -13,7 +13,7 @@
 
 | `state`   | `imp`                         |   `type` | `cycles`   |
 | :--------:| :----------------------------:|  :------:|  ---------:|
-| `4x40b`   | SBox(bitsliced) + pLayer(ISE) |  `TYPE2` |  71677     | 
-| `4x40b`   | SBox(bitsliced) + pLayer(ISE) |  `TYPE3` |  n/a       | 
+| `4x40b`   | pLayer(ISE) + SBox(bitsliced) |  `TYPE2` |  71677     | 
+| `4x40b`   | pLayer(ISE) + SBox(bitsliced) |  `TYPE3` |  n/a       | 
 | `5x32b`   | SBox(LUT) + pLayer(ISE)       |  `TYPE2` |  27082     |         
 | `5x32b`   | SBox(LUT) + pLayer(ISE)       |  `TYPE3` |  n/a       | 

@@ -110,9 +110,13 @@
 // corresponding offset.
 
 .macro GIFT_PERMBITS_STEP s0
+#if (GIFT_RV32_TYPE2)
+  gift.key.reorg \s0, \s0, 3
+#else
   unzip \s0, \s0
   unzip \s0, \s0 
   rev8  \s0, \s0
+#endif
 .endm
 
 .macro GIFT_PERMBITS s0, s1, s2, s3
@@ -145,6 +149,9 @@
 // needs to be fixed.
 
 .macro GIFT_KEYSTUPD k3, k4, t0
+#if (GIFT_RV32_TYPE2)
+  gift.key.updstd \k4, \k3 
+#else 
   srli \k4, \k3, 12
   and  \k4, \k4, s0
 
@@ -159,6 +166,7 @@
   and  \t0, \k3, s3
   slli \t0, \t0, 14
   or   \k4, \k4, \t0
+#endif 
 .endm
 
 # .macro GIFT_KEYSTUPD k3, k4, t0

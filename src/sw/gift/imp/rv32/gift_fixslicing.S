@@ -83,22 +83,59 @@
 // swapmove32
 
 .macro GIFT_SPMV s0, m0, imm, t0, t1
+# # if (GIFT_RV32_TYPE2)
+#   gift.swapmove \s0, \m0, \imm
+# #else
   srli \t0, \s0, \imm
   xor  \t0, \s0, \t0
   and  \t0, \t0, \m0
   slli \t1, \t0, \imm
   xor  \t0, \t0, \t1
   xor  \s0, \t0, \s0
+# #endif 
 .endm
+
 
 // nibble-wise rotation to the right
 
 .macro GIFT_NROR s0, m0, m1, imm0, imm1, t0
+#if (GIFT_RV32_TYPE2)
+  gift.rori.n \s0, \s0, \imm0
+#else 
   srli \t0, \s0, \imm0
   and  \t0, \t0, \m0
   and  \s0, \s0, \m1
   slli \s0, \s0, \imm1
   or   \s0, \s0, \t0
+#endif 
+.endm
+
+// nibble-wise rotation to the right
+
+.macro GIFT_BROR s0, m0, m1, imm0, imm1, t0
+#if (GIFT_RV32_TYPE2)
+  gift.rori.b \s0, \s0, \imm0
+#else 
+  srli \t0, \s0, \imm0
+  and  \t0, \t0, \m0
+  and  \s0, \s0, \m1
+  slli \s0, \s0, \imm1
+  or   \s0, \s0, \t0
+#endif 
+.endm
+
+// half-word-wise rotation to the right
+
+.macro GIFT_HROR s0, m0, m1, imm0, imm1, t0
+#if (GIFT_RV32_TYPE2)
+  gift.rori.h \s0, \s0, \imm0
+#else 
+  srli \t0, \s0, \imm0
+  and  \t0, \t0, \m0
+  and  \s0, \s0, \m1
+  slli \s0, \s0, \imm1
+  or   \s0, \s0, \t0
+#endif 
 .endm
 
 // byte3, byte2, byte1, byte0 -> byte2, byte3, byte0, byte1
@@ -127,9 +164,13 @@
 
 .macro GIFT_ROUND1 s0, s1, s2, s3, rci, t0
   GIFT_SBOX \s0, \s1, \s2, \s3, \t0
-  GIFT_NROR \s3, t5, t6,  4, 12, \t0
+  GIFT_HROR \s3, t5, t6,  4, 12, \t0
+#if (GIFT_RV32_TYPE2) 
+  GIFT_HROR \s1, t5, t6,  8,  8, \t0
+#else 
   GIFT_REV16 \s1
-  GIFT_NROR \s2, t6, t5, 12,  4, \t0
+#endif  
+  GIFT_HROR \s2, t6, t5, 12,  4, \t0
   lw        \t0,  8(a1)
   xor       \s1, \s1, \t0
   lw        \t0, 12(a1)
@@ -159,9 +200,9 @@
 
 .macro GIFT_ROUND3 s0, s1, s2, s3, rci, t0
   GIFT_SBOX \s0, \s1, \s2, \s3, \t0 
-  GIFT_NROR \s3, s3, s5, 6, 2, \t0
-  GIFT_NROR \s1, s4, s4, 4, 4, \t0
-  GIFT_NROR \s2, s5, s3, 2, 6, \t0
+  GIFT_BROR \s3, s3, s5, 6, 2, \t0
+  GIFT_BROR \s1, s4, s4, 4, 4, \t0
+  GIFT_BROR \s2, s5, s3, 2, 6, \t0
   lw        \t0, 24(a1)
   xor       \s1, \s1, \t0
   lw        \t0, 28(a1)
@@ -293,6 +334,9 @@ giftb128_fixslicing:
 .endm
 
 .macro GIFT_KUPD k1, k0, t0, t1
+#if (GIFT_RV32_TYPE2)
+  gift.key.updstd \k0, \k0
+#else
   srli \t0, \k0, 12
   and  \t0, \t0, t0
 
@@ -307,6 +351,7 @@ giftb128_fixslicing:
   and  \k0, \k0, t3
   slli \k0, \k0, 14
   or   \k0, \k0, \t0
+#endif
 
   sw   \k1, 0(a0)
   sw   \k0, 4(a0)
@@ -314,31 +359,47 @@ giftb128_fixslicing:
 .endm
 
 .macro GIFT_KARR0 k0, t0, t1
+#if (GIFT_RV32_TYPE2)
+  gift.key.reorg \k0, \k0, 0
+#else
   GIFT_SPMV \k0, t0,  9, \t0, \t1
   GIFT_SPMV \k0, t1, 12, \t0, \t1
   GIFT_SPMV \k0, t2, 18, \t0, \t1
   GIFT_SPMV \k0, t3, 24, \t0, \t1
+#endif
 .endm
 
 .macro GIFT_KARR1 k0, t0, t1
+#if (GIFT_RV32_TYPE2)
+  gift.key.reorg \k0, \k0, 1
+#else
   GIFT_SPMV \k0, t0,  3, \t0, \t1
   GIFT_SPMV \k0, t1,  6, \t0, \t1
   GIFT_SPMV \k0, t2, 12, \t0, \t1
   GIFT_SPMV \k0, t3, 24, \t0, \t1
+#endif
 .endm
 
 .macro GIFT_KARR2 k0, t0, t1
+#if (GIFT_RV32_TYPE2)
+  gift.key.reorg \k0, \k0, 2
+#else
   GIFT_SPMV \k0, t0, 15, \t0, \t1
   GIFT_SPMV \k0, t1, 18, \t0, \t1
   GIFT_SPMV \k0, t2, 12, \t0, \t1
   GIFT_SPMV \k0, t3, 24, \t0, \t1
+#endif
 .endm
 
 .macro GIFT_KARR3 k0, t0, t1
+#if (GIFT_RV32_TYPE2)
+  gift.key.reorg \k0, \k0, 3
+#else
   GIFT_SPMV \k0, t0,  3, \t0, \t1
   GIFT_SPMV \k0, t1,  6, \t0, \t1
   GIFT_SPMV \k0, t2, 12, \t0, \t1
   GIFT_SPMV \k0, t3, 24, \t0, \t1
+#endif
 .endm
 
 .macro GIFT_KTPL0 k0, m0, m1, t0
@@ -350,6 +411,9 @@ giftb128_fixslicing:
 .endm
 
 .macro GIFT_KDBL1 k0, m0, m1, m2, t0, t1, imm
+# #if (GIFT_RV32_TYPE2)
+#   gift.key.updfix \k0, \k0, 2
+# #else
   srli \t0, \k0, 4
   and  \t0, \t0, \m0
   and  \t1, \k0, \m0
@@ -361,6 +425,7 @@ giftb128_fixslicing:
   and  \t1, \k0, \m2
   slli \t1, \t1, 2
   or   \k0, \t0, \t1
+# # endif
   sw   \k0, \imm(a0)
 .endm
 
@@ -380,11 +445,15 @@ giftb128_fixslicing:
 .endm
 
 .macro GIFT_KDBL2 k0, m0, m1, t0, imm
+# #if (GIFT_RV32_TYPE2)
+#   gift.key.updfix \k0, \k0, 4
+# #else
   and  \t0, \k0, \m0
   and  \k0, \k0, \m1
   rori \t0, \t0, 24
   rori \k0, \k0, 16
   or   \k0, \k0, \t0
+# # endif
   sw   \k0, \imm(a0)
 .endm
 
@@ -567,22 +636,37 @@ precompute_rkeys:
   li   t4, 0xcccccccc
   lw   a4, 0(a0)
   lw   a5, 4(a0)
+# #if (GIFT_RV32_TYPE2)  
+#   gift.key.updfix a5, a5, 0
+#   gift.key.updfix a4, a4, 1
+# #else  
   GIFT_SPMV  a5, t0, 16, t5, t6
   GIFT_SPMV  a5, t1,  1, t5, t6
   GIFT_KTPL0 a4, t3, t4, t5
   GIFT_SPMV  a4, t2,  1, t5, t6
+# #endif
   sw   a5, 80(a0)
   sw   a4, 84(a0)
+# #if (GIFT_RV32_TYPE2)  
+#   gift.key.updfix a4, a4, 0
+#   gift.key.updfix a5, a5, 1
+# #else 
   GIFT_SPMV  a4, t0, 16, t5, t6
   GIFT_SPMV  a4, t1,  1, t5, t6
   GIFT_KTPL0 a5, t3, t4, t5
   GIFT_SPMV  a5, t2,  1, t5, t6
+# #endif
   sw   a4, 160(a0)
   sw   a5, 164(a0)
+# #if (GIFT_RV32_TYPE2)  
+#   gift.key.updfix a5, a5, 0
+#   gift.key.updfix a4, a4, 1
+# #else  
   GIFT_SPMV  a5, t0, 16, t5, t6
   GIFT_SPMV  a5, t1,  1, t5, t6
   GIFT_KTPL0 a4, t3, t4, t5
   GIFT_SPMV  a4, t2,  1, t5, t6
+# #endif  
   sw   a5, 240(a0)
   sw   a4, 244(a0)
   lw   a4, 40(a0)
