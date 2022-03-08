@@ -83,16 +83,16 @@
 // swapmove32
 
 .macro GIFT_SPMV s0, m0, imm, t0, t1
-# # if (GIFT_RV32_TYPE2)
-#   gift.swapmove \s0, \m0, \imm
-# #else
+# if (GIFT_RV32_TYPE2)
+  gift.swapmove \s0, \s0, \m0, \imm
+#else
   srli \t0, \s0, \imm
   xor  \t0, \s0, \t0
   and  \t0, \t0, \m0
   slli \t1, \t0, \imm
   xor  \t0, \t0, \t1
   xor  \s0, \t0, \s0
-# #endif 
+#endif 
 .endm
 
 
@@ -411,9 +411,9 @@ giftb128_fixslicing:
 .endm
 
 .macro GIFT_KDBL1 k0, m0, m1, m2, t0, t1, imm
-# #if (GIFT_RV32_TYPE2)
-#   gift.key.updfix \k0, \k0, 2
-# #else
+#if (GIFT_RV32_TYPE2)
+  gift.key.updfix \k0, \k0, 2
+#else
   srli \t0, \k0, 4
   and  \t0, \t0, \m0
   and  \t1, \k0, \m0
@@ -425,7 +425,7 @@ giftb128_fixslicing:
   and  \t1, \k0, \m2
   slli \t1, \t1, 2
   or   \k0, \t0, \t1
-# # endif
+# endif
   sw   \k0, \imm(a0)
 .endm
 
@@ -445,15 +445,15 @@ giftb128_fixslicing:
 .endm
 
 .macro GIFT_KDBL2 k0, m0, m1, t0, imm
-# #if (GIFT_RV32_TYPE2)
-#   gift.key.updfix \k0, \k0, 4
-# #else
+#if (GIFT_RV32_TYPE2)
+  gift.key.updfix \k0, \k0, 4
+#else
   and  \t0, \k0, \m0
   and  \k0, \k0, \m1
   rori \t0, \t0, 24
   rori \k0, \k0, 16
   or   \k0, \k0, \t0
-# # endif
+# endif
   sw   \k0, \imm(a0)
 .endm
 
@@ -636,37 +636,37 @@ precompute_rkeys:
   li   t4, 0xcccccccc
   lw   a4, 0(a0)
   lw   a5, 4(a0)
-# #if (GIFT_RV32_TYPE2)  
-#   gift.key.updfix a5, a5, 0
-#   gift.key.updfix a4, a4, 1
-# #else  
+#if (GIFT_RV32_TYPE2)  
+  gift.key.updfix a5, a5, 0
+  gift.key.updfix a4, a4, 1
+#else  
   GIFT_SPMV  a5, t0, 16, t5, t6
   GIFT_SPMV  a5, t1,  1, t5, t6
   GIFT_KTPL0 a4, t3, t4, t5
   GIFT_SPMV  a4, t2,  1, t5, t6
-# #endif
+#endif
   sw   a5, 80(a0)
   sw   a4, 84(a0)
-# #if (GIFT_RV32_TYPE2)  
-#   gift.key.updfix a4, a4, 0
-#   gift.key.updfix a5, a5, 1
-# #else 
+#if (GIFT_RV32_TYPE2)  
+  gift.key.updfix a4, a4, 0
+  gift.key.updfix a5, a5, 1
+#else 
   GIFT_SPMV  a4, t0, 16, t5, t6
   GIFT_SPMV  a4, t1,  1, t5, t6
   GIFT_KTPL0 a5, t3, t4, t5
   GIFT_SPMV  a5, t2,  1, t5, t6
-# #endif
+#endif
   sw   a4, 160(a0)
   sw   a5, 164(a0)
-# #if (GIFT_RV32_TYPE2)  
-#   gift.key.updfix a5, a5, 0
-#   gift.key.updfix a4, a4, 1
-# #else  
+#if (GIFT_RV32_TYPE2)  
+  gift.key.updfix a5, a5, 0
+  gift.key.updfix a4, a4, 1
+#else  
   GIFT_SPMV  a5, t0, 16, t5, t6
   GIFT_SPMV  a5, t1,  1, t5, t6
   GIFT_KTPL0 a4, t3, t4, t5
   GIFT_SPMV  a4, t2,  1, t5, t6
-# #endif  
+ #endif  
   sw   a5, 240(a0)
   sw   a4, 244(a0)
   lw   a4, 40(a0)
