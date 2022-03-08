@@ -112,6 +112,7 @@ The Ascon linear layer is described in [Sec. 2.6.3, 1] in terms of
 [1] C. Dobraunig, M. Eichlseder, F. Mendel, and M. Schläffer.
     [Ascon](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/ascon-spec-final.pdf).
     Submission to NIST (version 1.2), 2021.
+    
 [2] L. Jellema
     [Optimizing Ascon on RISC-V](http://www.cs.ru.nl/bachelors-theses/2019/Lars_Jellema___4388747___Optimizing_Ascon_on_RISC-V.pdf).
     BSc Thesis, Radboud University, 2019.
