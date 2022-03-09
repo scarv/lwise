@@ -30,13 +30,13 @@
 .insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_15  0x0000707B
 .endm                                              //                         => #define  MASK_JAMBU_FSR_15  0xFE00707F
 .macro jambu.fsr.6          rd, rs1, rs2           // jambu.fsr.6             => 0000 001r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_6   0x0200707B
+.insn r CUSTOM_3, 7,      ( 1* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_6   0x0200707B
 .endm                                              //                         => #define  MASK_JAMBU_FSR_6   0xFE00707F
 .macro jambu.fsr.21         rd, rs1, rs2           // jambu.fsr.21            => 0000 010r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_21  0x0400707B
+.insn r CUSTOM_3, 7,      ( 2* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_21  0x0400707B
 .endm                                              //                         => #define  MASK_JAMBU_FSR_21  0xFE00707F
 .macro jambu.fsr.27         rd, rs1, rs2           // jambu.fsr.27            => 0000 011r rrrr rrrr r111 rrrr r111 1011
-.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_27  0x0600707B
+.insn r CUSTOM_3, 7,      ( 3* 1), \rd, \rs1, \rs2 //                         => #define MATCH_JAMBU_FSR_27  0x0600707B
 .endm                                              //                         => #define  MASK_JAMBU_FSR_27  0xFE00707F
 
 .macro jambu.block.0        rd, rs1, rs2           // jambu.block.0           => 0100 000r rrrr rrrr r111 rrrr r111 1011
