@@ -37,7 +37,7 @@
 .endm
 
 
-// load state + store state: four 40-bit limbs 
+// load state + store state
 
 .macro SPONGENT_LDSTATE s0, s1, s2, s3, s4
   lw   \s0,  0(a0)

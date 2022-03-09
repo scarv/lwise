@@ -76,8 +76,8 @@
   xor  \t0, \x0, \x4    // t0 = x0 ^ x4
   xor  \t1, \x3, \x4    // t1 = x3 ^ x4 
 
-  orn  \x2, \x3, \x4    // x2 = x3 ^ ~x4
-  xor  \x2, \x2, \t2    // x2 = x1 ^ x2 ^ (x3 ^ ~x4)
+  orn  \x2, \x3, \x4    // x2 = x3 | ~x4
+  xor  \x2, \x2, \t2    // x2 = x1 ^ x2 ^ (x3 | ~x4)
 
   andn \x4, \x1, \t0    // x4 = x1 & ~(x0 ^ x4)
   xor  \x4, \x4, \t1    // x4 = x3 ^ x4 ^ (x1 & ~(x0 ^ x4))
@@ -100,8 +100,8 @@
   xor  \t1, \x3, \x4    // t1 = x3 ^ x4 
 
   not  \x4, \x4         // x4 = ~x4
-  or   \x2, \x3, \x4    // x2 = x3 ^ ~x4
-  xor  \x2, \x2, \t2    // x2 = x1 ^ x2 ^ (x3 ^ ~x4)
+  or   \x2, \x3, \x4    // x2 = x3 | ~x4
+  xor  \x2, \x2, \t2    // x2 = x1 ^ x2 ^ (x3 | ~x4)
 
   not  \x4, \t0         // x4 = ~(x0 ^ x4)
   and  \x4, \x1, \x4    // x4 = x1 & ~(x0 ^ x4)

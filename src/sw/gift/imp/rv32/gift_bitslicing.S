@@ -106,7 +106,7 @@
 
 // The resulting 32-bit state word is the same one needed by s3 (Table 2.2 in 
 // the GIFT-COFB spec).
-// For s0, s1, s2, just rotating the resulting state word to right with the 
+// For s0, s1, s2, just rotate the resulting state word to right with the 
 // corresponding offset.
 
 .macro GIFT_PERMBITS_STEP s0
