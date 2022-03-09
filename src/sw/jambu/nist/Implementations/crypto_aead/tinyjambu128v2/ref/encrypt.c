@@ -17,6 +17,7 @@
 #define NROUND1 128*5 
 #define NROUND2 128*8 
 
+#if !defined(LWISE)
 /*no-optimized date update function*/    
 void state_update(unsigned int *state, const unsigned char *key, unsigned int number_of_steps) 
 {
@@ -34,6 +35,9 @@ void state_update(unsigned int *state, const unsigned char *key, unsigned int nu
                 state[3] = feedback ;
         }
 }
+#else 
+extern void state_update(void *state, const void *key, unsigned int number_of_steps);
+#endif
 
 // The initialization  
 /* The input to initialization is the 128-bit key; 96-bit IV;*/
