@@ -6,9 +6,12 @@
 // Register Allocation
 // (Use caller-saved registers to save push/pop instructions)  
 //
-// a2~a5: state
-// t0~t4: tmp registers
-// a6, a7, t5, t6: key 
+// a3, a4, a5, a6: state
+// a7, t5, t6, a1: key
+// t0-t4: temp registers 
+// a0: the address of state
+// a1: the address of key 
+// a2: the number of steps
 // ----------------------------------------------------------------------------
 
 // prologue + epilogue 
@@ -21,7 +24,7 @@
 .endm
 
 
-// load state + store state
+// load state/key + store state
 
 .macro JAMBU_LDSTATE addr, s0, s1, s2, s3
   lw   \s0,  0(\addr)
@@ -40,7 +43,7 @@
 
 // operations
 
-.macro JAMBU_STATEUPD_STEP0 r0, s0, s1, t0
+.macro JAMBU_ROUND_STEP0 r0, s0, s1, t0
 #if   (JAMBU_RV32_TYPE2)
   jambu.fsri   \r0, \s0, \s1, 15
 #elif (JAMBU_RV32_TYPE3)
@@ -52,8 +55,8 @@
 #endif  
 .endm
 
-.macro JAMBU_STATEUPD_STEP1 r0, s0, s1, t0
-#if (JAMBU_RV32_TYPE2)
+.macro JAMBU_ROUND_STEP1 r0, s0, s1, t0
+#if   (JAMBU_RV32_TYPE2)
   jambu.fsri   \r0, \s0, \s1, 6
 #elif (JAMBU_RV32_TYPE3)
   jambu.fsr.6  \r0, \s0, \s1
@@ -64,7 +67,7 @@
 #endif  
 .endm
 
-.macro JAMBU_STATEUPD_STEP2 r0, s0, s1, t0
+.macro JAMBU_ROUND_STEP2 r0, s0, s1, t0
 #if   (JAMBU_RV32_TYPE2)
   jambu.fsri   \r0, \s0, \s1, 21
 #elif (JAMBU_RV32_TYPE3)
@@ -76,7 +79,7 @@
 #endif  
 .endm
 
-.macro JAMBU_STATEUPD_STEP3 r0, s0, s1, t0
+.macro JAMBU_ROUND_STEP3 r0, s0, s1, t0
 #if   (JAMBU_RV32_TYPE2)
   jambu.fsri   \r0, \s0, \s1, 27
 # elif (JAMBU_RV32_TYPE3)
@@ -88,7 +91,7 @@
 #endif  
 .endm
 
-.macro JAMBU_STATEUPD_STEP4 s0, k0, t1, t2, t3, t4
+.macro JAMBU_ROUND_STEP4 s0, k0, t1, t2, t3, t4
   and  \t2, \t2, \t3
   xnor \t2, \t1, \t2
   xor  \t2, \t2, \t4
@@ -100,11 +103,11 @@
 // operations in each round
 
 .macro JMABU_ROUND s0, s1, s2, s3, k0, t1, t2, t3, t4, t5 
-  JAMBU_STATEUPD_STEP0 \t1, \s1, \s2, \t5
-  JAMBU_STATEUPD_STEP1 \t2, \s2, \s3, \t5
-  JAMBU_STATEUPD_STEP2 \t3, \s2, \s3, \t5
-  JAMBU_STATEUPD_STEP3 \t4, \s2, \s3, \t5
-  JAMBU_STATEUPD_STEP4 \s0, \k0, \t1, \t2, \t3, \t4
+  JAMBU_ROUND_STEP0 \t1, \s1, \s2, \t5
+  JAMBU_ROUND_STEP1 \t2, \s2, \s3, \t5
+  JAMBU_ROUND_STEP2 \t3, \s2, \s3, \t5
+  JAMBU_ROUND_STEP3 \t4, \s2, \s3, \t5
+  JAMBU_ROUND_STEP4 \s0, \k0, \t1, \t2, \t3, \t4
 .endm
 
 
