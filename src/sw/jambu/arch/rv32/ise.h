@@ -16,7 +16,7 @@
 
 #if ( JAMBU_RV32_TYPE3 )
 .macro jambu.fsr.15         rd, rs1, rs2
-.insn r CUSTOM_3, 7,      ( 0*32), \rd, \rs1, \rs2
+.insn r CUSTOM_3, 7,      ( 0* 1), \rd, \rs1, \rs2
 .endm
 .macro jambu.fsr.6          rd, rs1, rs2
 .insn r CUSTOM_3, 7,      ( 1* 1), \rd, \rs1, \rs2
