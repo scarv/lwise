@@ -49,6 +49,9 @@ static const uint8_t RC[] = {
 // bit[15: 8]  30 26 22 18 14 10  6  2 
 // bit[ 7: 0]  31 27 23 19 15 11  7  3 
 
+// This step1 in rv32 assembler can be easily implemented with "unzip" and "rev8" 
+// instructions from ZBKB.
+
 #define pLayer_STEP1(x)     {      \
   SWAPMOVE32(x, 0x0A0A0A0AUL,  3); \
   SWAPMOVE32(x, 0x00CC00CCUL,  6); \
@@ -67,10 +70,10 @@ void Spongent160_4x40b(void *state)
   int i;
 
   // The state is in four 40-bit slices (each slice is composed of two uint32_t words). 
-  // s1 | s0:  39  38  ...  33  32 |  31  30  ...   1   0
-  // s3 | s2:  79  78  ...  73  72 |  71  70  ...  41  40
-  // s5 | s4: 119 118  ... 113 112 | 111 110  ...  81  80
-  // s7 | s6: 159 158  ... 153 152 | 151 150  ... 121 120
+  // s1 | s0:  39  38  ...  33  32 |  31  30  ... ...   1   0
+  // s3 | s2:  79  78  ...  73  72 |  71  70  ... ...  41  40
+  // s5 | s4: 119 118  ... 113 112 | 111 110  ... ...  81  80
+  // s7 | s6: 159 158  ... 153 152 | 151 150  ... ... 121 120
 
   memcpy(&s[0], state,    5);
   memcpy(&s[2], state+5,  5);
@@ -99,7 +102,7 @@ void Spongent160_4x40b(void *state)
     // s5 | s4: 119 118  ... 113 112 | 111 110  ... ...  81  80
     // s7 | s6: 159 158  ... 153 152 | 151 150  ... ... 121 120
     
-    // from the above form to the below form
+    // from the form above to the form below
     
     // s1 | s0: 156 152  ... 132 128 | 124 120  ... ...   4   0
     // s3 | s2: 157 153  ... 133 129 | 125 121  ... ...   5   1
