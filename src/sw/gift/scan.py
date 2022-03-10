@@ -15,11 +15,8 @@ def rv32( args ) :
     driver.run( args, 'gift', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
 
   for TYPE in [ 'GIFT_RV32_TYPE1', 'GIFT_RV32_TYPE2' ] :
-    for UNROLL in [ False, True ] :
-      CONF = [ TYPE ]
-
-      if ( UNROLL ) :
-        CONF += [ 'GIFT_UNROLL' ]
+    for METHOD in [ 'GIFT_FIXSLICING', 'GIFT_BITSLICING' ] :
+      CONF = [ TYPE, METHOD ]
   
       driver.run( args, 'gift', CONF, 'rv32', 'rv32' )
 

@@ -7,11 +7,11 @@
 // Register Allocation
 // (Use caller-saved registers to save push/pop instructions)  
 //
-// a3~a6: cipher state
-// t2~t6: key state
-// t1: tmp register
-// t0, s0~s3: masks
-// a0, a1, a2: the address of plaintext, key, ciphertext, respectively 
+// a3-a6:      cipher state 
+// t2-t6:      key state
+// t1:         temp register
+// t0, s0-s3:  masks
+// a0, a1, a2: the address of plaintext, key, ciphertext resp.
 // ----------------------------------------------------------------------------
 
 
