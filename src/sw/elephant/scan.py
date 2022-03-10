@@ -14,12 +14,9 @@ def rv32( args ) :
 
     driver.run( args, 'elephant', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
 
-  for TYPE in [ 'ELEPHANT_RV32_TYPE1', 'ELEPHANT_RV32_TYPE2' ] :
-    for UNROLL in [ False, True ] :
-      CONF = [ TYPE ]
-
-      if ( UNROLL ) :
-        CONF += [ 'ELEPHANT_UNROLL' ]
+  for TYPE in [ 'ELEPHANT_RV32_TYPE1', 'ELEPHANT_RV32_TYPE2', 'ELEPHANT_RV32_TYPE3' ] :
+    for STATE in [ 'ELEPHANT_STATE_4X40B', 'ELEPHANT_STATE_5X32B' ] :
+      CONF = [TYPE, STATE]
   
       driver.run( args, 'elephant', CONF, 'rv32', 'rv32' )
 
