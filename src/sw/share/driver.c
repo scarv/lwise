@@ -6,7 +6,7 @@
  */
 
 #include "driver.h"
-
+#include "lwc_kernels.h"
 // ============================================================================
 
 void parse_bytes( uint8_t* r, char* x, int n ) {
@@ -207,6 +207,10 @@ int main( int argc, char* argv[] ) {
   printf( "++ time : decrypt\n" );
   time_decrypt();
   printf( "-- time : decrypt\n" );
+
+  printf( "++ time : kernel\n" );
+  time_kernel();
+  printf( "-- time : kernel\n" );
 
   rand_bytes_fini();
 
