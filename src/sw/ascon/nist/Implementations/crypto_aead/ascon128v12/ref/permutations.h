@@ -109,18 +109,8 @@ static inline void P6(state_t* s) {
 }
 
 #else
-extern void Ascon_Permute_6rounds(void * state);
-extern void Ascon_Permute_12rounds(void * state);
-
-static inline void P12(void* s)
-{
-  Ascon_Permute_12rounds(s);
-}
-
-static inline void P6(void* s)
-{
-  Ascon_Permute_6rounds(s);
-}
+extern void P6(void * state);
+extern void P12(void * state);
 #endif
 
 #endif /* PERMUTATIONS_H_ */

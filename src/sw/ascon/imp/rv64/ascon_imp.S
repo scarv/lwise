@@ -6,8 +6,8 @@
 // Register Allocation
 // (Use caller-saved registers to save push/pop instructions)  
 //
-// a2~a6: state
-// t0, t1, t6: tmp registers used in ASCON_ROUND
+// a2-a6:      state
+// t0, t1, t6: temp registers
 // ----------------------------------------------------------------------------
 
 // prologue + epilogue 
@@ -141,9 +141,9 @@
 
 .section .text
 
-.global Ascon_Permute_6rounds
+.global P6
 
-Ascon_Permute_6rounds:
+P6:
   ASCON_PROLOGUE
   ASCON_LDSTATE a2, a3, a4, a5, a6
   //
@@ -160,9 +160,9 @@ Ascon_Permute_6rounds:
 
 .section .text
 
-.global Ascon_Permute_12rounds
+.global P12
 
-Ascon_Permute_12rounds:
+P12:
   ASCON_PROLOGUE
   ASCON_LDSTATE a2, a3, a4, a5, a6
   //
