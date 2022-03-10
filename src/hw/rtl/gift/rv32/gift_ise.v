@@ -1,4 +1,4 @@
-module gift_cofb_ise(
+module gift_ise(
 input  wire [31:0]  rs1,
 input  wire [31:0]  rs2,
 input  wire [ 4:0]  imm,
@@ -7,10 +7,14 @@ input  wire         op_swapmove,
 input  wire         op_keyupdate, 
 input  wire         op_keyarrange,
 input  wire         op_fskeyupdate, //FixslicedKeyUpdate
+input  wire         op_rori_n,      //used in Fixsliced
+input  wire         op_rori_b,      //used in Fixsliced
+input  wire         op_rori_h,      //used in Fixsliced
+
 
 output wire [31:0]  rd
 );
-parameter [0:0] FIXSLICE = 1'b0;
+parameter [0:0] FIXSLICE = 1'b1;
 
 `define rotmsk( x, A, M )    ({ x[ A-1:0], x[31: A] } & M)                  //right rotation and mask
 `define mskshl( x, A, M )    ({ x[31-A:0],{A{ 1'b0}}} &(M<<A))
@@ -31,8 +35,24 @@ parameter [0:0] FIXSLICE = 1'b0;
         wire [31:0] l2``l = ({32{imm[1]}} & {l1``l[29:0],  2'd0 }) | ({32{!imm[1]}} & l1``l[31:0]); \
         wire [31:0] l1``l = ({32{imm[0]}} & {l0``l[30:0],  1'd0 }) | ({32{!imm[0]}} & l0``l[31:0]); \
         wire [31:0] l0``l = x
+
 `define swapmv(x, xshf, msk, t, tshf)   (x ^ tshf  ^ t); \
-                        assign  t     = (x ^ xshf) & msk
+        assign  t     = (x ^ xshf) & msk
+
+`define rori4( x,imm,n,l)   ({ 4{imm[1]}} & {l1``l[ 1:0], l1``l[ 3: 2]}) | ({ 4{!imm[1]}} & l1``l[ 3:0]); \
+        wire [ 3:0] l1``l = ({ 4{imm[0]}} & {l0``l[   0], l0``l[ 3: 1]}) | ({ 4{!imm[0]}} & l0``l[ 3:0]); \
+        wire [31:0] l0``l = x[ 4*n +:4]  
+                
+`define rori8( x,imm,n,l)   ({ 8{imm[2]}} & {l2``l[ 3:0], l2``l[ 7: 4]}) | ({ 8{!imm[2]}} & l2``l[ 7:0]); \
+        wire [ 7:0] l2``l = ({ 8{imm[1]}} & {l1``l[ 1:0], l1``l[ 7: 2]}) | ({ 8{!imm[1]}} & l1``l[ 7:0]); \
+        wire [ 7:0] l1``l = ({ 8{imm[0]}} & {l0``l[   0], l0``l[ 7: 1]}) | ({ 8{!imm[0]}} & l0``l[ 7:0]); \
+        wire [31:0] l0``l = x[ 8*n +:8]  
+                
+`define rori16(x,imm,n,l)   ({16{imm[3]}} & {l4``l[ 7:0], l4``l[15: 8]}) | ({16{!imm[3]}} & l4``l[15:0]); \
+        wire [15:0] l4``l = ({16{imm[2]}} & {l2``l[ 3:0], l2``l[15: 4]}) | ({16{!imm[2]}} & l2``l[15:0]); \
+        wire [15:0] l2``l = ({16{imm[1]}} & {l1``l[ 1:0], l1``l[15: 2]}) | ({16{!imm[1]}} & l1``l[15:0]); \
+        wire [15:0] l1``l = ({16{imm[0]}} & {l0``l[   0], l0``l[15: 1]}) | ({16{!imm[0]}} & l0``l[15:0]); \
+        wire [15:0] l0``l = x[16*n +:16]
 
 wire [31:0] rt1;
 wire [31:0] rs1_rsh   = `rsh(rs1, imm, rsh0);
@@ -68,6 +88,10 @@ wire [31:0]  ka32 = `swapmvc(ka31, 12, 32'h0000f0f0, _ka32);
 wire [31:0]  ka3  = `swapmvc(ka32, 24, 32'h000000ff, _ka33);
 
 wire [31:0] fskeyupdate;
+wire [31:0] rori_h;
+wire [31:0] rori_b;
+wire [31:0] rori_n;
+
 generate 
     if (FIXSLICE[0] == 1'b1) begin :                                                      FIXSLICE_IMP
 wire     fskeyupdate_0 = op_fskeyupdate && (imm == 0);  
@@ -82,7 +106,7 @@ wire     fskeyupdate_8 = op_fskeyupdate && (imm == 8);
 wire     fskeyupdate_9 = op_fskeyupdate && (imm == 9);  
 
 wire [31:0]        rt0 = `swapmvc(rs1, 16, 32'h00003333, _rt0);
-wire [31:0] fs_upkey_0 = `swapmvc(rs1,  1, 32'h55554444, _fs0);
+wire [31:0] fs_upkey_0 = `swapmvc(rt0,  1, 32'h55554444, _fs0);
 
 wire [31:0]        rt2 = `rotmsk(rs1, 24, 32'h33333333) | `rotmsk(rs1, 16, 32'hcccccccc); 
 wire [31:0] fs_upkey_1 = `swapmvc(rt2,  1, 32'h55551100, _fs1);
@@ -110,9 +134,6 @@ wire [31:0] fs_upkey_8 = `shrmsk(rs1,  4, 32'h0fff0000) | `mskshl(rs1, 12, 32'h0
 wire [31:0] fs_upkey_9 = `shrmsk(rs1,  6, 32'h03ff0000) | `mskshl(rs1, 10, 32'h003f0000) |
                          `shrmsk(rs1,  4, 32'h00000fff) | `mskshl(rs1, 12, 32'h0000000f) ;
 
-wire [31:0] keyupdate  = `shrmsk(rs1, 12, 32'h0000000f) | `mskshl(rs1,  4, 32'h00000fff) |
-                         `shrmsk(rs1,  2, 32'h3fff0000) | `mskshl(rs1, 14, 32'h00030000) ;
-
 assign fskeyupdate = {32{ fskeyupdate_0 }} & fs_upkey_0 |
                      {32{ fskeyupdate_1 }} & fs_upkey_1 |
                      {32{ fskeyupdate_2 }} & fs_upkey_2 |
@@ -123,17 +144,41 @@ assign fskeyupdate = {32{ fskeyupdate_0 }} & fs_upkey_0 |
                      {32{ fskeyupdate_7 }} & fs_upkey_7 |
                      {32{ fskeyupdate_8 }} & fs_upkey_8 |
                      {32{ fskeyupdate_9 }} & fs_upkey_9 ;
+
+assign        rori_h[1*16+:16] = `rori16(rs1, imm, 1, i16_1);
+assign        rori_h[0   +:16] = `rori16(rs1, imm, 0, i16_0);
+
+assign        rori_b[3*8 +: 8] = `rori8( rs1, imm, 3, i8_3 );
+assign        rori_b[2*8 +: 8] = `rori8( rs1, imm, 2, i8_2 );
+assign        rori_b[1*8 +: 8] = `rori8( rs1, imm, 1, i8_1 );
+assign        rori_b[0   +: 8] = `rori8( rs1, imm, 0, i8_0 );
+
+assign        rori_n[7*4 +: 4] = `rori4( rs1, imm, 7, i4_7 );
+assign        rori_n[6*4 +: 4] = `rori4( rs1, imm, 6, i4_6 );
+assign        rori_n[5*4 +: 4] = `rori4( rs1, imm, 5, i4_5 );
+assign        rori_n[4*4 +: 4] = `rori4( rs1, imm, 4, i4_4 );
+assign        rori_n[3*4 +: 4] = `rori4( rs1, imm, 3, i4_3 );
+assign        rori_n[2*4 +: 4] = `rori4( rs1, imm, 2, i4_2 );
+assign        rori_n[1*4 +: 4] = `rori4( rs1, imm, 1, i4_1 );
+assign        rori_n[0   +: 4] = `rori4( rs1, imm, 0, i4_0 );
+
 end else begin       :                                                                      No_FIXSLICE
-assign fskeyupdate =  32'd0;  
+assign fskeyupdate = 32'd0;  
+assign rori_h      = 32'd0;
+assign rori_b      = 32'd0;
+assign rori_n      = 32'd0;
 end
 endgenerate              
 
 assign        rd  = {32{op_swapmove   }} & swapmove    |
-                    {32{op_keyupdate  }} & keyupdate   |
-                    {32{op_fskeyupdate}} & fskeyupdate |
                     {32{keyarrange_0  }} & ka0         |
                     {32{keyarrange_1  }} & ka1         |
                     {32{keyarrange_2  }} & ka2         |
-                    {32{keyarrange_3  }} & ka3         ;   
+                    {32{keyarrange_3  }} & ka3         |
+                    {32{op_keyupdate  }} & keyupdate   |
+                    {32{op_fskeyupdate}} & fskeyupdate |
+                    {32{op_rori_n     }} & rori_n      |
+                    {32{op_rori_b     }} & rori_b      |
+                    {32{op_rori_h     }} & rori_h      ;   
 endmodule
 
