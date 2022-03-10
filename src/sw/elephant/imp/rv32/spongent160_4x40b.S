@@ -7,27 +7,24 @@
 // Register Allocation
 // (Use caller-saved registers to save push/pop instructions)  
 //
-// s0~s7: state
-// t0, a1~a7: tmp state
-// t5, t6: tmp registers  
-// a0: the address of state
+// s0, a1-a7:    state
+// t0-t4, s1-s3: temp state 
+// t5, t6:       temp state
+// s4, s5:       masks
+// a0:           the address of state
 // ----------------------------------------------------------------------------
 
 
 // prologue + epilogue 
 
 .macro SPONGENT_PROLOGUE
-  addi sp, sp, -40
+  addi sp, sp, -24
   sw   s0,  0(sp)
   sw   s1,  4(sp)
   sw   s2,  8(sp)
   sw   s3, 12(sp)
   sw   s4, 16(sp)
   sw   s5, 20(sp)
-  sw   s6, 24(sp)
-  sw   s7, 28(sp)
-  sw   s8, 32(sp)
-  sw   s9, 36(sp)
 .endm
 
 .macro SPONGENT_EPILOGUE
@@ -37,11 +34,7 @@
   lw   s3, 12(sp)
   lw   s4, 16(sp)
   lw   s5, 20(sp)
-  lw   s6, 24(sp)
-  lw   s7, 28(sp)
-  lw   s8, 32(sp)
-  lw   s9, 36(sp)
-  addi sp, sp, 40 
+  addi sp, sp, 24 
   ret
 .endm
 
@@ -133,7 +126,7 @@
 #if (ELEPHANT_RV32_TYPE1)
 .macro BUP r0, s0, t0, imm0, imm1 
   slli \r0, \s0, \imm0  
-  slli \t0,  s8, \imm1
+  slli \t0,  s5, \imm1
   and  \r0, \r0, \t0
 .endm
 
@@ -205,22 +198,6 @@
   BUPD \r1, \s7, \pos, 6           
 .endm
 #endif 
-
-# .macro SPONGENT_SWAPMOVE32 s0, mask, imm, t0, t1
-#   srli \t0, \s0, \imm
-#   xor  \t0, \s0, \t0
-#   and  \t0, \t0, \mask
-#   slli \t1, \t0, \imm
-#   xor  \t0, \t0, \t1
-#   xor  \s0, \t0, \s0
-# .endm
-
-# .macro SPONGENT_PL_STEP1 s0, t0, t1
-#   SPONGENT_SWAPMOVE32 \s0, t1,  3, \t0, \t1
-#   SPONGENT_SWAPMOVE32 \s0, t2,  6, \t0, \t1
-#   SPONGENT_SWAPMOVE32 \s0, t3, 12, \t0, \t1
-#   SPONGENT_SWAPMOVE32 \s0, t4, 24, \t0, \t1
-# .endm
 
 // This step1 can be easily implemented with "unzip" and "rev8" instructions 
 // from ZBKB.
@@ -345,7 +322,7 @@
   srli \s4, \s4, 8
   SPONGENT_BSLLXOR \r0, \r0, \s4, 20, \t0
 
-  and  \t1, \s6, s9
+  and  \t1, \s6, s4
   SPONGENT_BSLLXOR \r6, \r6, \s6, 30, \t0
   srli \s6, \s6, 8
   SPONGENT_BSLLXOR \r4, \r4, \s6, 30, \t0
@@ -385,7 +362,7 @@
   elephant.pstep2.0  \r6, \r6, \s6, 30
 
   srli \s6, \s6, 2
-  and  \s6, \s6, s9
+  and  \s6, \s6, s4
   elephant.pstep2.24 \r1, \r1, \s6, 0 
   elephant.pstep2.16 \r3, \r3, \s6, 0 
   elephant.pstep2.8  \r5, \r5, \s6, 0 
@@ -412,117 +389,115 @@
 
 Spongent160_4x40b:
   SPONGENT_PROLOGUE
-  SPONGENT_LDSTATE  s0, s1, s2, s3, s4, s5, s6, s7
-  li t1, 0x0A0A0A0A
-  li t2, 0x00CC00CC
-  li t3, 0x0000F0F0
-  li t4, 0x000000FF
-  li s8, 1
-#if   (ELEPHANT_RV32_TYPE2)
-  li s9, 0xFCFCFCFC
+  SPONGENT_LDSTATE  s0, a1, a2, a3, a4, a5, a6, a7
+#if   (ELEPHANT_RV32_TYPE1)|(ELEPHANT_RV32_TYPE2)
+  li s4, 0xFCFCFCFC
 #elif (ELEPHANT_RV32_TYPE3)
-  li s9, 0x3F3F3F3F
+  li s4, 0x3F3F3F3F
 #endif 
+#if   (ELEPHANT_RV32_TYPE1)
+  li s5, 1
+#endif
   //
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x75, 0xae, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x6a, 0x56, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x54, 0x2a, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x29, 0x94, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x75, 0xae, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x6a, 0x56, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x54, 0x2a, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x29, 0x94, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x53, 0xca, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x27, 0xe4, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x4f, 0xf2, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x1f, 0xf8, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x53, 0xca, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x27, 0xe4, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x4f, 0xf2, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x1f, 0xf8, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x3e, 0x7c, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x7d, 0xbe, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x7a, 0x5e, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x74, 0x2e, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x3e, 0x7c, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x7d, 0xbe, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x7a, 0x5e, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x74, 0x2e, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x68, 0x16, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x50, 0x0a, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x21, 0x84, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x43, 0xc2, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x68, 0x16, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x50, 0x0a, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x21, 0x84, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x43, 0xc2, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x07, 0xe0, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x0e, 0x70, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x1c, 0x38, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x38, 0x1c, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x07, 0xe0, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x0e, 0x70, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x1c, 0x38, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x38, 0x1c, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x71, 0x8e, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x62, 0x46, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x44, 0x22, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x09, 0x90, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x71, 0x8e, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x62, 0x46, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x44, 0x22, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x09, 0x90, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x12, 0x48, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x24, 0x24, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x49, 0x92, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x13, 0xc8, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x12, 0x48, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x24, 0x24, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x49, 0x92, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x13, 0xc8, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x26, 0x64, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x4d, 0xb2, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x1b, 0xd8, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x36, 0x6c, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x26, 0x64, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x4d, 0xb2, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x1b, 0xd8, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x36, 0x6c, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x6d, 0xb6, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x5a, 0x5a, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x35, 0xac, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x6b, 0xd6, t5, t6  
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x6d, 0xb6, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x5a, 0x5a, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x35, 0xac, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x6b, 0xd6, t5, t6  
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x56, 0x6a, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x2d, 0xb4, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x5b, 0xda, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x37, 0xec, t5, t6  
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x56, 0x6a, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x2d, 0xb4, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x5b, 0xda, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x37, 0xec, t5, t6  
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x6f, 0xf6, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x5e, 0x7a, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x3d, 0xbc, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x7b, 0xde, t5, t6 
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x6f, 0xf6, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x5e, 0x7a, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x3d, 0xbc, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x7b, 0xde, t5, t6 
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x76, 0x6e, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x6c, 0x36, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x58, 0x1a, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x31, 0x8c, t5, t6 
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x76, 0x6e, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x6c, 0x36, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x58, 0x1a, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x31, 0x8c, t5, t6 
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x63, 0xc6, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x46, 0x62, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x0d, 0xb0, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x1a, 0x58, t5, t6  
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x63, 0xc6, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x46, 0x62, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x0d, 0xb0, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x1a, 0x58, t5, t6  
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x34, 0x2c, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x69, 0x96, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x52, 0x4a, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x25, 0xa4, t5, t6  
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x34, 0x2c, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x69, 0x96, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x52, 0x4a, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x25, 0xa4, t5, t6  
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x4b, 0xd2, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x17, 0xe8, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x2e, 0x74, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x5d, 0xba, t5, t6  
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x4b, 0xd2, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x17, 0xe8, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x2e, 0x74, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x5d, 0xba, t5, t6  
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x3b, 0xdc, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x77, 0xee, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x6e, 0x76, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x5c, 0x3a, t5, t6  
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x3b, 0xdc, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x77, 0xee, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x6e, 0x76, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x5c, 0x3a, t5, t6  
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x39, 0x9c, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x73, 0xce, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x66, 0x66, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x4c, 0x32, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x39, 0x9c, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x73, 0xce, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x66, 0x66, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x4c, 0x32, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x19, 0x98, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x32, 0x4c, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x65, 0xa6, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x4a, 0x52, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x19, 0x98, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x32, 0x4c, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x65, 0xa6, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x4a, 0x52, t5, t6
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x15, 0xa8, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x2a, 0x54, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x55, 0xaa, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x2b, 0xd4, t5, t6 
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x15, 0xa8, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x2a, 0x54, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x55, 0xaa, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x2b, 0xd4, t5, t6 
 
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x57, 0xea, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x2f, 0xf4, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x5f, 0xfa, t5, t6
-  SONPGENT_ROUND    s0, s1, s2, s3, s4, s5, s6, s7, t0, a1, a2, a3, a4, a5, a6, a7, 0x3f, 0xfc, t5, t6   
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x57, 0xea, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x2f, 0xf4, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x5f, 0xfa, t5, t6
+  SONPGENT_ROUND    s0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, t4, s1, s2, s3, 0x3f, 0xfc, t5, t6   
   //
-  SPONGENT_STSTATE  s0, s1, s2, s3, s4, s5, s6, s7
+  SPONGENT_STSTATE  s0, a1, a2, a3, a4, a5, a6, a7
   SPONGENT_EPILOGUE
