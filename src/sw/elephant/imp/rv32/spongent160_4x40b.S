@@ -9,7 +9,7 @@
 //
 // s0, a1-a7:    state
 // t0-t4, s1-s3: temp state 
-// t5, t6:       temp state
+// t5, t6:       temp registers
 // s4, s5:       masks
 // a0:           the address of state
 // ----------------------------------------------------------------------------
