@@ -348,6 +348,19 @@ index 00000000..093508c1
 +
 +  WRITE_REG( insn.rd(), r );
 +}
+diff --git a/riscv/insns/pack.h b/riscv/insns/pack.h
+index 2b09e7ed..bb22147f 100644
+--- a/riscv/insns/pack.h
++++ b/riscv/insns/pack.h
+@@ -2,7 +2,7 @@
+ require(((xlen == 32) && (insn.rs2() == 0) && p->extension_enabled(EXT_ZBB))
+   || p->extension_enabled(EXT_ZBKB)
+   || p->extension_enabled(EXT_XBITMANIP));
+-require(SHAMT < (xlen/2));
++//require(SHAMT < (xlen/2));
+ reg_t lo = zext_xlen(RS1 << (xlen/2)) >> (xlen/2);
+ reg_t hi = zext_xlen(RS2 << (xlen/2));
+ WRITE_RD(sext_xlen(lo | hi));
 diff --git a/riscv/riscv.mk.in b/riscv/riscv.mk.in
 index 9a6b118d..aa1f8ca5 100644
 --- a/riscv/riscv.mk.in
