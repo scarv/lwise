@@ -1,4 +1,4 @@
-# ISEs for NIST lightweight candidates
+# ISEs for NIST LWC submissions
 
 <!--- ==================================================================== --->
 
