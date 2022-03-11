@@ -10,7 +10,7 @@
 // a3-a6:      cipher state 
 // t2-t6:      key state
 // t1:         temp register
-// t0, s0-s3:  masks
+// t0:         constant
 // a0, a1, a2: the address of plaintext, key, ciphertext resp.
 // ----------------------------------------------------------------------------
 
@@ -18,19 +18,9 @@
 // prologue + epilogue 
 
 .macro GIFT_PROLOGUE
-  addi sp, sp, -16
-  sw   s0,  0(sp)
-  sw   s1,  4(sp)
-  sw   s2,  8(sp)
-  sw   s3, 12(sp)
 .endm
 
 .macro GIFT_EPILOGUE
-  lw   s0,  0(sp)
-  lw   s1,  4(sp)
-  lw   s2,  8(sp)
-  lw   s3, 12(sp)
-  addi sp, sp, 16 
   ret
 .endm
 
@@ -82,8 +72,8 @@
 .endm 
 
 // PermBits
-// The costly permutation operation can be easily optimized by "unzip" and "rev8" 
-// instructions from ZBKB.
+// The costly permutation operation can be easily implemented with "unzip" and 
+// "rev8" instructions from ZBKB.
 // NOTE: "unzip" is only available on rv32.
 
 // The 1st "unzip" permutes the 32-bit state word as follows: 
@@ -106,7 +96,7 @@
 
 // The resulting 32-bit state word is the same one needed by s3 (Table 2.2 in 
 // the GIFT-COFB spec).
-// For s0, s1, s2, just rotate the resulting state word to right with the 
+// For s0, s1, s2, just rotate resulting state word to the right with the 
 // corresponding offset.
 
 .macro GIFT_PERMBITS_STEP s0
@@ -144,49 +134,20 @@
 .endm  
 
 // Key state update
-// could be accelerated by "pack" and "rori" instructions as shown in the 
-// following comments. There are some issues when using "pack" instruction, which
-// needs to be fixed.
+// This halfword-wise rotation can be optimized with "pack" and "rori". 
 
 .macro GIFT_KEYSTUPD k3, k4, t0
 #if (GIFT_RV32_TYPE2)
   gift.key.updstd \k4, \k3 
-#else 
-  srli \k4, \k3, 12
-  and  \k4, \k4, s0
-
-  and  \t0, \k3, s1
-  slli \t0, \t0, 4
-  or   \k4, \k4, \t0
-  
-  srli \t0, \k3, 2
-  and  \t0, \t0, s2
-  or   \k4, \k4, \t0
-
-  and  \t0, \k3, s3
-  slli \t0, \t0, 14
-  or   \k4, \k4, \t0
+#else                           // k3 = W6 | w7
+  pack \t0, \k3, \k3            // t0 = W7 | w7
+  rori \k4, \k3, 16             // k4 = W7 | W6
+  pack \k4, \k4, \k4            // k4 = W6 | W6
+  rori \t0, \t0, 12             // t0 = W7 >>> 12 | W7 >>> 12 
+  rori \k4, \k4,  2             // k4 = W6 >>> 2  | W6 >>> 2 
+  pack \k4, \t0, \k4            // k4 = W6 >>> 2  | W7 >>> 12
 #endif 
 .endm
-
-# .macro GIFT_KEYSTUPD k3, k4, t0
-#   pack \t0, \k3, \k3
-#   rori \k4, \k3, 16
-#   pack \k4, \k4, \k4
-#   rori \t0, \t0, 12
-#   rori \k4, \k4,  2
-#   pack \k4, \t0, \k4 
-
-#   # mv   \t0, \k3
-#   # pack \t0, \t0, \t0
-#   # rori a1, \k3, 16
-#   # pack a1, a1, a1
-#   # rori \t0, \t0, 12
-#   # rori a1, a1,  2
-#   # pack \t0, \t0, a1
-#   # mv   \k4, \t0 
-# .endm
-
 
 // operations in each round
 
@@ -211,11 +172,7 @@ giftb128_bitslicing:
   GIFT_REVERSE  a3, a4, a5, a6
   GIFT_LDSTATE  a1, t3, t4, t5, t6
   GIFT_REVERSE  t3, t4, t5, t6
-  li   s0, 0x0000000F
-  li   s1, 0x00000FFF
-  li   s2, 0x3FFF0000
-  li   s3, 0x00030000
-  slli t0, s0, 31
+  li t0, 0x80000000
   //  
   GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x00000001, t1
   GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x00000003, t1
