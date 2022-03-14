@@ -1,6 +1,6 @@
 diff --git a/riscv/arith.cc b/riscv/arith.cc
 new file mode 100644
-index 0000000..60d2a14
+index 00000000..a8cc5986
 --- /dev/null
 +++ b/riscv/arith.cc
 @@ -0,0 +1,19 @@
@@ -24,7 +24,7 @@ index 0000000..60d2a14
 +};
 +// -- lwise
 diff --git a/riscv/arith.h b/riscv/arith.h
-index 9e0c2f7..d3f741f 100644
+index 9e0c2f74..2a6db47a 100644
 --- a/riscv/arith.h
 +++ b/riscv/arith.h
 @@ -8,6 +8,29 @@
@@ -58,7 +58,7 @@ index 9e0c2f7..d3f741f 100644
  {
    uint64_t t;
 diff --git a/riscv/decode.h b/riscv/decode.h
-index 7028c85..93944ce 100644
+index 7028c855..a00ae7c5 100644
 --- a/riscv/decode.h
 +++ b/riscv/decode.h
 @@ -80,6 +80,10 @@ public:
@@ -73,7 +73,7 @@ index 7028c85..93944ce 100644
    int64_t shamt() { return x(20, 6); }
    int64_t s_imm() { return x(7, 5) + (xs(25, 7) << 5); }
 diff --git a/riscv/encoding.h b/riscv/encoding.h
-index b216296..4d61cb3 100644
+index b2162963..68360c7c 100644
 --- a/riscv/encoding.h
 +++ b/riscv/encoding.h
 @@ -281,6 +281,10 @@
@@ -97,9 +97,22 @@ index b216296..4d61cb3 100644
  DECLARE_INSN(slli_rv32, MATCH_SLLI_RV32, MASK_SLLI_RV32)
  DECLARE_INSN(srli_rv32, MATCH_SRLI_RV32, MASK_SRLI_RV32)
  DECLARE_INSN(srai_rv32, MATCH_SRAI_RV32, MASK_SRAI_RV32)
+diff --git a/riscv/insns/pack.h b/riscv/insns/pack.h
+index 2b09e7ed..bb22147f 100644
+--- a/riscv/insns/pack.h
++++ b/riscv/insns/pack.h
+@@ -2,7 +2,7 @@
+ require(((xlen == 32) && (insn.rs2() == 0) && p->extension_enabled(EXT_ZBB))
+   || p->extension_enabled(EXT_ZBKB)
+   || p->extension_enabled(EXT_XBITMANIP));
+-require(SHAMT < (xlen/2));
++//require(SHAMT < (xlen/2));
+ reg_t lo = zext_xlen(RS1 << (xlen/2)) >> (xlen/2);
+ reg_t hi = zext_xlen(RS2 << (xlen/2));
+ WRITE_RD(sext_xlen(lo | hi));
 diff --git a/riscv/insns/photon_step.h b/riscv/insns/photon_step.h
 new file mode 100644
-index 0000000..45fbccf
+index 00000000..45fbccf1
 --- /dev/null
 +++ b/riscv/insns/photon_step.h
 @@ -0,0 +1,16 @@
@@ -120,7 +133,7 @@ index 0000000..45fbccf
 +  WRITE_REG( insn.rd(), r ); 
 +}
 diff --git a/riscv/riscv.mk.in b/riscv/riscv.mk.in
-index 9a6b118..2a76571 100644
+index 9a6b118d..f00266d9 100644
 --- a/riscv/riscv.mk.in
 +++ b/riscv/riscv.mk.in
 @@ -39,6 +39,7 @@ riscv_precompiled_hdrs = \
