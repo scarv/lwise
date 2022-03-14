@@ -116,7 +116,133 @@
 // Skinny-128-384+ implementation => round TYPE_1
 
 #if  ( ROMULUS_RV32_TYPE1 )
-#error "can't use ROMULUS_RV32_TYPE1: not yet implemented!"
+// #error "can't use ROMULUS_RV32_TYPE1: not yet implemented!"
+
+// SubCells
+
+// The problem for TYPE1 to use the "xperm"-style 8-bit SBox: 
+// Skinny-128 uses an 8-bit SBox, which means we have to use "xperm8" instruction 
+// here. There are 2^8 = _256_ 8-bit entries/values in this LUT, and each 32-bit 
+// register can only store 32/8 = 4 values, which means we need 256/4 = _64_ 
+// 32-bit registers (impractical and inefficient). Additionally, an "xperm8" 
+// needs to work together with "xor" and a mask, namely we need 2*64 = _128_ 
+// instructions and _127_ registers for a LUT (64) + all the masks (63).    
+
+// Solutions: conventional (non-"xperm"-style) LUT or bitslice. But in order to 
+// serve as a baseline for our TYPE2, I suppose only the former option is possible. 
+
+.macro SKINNY_SBOX s0, lut0, lut1, t0, t1
+  romulus.rstep.enc \s0, \s0, x0, 0
+.endm
+
+.macro SKINNY_SC s0, s1, s2, s3, lut0, lut1, t0, t1
+  SKINNY_SBOX \s0, \lut0, \lut1, \t0, \t1
+  SKINNY_SBOX \s1, \lut0, \lut1, \t0, \t1
+  SKINNY_SBOX \s2, \lut0, \lut1, \t0, \t1
+  SKINNY_SBOX \s3, \lut0, \lut1, \t0, \t1
+.endm
+
+// AddConstants
+
+.macro SKINNY_AC s0, s1, s2, rc0, rc1
+  xori \s0, \s0, \rc0
+  xori \s1, \s1, \rc1
+  xori \s2, \s2, 0x02
+.endm
+
+// AddTweakKey
+
+.macro SKINNY_ART s0, s1, k10, k11, k20, k21, k30, k31
+  xor  \s0, \s0, \k10
+  xor  \s0, \s0, \k20
+  xor  \s0, \s0, \k30
+  xor  \s1, \s1, \k11
+  xor  \s1, \s1, \k21
+  xor  \s1, \s1, \k31
+.endm
+
+// KeyUpdate 
+
+// KeyPerm k0, k1, k2, k3 -> k2, k3, k0, k1
+
+.macro SKINNY_KEYPERM k2, k3, t0, t1  
+
+  rori  \t0, \k3, 16        // t0 = B13 B12 B15 B14
+  packh \k3, \t0, \k3       // k3 =         B12 B14
+  rev8  \t1, \k2            // t1 = B8  B9  B10 B11
+  # pack  \k3, \k3, \t1       // k3 = B10 B11 B12 B14
+  slli  \t1, \t1, 16 
+  xor   \k3, \k3, \t1
+  rev8  \t1, \k2
+  # 
+  rori  \k3, \k3, 24         // k3 = B11 B12 B14 B10
+
+  and   \t0, \t0, a2        // t0 = B13     B15
+  srli  \t1, \t1, 16        // t1 =         B8  B9
+  # pack  \k2, \t1, \k2       // k2 = B9  B8  B8  B9
+  slli  \k2, \k2, 16
+  xor   \k2, \k2, \t1
+  #
+  and   \k2, \k2, a1        // k2 =     B8      B9
+  xor   \k2, \k2, \t0       // k2 = B13 B8  B15 B9
+.endm
+
+.macro SKINNY_TK2LFSR k0, t0, t1
+  srli \t0, \k0, 7
+  srli \t1, \k0, 5
+  xor  \t0, \t0, \t1
+  and  \t0, \t0, a3
+  slli \k0, \k0, 1
+  not  \t1, a3
+  and  \k0, \k0, \t1
+  xor  \k0, \k0, \t0
+.endm
+
+.macro SKINNY_TK3LFSR k0, t0, t1
+  slli \t0, \k0, 7
+  slli \t1, \k0, 1
+  xor  \t0, \t0, \t1
+  and  \t0, \t0, a4
+  not  \t1, a4
+  srli \k0, \k0, 1
+  and  \k0, \k0, \t1
+  xor  \k0, \k0, \t0
+.endm
+
+.macro SKINNY_KU k12, k13, k22, k23, k32, k33, t0, t1
+  SKINNY_KEYPERM \k12, \k13, \t0,  \t1
+  SKINNY_KEYPERM \k22, \k23, \t0,  \t1
+  SKINNY_KEYPERM \k32, \k33, \t0,  \t1
+  SKINNY_TK2LFSR \k22, \t0,  \t1
+  SKINNY_TK2LFSR \k23, \t0,  \t1
+  SKINNY_TK3LFSR \k32, \t0,  \t1
+  SKINNY_TK3LFSR \k33, \t0,  \t1
+.endm
+
+// ShiftRows
+
+.macro SKINNY_SR s0, s1, s2, s3
+  rori \s1, \s1, 24
+  rori \s2, \s2, 16
+  rori \s3, \s3, 8
+.endm
+
+// MixColumns s0, s1, s2, s3 -> s3, s0, s1, s2
+
+.macro SKINNY_MC s0, s1, s2, s3
+  xor  \s1, \s1, \s2
+  xor  \s2, \s2, \s0
+  xor  \s3, \s3, \s2  
+.endm
+
+.macro SKINNY_ROUND s0, s1, s2, s3, k10, k11, k12, k13, k20, k21, k22, k23, k30, k31, k32, k33, rc0, rc1, t0, t1
+  SKINNY_SC  \s0, \s1, \s2, \s3, a5, a6, \t0, \t1
+  SKINNY_AC  \s0, \s1, \s2, \rc0, \rc1
+  SKINNY_ART \s0, \s1, \k10, \k11, \k20, \k21, \k30, \k31
+  SKINNY_KU  \k12, \k13, \k22, \k23, \k32, \k33, \t0, \t1
+  SKINNY_SR  \s0, \s1, \s2, \s3
+  SKINNY_MC  \s0, \s1, \s2, \s3
+.endm
 #endif
 
 // ----------------------------------------------------------------------------
@@ -180,6 +306,7 @@
 
 skinny_128_384_plus_enc:  SKINNY_PROLOGUE
 
+#if ( ROMULUS_RV32_TYPE2 )
 #if !( ROMULUS_UNROLL )
 0:                        SKINNY_ROUND
                           SKINNY_ROUND
@@ -195,6 +322,61 @@ skinny_128_384_plus_enc:  SKINNY_PROLOGUE
                           SKINNY_ROUND I + 1
                           .set I, I + 2
                           .endr
+#endif
+
+#elif ( ROMULUS_RV32_TYPE1 )
+  # li a5, 0xB2A1096C 
+  # li a6, 0xF7E4D583
+  # li a7, 0x88888888
+  li a1, 0x00FF00FF
+  li a2, 0xFF00FF00
+  li a3, 0x01010101
+  li a4, 0x80808080
+  //
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x1, 0x0, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0x3, 0x0, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x7, 0x0, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xF, 0x0, t4, t5
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0xF, 0x1, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xE, 0x3, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0xD, 0x3, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xB, 0x3, t4, t5
+
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x7, 0x3, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xF, 0x2, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0xE, 0x1, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xC, 0x3, t4, t5
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x9, 0x3, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0x3, 0x3, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x7, 0x2, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xE, 0x0, t4, t5
+
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0xD, 0x1, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xA, 0x3, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x5, 0x3, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xB, 0x2, t4, t5
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x6, 0x1, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xC, 0x2, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x8, 0x1, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0x0, 0x3, t4, t5
+
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x1, 0x2, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0x2, 0x0, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x5, 0x0, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xB, 0x0, t4, t5
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x7, 0x1, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xE, 0x2, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0xC, 0x1, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0x8, 0x3, t4, t5
+
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x1, 0x3, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0x3, 0x2, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0x6, 0x0, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xD, 0x0, t4, t5
+  SKINNY_ROUND t0, t1, t2, t3, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0xB, 0x1, t4, t5
+  SKINNY_ROUND t3, t0, t1, t2, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0x6, 0x3, t4, t5
+  SKINNY_ROUND t2, t3, t0, t1, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, 0xD, 0x2, t4, t5
+  SKINNY_ROUND t1, t2, t3, t0, s2, s3, s0, s1, s6, s7, s4, s5, s10, s11, s8, s9, 0xA, 0x1, t4, t5
 #endif
 
 1:                        SKINNY_EPILOGUE
