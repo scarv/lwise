@@ -193,7 +193,96 @@
 // PHOTON_256 implementation => round TYPE_1
 
 #if  ( PHOTON_RV32_TYPE1 )
-#error "can't use PHOTON_RV32_TYPE1: not yet implemented!"
+
+.macro PHOTON_SBOX s0, lut0, lut1, t0
+  xperm4 \t0, \lut0, \s0
+  xor    \s0, \s0,   s7
+  xperm4 \s0, \lut1, \s0
+  xor    \s0, \s0,   \t0
+.endm
+
+.macro PHOTON_GF2NMUL r, imm, y, t, x
+  li    \x,  \imm
+  srli  \t,  \x,  3    
+  mv    \r,  x0
+  beq   \t,  x0,  2f         // x is public
+  xor   \r,  \r,  \y
+2:
+  slli  \r,  \r,  1
+  srli  \t,  \r,  4
+  andi  \t,  \t,  1          // t is either 0 or 1    now
+  sub   \t,  x0,  \t         // t is either 0 or 0xFF now
+  andi  \t,  \t,  0x13       // t is either 0 or 0x13 now
+  xor   \r,  \r,  \t         // r = r ^ 0 or r ^ 0x13 
+  srli  \t,  \x,  2  
+  andi  \t,  \t,  1       
+  beq   \t,  x0,  3f         // x is public
+  xor   \r,  \r,  \y
+3:
+  slli  \r,  \r,  1
+  srli  \t,  \r,  4
+  andi  \t,  \t,  1          // t is either 0 or 1    now
+  sub   \t,  x0,  \t         // t is either 0 or 0xFF now
+  andi  \t,  \t,  0x13       // t is either 0 or 0x13 now
+  xor   \r,  \r,  \t         // r = r ^ 0 or r ^ 0x13 
+  srli  \t,  \x,  1
+  andi  \t,  \t,  1          
+  beq   \t,  x0,  4f         // x is public
+  xor   \r,  \r,  \y
+4: 
+  slli  \r,  \r,  1
+  srli  \t,  \r,  4
+  andi  \t,  \t,  1          // t is either 0 or 1    now
+  sub   \t,  x0,  \t         // t is either 0 or 0xFF now
+  andi  \t,  \t,  0x13       // t is either 0 or 0x13 now
+  xor   \r,  \r,  \t         // r = r ^ 0 or r ^ 0x13 
+  andi  \t,  \x,  1          
+  beq   \t,  x0,  5f         // x is public
+  xor   \r,  \r,  \y
+5:  
+  andi  \r,  \r,  0x0F
+.endm
+
+.macro PHOTON_STEP r, x, y, imm, m0, m1, m2, m3, m4, m5, m6, m7, t0, t1, t2, t3
+  srli \t0, \y,  \imm           
+  PHOTON_SBOX \t0, s5, s6, \t1  
+  mv   \r,  \x
+  PHOTON_GF2NMUL \t1, \m0, \t0, \t2, \t3   
+  xor  \r,  \r,  \t1            
+  PHOTON_GF2NMUL \t1, \m1, \t0, \t2, \t3 
+  slli \t1, \t1, 4                   
+  xor  \r,  \r,  \t1            
+  PHOTON_GF2NMUL \t1, \m2, \t0, \t2, \t3
+  slli \t1, \t1, 8                   
+  xor  \r,  \r,  \t1            
+  PHOTON_GF2NMUL \t1, \m3, \t0, \t2, \t3  
+  slli \t1, \t1, 12                  
+  xor  \r,  \r,  \t1            
+  PHOTON_GF2NMUL \t1, \m4, \t0, \t2, \t3 
+  slli \t1, \t1, 16                  
+  xor  \r,  \r,  \t1            
+  PHOTON_GF2NMUL \t1, \m5, \t0, \t2, \t3
+  slli \t1, \t1, 20                  
+  xor  \r,  \r,  \t1            
+  PHOTON_GF2NMUL \t1, \m6, \t0, \t2, \t3 
+  slli \t1, \t1, 24                  
+  xor  \r,  \r,  \t1            
+  PHOTON_GF2NMUL \t1, \m7, \t0, \t2, \t3
+  slli \t1, \t1, 28                  
+  xor  \r,  \r,  \t1            
+.endm
+
+.macro PHOTON_COLUMN r, s0, s1, s2, s3, s4, s5, s6, s7
+  PHOTON_STEP          \r, x0, \s0, 0 , 0x2, 0xC, 0x4, 0x1, 0xF, 0x9, 0xC, 0xF, a2, a3, s8, s9
+  PHOTON_STEP          \r, \r, \s1, 4 , 0x4, 0x9, 0x4, 0x6, 0xC, 0xE, 0x2, 0x1, a2, a3, s8, s9
+  PHOTON_STEP          \r, \r, \s2, 8 , 0x2, 0x8, 0xD, 0x5, 0x9, 0x5, 0x2, 0xD, a2, a3, s8, s9
+  PHOTON_STEP          \r, \r, \s3, 12, 0xB, 0xD, 0xD, 0x1, 0xD, 0xF, 0xA, 0xA, a2, a3, s8, s9
+  PHOTON_STEP          \r, \r, \s4, 16, 0x2, 0x7, 0x9, 0xC, 0xE, 0x4, 0x3, 0x5, a2, a3, s8, s9 
+  PHOTON_STEP          \r, \r, \s5, 20, 0x8, 0x7, 0x4, 0xD, 0x5, 0xC, 0x1, 0xA, a2, a3, s8, s9
+  PHOTON_STEP          \r, \r, \s6, 24, 0x5, 0x5, 0xD, 0xF, 0xE, 0x9, 0x1, 0x2, a2, a3, s8, s9
+  PHOTON_STEP          \r, \r, \s7, 28, 0x6, 0x2, 0x9, 0xE, 0xD, 0x6, 0xE, 0x3, a2, a3, s8, s9
+.endm
+
 #endif
 
 // ----------------------------------------------------------------------------
@@ -210,6 +299,7 @@
                           photon.step          \r, \r, \s6, 6
                           photon.step          \r, \r, \s7, 7
 .endm
+#endif
 
 .macro PHOTON_ROUND_EVN I
                           lw                   t4,     0(a1)
@@ -240,7 +330,7 @@
                           PHOTON_COLUMN        t2, s3, s4, t4, t5, t6, s0, s1, s2
                           PHOTON_COLUMN        t3, s4, t4, t5, t6, s0, s1, s2, s3
 .endm
-#endif
+
 
 // ----------------------------------------------------------------------------
 // PHOTON_256 implementation => round constants
@@ -271,6 +361,7 @@ RC:                       .word 0x9DFE6201
 
 PHOTON_Permutation:       PHOTON_PROLOGUE
 
+#if  ( PHOTON_RV32_TYPE2 )
 #if !( PHOTON_UNROLL )
 0:                        PHOTON_ROUND_EVN
                           PHOTON_ROUND_ODD
@@ -286,6 +377,35 @@ PHOTON_Permutation:       PHOTON_PROLOGUE
                           PHOTON_ROUND_ODD I + 1
                           .set I, I + 2
                           .endr
+#endif
+#elif( PHOTON_RV32_TYPE1 )
+  addi sp, sp, -20 
+  sw   s5,  0(sp)
+  sw   s6,  4(sp)
+  sw   s7,  8(sp)
+  sw   s8, 12(sp)
+  sw   s9, 16(sp)
+  li   s5, 0xDA09B65C
+  li   s6, 0x21748FE3
+  li   s7, 0x88888888
+  PHOTON_ROUND_EVN
+  PHOTON_ROUND_ODD
+  PHOTON_ROUND_EVN
+  PHOTON_ROUND_ODD
+  PHOTON_ROUND_EVN
+  PHOTON_ROUND_ODD
+  PHOTON_ROUND_EVN
+  PHOTON_ROUND_ODD
+  PHOTON_ROUND_EVN
+  PHOTON_ROUND_ODD
+  PHOTON_ROUND_EVN
+  PHOTON_ROUND_ODD
+  lw   s5, 0(sp)
+  lw   s6, 4(sp)
+  lw   s7, 8(sp)
+  lw   s8, 12(sp)
+  lw   s9, 16(sp)
+  addi sp, sp, 20 
 #endif
 
 1:                        PHOTON_EPILOGUE
