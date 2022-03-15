@@ -43,13 +43,13 @@
 
 .macro SPONGENT_LDSTATE s0, s1, s2, s3, s4, s5, s6, s7
   lw   \s0,  0(a0)
-  lb   \s1,  4(a0)
+  lbu  \s1,  4(a0)
   lw   \s2,  5(a0)
-  lb   \s3,  9(a0)
+  lbu  \s3,  9(a0)
   lw   \s4, 10(a0)
-  lb   \s5, 14(a0)
+  lbu  \s5, 14(a0)
   lw   \s6, 15(a0)
-  lb   \s7, 19(a0)
+  lbu  \s7, 19(a0)
 .endm
 
 .macro SPONGENT_STSTATE s0, s1, s2, s3, s4, s5, s6, s7
