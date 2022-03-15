@@ -19,25 +19,25 @@ void time_kernel() {
 
   printf( "sizeof( s ) = %llu\n", s_n );
 
-  MEASURE_PROLOGUE( Ascon_Permute_12rounds );
+  MEASURE_PROLOGUE( P12 );
 
   for( int i = 0; i < trials; i++ ) {
     rand_bytes( s, s_n );
 
-    MEASURE_STEP( Ascon_Permute_12rounds, s );
+    MEASURE_STEP( P12, s );
   }
 
-  MEASURE_EPILOGUE( Ascon_Permute_12rounds );
+  MEASURE_EPILOGUE( P12 );
 
-  MEASURE_PROLOGUE( Ascon_Permute_6rounds );
+  MEASURE_PROLOGUE( P6 );
 
   for( int i = 0; i < trials; i++ ) {
     rand_bytes( s, s_n );
 
-    MEASURE_STEP( Ascon_Permute_6rounds, s );
+    MEASURE_STEP( P6, s );
   }
 
-  MEASURE_EPILOGUE( Ascon_Permute_6rounds );
+  MEASURE_EPILOGUE( P6 );
 
 #elif defined(GIFT_RV32_TYPE1) || defined(GIFT_RV32_TYPE2)
   unsigned long long p_n = 16; uint8_t p[ p_n ];

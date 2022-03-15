@@ -9,8 +9,8 @@
 #define __LWC_KERNELS_H
 void time_kernel();
 
-extern void Ascon_Permute_6rounds(void * state);
-extern void Ascon_Permute_12rounds(void * state);
+extern void P6(void * state);
+extern void P12(void * state);
 
 extern void giftb128_bitslicing(void *P, const void *K, void *C);
 extern void giftb128_fixslicing(void *P, const void *K, void *C);
