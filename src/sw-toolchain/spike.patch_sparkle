@@ -1,6 +1,6 @@
 diff --git a/riscv/arith.cc b/riscv/arith.cc
 new file mode 100644
-index 0000000..fbd5714
+index 00000000..c1eb28ab
 --- /dev/null
 +++ b/riscv/arith.cc
 @@ -0,0 +1,8 @@
@@ -13,7 +13,7 @@ index 0000000..fbd5714
 +int ROT_1[] = { 24, 17, 31, 16 };
 +// -- lwise
 diff --git a/riscv/arith.h b/riscv/arith.h
-index 9e0c2f7..33ee0ac 100644
+index 9e0c2f74..3d460039 100644
 --- a/riscv/arith.h
 +++ b/riscv/arith.h
 @@ -8,6 +8,24 @@
@@ -42,7 +42,7 @@ index 9e0c2f7..33ee0ac 100644
  {
    uint64_t t;
 diff --git a/riscv/decode.h b/riscv/decode.h
-index 7028c85..d4b5b6f 100644
+index 7028c855..8437b36f 100644
 --- a/riscv/decode.h
 +++ b/riscv/decode.h
 @@ -80,6 +80,10 @@ public:
@@ -57,7 +57,7 @@ index 7028c85..d4b5b6f 100644
    int64_t shamt() { return x(20, 6); }
    int64_t s_imm() { return x(7, 5) + (xs(25, 7) << 5); }
 diff --git a/riscv/encoding.h b/riscv/encoding.h
-index b216296..6c6b4c3 100644
+index b2162963..8682c566 100644
 --- a/riscv/encoding.h
 +++ b/riscv/encoding.h
 @@ -281,6 +281,78 @@
@@ -183,9 +183,22 @@ index b216296..6c6b4c3 100644
  DECLARE_INSN(slli_rv32, MATCH_SLLI_RV32, MASK_SLLI_RV32)
  DECLARE_INSN(srli_rv32, MATCH_SRLI_RV32, MASK_SRLI_RV32)
  DECLARE_INSN(srai_rv32, MATCH_SRAI_RV32, MASK_SRAI_RV32)
+diff --git a/riscv/insns/pack.h b/riscv/insns/pack.h
+index 2b09e7ed..bb22147f 100644
+--- a/riscv/insns/pack.h
++++ b/riscv/insns/pack.h
+@@ -2,7 +2,7 @@
+ require(((xlen == 32) && (insn.rs2() == 0) && p->extension_enabled(EXT_ZBB))
+   || p->extension_enabled(EXT_ZBKB)
+   || p->extension_enabled(EXT_XBITMANIP));
+-require(SHAMT < (xlen/2));
++//require(SHAMT < (xlen/2));
+ reg_t lo = zext_xlen(RS1 << (xlen/2)) >> (xlen/2);
+ reg_t hi = zext_xlen(RS2 << (xlen/2));
+ WRITE_RD(sext_xlen(lo | hi));
 diff --git a/riscv/insns/sparkle_addror_17.h b/riscv/insns/sparkle_addror_17.h
 new file mode 100644
-index 0000000..9eab086
+index 00000000..9eab0863
 --- /dev/null
 +++ b/riscv/insns/sparkle_addror_17.h
 @@ -0,0 +1,6 @@
@@ -197,7 +210,7 @@ index 0000000..9eab086
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_addror_24.h b/riscv/insns/sparkle_addror_24.h
 new file mode 100644
-index 0000000..fb2b95b
+index 00000000..fb2b95bc
 --- /dev/null
 +++ b/riscv/insns/sparkle_addror_24.h
 @@ -0,0 +1,6 @@
@@ -209,7 +222,7 @@ index 0000000..fb2b95b
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_addror_31.h b/riscv/insns/sparkle_addror_31.h
 new file mode 100644
-index 0000000..512f713
+index 00000000..512f7135
 --- /dev/null
 +++ b/riscv/insns/sparkle_addror_31.h
 @@ -0,0 +1,6 @@
@@ -221,7 +234,7 @@ index 0000000..512f713
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_addrori.h b/riscv/insns/sparkle_addrori.h
 new file mode 100644
-index 0000000..65a0818
+index 00000000..65a0818d
 --- /dev/null
 +++ b/riscv/insns/sparkle_addrori.h
 @@ -0,0 +1,6 @@
@@ -233,7 +246,7 @@ index 0000000..65a0818
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_dec_0.h b/riscv/insns/sparkle_block_dec_0.h
 new file mode 100644
-index 0000000..0915960
+index 00000000..09159601
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_dec_0.h
 @@ -0,0 +1,12 @@
@@ -251,7 +264,7 @@ index 0000000..0915960
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_dec_1.h b/riscv/insns/sparkle_block_dec_1.h
 new file mode 100644
-index 0000000..ab69e69
+index 00000000..ab69e69e
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_dec_1.h
 @@ -0,0 +1,12 @@
@@ -269,7 +282,7 @@ index 0000000..ab69e69
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_dec_2.h b/riscv/insns/sparkle_block_dec_2.h
 new file mode 100644
-index 0000000..8eafcec
+index 00000000..8eafcec2
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_dec_2.h
 @@ -0,0 +1,12 @@
@@ -287,7 +300,7 @@ index 0000000..8eafcec
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_dec_3.h b/riscv/insns/sparkle_block_dec_3.h
 new file mode 100644
-index 0000000..375aeac
+index 00000000..375aeac9
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_dec_3.h
 @@ -0,0 +1,12 @@
@@ -305,7 +318,7 @@ index 0000000..375aeac
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_deci.h b/riscv/insns/sparkle_block_deci.h
 new file mode 100644
-index 0000000..97114ea
+index 00000000..97114ea2
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_deci.h
 @@ -0,0 +1,12 @@
@@ -323,7 +336,7 @@ index 0000000..97114ea
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_enc_0.h b/riscv/insns/sparkle_block_enc_0.h
 new file mode 100644
-index 0000000..9d90c3a
+index 00000000..9d90c3a5
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_enc_0.h
 @@ -0,0 +1,12 @@
@@ -341,7 +354,7 @@ index 0000000..9d90c3a
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_enc_1.h b/riscv/insns/sparkle_block_enc_1.h
 new file mode 100644
-index 0000000..8d0004b
+index 00000000..8d0004bb
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_enc_1.h
 @@ -0,0 +1,12 @@
@@ -359,7 +372,7 @@ index 0000000..8d0004b
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_enc_2.h b/riscv/insns/sparkle_block_enc_2.h
 new file mode 100644
-index 0000000..05fa865
+index 00000000..05fa8651
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_enc_2.h
 @@ -0,0 +1,12 @@
@@ -377,7 +390,7 @@ index 0000000..05fa865
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_enc_3.h b/riscv/insns/sparkle_block_enc_3.h
 new file mode 100644
-index 0000000..57274e7
+index 00000000..57274e7d
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_enc_3.h
 @@ -0,0 +1,12 @@
@@ -395,7 +408,7 @@ index 0000000..57274e7
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_block_enci.h b/riscv/insns/sparkle_block_enci.h
 new file mode 100644
-index 0000000..873c1c9
+index 00000000..873c1c9b
 --- /dev/null
 +++ b/riscv/insns/sparkle_block_enci.h
 @@ -0,0 +1,12 @@
@@ -413,7 +426,7 @@ index 0000000..873c1c9
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_ell.h b/riscv/insns/sparkle_ell.h
 new file mode 100644
-index 0000000..5815b14
+index 00000000..5815b144
 --- /dev/null
 +++ b/riscv/insns/sparkle_ell.h
 @@ -0,0 +1,23 @@
@@ -442,7 +455,7 @@ index 0000000..5815b14
 +
 diff --git a/riscv/insns/sparkle_ellrev.h b/riscv/insns/sparkle_ellrev.h
 new file mode 100644
-index 0000000..48e219e
+index 00000000..48e219e6
 --- /dev/null
 +++ b/riscv/insns/sparkle_ellrev.h
 @@ -0,0 +1,15 @@
@@ -463,7 +476,7 @@ index 0000000..48e219e
 +
 diff --git a/riscv/insns/sparkle_rcon.h b/riscv/insns/sparkle_rcon.h
 new file mode 100644
-index 0000000..4dbb52e
+index 00000000..4dbb52e8
 --- /dev/null
 +++ b/riscv/insns/sparkle_rcon.h
 @@ -0,0 +1,19 @@
@@ -488,7 +501,7 @@ index 0000000..4dbb52e
 +}
 diff --git a/riscv/insns/sparkle_rconw.h b/riscv/insns/sparkle_rconw.h
 new file mode 100644
-index 0000000..7c315c4
+index 00000000..7c315c40
 --- /dev/null
 +++ b/riscv/insns/sparkle_rconw.h
 @@ -0,0 +1,7 @@
@@ -501,7 +514,7 @@ index 0000000..7c315c4
 +}
 diff --git a/riscv/insns/sparkle_subror_17.h b/riscv/insns/sparkle_subror_17.h
 new file mode 100644
-index 0000000..6b82f7f
+index 00000000..6b82f7fb
 --- /dev/null
 +++ b/riscv/insns/sparkle_subror_17.h
 @@ -0,0 +1,6 @@
@@ -513,7 +526,7 @@ index 0000000..6b82f7f
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_subror_24.h b/riscv/insns/sparkle_subror_24.h
 new file mode 100644
-index 0000000..a737d0a
+index 00000000..a737d0a5
 --- /dev/null
 +++ b/riscv/insns/sparkle_subror_24.h
 @@ -0,0 +1,6 @@
@@ -525,7 +538,7 @@ index 0000000..a737d0a
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_subror_31.h b/riscv/insns/sparkle_subror_31.h
 new file mode 100644
-index 0000000..d6d2739
+index 00000000..d6d27394
 --- /dev/null
 +++ b/riscv/insns/sparkle_subror_31.h
 @@ -0,0 +1,6 @@
@@ -537,7 +550,7 @@ index 0000000..d6d2739
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_subrori.h b/riscv/insns/sparkle_subrori.h
 new file mode 100644
-index 0000000..2e2eb0c
+index 00000000..2e2eb0c3
 --- /dev/null
 +++ b/riscv/insns/sparkle_subrori.h
 @@ -0,0 +1,6 @@
@@ -549,7 +562,7 @@ index 0000000..2e2eb0c
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_whole_dec.h b/riscv/insns/sparkle_whole_dec.h
 new file mode 100644
-index 0000000..0b0d781
+index 00000000..0b0d7811
 --- /dev/null
 +++ b/riscv/insns/sparkle_whole_dec.h
 @@ -0,0 +1,21 @@
@@ -576,7 +589,7 @@ index 0000000..0b0d781
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_whole_deci.h b/riscv/insns/sparkle_whole_deci.h
 new file mode 100644
-index 0000000..a023f80
+index 00000000..a023f80f
 --- /dev/null
 +++ b/riscv/insns/sparkle_whole_deci.h
 @@ -0,0 +1,21 @@
@@ -603,7 +616,7 @@ index 0000000..a023f80
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_whole_deci_x.h b/riscv/insns/sparkle_whole_deci_x.h
 new file mode 100644
-index 0000000..bc52850
+index 00000000..bc52850c
 --- /dev/null
 +++ b/riscv/insns/sparkle_whole_deci_x.h
 @@ -0,0 +1,18 @@
@@ -627,7 +640,7 @@ index 0000000..bc52850
 +WRITE_REG( insn.rd(), xi );
 diff --git a/riscv/insns/sparkle_whole_deci_y.h b/riscv/insns/sparkle_whole_deci_y.h
 new file mode 100644
-index 0000000..f502bc7
+index 00000000..f502bc70
 --- /dev/null
 +++ b/riscv/insns/sparkle_whole_deci_y.h
 @@ -0,0 +1,18 @@
@@ -651,7 +664,7 @@ index 0000000..f502bc7
 +WRITE_REG( insn.rd(), yi );
 diff --git a/riscv/insns/sparkle_whole_enc.h b/riscv/insns/sparkle_whole_enc.h
 new file mode 100644
-index 0000000..f586ea2
+index 00000000..f586ea2c
 --- /dev/null
 +++ b/riscv/insns/sparkle_whole_enc.h
 @@ -0,0 +1,21 @@
@@ -678,7 +691,7 @@ index 0000000..f586ea2
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_whole_enci.h b/riscv/insns/sparkle_whole_enci.h
 new file mode 100644
-index 0000000..8be2915
+index 00000000..8be29153
 --- /dev/null
 +++ b/riscv/insns/sparkle_whole_enci.h
 @@ -0,0 +1,21 @@
@@ -705,7 +718,7 @@ index 0000000..8be2915
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_whole_enci_x.h b/riscv/insns/sparkle_whole_enci_x.h
 new file mode 100644
-index 0000000..689b632
+index 00000000..689b632b
 --- /dev/null
 +++ b/riscv/insns/sparkle_whole_enci_x.h
 @@ -0,0 +1,18 @@
@@ -729,7 +742,7 @@ index 0000000..689b632
 +WRITE_REG( insn.rd(), xi );
 diff --git a/riscv/insns/sparkle_whole_enci_y.h b/riscv/insns/sparkle_whole_enci_y.h
 new file mode 100644
-index 0000000..5e4df3e
+index 00000000..5e4df3e2
 --- /dev/null
 +++ b/riscv/insns/sparkle_whole_enci_y.h
 @@ -0,0 +1,18 @@
@@ -753,7 +766,7 @@ index 0000000..5e4df3e
 +WRITE_REG( insn.rd(), yi );
 diff --git a/riscv/insns/sparkle_xorror_16.h b/riscv/insns/sparkle_xorror_16.h
 new file mode 100644
-index 0000000..77d62b9
+index 00000000..77d62b91
 --- /dev/null
 +++ b/riscv/insns/sparkle_xorror_16.h
 @@ -0,0 +1,6 @@
@@ -765,7 +778,7 @@ index 0000000..77d62b9
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_xorror_17.h b/riscv/insns/sparkle_xorror_17.h
 new file mode 100644
-index 0000000..dbd7d67
+index 00000000..dbd7d67f
 --- /dev/null
 +++ b/riscv/insns/sparkle_xorror_17.h
 @@ -0,0 +1,6 @@
@@ -777,7 +790,7 @@ index 0000000..dbd7d67
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_xorror_24.h b/riscv/insns/sparkle_xorror_24.h
 new file mode 100644
-index 0000000..45e0ae2
+index 00000000..45e0ae23
 --- /dev/null
 +++ b/riscv/insns/sparkle_xorror_24.h
 @@ -0,0 +1,6 @@
@@ -789,7 +802,7 @@ index 0000000..45e0ae2
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_xorror_31.h b/riscv/insns/sparkle_xorror_31.h
 new file mode 100644
-index 0000000..073fa11
+index 00000000..073fa119
 --- /dev/null
 +++ b/riscv/insns/sparkle_xorror_31.h
 @@ -0,0 +1,6 @@
@@ -801,7 +814,7 @@ index 0000000..073fa11
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/insns/sparkle_xorrori.h b/riscv/insns/sparkle_xorrori.h
 new file mode 100644
-index 0000000..b4827c0
+index 00000000..b4827c00
 --- /dev/null
 +++ b/riscv/insns/sparkle_xorrori.h
 @@ -0,0 +1,6 @@
@@ -812,7 +825,7 @@ index 0000000..b4827c0
 +
 +WRITE_REG( insn.rd(), r );
 diff --git a/riscv/riscv.mk.in b/riscv/riscv.mk.in
-index 9a6b118..af6b208 100644
+index 9a6b118d..44fae456 100644
 --- a/riscv/riscv.mk.in
 +++ b/riscv/riscv.mk.in
 @@ -39,6 +39,7 @@ riscv_precompiled_hdrs = \
