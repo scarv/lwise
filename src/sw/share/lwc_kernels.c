@@ -125,6 +125,20 @@ void time_kernel() {
 
   MEASURE_EPILOGUE( sparkle_opt );
 
+#elif defined(JAMBU_RV32_TYPE1) || defined(JAMBU_RV32_TYPE2) || defined(JAMBU_RV32_TYPE3) 
+  unsigned long long s_n = 16; uint8_t s[ s_n ];
+  unsigned long long k_n = 48; uint8_t k[ k_n ];
+
+  MEASURE_PROLOGUE( state_update );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( s, s_n );
+    rand_bytes( k, k_n );
+    MEASURE_STEP( state_update, s, k, 128*8);
+  }
+
+  MEASURE_EPILOGUE( state_update );
+
 #elif defined(XOODYAK_RV32_TYPE1) || defined(XOODYAK_RV32_TYPE2)
   unsigned long long s_n = 48; uint8_t s[ s_n ];
 

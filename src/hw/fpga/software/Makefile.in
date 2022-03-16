@@ -21,22 +21,22 @@ else ifeq "${ALG}" "ascon"
 FPGA_DEF_CONF  = -DASCON_RV32_TYPE2
 FPGA_DEF_CONF += -DENABLE_ZBKB_ZBKX 
 FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         =  Ascon_Permute_12rounds Ascon_Permute_6rounds
+KERNEL         =  P12 P6
 
 else ifeq "${ALG}" "gift"
 FPGA_DEF_CONF  = -DGIFT_RV32_TYPE1 -DGIFT_FIXSLICING
-FPGA_DEF_CONF += -DENABLE_ZBKB_ZBKX 
+#FPGA_DEF_CONF += -DENABLE_ZBKB_ZBKX 
 FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
 KERNEL         =  giftb128_bitslicing giftb128_fixslicing precompute_rkeys
 
 else ifeq "${ALG}" "photon"
-FPGA_DEF_CONF  = -DPHOTON_RV32_TYPE2
+FPGA_DEF_CONF  = -DPHOTON_RV32_TYPE1
 FPGA_DEF_CONF += -DPHOTON_UNROLL 
 FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
 KERNEL         = PHOTON_Permutation
 
 else ifeq "${ALG}" "romulus"
-FPGA_DEF_CONF  = -DROMULUS_RV32_TYPE2
+FPGA_DEF_CONF  = -DROMULUS_RV32_TYPE1
 FPGA_DEF_CONF += -DROMULUS_UNROLL 
 FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
 KERNEL         = skinny_128_384_plus_enc
@@ -48,6 +48,12 @@ FPGA_DEF_CONF += -DSPARKLE_UNROLL
 FPGA_DEF_CONF += -DSPARKLE_REV_EXTERN -DSPARKLE_FWD_EXTERN 
 FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
 KERNEL         = sparkle_opt
+
+else ifeq "${ALG}" "jambu"
+FPGA_DEF_CONF  = -DJAMBU_RV32_TYPE3
+FPGA_DEF_CONF += -DJAMBU_UNROLL 
+FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
+KERNEL         = state_update
 
 else ifeq "${ALG}" "xoodyak"
 FPGA_DEF_CONF  = -DXOODYAK_RV32_TYPE2
@@ -79,7 +85,7 @@ export FPGA_HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/fpg
 
 MABI       = $(findstring i,$(ARCH:rv32=i))lp$(ARCH:rv%=%)
 FPGA_GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany
-FPGA_GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T$(SOC_HAL)/lscript.ld
+FPGA_GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T$(SOC_HAL)/lscript.ld -g
 GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
 
 # pass-through environment variable as macros for use in source code

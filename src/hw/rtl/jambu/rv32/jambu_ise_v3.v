@@ -10,7 +10,6 @@ input  wire         op_fsr_06,
 output wire [31:0]  rd
 );
 
-wire [ 4:0] shamt = imm[4:0]; 
 
 //64-bit right rotation
 wire [63:0] opr64 = {rs2, rs1};

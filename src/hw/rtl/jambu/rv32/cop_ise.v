@@ -32,29 +32,6 @@ localparam [6:0] CUSTOM_3 = 7'b1111011;
 assign     cop_wait = 1'b0;
 wire [6:0] funct    = cop_insn[31:25];
 
-//decode rv32b_ise
-wire        rv32b_sel;
-wire [31:0] rv32b_rd;  
-generate 
-    if (ISE_V[0] == 1'b1) begin : RB32B_IMP
-wire   op_rori     = ise_val && (funct[6:5] == 2'b00)      && (cop_insn[6:0] == CUSTOM_0);
-wire   op_xnor     = ise_val && (funct[6:0] == 7'b0000000) && (cop_insn[6:0] == CUSTOM_2);
-
-assign rv32b_sel = op_rori | op_xnor;
-rv32b_ise rv32b_ins(
-    .rs1(      ise_in1  ),
-    .rs2(      ise_in2  ),
-    .rd (      rv32b_rd ),
-    .imm(     funct[4:0]),
-    .op_rori(  op_rori  ),
-    .op_xnor(  op_xnor  )
-);
-end else begin            : No_RB32B
-assign  rv32b_sel =  1'b0;
-assign  rv32b_rd  = 32'd0;  
-    end
-endgenerate
- 
 //decode jambu_ise_v2
 wire        jambu_ise_v2_sel;
 wire [31:0] jambu_ise_v2_rd;  
@@ -102,14 +79,13 @@ assign  jambu_ise_v3_rd  = 32'd0;
     end
 endgenerate
 
-wire [31:0] dout = {32{       rv32b_sel}} &        rv32b_rd | 
-                   {32{jambu_ise_v2_sel}} & jambu_ise_v2_rd |
+wire [31:0] dout = {32{jambu_ise_v2_sel}} & jambu_ise_v2_rd |
                    {32{jambu_ise_v3_sel}} & jambu_ise_v3_rd ;
 
 wire   stallResp = cop_wr && (~cop_rdywr);
 assign cop_ready = ~stallResp;
 
-assign cop_wr = cop_valid && (rv32b_sel | jambu_ise_v2_sel | jambu_ise_v3_sel);
+assign cop_wr = cop_valid && (jambu_ise_v2_sel | jambu_ise_v3_sel);
 assign cop_rd = dout;
 
 endmodule

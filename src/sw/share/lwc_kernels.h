@@ -23,6 +23,8 @@ extern void skinny_128_384_plus_enc (void * input, void* userkey);
 extern void sparkle_opt( void* state, int brans, int steps );
 //extern void sparkle_inv_opt( void* state, int brans, int steps ); not used
 
+extern void state_update(void *state, const void *key, unsigned int number_of_steps);
+
 extern void Xoodoo_Permute_12rounds( void * state);
 
 #endif
