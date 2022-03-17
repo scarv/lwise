@@ -42,25 +42,53 @@
 // load state + store state: four 40-bit slices
 
 .macro SPONGENT_LDSTATE s0, s1, s2, s3, s4, s5, s6, s7
+  lw   \s2,  4(a0)
+  andi \s1, \s2, 0xFF
+  srli \s2, \s2, 8
+  lw   \s4,  8(a0)
+  andi \s3, \s4, 0xFFa
+  slli \s3, \s3, 24
+  xor  \s2, \s2, \s3
+  srli \s3, \s4, 8
+  andi \s3, \s3, 0xFF
+  srli \s4, \s4, 16
+  lw   \s6, 12(a0)
+  slli \s5, \s6, 16
+  xor  \s4, \s5, \s4
+  srli \s6, \s6, 16
+  andi \s5, \s6, 0xFF
+  srli \s6, \s6, 8
+  lw   \s0, 16(a0)
+  srli \s7, \s0, 24
+  slli \s0, \s0, 8
+  xor  \s6, \s0, \s6 
   lw   \s0,  0(a0)
-  lbu  \s1,  4(a0)
-  lw   \s2,  5(a0)
-  lbu  \s3,  9(a0)
-  lw   \s4, 10(a0)
-  lbu  \s5, 14(a0)
-  lw   \s6, 15(a0)
-  lbu  \s7, 19(a0)
 .endm
 
 .macro SPONGENT_STSTATE s0, s1, s2, s3, s4, s5, s6, s7
+  andi \s1, \s1, 0xFF
+  andi \s3, \s3, 0xFF
+  andi \s5, \s5, 0xFF
   sw   \s0,  0(a0)
-  sb   \s1,  4(a0)
-  sw   \s2,  5(a0)
-  sb   \s3,  9(a0)
-  sw   \s4, 10(a0)
-  sb   \s5, 14(a0)
-  sw   \s6, 15(a0)
-  sb   \s7, 19(a0)  
+  slli \s0, \s2, 8
+  xor  \s1, \s1, \s0
+  sw   \s1,  4(a0)
+  srli \s2, \s2, 24
+  slli \s3, \s3, 8
+  xor  \s2, \s3, \s2
+  slli \s0, \s4, 16
+  xor  \s2, \s2, \s0
+  sw   \s2,  8(a0)
+  srli \s3, \s4, 16
+  slli \s5, \s5, 16
+  xor  \s3, \s3, \s5
+  slli \s0, \s6, 24
+  xor  \s3, \s3, \s0
+  sw   \s3, 12(a0)
+  srli \s4, \s6, 8
+  slli \s0, \s7, 24
+  xor  \s4, \s4, \s0
+  sw   \s4, 16(a0)
 .endm
 
 
