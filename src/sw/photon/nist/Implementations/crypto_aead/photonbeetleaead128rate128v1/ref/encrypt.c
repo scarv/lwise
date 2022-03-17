@@ -343,34 +343,34 @@ int crypto_aead_decrypt(
 	if (adlen != 0) HASH(State, A, adlen, c0);
 	if (cmtlen != 0)
 	{
-#if defined( LWISE )
+//#if defined( LWISE )
         M = m;
-#else
-		M = (uint8_t *)malloc(cmtlen);
-#endif
+//#else
+//		M = (uint8_t *)malloc(cmtlen);
+//#endif
 		if (M == NULL) return OTHER_FAILURES;
 		ENCorDEC(State, M, C, cmtlen, c1, DEC);
 	}
 
 	TAG(T_tmp, State);
-#if !defined( LWISE )
-	if (memcmp(T_tmp, T, TAG_INBYTES) != 0)
-	{
-		if (M != NULL) free(M);
-		return TAG_UNMATCH;
-	}
+//#if !defined( LWISE )
+//	if (memcmp(T_tmp, T, TAG_INBYTES) != 0)
+//	{
+//		if (M != NULL) free(M);
+//		return TAG_UNMATCH;
+//	}
 
-	if (cmtlen != 0)
-	{
-		memcpy(m, M, cmtlen);
-		free(M);
-	}
-#else
+//	if (cmtlen != 0)
+//	{
+//		memcpy(m, M, cmtlen);
+//		free(M);
+//	}
+//#else
 	if (memcmp(T_tmp, T, TAG_INBYTES) != 0)
 	{
 		return TAG_UNMATCH;
 	}
-#endif
+//#endif
 	*mlen = cmtlen;
 	return TAG_MATCH;
 }
