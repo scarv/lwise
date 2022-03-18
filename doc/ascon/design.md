@@ -33,22 +33,6 @@
 - `ASCON_RV32_TYPE2`: base ISA plus ISE.
 
   ```
-  ascon.rori.lo  rd, rs1, rs2, imm {
-    x_hi    <- GPR[rs2]
-    x_lo    <- GPR[rs1]
-    x       <- x_hi || x_lo
-    r       <- ROR64( x, imm )
-    GPR[rd] <- r_{31.. 0}
-  }
-
-  ascon.rori.hi  rd, rs1, rs2, imm {
-    x_hi    <- GPR[rs2]
-    x_lo    <- GPR[rs1]
-    x       <- x_hi || x_lo
-    r       <- ROR64( x, imm )
-    GPR[rd] <- r_{63..32}
-  }
-
   ascon.sigma.lo rd, rs1, rs2, imm {
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]

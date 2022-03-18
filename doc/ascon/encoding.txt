@@ -2,22 +2,6 @@
 | class               | instruction          | format   | f7                  | f3      | custom      |
 +=====================+======================+==========+=====================+=========+=============+
 |                     |                      |          |                     |         |             |
-| ASCON_RV32_TYPE2    | ascon.rori.lo        | 2R+I->1R | 00 : imm5           | 7 = 111 | 0 = 0001011 | 
-| ASCON_RV32_TYPE2    | ascon.rori.hi        | 2R+I->1R | 01 : imm5           | 7 = 111 | 0 = 0001011 | 
-|                     |                      |          |                     |         |             |
-+=====================+======================+==========+=====================+=========+=============+
-
-.macro ascon.rori.lo        rd, rs1, rs2, imm      // ascon.rori.lo           => 00ii iiir rrrr rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_ASCON_RORI_LO  0x0000700B
-.endm                                              //                         => #define  MASK_ASCON_RORI_LO  0xC000707F
-.macro ascon.rori.hi        rd, rs1, rs2, imm      // ascon.rori.hi           => 01ii iiir rrrr rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 7, \imm+( 1*32), \rd, \rs1, \rs2 //                         => #define MATCH_ASCON_RORI_HI  0x4000700B
-.endm                                              //                         => #define  MASK_ASCON_RORI_HI  0xC000707F
-
-+=====================+======================+==========+=====================+=========+=============+
-| class               | instruction          | format   | f7                  | f3      | custom      |
-+=====================+======================+==========+=====================+=========+=============+
-|                     |                      |          |                     |         |             |
 | ASCON_RV32_TYPE2    | ascon.sigma.lo       | 2R+I->1R | 00 : imm5           | 7 = 111 | 1 = 0101011 |
 | ASCON_RV32_TYPE2    | ascon.sigma.hi       | 2R+I->1R | 01 : imm5           | 7 = 111 | 1 = 0101011 |
 |                     |                      |          |                     |         |             |
