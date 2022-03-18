@@ -1,0 +1,51 @@
++=====================+======================+==========+=====================+=========+=============+
+| class               | instruction          | format   | f7                  | f3      | custom      |
++=====================+======================+==========+=====================+=========+=============+
+|                     |                      |          |                     |         |             |
+| GRAIN_RV32_TYPE2    | grain.extr           | 2R+I->1R | 00 : imm5           | 7 = 111 | 0 = 0001011 | 
+|                     |                      |          |                     |         |             |
++=====================+======================+==========+=====================+=========+=============+
+
+.macro grain.extr           rd, rs1, rs2, imm      // grain.extr => 00ii iiir rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_EXTR 0x0000700B
+.endm                                              //            => #define  MASK_GRAIN_EXTR 0xC000707F
+
++=====================+======================+==========+=====================+=========+=============+
+| class               | instruction          | format   | f7                  | f3      | custom      |
++=====================+======================+==========+=====================+=========+=============+
+|                     |                      |          |                     |         |             |
+| GRAIN_RV32_TYPE2    | grain.fln2           | 2R  ->1R | 000 : 0000          | 7 = 111 | 1 = 0101011 |
+| GRAIN_RV32_TYPE2    | grain.gnn0           | 2R  ->1R | 001 : 0000          | 7 = 111 | 1 = 0101011 |
+| GRAIN_RV32_TYPE2    | grain.gnn1           | 2R  ->1R | 010 : 0000          | 7 = 111 | 1 = 0101011 |
+| GRAIN_RV32_TYPE2    | grain.gnn2           | 2R  ->1R | 011 : 0000          | 7 = 111 | 1 = 0101011 |
+| GRAIN_RV32_TYPE2    | grain.onn0           | 2R  ->1R | 100 : 0000          | 7 = 111 | 1 = 0101011 |
+| GRAIN_RV32_TYPE2    | grain.onn1           | 2R  ->1R | 101 : 0000          | 7 = 111 | 1 = 0101011 |
+| GRAIN_RV32_TYPE2    | grain.onn2           | 2R  ->1R | 110 : 0000          | 7 = 111 | 1 = 0101011 |
+| GRAIN_RV32_TYPE2    | grain.oln0           | 2R  ->1R | 111 : 0000          | 7 = 111 | 1 = 0101011 |
+|                     |                      |          |                     |         |             |
++=====================+======================+==========+=====================+=========+=============+
+
+.macro grain.fln2           rd, rs1, rs2           // grain.fln2 => 0000 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 0*16), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_FLN2 0x0000702B
+.endm                                              //            => #define  MASK_GRAIN_FLN2 0xE000707F
+.macro grain.gnn0           rd, rs1, rs2           // grain.gnn0 => 0010 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 1*16), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_GNN0 0x2000702B
+.endm                                              //            => #define  MASK_GRAIN_GNN0 0xE000707F
+.macro grain.gnn1           rd, rs1, rs2           // grain.gnn1 => 0100 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 2*16), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_GNN1 0x4000702B
+.endm                                              //            => #define  MASK_GRAIN_GNN1 0xE000707F
+.macro grain.gnn2           rd, rs1, rs2           // grain.gnn2 => 0110 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 3*16), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_GNN2 0x6000702B
+.endm                                              //            => #define  MASK_GRAIN_GNN2 0xE000707F
+.macro grain.onn0           rd, rs1, rs2           // grain.onn0 => 1000 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 4*16), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_ONN0 0x8000702B
+.endm                                              //            => #define  MASK_GRAIN_ONN0 0xE000707F
+.macro grain.onn1           rd, rs1, rs2           // grain.onn1 => 1010 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 5*16), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_ONN1 0xA000702B
+.endm                                              //            => #define  MASK_GRAIN_ONN1 0xE000707F
+.macro grain.onn2           rd, rs1, rs2           // grain.onn2 => 1100 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 6*16), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_ONN2 0xC000702B
+.endm                                              //            => #define  MASK_GRAIN_ONN2 0xE000707F
+.macro grain.oln0           rd, rs1, rs2           // grain.oln0 => 1110 000r rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7,      ( 7*16), \rd, \rs1, \rs2 //            => #define MATCH_GRAIN_OLN0 0xE000702B
+.endm                                              //            => #define  MASK_GRAIN_OLN0 0xE000707F
