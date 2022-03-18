@@ -22,20 +22,20 @@
 | class               | instruction          | format   | f7                  | f3      | custom      |
 +=====================+======================+==========+=====================+=========+=============+
 |                     |                      |          |                     |         |             |
-| SPARKLE_RV32_RCON   | sparkle.rcon         | 1R+I->1R | 00 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
-| SPARKLE_RV64_RCON   | sparkle.rcon         | 1R+I->1R | 00 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
-| SPARKLE_RV64_RCON   | sparkle.rconw        | 1R+I->1R | 00 : 01     : dec3  | 6 = 110 | 2 = 1011011 |
+| SPARKLE_RV32_RCON   | sparkle.rcon         | 1R+I->1R | 00 : 00     : imm3  | 6 = 110 | 2 = 1011011 |
+| SPARKLE_RV64_RCON   | sparkle.rcon         | 1R+I->1R | 00 : 00     : imm3  | 6 = 110 | 2 = 1011011 |
+| SPARKLE_RV64_RCON   | sparkle.rconw        | 1R+I->1R | 00 : 01     : imm3  | 6 = 110 | 2 = 1011011 |
 |                     |                      |          |                     |         |             |
-| SPARKLE_RV64_TYPE2  | sparkle.block.enci   | 2R+I->1R | 01 : 00 : 0 : dec2  | 7 = 111 | 2 = 1011011 |
-| SPARKLE_RV64_TYPE2  | sparkle.block.deci   | 2R+I->1R | 01 : 01 : 0 : dec2  | 7 = 111 | 2 = 1011011 |
+| SPARKLE_RV64_TYPE2  | sparkle.block.enci   | 2R+I->1R | 01 : 00 : 0 : imm2  | 7 = 111 | 2 = 1011011 |
+| SPARKLE_RV64_TYPE2  | sparkle.block.deci   | 2R+I->1R | 01 : 01 : 0 : imm2  | 7 = 111 | 2 = 1011011 |
 |                     |                      |          |                     |         |             |
-| SPARKLE_RV32_TYPE4  | sparkle.whole.enci.x | 2R+I->1R | 10 : 00     : dec3  | 7 = 111 | 2 = 1011011 |
-| SPARKLE_RV32_TYPE4  | sparkle.whole.enci.y | 2R+I->1R | 10 : 01     : dec3  | 7 = 111 | 2 = 1011011 |
-| SPARKLE_RV32_TYPE4  | sparkle.whole.deci.x | 2R+I->1R | 10 : 10     : dec3  | 7 = 111 | 2 = 1011011 |
-| SPARKLE_RV32_TYPE4  | sparkle.whole.deci.y | 2R+I->1R | 10 : 11     : dec3  | 7 = 111 | 2 = 1011011 |
+| SPARKLE_RV32_TYPE4  | sparkle.whole.enci.x | 2R+I->1R | 10 : 00     : imm3  | 7 = 111 | 2 = 1011011 |
+| SPARKLE_RV32_TYPE4  | sparkle.whole.enci.y | 2R+I->1R | 10 : 01     : imm3  | 7 = 111 | 2 = 1011011 |
+| SPARKLE_RV32_TYPE4  | sparkle.whole.deci.x | 2R+I->1R | 10 : 10     : imm3  | 7 = 111 | 2 = 1011011 |
+| SPARKLE_RV32_TYPE4  | sparkle.whole.deci.y | 2R+I->1R | 10 : 11     : imm3  | 7 = 111 | 2 = 1011011 |
 |                     |                      |          |                     |         |             |
-| SPARKLE_RV64_TYPE4  | sparkle.whole.enci   | 1R+I->1R | 11 : 00     : dec3  | 6 = 110 | 2 = 1011011 |
-| SPARKLE_RV64_TYPE4  | sparkle.whole.deci   | 1R+I->1R | 11 : 01     : dec3  | 6 = 110 | 2 = 1011011 |
+| SPARKLE_RV64_TYPE4  | sparkle.whole.enci   | 1R+I->1R | 11 : 00     : imm3  | 6 = 110 | 2 = 1011011 |
+| SPARKLE_RV64_TYPE4  | sparkle.whole.deci   | 1R+I->1R | 11 : 01     : imm3  | 6 = 110 | 2 = 1011011 |
 |                     |                      |          |                     |         |             |
 +=====================+======================+==========+=====================+=========+=============+
 

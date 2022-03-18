@@ -68,28 +68,28 @@
     x       <- GPR[rs1]
     y       <- GPR[rs2]
 
-    if     ( imm == 2 ) {
+    if     ( imm = 2 ) {
       y <- 2
     }
-    else if( imm == 3 ) {
+    else if( imm = 3 ) {
       y <- 0
     }
 
-    t       <- SBOX[ x_{31..24} ] || SBOX[ x_{23..16} ] ||
-               SBOX[ x_{15.. 8} ] || SBOX[ x_{ 7.. 0} ]
+    t       <- SBOX_ENC[ x_{31..24} ] || SBOX_ENC[ x_{23..16} ] ||
+               SBOX_ENC[ x_{15.. 8} ] || SBOX_ENC[ x_{ 7.. 0} ]
 
     t       <- t ^ y
 
-    if     ( imm == 0 ) {
+    if     ( imm = 0 ) {
       r <- ROL32( t,  0 )
     }
-    else if( imm == 1 ) {
+    else if( imm = 1 ) {
       r <- ROL32( t,  8 )
     }
-    else if( imm == 2 ) {
+    else if( imm = 2 ) {
       r <- ROL32( t, 16 )
     }
-    else if( imm == 3 ) {
+    else if( imm = 3 ) {
       r <- ROL32( t, 24 )
     }
 
@@ -120,15 +120,15 @@
     x       <- GPR[rs1]
     y       <- GPR[rs2]
 
-    if     ( imm == 1 ) {
-      r <-           x_{31..24}   ||           y_{ 7.. 0}   ||
-                     y_{23..16}   ||           x_{23..16}  
+    if     ( imm = 1 ) {
+      r <-           y_{15.. 8}   ||           x_{ 7.. 0}   ||
+                     y_{31..24}   ||           x_{15.. 8}  
     }
-    else if( imm == 2 ) {
-      r <- LFSR_TK2( y_{16.. 8} ) || LFSR_TK2( x_{ 7.. 0} ) ||
+    else if( imm = 2 ) {
+      r <- LFSR_TK2( y_{15.. 8} ) || LFSR_TK2( x_{ 7.. 0} ) ||
            LFSR_TK2( y_{31..24} ) || LFSR_TK2( x_{15.. 8} )
     }
-    else if( imm == 3 ) {
+    else if( imm = 3 ) {
       r <- LFSR_TK3( y_{15.. 8} ) || LFSR_TK3( x_{ 7.. 0} ) ||
            LFSR_TK3( y_{31..24} ) || LFSR_TK3( x_{15.. 8} )
     }
@@ -140,15 +140,15 @@
     x       <- GPR[rs1]
     y       <- GPR[rs2]
 
-    if     ( imm == 1 ) {
+    if     ( imm = 1 ) {
       r <-           x_{31..24}   ||           y_{ 7.. 0}   ||
                      y_{23..16}   ||           x_{23..16}  
     }
-    else if( imm == 2 ) {
+    else if( imm = 2 ) {
       r <- LFSR_TK2( x_{31..24} ) || LFSR_TK2( y_{ 7.. 0} ) ||
            LFSR_TK2( y_{23..16} ) || LFSR_TK2( x_{23..16} )
     }
-    else if( imm == 3 ) {
+    else if( imm = 3 ) {
       r <- LFSR_TK3( x_{31..24} ) || LFSR_TK3( y_{ 7.. 0} ) ||
            LFSR_TK3( y_{23..16} ) || LFSR_TK3( x_{23..16} )
     }
@@ -170,21 +170,21 @@
     x       <- GPR[rs1]
     y       <- GPR[rs2]
 
-    if     ( imm == 1 ) {
+    if     ( imm = 1 ) {
       y <- 2
     }
 
-    t       <- SBOX[ x_{63..56} ] || SBOX[ x_{55..48} ] ||
-               SBOX[ x_{47..40} ] || SBOX[ x_{39..32} ] ||
-               SBOX[ x_{31..24} ] || SBOX[ x_{23..16} ] ||
-               SBOX[ x_{15.. 8} ] || SBOX[ x_{ 7.. 0} ]
+    t       <- SBOX_ENC[ x_{63..56} ] || SBOX_ENC[ x_{55..48} ] ||
+               SBOX_ENC[ x_{47..40} ] || SBOX_ENC[ x_{39..32} ] ||
+               SBOX_ENC[ x_{31..24} ] || SBOX_ENC[ x_{23..16} ] ||
+               SBOX_ENC[ x_{15.. 8} ] || SBOX_ENC[ x_{ 7.. 0} ]
 
     t       <- t ^ y
 
-    if     ( imm == 0 ) {
+    if     ( imm = 0 ) {
       r <- ROL32( t_{63..32},  8 ) || ROL32( t_{31.. 0},  0 )
     }
-    else if( imm == 1 ) {
+    else if( imm = 1 ) {
       r <- ROL32( t_{63..32}, 16 ) || ROL32( t_{31.. 0}, 24 )
     }
 
@@ -217,11 +217,11 @@
                (                                              t_3_{ 7.. 0} ) ||
                ( t_3_{31..24} ^ t_3_{23..16} ^                t_3_{ 7.. 0} )
 
-    if     ( imm == 0 ) {
+    if     ( imm = 0 ) {
       r <- t_3_{15.. 8} || t_2_{15.. 8} || t_1_{15.. 8} || t_0_{15.. 8} ||
            t_3_{ 7.. 0} || t_2_{ 7.. 0} || t_1_{ 7.. 0} || t_0_{ 7.. 0}
     }
-    else if( imm == 1 ) {
+    else if( imm = 1 ) {
       r <- t_3_{31..24} || t_2_{31..24} || t_1_{31..24} || t_0_{31..24} ||
            t_3_{23..16} || t_2_{23..16} || t_1_{23..16} || t_0_{23..16}
     }
@@ -246,13 +246,13 @@
   romulus.tk.upd.enc   rd, rs1,      imm {
     x       <- GPR[rs1]
 
-    if     ( imm == 2 ) {
+    if     ( imm = 2 ) {
       r <- LFSR_TK2( x_{16.. 8} ) || LFSR_TK2( x_{61..56} ) ||
            LFSR_TK2( x_{ 7.. 0} ) || LFSR_TK2( x_{47..40} ) ||
            LFSR_TK2( x_{24..16} ) || LFSR_TK2( x_{55..48} ) ||
            LFSR_TK2( x_{39..32} ) || LFSR_TK2( x_{31..24} )
     }
-    else if( imm == 3 ) {
+    else if( imm = 3 ) {
       r <- LFSR_TK3( x_{16.. 8} ) || LFSR_TK3( x_{61..56} ) ||
            LFSR_TK3( x_{ 7.. 0} ) || LFSR_TK3( x_{47..40} ) ||
            LFSR_TK3( x_{24..16} ) || LFSR_TK3( x_{55..48} ) ||

@@ -49,8 +49,9 @@
 
   ```
   sparkle.ell          rd, rs1, rs2      {
-    x       <- GPR[rs1] ^ GPR[rs2]
-    r       <- ELL( x  )
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- ELL( x ^ y )
     GPR[rd] <- r
   }
   ```

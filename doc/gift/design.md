@@ -54,10 +54,10 @@
     x_2     <- GPR[rs1]_{11.. 8}
     x_1     <- GPR[rs1]_{ 7.. 4}
     x_0     <- GPR[rs1]_{ 3.. 0}
-    r       <- ROR4 ( x_7, imm ) | ROR4 ( x_6, imm ) | 
-               ROR4 ( x_5, imm ) | ROR4 ( x_4, imm ) | 
-               ROR4 ( x_3, imm ) | ROR4 ( x_2, imm ) | 
-               ROR4 ( x_1, imm ) | ROR4 ( x_0, imm ) 
+    r       <- ROR4 ( x_7, imm ) || ROR4 ( x_6, imm ) || 
+               ROR4 ( x_5, imm ) || ROR4 ( x_4, imm ) || 
+               ROR4 ( x_3, imm ) || ROR4 ( x_2, imm ) || 
+               ROR4 ( x_1, imm ) || ROR4 ( x_0, imm ) 
     GPR[rd] <- r
   }
   
@@ -66,15 +66,15 @@
     x_2     <- GPR[rs1]_{23..16}
     x_1     <- GPR[rs1]_{15.. 8}
     x_0     <- GPR[rs1]_{ 7.. 0}
-    r       <- ROR8 ( x_3, imm ) | ROR8 ( x_2, imm ) | 
-               ROR8 ( x_1, imm ) | ROR8 ( x_0, imm ) 
+    r       <- ROR8 ( x_3, imm ) || ROR8 ( x_2, imm ) || 
+               ROR8 ( x_1, imm ) || ROR8 ( x_0, imm ) 
     GPR[rd] <- r
   }
   
   gift.rori.h     rd, rs1,      imm {
     x_1     <- GPR[rs1]_{31..16}
     x_0     <- GPR[rs1]_{15.. 0}
-    r       <- ROR16( x_1, imm ) | ROR16( x_0, imm )
+    r       <- ROR16( x_1, imm ) || ROR16( x_0, imm )
     GPR[rd] <- r
   }
     
