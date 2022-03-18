@@ -1,37 +1,31 @@
-# `${ALG} = "jambu"`
-
 <!--- -------------------------------------------------------------------- --->
 
 ## Notation
-
-Throughout the following, we
 
 - use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
 - use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate.
 
 <!--- -------------------------------------------------------------------- --->
 
-## Discussion
-
-<!--- -------------------------------------------------------------------- --->
-
 ## Options
 
-| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
-| :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE1`    | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE2`    | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE3`    | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
-|           | `jambu`    | `rv64`    | `JAMBU_RV64_TYPE1`    | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `jambu`    | `rv64`    | `JAMBU_RV64_TYPE2`    | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                 | Meaning                                                                 |
+| :-------- | :--------- | :-------- | :--------------------- | :---------------------------------------------------------------------- |
+|           | `jambu`    | `rv32`    | `JAMBU_RV32_UNROLL`    | use fully (vs. partially, by a factor of two) unrolled implementation   |
+|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE1`     | select 32-bit RISC-V base ISA:          option 1, per description below |
+|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE2`     | select 32-bit RISC-V base ISA plus ISE: option 2, per description below |
+|           | `jambu`    | `rv32`    | `JAMBU_RV32_TYPE3`     | select 32-bit RISC-V base ISA plus ISE: option 3, per description below |
+|           | `jambu`    | `rv64`    | `JAMBU_RV64_UNROLL`    | use fully (vs. partially, by a factor of two) unrolled implementation   |
+|           | `jambu`    | `rv64`    | `JAMBU_RV64_TYPE1`     | select 64-bit RISC-V base ISA:          option 1, per description below |
+|           | `jambu`    | `rv64`    | `JAMBU_RV64_TYPE2`     | select 64-bit RISC-V base ISA plus ISE: option 2, per description below |
 
 <!--- -------------------------------------------------------------------- --->
 
 ## `${IMP} = "rv32"`
 
-- `JAMBU_RV32_TYPE1`: baseline ISA.
+- `JAMBU_RV32_TYPE1`: base ISA.
 
-- `JAMBU_RV32_TYPE2`: baseline ISA plus custom ISE.
+- `JAMBU_RV32_TYPE2`: base ISA plus ISE.
 
   ```
   jambu.fsri    rd, rs1, rs2, imm {
@@ -42,12 +36,7 @@ Throughout the following, we
   }                                             
   ```
 
-  Note that this operation overlaps with, or is at least similar to one 
-  which exists for the
-  `ascon`
-  case: there it is called `ascon.rori.lo`.
-
-- `JAMBU_RV32_TYPE3`: baseline ISA plus custom ISE.
+- `JAMBU_RV32_TYPE3`: base ISA plus ISE.
 
   ```
   jambu.fsr.15  rd, rs1, rs2      {
@@ -83,9 +72,9 @@ Throughout the following, we
 
 ## `${IMP} = "rv64"`
 
-- `JAMBU_RV64_TYPE1`: baseline ISA.
+- `JAMBU_RV64_TYPE1`: base ISA.
 
-- `JAMBU_RV64_TYPE2`: baseline ISA plus custom ISE.
+- `JAMBU_RV64_TYPE2`: base ISA plus ISE.
 
   ```
   jambu.block.0 rd, rs1, rs2      { 
@@ -140,13 +129,5 @@ Throughout the following, we
     GPR[rd] <- r_{31.. 0}
   }
   ```
-
-<!--- -------------------------------------------------------------------- --->
-
-## References
-
-[1] H. Wu and T. Huang
-    [TinyJAMBU](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/tinyjambu-spec-final.pdf).
-    Submission to NIST (version 2.0), 2021.
 
 <!--- -------------------------------------------------------------------- --->

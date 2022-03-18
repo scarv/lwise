@@ -16,7 +16,12 @@ def rv32( args ) :
     driver.run( args, 'jambu', CONF, 'rv32', 'nist', NIST_IMP = 'opt' )
 
   for TYPE in [ 'JAMBU_RV32_TYPE1', 'JAMBU_RV32_TYPE2', 'JAMBU_RV32_TYPE3' ] :
+    for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
+
+      if ( UNROLL ) :
+        CONF += [ 'JAMBU_RV32_UNROLL' ]
+
       driver.run( args, 'jambu', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
@@ -33,7 +38,7 @@ def rv64( args ) :
       CONF = [ TYPE ]
 
       if ( UNROLL ) :
-        CONF += [ 'JAMBU_UNROLL' ]
+        CONF += [ 'JAMBU_RV64_UNROLL' ]
   
       driver.run( args, 'jambu', CONF, 'rv64', 'rv64' )
 

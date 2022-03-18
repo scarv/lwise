@@ -21,11 +21,11 @@ def rv32( args ) :
         CONF = [ TYPE ]
 
         if ( UNROLL ) :
-          CONF += [ 'SPARKLE_UNROLL'    ]
+          CONF += [ 'SPARKLE_RV32_UNROLL' ]
         if ( ELL    ) :
-          CONF += [ 'SPARKLE_RV32_ELL'  ]
+          CONF += [ 'SPARKLE_RV32_ELL'    ]
         if ( RCON   ) :
-          CONF += [ 'SPARKLE_RV32_RCON' ]
+          CONF += [ 'SPARKLE_RV32_RCON'   ]
   
         driver.run( args, 'sparkle', CONF, 'rv32', 'rv32' )
 
@@ -44,11 +44,11 @@ def rv64( args ) :
         CONF = [ TYPE ]
   
         if ( UNROLL   ) :
-          CONF += [ 'SPARKLE_UNROLL'    ]
+          CONF += [ 'SPARKLE_RV64_UNROLL' ]
         if ( ELL      ) :
-          CONF += [ 'SPARKLE_RV64_ELL'  ]
+          CONF += [ 'SPARKLE_RV64_ELL'    ]
         if ( RCON     ) :
-          CONF += [ 'SPARKLE_RV64_RCON' ]
+          CONF += [ 'SPARKLE_RV64_RCON'   ]
 
         driver.run( args, 'sparkle', CONF, 'rv64', 'rv64' )
 

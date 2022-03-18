@@ -1,10 +1,6 @@
-# `${ALG} = "gift"`
-
 <!--- -------------------------------------------------------------------- --->
 
 ## Notation
-
-Throughout the following, we
 
 - use `ROL32` (resp. `ROL4`, `ROL8`, `ROL16`, and `ROL64`) to denote a 32-bit (resp. 4-bit, 8-bit, 16-bit, and 64-bit)  left-rotate,
 - use `ROR32` (resp. `ROR4`, `ROR8`, `ROR16`, and `ROR64`) to denote a 32-bit (resp. 4-bit, 8-bit, 16-bit, and 64-bit) right-rotate,
@@ -25,42 +21,13 @@ Throughout the following, we
 
 <!--- -------------------------------------------------------------------- --->
 
-## Discussion
-
-SWAPMOVE *seems* to have been first defined in [Sec. 3.1, 2], although
-even that cites prior art (e.g., libdes).  Either way, that definition 
-is (with some cosmetic alterations) as follows:
-
-  ```
-  SWAPMOVE(x,y,m,n) {
-    t = y ^ ( x >> n )
-    t = t & m
-    x = x ^ ( t << n )
-    y = y ^ ( t      )
-
-    return ( x, y )
-  }
-  ```
-
-The basic idea is that 
-the bits in  `y` masked by `m` 
-are swapped with
-the bits in  `x` masked by `m << n`.
-Or put even more simply, 
-some bits in `y` 
-are swapped with 
-some bits in `x`
-with the bits in question controlled by `n` and `m`.
-
-<!--- -------------------------------------------------------------------- --->
-
 ## Options
 
-| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
-| :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `gift`     | `rv32`    | `GIFT_RV32_TYPE1`     | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `gift`     | `rv32`    | `GIFT_RV32_TYPE2`     | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `gift`     | `rv64`    | `GIFT_RV64_TYPE1`     | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
+| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                 | Meaning                                                                 |
+| :-------- | :--------- | :-------- | :--------------------- | :---------------------------------------------------------------------- |
+|           | `gift`     | `rv32`    | `GIFT_RV32_UNROLL`     | use fully (vs. partially, by a factor of two) unrolled implementation   |
+|           | `gift`     | `rv32`    | `GIFT_RV32_TYPE1`      | select 32-bit RISC-V base ISA:          option 1, per description below |
+|           | `gift`     | `rv32`    | `GIFT_RV32_TYPE2`      | select 32-bit RISC-V base ISA plus ISE: option 2, per description below |
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -68,7 +35,7 @@ with the bits in question controlled by `n` and `m`.
 
 - `GIFT_RV32_TYPE1`: base ISA.
 
-- `GIFT_RV32_TYPE2`: base ISA plus custom ISE.
+- `GIFT_RV32_TYPE2`: base ISA plus ISE.
 
   ```
   gift.swapmove   rd, rs1, rs2, imm {
@@ -77,15 +44,7 @@ with the bits in question controlled by `n` and `m`.
     r       <- SWAPMOVE32( x, m, imm )
     GPR[rd] <- r
   }
-  ```
 
-  Note that this operation is *already* more special-purpose than the
-  original definition of `SWAPMOVE`, in the sense it moves bits in an
-  intra-word vs. inter-word manner.  It is at least possible to think
-  about a *further* specialisation, because GIFT-COFB uses a fairly
-  small set of masks (`m`) and distances (`imm`).
-
-  ```
   gift.rori.n     rd, rs1,      imm {
     x_7     <- GPR[rs1]_{31..28}
     x_6     <- GPR[rs1]_{27..24}
@@ -221,23 +180,5 @@ with the bits in question controlled by `n` and `m`.
     GPR[rd] <- r
   }
   ```
-
-<!--- -------------------------------------------------------------------- --->
-
-## `${IMP} = "rv64"`
-
-- `GIFT_RV64_TYPE1`: baseline ISA.
-
-<!--- -------------------------------------------------------------------- --->
-
-## References
-
-[1] S. Banik, A. Chakraborti, T. Iwata, K. Minematsu, M. Nandi, T. Peyrin, Y. Sasaki, S.M. Sim, Y. Todo.
-    [GIFT-COFB](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf).
-    Submission to NIST (version 1.1), 2021.
-
-[2] L. May and L. Penna and A. Clark.
-    [An Implementation of Bitsliced DES on the Pentium MMX Processor](https://link.springer.com/chapter/10.1007/10718964_10).
-    Australasian Conference on Information Security and Privacy (ACISP). Springer-Verlag, LNCS 1841, 112--122, 2000.
 
 <!--- -------------------------------------------------------------------- --->

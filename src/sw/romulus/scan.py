@@ -21,7 +21,7 @@ def rv32( args ) :
       CONF = [ TYPE ]
 
       if ( UNROLL ) :
-        CONF += [ 'ROMULUS_UNROLL' ]
+        CONF += [ 'ROMULUS_RV32_UNROLL' ]
 
       driver.run( args, 'romulus', CONF, 'rv32', 'rv32' )
 
@@ -40,7 +40,7 @@ def rv64( args ) :
       CONF = [ TYPE ]
 
       if ( UNROLL ) :
-        CONF += [ 'ROMULUS_UNROLL' ]
+        CONF += [ 'ROMULUS_RV64_UNROLL' ]
 
       driver.run( args, 'romulus', CONF, 'rv64', 'rv64' )
 

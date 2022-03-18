@@ -1,10 +1,6 @@
-# `${ALG} = "sparkle"`
-
 <!--- -------------------------------------------------------------------- --->
 
 ## Notation
-
-Throughout the following, we
 
 - use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
 - use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate,
@@ -25,73 +21,25 @@ Throughout the following, we
 
 <!--- -------------------------------------------------------------------- --->
 
-## Discussion
-
-Focusing on encryption, the Alzette function is described in [Appx. C, 2] 
-as follows
-
-```
-.macro ALZETTE xi:req, yi:req, ci:req
-  add \xi, \xi, \yi, ror #31
-  eor \yi, \yi, \xi, ror #24
-  eor \xi, \xi, \ci
-  add \xi, \xi, \yi, ror #17
-  eor \yi, \yi, \xi, ror #17
-  eor \xi, \xi, \ci
-  add \xi, \xi, \yi
-  eor \yi, \yi, \xi, ror #31
-  eor \xi, \xi, \ci
-  add \xi, \xi, \yi, ror #24
-  eor \yi, \yi, \xi, ror #16
-  eor \xi, \xi, \ci
-.endm
-```
-
-or, as more C-like pseudo-code
-
-```
-ALZETTE( xi, yi, ci ) {
-  xi = xi + ROR32( yi, 31 )
-  yi = yi ^ ROR32( xi, 24 )
-  xi = xi ^        ci
-
-  xi = xi + ROR32( yi, 17 )
-  yi = yi ^ ROR32( xi, 17 )
-  xi = xi ^        ci
-
-  xi = xi + ROR32( yi,  0 )
-  yi = yi ^ ROR32( xi, 31 )
-  xi = xi ^        ci
-
-  xi = xi + ROR32( yi, 24 )
-  yi = yi ^ ROR32( xi, 16 )
-  xi = xi ^        ci
-}
-```
-
-intentionally typeset to stress repeated use of an `add-xor-xor` block.
-
-<!--- -------------------------------------------------------------------- --->
-
 ## Options
 
-| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
-| :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `sparkle`  |           | `SPARKLE_FWD_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of forward SPARKLE                       |
-|           | `sparkle`  |           | `SPARKLE_REV_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation of reverse SPARKLE                       |
-|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_ELL`    | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_RCON`   | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE1`  | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE2`  | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE3`  | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
-|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE4`  | select 32-bit RISC-V baseline ISA plus custom ISE: option 4, per description below                             |
-|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_ELL`    | enable ISE for `\ell` function                (as used in, e.g., TRAXL17, SPARKLE)                             |
-|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_RCON`   | enable ISE for round constant look-up and XOR (as used in, e.g.,          SPARKLE)                             |
-|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE1`  | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE2`  | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE3`  | select 64-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
-|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE4`  | select 64-bit RISC-V baseline ISA plus custom ISE: option 4, per description below                             |
-|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE5`  | select 64-bit RISC-V baseline ISA plus custom ISE: option 5, per description below                             |
+| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                 | Meaning                                                                 |
+| :-------- | :--------- | :-------- | :--------------------- | :---------------------------------------------------------------------- |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation   |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_ELL`     | enable ISE for `\ell` function                                          |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_RCON`    | enable ISE for round constant look-up and XOR                           |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE1`   | select 32-bit RISC-V base ISA:          option 1, per description below |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE2`   | select 32-bit RISC-V base ISA plus ISE: option 2, per description below |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE3`   | select 32-bit RISC-V base ISA plus ISE: option 3, per description below |
+|           | `sparkle`  | `rv32`    | `SPARKLE_RV32_TYPE4`   | select 32-bit RISC-V base ISA plus ISE: option 4, per description below |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_UNROLL`  | use fully (vs. partially, by a factor of two) unrolled implementation   |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_ELL`     | enable ISE for `\ell` function                                          |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_RCON`    | enable ISE for round constant look-up and XOR                           |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE1`   | select 64-bit RISC-V base ISA:          option 1, per description below |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE2`   | select 64-bit RISC-V base ISA plus ISE: option 2, per description below |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE3`   | select 64-bit RISC-V base ISA plus ISE: option 3, per description below |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE4`   | select 64-bit RISC-V base ISA plus ISE: option 4, per description below |
+|           | `sparkle`  | `rv64`    | `SPARKLE_RV64_TYPE5`   | select 64-bit RISC-V base ISA plus ISE: option 5, per description below |
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -117,13 +65,9 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
 
-  Note that, in theory, this operation is basically `xori`.  However,
-  in practice `xori` only allows a 12-bit immediate: we need a 32-bit
-  round constant.
+- `SPARKLE_RV32_TYPE1`: base ISA.
 
-- `SPARKLE_RV32_TYPE1`: baseline ISA.
-
-- `SPARKLE_RV32_TYPE2`: baseline ISA plus custom ISE.
+- `SPARKLE_RV32_TYPE2`: base ISA plus ISE.
 
   ```
   sparkle.addrori      rd, rs1, rs2, imm {
@@ -148,7 +92,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
 
-- `SPARKLE_RV32_TYPE3`: baseline ISA plus custom ISE.
+- `SPARKLE_RV32_TYPE3`: base ISA plus ISE.
 
   ```
   sparkle.addror.31    rd, rs1, rs2      {
@@ -222,7 +166,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
      
-- `SPARKLE_RV32_TYPE4`: baseline ISA plus custom ISE.
+- `SPARKLE_RV32_TYPE4`: base ISA plus ISE.
    
   ```
   sparkle.whole.enci.x rd, rs1, rs2, imm {
@@ -346,13 +290,9 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
 
-  Note that, in theory, this operation is basically `xori`.  However,
-  in practice `xori` only allows a 12-bit immediate: we need a 32-bit
-  round constant.
+- `SPARKLE_RV64_TYPE1`: base ISA.
 
-- `SPARKLE_RV64_TYPE1`: baseline ISA.
-
-- `SPARKLE_RV64_TYPE2`: baseline ISA plus custom ISE.
+- `SPARKLE_RV64_TYPE2`: base ISA plus ISE.
 
   ```
   sparkle.block.enci   rd, rs1, rs2, imm {
@@ -376,7 +316,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
 
-- `SPARKLE_RV64_TYPE3`: baseline ISA plus custom ISE.
+- `SPARKLE_RV64_TYPE3`: base ISA plus ISE.
 
   ```
   sparkle.block.enc.0  rd, rs1, rs2      {
@@ -460,7 +400,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
 
-- `SPARKLE_RV64_TYPE4`: baseline ISA plus custom ISE.
+- `SPARKLE_RV64_TYPE4`: base ISA plus ISE.
 
   ```
   sparkle.whole.enci   rd, rs1,      imm {
@@ -502,7 +442,7 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
   }
   ```
 
-- `SPARKLE_RV64_TYPE5`: baseline ISA plus custom ISE.
+- `SPARKLE_RV64_TYPE5`: base ISA plus ISE.
 
   ```
   sparkle.whole.enc    rd, rs1, rs2      {
@@ -543,22 +483,5 @@ intentionally typeset to stress repeated use of an `add-xor-xor` block.
     GPR[rd] <- yi || xi
   }
   ```
-
-<!--- -------------------------------------------------------------------- --->
-
-## References
-
-[1] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, A. Moradi, L. Perrin, A.R. Shahmirzadi, A. Udovenko, V. Velichkov, and Q. Wang.
-    [Schwaemm and Esch: Lightweight Authenticated Encryption and Hashing using the Sparkle Permutation Family](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)
-    Submission to NIST (version 1.2), 2021.
-
-[2] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
-    [Alzette: a 64-bit ARX-box (feat. CRAX and TRAX)](https://link.springer.com/chapter/10.1007/978-3-030-56877-1_15).
-    Advances in Cryptology (CRYPTO), Springer-Verlag, LNCS 12172, 419--448, 2020.
-    See also [Cryptology ePrint Archive, Report 2019/1378](https://eprint.iacr.org/2019/1378).
-
-[3] C. Beierle, A. Biryukov, L. Cardoso dos Santos, J. Großschädl, L. Perrin, A. Udovenko, V. Velichkov, and Q. Wang.
-    [Lightweight AEAD and Hashing using the Sparkle Permutation Family](https://tosc.iacr.org/index.php/ToSC/article/view/8627)
-    IACR Transactions on Symmetric Cryptology, 2020(S1), 208--261, 2020.
 
 <!--- -------------------------------------------------------------------- --->

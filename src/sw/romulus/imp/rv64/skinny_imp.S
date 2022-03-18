@@ -49,7 +49,7 @@
                           sd                   s4,       32(sp) // push s4
                           sd                   s5,       40(sp) // push s5
 
-#if !( ROMULUS_UNROLL )
+#if !( ROMULUS_RV64_UNROLL )
                           li                   a2,        0     // i     =  0
                           li                   a3,       40     // n     = 40
 #endif
@@ -131,7 +131,7 @@
 
 skinny_128_384_plus_enc:  SKINNY_PROLOGUE
 
-#if !( ROMULUS_UNROLL )
+#if !( ROMULUS_RV64_UNROLL )
 0:                        SKINNY_ROUND
                           SKINNY_ROUND
 

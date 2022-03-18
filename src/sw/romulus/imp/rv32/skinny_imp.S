@@ -61,7 +61,7 @@
                           sw                   s10,      40(sp) // push s10
                           sw                   s11,      44(sp) // push s11
 
-#if !( ROMULUS_UNROLL )
+#if !( ROMULUS_RV32_UNROLL )
                           li                   a2,        0     // i     =  0
                           li                   a3,       40     // n     = 40
 #endif
@@ -325,7 +325,7 @@ SBOX_LUT:
 skinny_128_384_plus_enc:  SKINNY_PROLOGUE
 
 #if ( ROMULUS_RV32_TYPE2 )
-#if !( ROMULUS_UNROLL )
+#if !( ROMULUS_RV32_UNROLL )
 0:                        SKINNY_ROUND
                           SKINNY_ROUND
 

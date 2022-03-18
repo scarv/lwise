@@ -22,7 +22,7 @@ def rv32( args ) :
       CONF = [ TYPE ]
 
       if ( UNROLL ) :
-        CONF += [ 'PHOTON_UNROLL' ]
+        CONF += [ 'PHOTON_RV32_UNROLL' ]
 
       driver.run( args, 'photon', CONF, 'rv32', 'rv32' )
 
@@ -36,15 +36,6 @@ def rv64( args ) :
     driver.run( args, 'photon', CONF, 'rv64', 'nist', NIST_IMP = 'table2'        )
     driver.run( args, 'photon', CONF, 'rv64', 'nist', NIST_IMP = 'table3'        )
     driver.run( args, 'photon', CONF, 'rv64', 'nist', NIST_IMP = 'bitslice_sb64' )
-
-  for TYPE in [ 'PHOTON_RV64_TYPE1', 'PHOTON_RV64_TYPE2' ] :
-    for UNROLL in [ False, True ] :
-      CONF = [ TYPE ]
-
-      if ( UNROLL ) :
-        CONF += [ 'PHOTON_UNROLL' ]
-
-      driver.run( args, 'photon', CONF, 'rv64', 'rv64' )
 
 # -----------------------------------------------------------------------------
 

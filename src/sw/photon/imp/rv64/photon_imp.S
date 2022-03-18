@@ -80,7 +80,7 @@
 
 PHOTON_Permutation : PHOTON_PROLOGUE
 
-#if !( PHOTON_UNROLL )
+#if !( PHOTON_RV64_UNROLL )
 0:                   PHOTON_ROUND_EVN
                      PHOTON_ROUND_ODD
 

@@ -21,7 +21,7 @@ def rv32( args ) :
       CONF = [ TYPE ]
 
       # if ( UNROLL ) :
-      #   CONF += [ 'XOODYAK_UNROLL' ]
+      #   CONF += [ 'XOODYAK_RV32_UNROLL' ]
       if ( ZBKB_ZBKX ):
         CONF += [ 'ENABLE_ZBKB_ZBKX' ]        
   
@@ -34,20 +34,6 @@ def rv64( args ) :
     CONF = []
 
     driver.run( args, 'xoodyak', CONF, 'rv64', 'nist', NIST_IMP = 'ref' )
-
-  # for TYPE in [ 'XOODYAK_RV64_TYPE1', 'XOODYAK_RV64_TYPE2' ] :
-  for TYPE in [ 'XOODYAK_RV64_TYPE1' ] :
-    # for UNROLL in [ False, True ] :
-    for ZBKB_ZBKX in [ False, True ] :  
-      # CONF = [ TYPE, 'ENABLE_ZBKB_ZBKX' ]
-      CONF = [ TYPE ]
-
-      # if ( UNROLL ) :
-      #   CONF += [ 'XOODYAK_UNROLL' ]
-      if ( ZBKB_ZBKX ):
-        CONF += [ 'ENABLE_ZBKB_ZBKX' ]   
-  
-      driver.run( args, 'xoodyak', CONF, 'rv64', 'rv64' )
 
 # -----------------------------------------------------------------------------
 

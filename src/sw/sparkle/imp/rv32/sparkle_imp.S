@@ -165,7 +165,7 @@
               XOR3        \x3, \x3, \x0, \t0, \t1        //  x3 ^= x0 ^ tmpy 
               XOR3        \x4, \x4, \x1, \t0, \t1        //  x4 ^= x1 ^ tmpy
               XOR3        \x5, \x5, \x2, \t0, \t1        //  x5 ^= x2 ^ tmpy
-#if !( SPARKLE_UNROLL )
+#if !( SPARKLE_RV32_UNROLL )
               // 0 1 2  3 4 5
               // 4 5 3  0 1 2
               // Branch swap of the x part
@@ -188,7 +188,7 @@
 .endm
 
 .macro SPARKLE_REV_LINEAR  x0, x1, x2, x3, x4, x5, y0, y1, y2, y3, y4, y5, t0, t1, t2  
-#if !( SPARKLE_UNROLL )
+#if !( SPARKLE_RV32_UNROLL )
               // 0 1 2  3 4 5
               // 3 4 5  2 0 1
               // Branch swap of the x part
@@ -312,7 +312,7 @@
               add         \t0, \rc, \rcb
               lw          \t0,    0(\t0)
               xor         \y0, \y0, \t0                  // y0 ^= rc
-#if  ( SPARKLE_UNROLL )
+#if  ( SPARKLE_RV32_UNROLL )
               xori        \y1, \y1, \st                  // y1 ^= i
 #else
               xor         \y1, \y1, \st                  // y1 ^= i
@@ -323,7 +323,7 @@
               add         \t0, \rc, \rcb
               lw          \t0,    0(\t0)
               xor         \y0, \y0, \t0                  // y0 ^= rc
-#if  ( SPARKLE_UNROLL )
+#if  ( SPARKLE_RV32_UNROLL )
               xori        \y1, \y1, \st                  // y1 ^= i
 #else
               xor         \y1, \y1, \st                  // y1 ^= i
@@ -341,13 +341,13 @@
 
               addi                     \rc, \rc,   4          //          => rc +=  4
               andi                     \rc, \rc,  31          //             rc  =  rc  % (SPARKLE_BRANS*4)
-#if !( SPARKLE_UNROLL )
+#if !( SPARKLE_RV32_UNROLL )
               addi                     \st, \st,   1          //  t2 = t2 + 1  => step++
 #endif
 .endm     
 
 .macro SPARKLE_REV_STEP           rcb,  rc,  st,  x0,  x1,  x2,  x3,  x4,  x5,  y0,  y1,  y2,  y3,  y4,  y5,  t0,  t1,  t2
-#if !( SPARKLE_UNROLL )
+#if !( SPARKLE_RV32_UNROLL )
               addi                     \st, \st,  -1          //  t2 = t2 - 1   => step++
 #endif
               SPARKLE_REV_LINEAR                 \x0, \x1, \x2, \x3, \x4, \x5, \y0, \y1, \y2, \y3, \y4, \y5, \t0, \t1, \t2
@@ -371,7 +371,7 @@ sparkle_opt:  SPARKLE_FWD_PROLOGUE
               mv           t1, x0                        // t1 = &SPARKLE_RCON_INDEX
               //               rcb  rc  st  x0  x1  x2  x3  x4  x5   y0   y1   y2   y3    y4   y5  t0  t1  t2
               SPARKLE_RD_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9,  s10, s11
-#if ( SPARKLE_UNROLL )          
+#if ( SPARKLE_RV32_UNROLL )          
               //                             0   1   2   3   4   5
               //                             4   5   3   0   1   2   
               SPARKLE_FWD_STEP  t0, t1,  0, s0, s1, s2, s3, s4, s5,  s6 , s7 , s8 , s9 , s10, s11, t4, t5, t6    
@@ -399,7 +399,7 @@ sparkle_opt:  SPARKLE_FWD_PROLOGUE
               j                    0b                    //            goto 0
 1:            SPARKLE_WR_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9,  s10, s11
 #else	
-#error "can't use SPARKLE_RV32_TYPE4 without SPARKLE_UNROLL"
+#error "can't use SPARKLE_RV32_TYPE4 without SPARKLE_RV32_UNROLL"
 #endif                           
 #endif
               SPARKLE_FWD_EPILOGUE
@@ -416,7 +416,7 @@ sparkle_inv_opt:  SPARKLE_REV_PROLOGUE
               addi         t1, t0, 4*6                   // t1 = &SPARKLE_RCON_INDEX
               //               rcb  rc  st  x0  x1  x2  x3  x4  x5   y0   y1   y2   y3   y4   y5  t0  t1  t2
               SPARKLE_RD_STATE              s0, s1, s2, s3, s4, s5,  s6 , s7 , s8 , s9 , s10, s11
-#if ( SPARKLE_UNROLL )         
+#if ( SPARKLE_RV32_UNROLL )         
               //                             0   1   2   3   4   5
               //                             3   4   5   2   0   1
               SPARKLE_REV_STEP  t0, t1,  6, s3, s4, s5, s2, s0, s1,  s9 , s10, s11, s8 , s6 , s7 , t4, t5, t6
@@ -434,7 +434,7 @@ sparkle_inv_opt:  SPARKLE_REV_PROLOGUE
               j                    0b                    //            goto 0
 1:            SPARKLE_WR_STATE              s0, s1, s2, s3, s4, s5,  s6,  s7,  s8,  s9, s10, s11
 #else	
-#error "can't use SPARKLE_RV32_TYPE4 without SPARKLE_UNROLL"
+#error "can't use SPARKLE_RV32_TYPE4 without SPARKLE_RV32_UNROLL"
 #endif  
 #endif
               SPARKLE_REV_EPILOGUE

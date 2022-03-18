@@ -165,7 +165,7 @@
                           sw                   s4,       16(sp) // push s4
 
                           la                   a1,       RC     //       = &RC
-#if !( PHOTON_UNROLL )
+#if !( PHOTON_RV32_UNROLL )
                           li                   a2,        0     // i     =  0
                           li                   a3,       12     // n     = 12
 #endif
@@ -362,7 +362,7 @@ RC:                       .word 0x9DFE6201
 PHOTON_Permutation:       PHOTON_PROLOGUE
 
 #if  ( PHOTON_RV32_TYPE2 )
-#if !( PHOTON_UNROLL )
+#if !( PHOTON_RV32_UNROLL )
 0:                        PHOTON_ROUND_EVN
                           PHOTON_ROUND_ODD
 

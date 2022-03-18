@@ -1,5 +1,3 @@
-# `${ALG} = "elephant"`
-
 <!--- -------------------------------------------------------------------- --->
 
 ## Notation
@@ -21,52 +19,22 @@
 
 <!--- -------------------------------------------------------------------- --->
 
-## Discussion
-
-SWAPMOVE *seems* to have been first defined in [Sec. 3.1, 2], although
-even that cites prior art (e.g., libdes).  Either way, that definition
-is (with some cosmetic alterations) as follows:
-
-  ```
-  SWAPMOVE(x,y,m,n) {
-    t = y ^ ( x >> n )
-    t = t & m
-    x = x ^ ( t << n )
-    y = y ^ ( t      )
-
-    return ( x, y )
-  }
-  ```
-
-The basic idea is that
-the bits in  `y` masked by `m`
-are swapped with
-the bits in  `x` masked by `m << n`.
-Or put even more simply,
-some bits in `y`
-are swapped with
-some bits in `x`
-with the bits in question controlled by `n` and `m`.
-
-<!--- -------------------------------------------------------------------- --->
-
 ## Options
 
-| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                | Meaning                                                                                                        |
-| :-------- | :--------- | :-------- | :-------------------- | :------------------------------------------------------------------------------------------------------------- |
-|           | `elephant` | `rv32`    | `ELEPHANT_RV32_TYPE1` | select 32-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `elephant` | `rv32`    | `ELEPHANT_RV32_TYPE2` | select 32-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
-|           | `elephant` | `rv32`    | `ELEPHANT_RV32_TYPE3` | select 32-bit RISC-V baseline ISA plus custom ISE: option 3, per description below                             |
-|           | `elephant` | `rv64`    | `ELEPHANT_RV64_TYPE1` | select 64-bit RISC-V baseline ISA:                 option 1, per description below                             |
-|           | `elephant` | `rv64`    | `ELEPHANT_RV64_TYPE2` | select 64-bit RISC-V baseline ISA plus custom ISE: option 2, per description below                             |
+| `${ARCH}` | `${ALG}`   | `${IMP}`  | Symbol                 | Meaning                                                                 |
+| :-------- | :--------- | :-------- | :--------------------- | :---------------------------------------------------------------------- |
+|           | `elephant` | `rv32`    | `ELEPHANT_RV32_UNROLL` | use fully (vs. partially, by a factor of two) unrolled implementation   |
+|           | `elephant` | `rv32`    | `ELEPHANT_RV32_TYPE1`  | select 32-bit RISC-V base ISA:          option 1, per description below |
+|           | `elephant` | `rv32`    | `ELEPHANT_RV32_TYPE2`  | select 32-bit RISC-V base ISA plus ISE: option 2, per description below |
+|           | `elephant` | `rv32`    | `ELEPHANT_RV32_TYPE3`  | select 32-bit RISC-V base ISA plus ISE: option 3, per description below |
 
 <!--- -------------------------------------------------------------------- --->
 
 ## `${IMP} = "rv32"`
 
-- `ELEPHANT_RV32_TYPE1`: baseline ISA.
+- `ELEPHANT_RV32_TYPE1`: base ISA.
 
-- `ELEPHANT_RV32_TYPE2`: baseline ISA plus custom ISE.
+- `ELEPHANT_RV32_TYPE2`: base ISA plus ISE.
 
   ```
   elephant.bsllxor   rd, rs1, rs2, imm {
@@ -93,7 +61,7 @@ with the bits in question controlled by `n` and `m`.
   }
   ```
 
-- `ELEPHANT_RV32_TYPE3`: baseline ISA plus custom ISE.
+- `ELEPHANT_RV32_TYPE3`: base ISA plus ISE.
 
   ```
   elephant.bupd      rd, rs1, rs2, imm {
@@ -142,25 +110,5 @@ with the bits in question controlled by `n` and `m`.
     GPR[rd] <- r
   }
   ```
-
-<!--- -------------------------------------------------------------------- --->
-
-## `${IMP} = "rv64"`
-
-- `ELEPHANT_RV64_TYPE1`: baseline ISA.
-
-- `ELEPHANT_RV64_TYPE2`: baseline ISA plus custom ISE.
-
-<!--- -------------------------------------------------------------------- --->
-
-## References
-
-[1] T. Beyne, Y. L. Chen, C. Dobraunig, and B. Mennink.
-    [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf).
-    Submission to NIST (version 2.0), 2021.
-    
-[2] M. Lemmen.
-    [Optimizing Elephant for RISC-V](https://www.cs.ru.nl/bachelors-theses/2020/Mauk_Lemmen___4798937___Optimizing_Elephant_for_RISC-V.pdf).
-    BSc Thesis, Radboud University, 2020.
 
 <!--- -------------------------------------------------------------------- --->

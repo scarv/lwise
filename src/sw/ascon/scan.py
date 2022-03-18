@@ -23,7 +23,7 @@ def rv32( args ) :
       CONF = [ TYPE ]
 
       # if ( UNROLL ) :
-        # CONF += [ 'ASCON_UNROLL' ]
+        # CONF += [ 'ASCON_RV32_UNROLL' ]
       if ( ZBKB_ZBKX ):
         CONF += [ 'ENABLE_ZBKB_ZBKX' ]   
 
@@ -45,7 +45,7 @@ def rv64( args ) :
       CONF = [ TYPE ]
 
       # if ( UNROLL ) :
-        # CONF += [ 'ASCON_UNROLL' ]
+        # CONF += [ 'ASCON_RV64_UNROLL' ]
       if ( ZBKB_ZBKX ):
         CONF += [ 'ENABLE_ZBKB_ZBKX' ] 
   
