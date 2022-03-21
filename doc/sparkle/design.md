@@ -63,7 +63,7 @@
   ```
   sparkle.rcon         rd, rs1,      imm {
     x       <- GPR[rs1]
-    r       <- x  ^ RCON[imm]
+    r       <- x  ^ RCON[ imm ]
     GPR[rd] <- r 
   }
   ```
@@ -175,7 +175,7 @@
   sparkle.whole.enci.x rd, rs1, rs2, imm {
     xi      <- GPR[rs1]
     yi      <- GPR[rs2]
-    ci      <- RCON[imm]
+    ci      <- RCON[ imm ]
     xi      <- xi + ROR32( yi, 31 )
     yi      <- yi ^ ROR32( xi, 24 )
     xi      <- xi ^        ci
@@ -194,7 +194,7 @@
   sparkle.whole.enci.y rd, rs1, rs2, imm {
     xi      <- GPR[rs1]
     yi      <- GPR[rs2]
-    ci      <- RCON[imm]
+    ci      <- RCON[ imm ]
     xi      <- xi + ROR32( yi, 31 )
     yi      <- yi ^ ROR32( xi, 24 )
     xi      <- xi ^        ci
@@ -213,7 +213,7 @@
   sparkle.whole.deci.x rd, rs1, rs2, imm {
     xi      <- GPR[rs1]
     yi      <- GPR[rs2]
-    ci      <- RCON[imm]
+    ci      <- RCON[ imm ]
     xi      <- xi ^        ci
     yi      <- yi ^ ROR32( xi, 16 )
     xi      <- xi - ROR32( yi, 24 )
@@ -232,7 +232,7 @@
   sparkle.whole.deci.y rd, rs1, rs2, imm {
     xi      <- GPR[rs1]
     yi      <- GPR[rs2]
-    ci      <- RCON[imm]
+    ci      <- RCON[ imm ]
     xi      <- xi ^        ci
     yi      <- yi ^ ROR32( xi, 16 )
     xi      <- xi - ROR32( yi, 24 )
@@ -283,15 +283,15 @@
   sparkle.rcon         rd, rs1,      imm {
     x_hi    <- GPR[rs1]_{63..32}
     x_lo    <- GPR[rs1]_{31.. 0}
-    r_hi    <- x_hi ^ RCON[imm]
-    r_lo    <- x_lo ^ RCON[imm]
+    r_hi    <- x_hi ^ RCON[ imm ]
+    r_lo    <- x_lo ^ RCON[ imm ]
     r       <- r_hi || r_lo
     GPR[rd] <- r
   }
 
   sparkle.rconw        rd, rs1,      imm {
     x       <- GPR[rs1]_{31.. 0}
-    r       <- x    ^ RCON[imm]
+    r       <- x    ^ RCON[ imm ]
     GPR[rd] <- r
   }
   ```
@@ -305,8 +305,8 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi + ROR32( yi, ROT_0[imm] )
-    yi      <- yi ^ ROR32( xi, ROT_1[imm] )
+    xi      <- xi + ROR32( yi, ROT_0[ imm ] )
+    yi      <- yi ^ ROR32( xi, ROT_1[ imm ] )
     xi      <- xi ^        ci
     GPR[rd] <- yi || xi
   }
@@ -316,8 +316,8 @@
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
     xi      <- xi ^   ci
-    yi      <- yi ^ ROR32( xi, ROT_1[imm] )
-    xi      <- xi - ROR32( yi, ROT_0[imm] )
+    yi      <- yi ^ ROR32( xi, ROT_1[ imm ] )
+    xi      <- xi - ROR32( yi, ROT_0[ imm ] )
     GPR[rd] <- yi || xi
   }
   ```
@@ -412,7 +412,7 @@
   sparkle.whole.enci   rd, rs1,      imm {
     xi      <- GPR[rs1]_{63..32}
     yi      <- GPR[rs1]_{31.. 0}
-    ci      <- RCON[imm]
+    ci      <- RCON[ imm ]
     xi      <- xi + ROR32( yi, 31 )
     yi      <- yi ^ ROR32( xi, 24 )
     xi      <- xi ^        ci
@@ -431,7 +431,7 @@
   sparkle.whole.deci   rd, rs1,      imm {
     xi      <- GPR[rs1]_{63..32}
     yi      <- GPR[rs1]_{31.. 0}
-    ci      <- RCON[imm]
+    ci      <- RCON[ imm ]
     xi      <- xi ^        ci
     yi      <- yi ^ ROR32( xi, 16 )
     xi      <- xi - ROR32( yi, 24 )
