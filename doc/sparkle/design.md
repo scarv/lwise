@@ -16,7 +16,9 @@
 - define 
  
   ```
-  ELL( x ) = ROR32( x ^ ( x << 16 ), 16 )
+  ELL( x ) {
+    return ROR32( x ^ ( x << 16 ), 16 )
+  }
   ```
 
 <!--- -------------------------------------------------------------------- --->
@@ -187,6 +189,7 @@
     yi      <- yi ^ ROR32( xi, 16 )
     xi      <- xi ^        ci
     GPR[rd] <- xi
+  }
 
   sparkle.whole.enci.y rd, rs1, rs2, imm {
     xi      <- GPR[rs1]
@@ -205,6 +208,7 @@
     yi      <- yi ^ ROR32( xi, 16 )
     xi      <- xi ^        ci
     GPR[rd] <- yi
+  }
 
   sparkle.whole.deci.x rd, rs1, rs2, imm {
     xi      <- GPR[rs1]
@@ -223,6 +227,7 @@
     yi      <- yi ^ ROR32( xi, 24 )
     xi      <- xi - ROR32( yi, 31 )
     GPR[rd] <- xi
+  }
 
   sparkle.whole.deci.y rd, rs1, rs2, imm {
     xi      <- GPR[rs1]

@@ -2,9 +2,7 @@
 
 ## Notation
 
-- use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
-- use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate,
-- define various look-up tables:
+- Define the look-up tables
 
   ```
   ROT_0 = { 19, 61,  1, 10,  7 }
