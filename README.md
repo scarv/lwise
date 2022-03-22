@@ -275,6 +275,33 @@ such as execution latency.*
   make -f ${REPO_HOME}/src/hw/Makefile rocketchip-apply
   ```
 
+- Build the bitstream of the Xilinx FPGA and run a software on the FPGA using Vivado:
+
+  - Fix path for the installed Vivado Design Suite, e.g., 
+  
+  ```sh
+  export VIVADO_TOOL_DIR="/opt/Xilinx/Vivado/2019.1"
+  source ./bin/Vivado-conf.sh
+  ```
+
+  - Generate the verilog files for FPGA, e.g.,
+
+  ```sh
+  ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" make -C src/hw  fpga-verilog
+  ```
+  
+  - Make Vivado project, generate bit-stream, and download bit-stream into FPGA, e.g.,
+
+  ```sh
+  ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" make -C src/hw program-fpga
+  ```
+
+  - Build and execute software on the hardware implementation on the FPGA, e.g.,
+
+  ```sh
+  ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" make -C src/hw fpga-clean fpga-run
+  ```
+
 - Build the emulator of the implementation using 
   [verilator](https://www.veripool.org/verilator): 
 
@@ -286,33 +313,6 @@ such as execution latency.*
 
     ```sh
     make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" emu-clean emulate
-    ```
-
-- Build the bitstream of the Xilinx FPGA and run a software on the FPGA using Vivado:
-
-  - Fix path for the installed Vivado Design Suite, e.g., 
-  
-  ```sh
-  export VIVADO_TOOL_DIR="/opt/Xilinx/Vivado/2018.2"
-  source ./bin/Vivado-conf.sh
-  ```
-
-  - Generate the verilog files for FPGA
-
-  ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" ISE="xalu" fpga-verilog
-  ```
-  
-  - Make Vivado project, generate bit-stream, and download bit-stream into FPGA
-
-  ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" ISE="xalu" program-fpga
-  ```
-
-  - Build and execute software on the hardware implementation on the FPGA, e.g.,
-
-    ```sh
-    make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" fpga-clean fpga-run
     ```
 
 - Run hardware synthesis flow using
