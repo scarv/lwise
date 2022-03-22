@@ -211,7 +211,7 @@ index f433fc067..622473935 100644
  object Causes {
    val misaligned_fetch = 0x0
 diff --git a/src/main/scala/rocket/RocketCore.scala b/src/main/scala/rocket/RocketCore.scala
-index abdbdf93e..bd27d8a6c 100644
+index abdbdf93e..a6ed66d72 100644
 --- a/src/main/scala/rocket/RocketCore.scala
 +++ b/src/main/scala/rocket/RocketCore.scala
 @@ -42,7 +42,11 @@ case class RocketCoreParams(
@@ -251,7 +251,7 @@ index abdbdf93e..bd27d8a6c 100644
 +    val ise_bb = Module(new xalu_ise(xLen))
 +    ise_bb.io.ise_clk := clock
 +    ise_bb.io.ise_rst := reset
-+    ise_bb.io.ise_val := ex_ctrl.alu_fn(4)
++    ise_bb.io.ise_val := ex_ctrl.alu_fn(4) && (!ex_ctrl.alu_fn(5))
 +    ise_bb.io.ise_fn  := ex_ctrl.alu_fn
 +    ise_bb.io.ise_imm := ex_reg_inst(31, 25)
 +    ise_bb.io.ise_in1 := ex_op1.asUInt
