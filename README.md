@@ -322,5 +322,14 @@ such as execution latency.*
   make -f ${REPO_HOME}/src/hw/Makefile synthesise ALG="sparkle" ARCH="rv32" ISE="xalu"
   ```
 
-<!--- -------------------------------------------------------------------- --->
+<!--- ==================================================================== --->
+
+## Acknowledgements
+
+This work has been supported in part
+by EPSRC via grant
+[EP/R012288/1](https://gow.epsrc.ukri.org/NGBOViewGrant.aspx?GrantRef=EP/R012288/1) (under the [RISE](http://www.ukrise.org) programme).
+
+<!--- ==================================================================== --->
+
    
