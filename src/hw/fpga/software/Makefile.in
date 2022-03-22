@@ -14,62 +14,21 @@ export SW = ${REPO_HOME}/src/sw
 # include build-related content for algorithm
 include ${SW}/${ALG}/Makefile.in
 
+# interested kernels in LWC algorithms
 ifeq "${IMP}" "nist"
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         =  P12 P6 giftb128 PHOTON_Permutation skinny_128_384_plus_enc sparkle_opt state_update Xoodoo_Permute_Nrounds
-
-else ifeq "${ALG}" "ascon"
-FPGA_DEF_CONF  = -DASCON_RV32_TYPE2
-FPGA_DEF_CONF += -DENABLE_ZBKB_ZBKX 
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         =  P12 P6
-
-else ifeq "${ALG}" "elephant"
-FPGA_DEF_CONF  = -DELEPHANT_RV32_TYPE2
-#FPGA_DEF_CONF += -DELEPHANT_STATE_5X32B
-FPGA_DEF_CONF += -DELEPHANT_STATE_4X40B
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         =  Spongent160_4x40b Spongent160_5x32b
-
-else ifeq "${ALG}" "gift"
-FPGA_DEF_CONF  = -DGIFT_RV32_TYPE2 -DGIFT_FIXSLICING
-#FPGA_DEF_CONF += -DENABLE_ZBKB_ZBKX 
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         =  giftb128_bitslicing giftb128_fixslicing precompute_rkeys
-
-else ifeq "${ALG}" "photon"
-FPGA_DEF_CONF  = -DPHOTON_RV32_TYPE1
-FPGA_DEF_CONF += -DPHOTON_RV32_UNROLL 
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         = PHOTON_Permutation
-
-else ifeq "${ALG}" "romulus"
-FPGA_DEF_CONF  = -DROMULUS_RV32_TYPE2
-FPGA_DEF_CONF += -DROMULUS_RV32_UNROLL 
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         = skinny_128_384_plus_enc
-
-else ifeq "${ALG}" "sparkle"
-FPGA_DEF_CONF  = -DSPARKLE_RV32_TYPE1
-#FPGA_DEF_CONF += -DSPARKLE_RV32_ELL -DSPARKLE_RV32_RCON
-FPGA_DEF_CONF += -DSPARKLE_RV32_UNROLL 
-FPGA_DEF_CONF += -DSPARKLE_REV_EXTERN -DSPARKLE_FWD_EXTERN 
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         = sparkle_opt
-
-else ifeq "${ALG}" "jambu"
-FPGA_DEF_CONF  = -DJAMBU_RV32_TYPE3
-FPGA_DEF_CONF += -DJAMBU_RV32_UNROLL 
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         = state_update
-
-else ifeq "${ALG}" "xoodyak"
-FPGA_DEF_CONF  = -DXOODYAK_RV32_TYPE1
-FPGA_DEF_CONF += -DENABLE_ZBKB_ZBKX 
-FPGA_DEF_CONF += -DDRIVER_TRIALS_WARM=10 -DDRIVER_TRIALS_REAL=50 -DDRIVER_MEASURE=1 
-KERNEL         = Xoodoo_Permute_12rounds
+KERNEL         = P6 giftb128 PHOTON_Permutation skinny_128_384_plus_enc sparkle_opt state_update Xoodoo_Permute_Nrounds
+else 
+KERNEL         = P6 
+KERNEL        += Spongent160_4x40b Spongent160_5x32b 
+KERNEL        += giftb128_bitslicing giftb128_fixslicing precompute_rkeys 
+KERNEL        += PHOTON_Permutation 
+KERNEL        += skinny_128_384_plus_enc 
+KERNEL        += sparkle_opt 
+KERNEL        += state_update 
+KERNEL        += Xoodoo_Permute_12rounds
 endif
 
+include ${REPO_HOME}/src/hw/fpga/software/FPGA_SWCONF.in
 export FPGA_SWCONF = $(FPGA_DEF_CONF)
 
 # -----------------------------------------------------------------------------
@@ -119,14 +78,14 @@ ${REPO_HOME}/build/fpga/${ALG}/kat.c : ${NIST_KAT} ${REPO_HOME}/build/fpga/${ALG
 	@python3 ${SW}/share/kat.py --source < ${<} > ${@}
 
 ${FPGA_TARGET} : ${FPGA_SOURCES} ${FPGA_HEADERS} 
-	${GCC_PREFIX}-gcc ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+	@${GCC_PREFIX}-gcc ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 $(FPGA_OUTBIN) : $(FPGA_TARGET)
 	@${GCC_PREFIX}-objcopy -O binary $< $@
 
 ${FPGA_TARGET}.asm : ${FPGA_TARGET}
 	@${GCC_PREFIX}-objdump -fhSD ${<} > ${@}
-	python3 ${REPO_HOME}/bin/size.py ${@} $(KERNEL)
+	@python3 ${REPO_HOME}/bin/size.py ${@} $(KERNEL)
 
 fpga-run : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
 	@$(FPGA)/script/upload.py --port $(PORT) --baud 115200 upload $(FPGA_OUTBIN) --stdout
