@@ -46,7 +46,7 @@
   andi \s1, \s2, 0xFF
   srli \s2, \s2, 8
   lw   \s4,  8(a0)
-  andi \s3, \s4, 0xFFa
+  andi \s3, \s4, 0xFF
   slli \s3, \s3, 24
   xor  \s2, \s2, \s3
   srli \s3, \s4, 8
