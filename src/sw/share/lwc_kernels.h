@@ -9,12 +9,20 @@
 #define __LWC_KERNELS_H
 void time_kernel();
 
+#if defined(ascon) && !defined(LWISE)
+#include "permutations.h"
+#else
 extern void P6(void * state);
 extern void P12(void * state);
+#endif
 
+#if defined(gift) && !defined(LWISE)
+extern void giftb128(uint8_t P[16], const uint8_t K[16], uint8_t C[16]);
+#else
 extern void giftb128_bitslicing(void *P, const void *K, void *C);
 extern void giftb128_fixslicing(void *P, const void *K, void *C);
 extern void precompute_rkeys(void* rkeys, const void* key);
+#endif
 
 extern void PHOTON_Permutation(void *state);
 extern void skinny_128_384_plus_enc (void * input, void* userkey);
