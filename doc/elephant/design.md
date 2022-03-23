@@ -2,10 +2,10 @@
 
 ## Notation
 
-- define
+- define the function
 
   ```
-  SWAPMOVE32(x,  m,n) {
+  SWAPMOVE32(x,m,n) {
     t = x ^ ( x >> n )
     t = t & m
     t = t ^ ( t << n )

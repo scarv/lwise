@@ -2,7 +2,7 @@
 
 ## Notation
 
-- Define the look-up tables
+- define the look-up tables
 
   ```
   ROT_0 = { 19, 61,  1, 10,  7 }
@@ -35,7 +35,7 @@
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]
     x       <- x_hi || x_lo
-    r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
+    r       <- x ^ ( x >>> ROT_0[ imm ] ) ^ ( x >>> ROT_1[ imm ] )
     GPR[rd] <- r_{31.. 0}
   }
 
@@ -43,7 +43,7 @@
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]
     x       <- x_hi || x_lo
-    r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
+    r       <- x ^ ( x >>> ROT_0[ imm ] ) ^ ( x >>> ROT_1[ imm ] )
     GPR[rd] <- r_{63..32}
   }
   ```
@@ -59,7 +59,7 @@
   ```
   ascon.sigma    rd, rs1,      imm {
     x       <- GPR[rs1]
-    r       <- x ^ ROR64( x, ROT_0[ imm ] ) ^ ROR64( x, ROT_1[ imm ] )
+    r       <- x ^ ( x >>> ROT_0[ imm ] ) ^ ( x >>> ROT_1[ imm ] )
     GPR[rd] <- r
   }
   ```

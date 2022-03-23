@@ -2,9 +2,8 @@
 
 ## Notation
 
-- use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
-- use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate,
-- capture the 6-bit, round constant LFSR update function using
+
+- define the functions
 
   ```
   RC_LFSR_FWD( x ) {
@@ -16,7 +15,7 @@
   }
   ```
 
-- capture the the 8-bit, tweakey    LFSR update function using
+- define the functions
 
   ```
   TK2_LFSR_FWD( x ) {
@@ -36,11 +35,11 @@
   }
   ```
 
-- define various look-up tables: 
+- define the look-up tables
   `SBOX_ENC` 
   and 
-  `SBOX_DEC`, 
-  for example, are the 8-bit Skinny encryption and decryption S-boxes.
+  `SBOX_DEC`
+  to be the Skinny encryption and decryption S-boxes
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -64,38 +63,6 @@
 - `ROMULUS_RV32_TYPE2`: base ISA plus ISE.
 
   ```
-  romulus.rstep.enc    rd, rs1, rs2, imm {
-    x       <- GPR[rs1]
-    y       <- GPR[rs2]
-
-    if     ( imm == 2 ) {
-      y <- 2
-    }
-    else if( imm == 3 ) {
-      y <- 0
-    }
-
-    t       <- SBOX_ENC[ x_{31..24} ] || SBOX_ENC[ x_{23..16} ] ||
-               SBOX_ENC[ x_{15.. 8} ] || SBOX_ENC[ x_{ 7.. 0} ]
-
-    t       <- t ^ y
-
-    if     ( imm == 0 ) {
-      r <- ROL32( t,  0 )
-    }
-    else if( imm == 1 ) {
-      r <- ROL32( t,  8 )
-    }
-    else if( imm == 2 ) {
-      r <- ROL32( t, 16 )
-    }
-    else if( imm == 3 ) {
-      r <- ROL32( t, 24 )
-    }
-
-    GPR[rd] <- r
-  }
-
   romulus.rc.upd.enc   rd, rs1           {
     x       <- GPR[rs1]
     r       <- LFSR_RC( x )
@@ -155,6 +122,38 @@
 
     GPR[rd] <- r
   }
+
+  romulus.rstep.enc    rd, rs1, rs2, imm {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+
+    if     ( imm == 2 ) {
+      y <- 2
+    }
+    else if( imm == 3 ) {
+      y <- 0
+    }
+
+    t       <- SBOX_ENC[ x_{31..24} ] || SBOX_ENC[ x_{23..16} ] ||
+               SBOX_ENC[ x_{15.. 8} ] || SBOX_ENC[ x_{ 7.. 0} ]
+
+    t       <- t ^ y
+
+    if     ( imm == 0 ) {
+      r <- t <<<  0
+    }
+    else if( imm == 1 ) {
+      r <- t <<<  8
+    }
+    else if( imm == 2 ) {
+      r <- t <<< 16
+    }
+    else if( imm == 3 ) {
+      r <- t <<< 24
+    }
+
+    GPR[rd] <- r
+  }
   ```
 
 <!--- -------------------------------------------------------------------- --->
@@ -166,6 +165,39 @@
 - `ROMULUS_RV64_TYPE2`: base ISA plus ISE.
 
   ```
+  romulus.rc.upd.enc   rd, rs1           {
+    x       <- GPR[rs1]
+    r       <- LFSR_RC( x )
+    GPR[rd] <- r
+  }
+
+  romulus.rc.use.enc   rd, rs1, rs2      {
+    x       <- GPR[rs1]
+    y       <- GPR[rs2]
+    r       <- y ^ ( x_{3..0} <<  0 ) ^ 
+                   ( x_{6..4} << 32 )
+    GPR[rd] <- r
+  }
+
+  romulus.tk.upd.enc   rd, rs1,      imm {
+    x       <- GPR[rs1]
+
+    if     ( imm == 2 ) {
+      r <- LFSR_TK2( x_{16.. 8} ) || LFSR_TK2( x_{61..56} ) ||
+           LFSR_TK2( x_{ 7.. 0} ) || LFSR_TK2( x_{47..40} ) ||
+           LFSR_TK2( x_{24..16} ) || LFSR_TK2( x_{55..48} ) ||
+           LFSR_TK2( x_{39..32} ) || LFSR_TK2( x_{31..24} )
+    }
+    else if( imm == 3 ) {
+      r <- LFSR_TK3( x_{16.. 8} ) || LFSR_TK3( x_{61..56} ) ||
+           LFSR_TK3( x_{ 7.. 0} ) || LFSR_TK3( x_{47..40} ) ||
+           LFSR_TK3( x_{24..16} ) || LFSR_TK3( x_{55..48} ) ||
+           LFSR_TK3( x_{39..32} ) || LFSR_TK3( x_{31..24} )
+    }
+
+    GPR[rd] <- r
+  }
+
   romulus.rstep.enc    rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
@@ -182,10 +214,10 @@
     t       <- t ^ y
 
     if     ( imm == 0 ) {
-      r <- ROL32( t_{63..32},  8 ) || ROL32( t_{31.. 0},  0 )
+      r <- ( t_{63..32} <<<  8 ) || ( t_{31.. 0} <<<  0 )
     }
     else if( imm == 1 ) {
-      r <- ROL32( t_{63..32}, 16 ) || ROL32( t_{31.. 0}, 24 )
+      r <- ( t_{63..32} <<< 16 ) || ( t_{31.. 0} <<< 24 )
     }
 
     GPR[rd] <- r
@@ -224,39 +256,6 @@
     else if( imm == 1 ) {
       r <- t_3_{31..24} || t_2_{31..24} || t_1_{31..24} || t_0_{31..24} ||
            t_3_{23..16} || t_2_{23..16} || t_1_{23..16} || t_0_{23..16}
-    }
-
-    GPR[rd] <- r
-  }
-
-  romulus.rc.upd.enc   rd, rs1           {
-    x       <- GPR[rs1]
-    r       <- LFSR_RC( x )
-    GPR[rd] <- r
-  }
-
-  romulus.rc.use.enc   rd, rs1, rs2      {
-    x       <- GPR[rs1]
-    y       <- GPR[rs2]
-    r       <- y ^ ( x_{3..0} <<  0 ) ^ 
-                   ( x_{6..4} << 32 )
-    GPR[rd] <- r
-  }
-
-  romulus.tk.upd.enc   rd, rs1,      imm {
-    x       <- GPR[rs1]
-
-    if     ( imm == 2 ) {
-      r <- LFSR_TK2( x_{16.. 8} ) || LFSR_TK2( x_{61..56} ) ||
-           LFSR_TK2( x_{ 7.. 0} ) || LFSR_TK2( x_{47..40} ) ||
-           LFSR_TK2( x_{24..16} ) || LFSR_TK2( x_{55..48} ) ||
-           LFSR_TK2( x_{39..32} ) || LFSR_TK2( x_{31..24} )
-    }
-    else if( imm == 3 ) {
-      r <- LFSR_TK3( x_{16.. 8} ) || LFSR_TK3( x_{61..56} ) ||
-           LFSR_TK3( x_{ 7.. 0} ) || LFSR_TK3( x_{47..40} ) ||
-           LFSR_TK3( x_{24..16} ) || LFSR_TK3( x_{55..48} ) ||
-           LFSR_TK3( x_{39..32} ) || LFSR_TK3( x_{31..24} )
     }
 
     GPR[rd] <- r

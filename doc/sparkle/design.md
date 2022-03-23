@@ -2,9 +2,7 @@
 
 ## Notation
 
-- use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
-- use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate,
-- define various look-up tables:
+- define the look-up tables
 
   ```
   ROT_0 = { 31, 17,  0, 24 }
@@ -13,11 +11,11 @@
   RCON  = { 0xB7E15162, 0xBF715880, 0x38B4DA56, 0x324E7738, 0xBB1185EB, 0x4F7C7B57, 0xCFBFA1C8, 0xC2B3293D }
   ```
 
-- define 
+- define the function
  
   ```
   ELL( x ) {
-    return ROR32( x ^ ( x << 16 ), 16 )
+    return ( x ^ ( x << 16 ) ) >>> 16
   }
   ```
 
@@ -76,21 +74,21 @@
   sparkle.addrori      rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x + ROR32( y, imm )
+    r       <- x + ( y >>> imm )
     GPR[rd] <- r
   }
 
   sparkle.subrori      rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x - ROR32( y, imm )
+    r       <- x - ( y >>> imm )
     GPR[rd] <- r
   }
 
   sparkle.xorrori      rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x ^ ROR32( y, imm )
+    r       <- x ^ ( y >>> imm )
     GPR[rd] <- r
   }
   ```
@@ -101,70 +99,70 @@
   sparkle.addror.31    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x + ROR32( y, 31 )
+    r       <- x + ( y >>> 31 )
     GPR[rd] <- r
   }
 
   sparkle.addror.17    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x + ROR32( y, 17 )
+    r       <- x + ( y >>> 17 )
     GPR[rd] <- r
   }
 
   sparkle.addror.24    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x + ROR32( y, 24 )
+    r       <- x + ( y >>> 24 )
     GPR[rd] <- r
   }
 
   sparkle.subror.31    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x - ROR32( y, 31 )
+    r       <- x - ( y >>> 31 )
     GPR[rd] <- r
   }
 
   sparkle.subror.17    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x - ROR32( y, 17 )
+    r       <- x - ( y >>> 17 )
     GPR[rd] <- r
   }
 
   sparkle.subror.24    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x - ROR32( y, 24 )
+    r       <- x - ( y >>> 24 )
     GPR[rd] <- r
   }
 
   sparkle.xorror.31    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x ^ ROR32( y, 31 )
+    r       <- x ^ ( y >>> 31 )
     GPR[rd] <- r
   }
 
   sparkle.xorror.17    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x ^ ROR32( y, 17 )
+    r       <- x ^ ( y >>> 17 )
     GPR[rd] <- r
   }
 
   sparkle.xorror.24    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x ^ ROR32( y, 24 )
+    r       <- x ^ ( y >>> 24 )
     GPR[rd] <- r
   }
 
   sparkle.xorror.16    rd, rs1, rs2      {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- x ^ ROR32( y, 16 )
+    r       <- x ^ ( y >>> 16 )
     GPR[rd] <- r
   }
   ```
@@ -176,18 +174,18 @@
     xi      <- GPR[rs1]
     yi      <- GPR[rs2]
     ci      <- RCON[ imm ]
-    xi      <- xi + ROR32( yi, 31 )
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi, 17 )
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi,  0 )
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi, 24 )
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>> 31 )
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>> 17 )
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>>  0 )
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>> 24 )
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi ^   ci
     GPR[rd] <- xi
   }
 
@@ -195,18 +193,18 @@
     xi      <- GPR[rs1]
     yi      <- GPR[rs2]
     ci      <- RCON[ imm ]
-    xi      <- xi + ROR32( yi, 31 )
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi, 17 )
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi,  0 )
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi, 24 )
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>> 31 )
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>> 17 )
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>>  0 )
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>> 24 )
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi ^   ci
     GPR[rd] <- yi
   }
 
@@ -214,18 +212,18 @@
     xi      <- GPR[rs1]
     yi      <- GPR[rs2]
     ci      <- RCON[ imm ]
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi - ROR32( yi, 24 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi - ROR32( yi,  0 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi - ROR32( yi, 17 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi - ROR32( yi, 31 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi - ( yi >>> 24 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi - ( yi >>>  0 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi - ( yi >>> 17 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi - ( yi >>> 31 )
     GPR[rd] <- xi
   }
 
@@ -233,18 +231,18 @@
     xi      <- GPR[rs1]
     yi      <- GPR[rs2]
     ci      <- RCON[ imm ]
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi - ROR32( yi, 24 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi - ROR32( yi,  0 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi - ROR32( yi, 17 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi - ROR32( yi, 31 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi - ( yi >>> 24 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi - ( yi >>>  0 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi - ( yi >>> 17 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi - ( yi >>> 31 )
     GPR[rd] <- yi
   }
   ```
@@ -305,9 +303,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi + ROR32( yi, ROT_0[ imm ] )
-    yi      <- yi ^ ROR32( xi, ROT_1[ imm ] )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>> ROT_0[ imm ] )
+    yi      <- yi ^ ( xi >>> ROT_1[ imm ] )
+    xi      <- xi ^   ci
     GPR[rd] <- yi || xi
   }
     
@@ -316,8 +314,8 @@
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
     xi      <- xi ^   ci
-    yi      <- yi ^ ROR32( xi, ROT_1[ imm ] )
-    xi      <- xi - ROR32( yi, ROT_0[ imm ] )
+    yi      <- yi ^ ( xi >>> ROT_1[ imm ] )
+    xi      <- xi - ( yi >>> ROT_0[ imm ] )
     GPR[rd] <- yi || xi
   }
   ```
@@ -329,9 +327,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi + ROR32( yi, 31 )
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>> 31 )
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi ^   ci
     GPR[rd] <- yi || xi
   }
 
@@ -339,9 +337,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi + ROR32( yi, 17 )
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>> 17 )
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi ^   ci
     GPR[rd] <- yi || xi
   }
 
@@ -349,9 +347,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi + ROR32( yi,  0 )
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>>  0 )
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi ^   ci
     GPR[rd] <- yi || xi
   }
 
@@ -359,9 +357,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi + ROR32( yi, 24 )
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>> 24 )
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi ^   ci
     GPR[rd] <- yi || xi
   }
 
@@ -369,9 +367,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi - ROR32( yi, 31 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi - ( yi >>> 31 )
     GPR[rd] <- yi || xi
   }
 
@@ -379,9 +377,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi - ROR32( yi, 17 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi - ( yi >>> 17 )
     GPR[rd] <- yi || xi
   }   
  
@@ -389,9 +387,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi - ROR32( yi,  0 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi - ( yi >>>  0 )
     GPR[rd] <- yi || xi
   }
 
@@ -399,9 +397,9 @@
     yi      <- GPR[rs1]_{63..32}
     xi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi - ROR32( yi, 24 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi - ( yi >>> 24 )
     GPR[rd] <- yi || xi
   }
   ```
@@ -413,18 +411,18 @@
     xi      <- GPR[rs1]_{63..32}
     yi      <- GPR[rs1]_{31.. 0}
     ci      <- RCON[ imm ]
-    xi      <- xi + ROR32( yi, 31 )
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi, 17 )
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi,  0 )
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi, 24 )
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>> 31 )
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>> 17 )
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>>  0 )
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>> 24 )
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi ^   ci
     GPR[rd] <- yi || xi
   }
 
@@ -432,18 +430,18 @@
     xi      <- GPR[rs1]_{63..32}
     yi      <- GPR[rs1]_{31.. 0}
     ci      <- RCON[ imm ]
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi - ROR32( yi, 24 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi - ROR32( yi,  0 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi - ROR32( yi, 17 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi - ROR32( yi, 31 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi - ( yi >>> 24 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi - ( yi >>>  0 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi - ( yi >>> 17 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi - ( yi >>> 31 )
     GPR[rd] <- yi || xi
   }
   ```
@@ -455,18 +453,18 @@
     xi      <- GPR[rs1]_{63..32}
     yi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi + ROR32( yi, 31 )
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi, 17 )
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi,  0 )
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi ^        ci
-    xi      <- xi + ROR32( yi, 24 )
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi ^        ci
+    xi      <- xi + ( yi >>> 31 )
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>> 17 )
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>>  0 )
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi ^   ci
+    xi      <- xi + ( yi >>> 24 )
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi ^   ci
     GPR[rd] <- yi || xi
   }
 
@@ -474,18 +472,18 @@
     xi      <- GPR[rs1]_{63..32}
     yi      <- GPR[rs1]_{31.. 0}
     ci      <- GPR[rs2]_{31.. 0}
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 16 )
-    xi      <- xi - ROR32( yi, 24 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 31 )
-    xi      <- xi - ROR32( yi,  0 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 17 )
-    xi      <- xi - ROR32( yi, 17 )
-    xi      <- xi ^        ci
-    yi      <- yi ^ ROR32( xi, 24 )
-    xi      <- xi - ROR32( yi, 31 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 16 )
+    xi      <- xi - ( yi >>> 24 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 31 )
+    xi      <- xi - ( yi >>>  0 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 17 )
+    xi      <- xi - ( yi >>> 17 )
+    xi      <- xi ^   ci
+    yi      <- yi ^ ( xi >>> 24 )
+    xi      <- xi - ( yi >>> 31 )
     GPR[rd] <- yi || xi
   }
   ```

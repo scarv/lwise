@@ -2,9 +2,6 @@
 
 ## Notation
 
-- use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
-- use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate.
-
 <!--- -------------------------------------------------------------------- --->
 
 ## Options
@@ -31,7 +28,7 @@
   jambu.fsri    rd, rs1, rs2, imm {
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]
-    r       <- ROR64( x_hi || x_lo, imm )
+    r       <- ( x_hi || x_lo ) >>> imm
     GPR[rd] <- r_{31.. 0}
   }                                             
   ```
@@ -42,28 +39,28 @@
   jambu.fsr.15  rd, rs1, rs2      {
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]                                             
-    r       <- ROR64( x_hi || x_lo, 15 )
+    r       <- ( x_hi || x_lo ) >>> 15
     GPR[rd] <- r_{31.. 0}
   }
 
   jambu.fsr.6   rd, rs1, rs2      {
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]                                             
-    r       <- ROR64( x_hi || x_lo,  6 )
+    r       <- ( x_hi || x_lo ) >>>  6
     GPR[rd] <- r_{31.. 0}
   }
 
   jambu.fsr.21  rd, rs1, rs2      {
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]                                             
-    r       <- ROR64( x_hi || x_lo, 21 )
+    r       <- ( x_hi || x_lo ) >>> 21
     GPR[rd] <- r_{31.. 0}
   }
 
   jambu.fsr.27  rd, rs1, rs2      {
     x_hi    <- GPR[rs2]
     x_lo    <- GPR[rs1]                                             
-    r       <- ROR64( x_hi || x_lo, 27 )
+    r       <- ( x_hi || x_lo ) >>> 27
     GPR[rd] <- r_{31.. 0}
   }
   ```
@@ -82,10 +79,10 @@
     s_1     <- GPR[rs1]_{64..32}
     s_2     <- GPR[rs2]_{31.. 0}
     s_3     <- GPR[rs2]_{64..32}
-    t_0     <- ROR64( s_2 || s_1, 15 )
-    t_1     <- ROR64( s_3 || s_2,  6 )
-    t_2     <- ROR64( s_3 || s_2, 21 )
-    t_3     <- ROR64( s_3 || s_2, 27 )
+    t_0     <- ( s_2 || s_1 ) >>> 15
+    t_1     <- ( s_3 || s_2 ) >>>  6
+    t_2     <- ( s_3 || s_2 ) >>> 21
+    t_3     <- ( s_3 || s_2 ) >>> 27
     r       <- t0 ^ ~( t1 & t2 ) ^ t3
     GPR[rd] <- r_{31.. 0}
   }
@@ -95,10 +92,10 @@
     s_1     <- GPR[rs1]_{64..32}
     s_2     <- GPR[rs2]_{31.. 0}
     s_3     <- GPR[rs2]_{64..32}
-    t_0     <- ROR64( s_3 || s_2, 15 )
-    t_1     <- ROR64( s_0 || s_3,  6 )
-    t_2     <- ROR64( s_0 || s_3, 21 )
-    t_3     <- ROR64( s_0 || s_3, 27 )
+    t_0     <- ( s_3 || s_2 ) >>> 15
+    t_1     <- ( s_0 || s_3 ) >>>  6
+    t_2     <- ( s_0 || s_3 ) >>> 21
+    t_3     <- ( s_0 || s_3 ) >>> 27
     r       <- t0 ^ ~( t1 & t2 ) ^ t3
     GPR[rd] <- r_{31.. 0}
   }
@@ -108,10 +105,10 @@
     s_1     <- GPR[rs1]_{64..32}
     s_2     <- GPR[rs2]_{31.. 0}
     s_3     <- GPR[rs2]_{64..32}
-    t_0     <- ROR64( s_0 || s_3, 15 )
-    t_1     <- ROR64( s_1 || s_0,  6 )
-    t_2     <- ROR64( s_1 || s_0, 21 )
-    t_3     <- ROR64( s_1 || s_0, 27 )
+    t_0     <- ( s_0 || s_3 ) >>> 15
+    t_1     <- ( s_1 || s_0 ) >>>  6
+    t_2     <- ( s_1 || s_0 ) >>> 21
+    t_3     <- ( s_1 || s_0 ) >>> 27
     r       <- t0 ^ ~( t1 & t2 ) ^ t3
     GPR[rd] <- r_{31.. 0}
   }
@@ -121,10 +118,10 @@
     s_1     <- GPR[rs1]_{64..32}
     s_2     <- GPR[rs2]_{31.. 0}
     s_3     <- GPR[rs2]_{64..32}
-    t_0     <- ROR64( s_1 || s_0, 15 )
-    t_1     <- ROR64( s_2 || s_1,  6 )
-    t_2     <- ROR64( s_2 || s_1, 21 )
-    t_3     <- ROR64( s_2 || s_1, 27 )
+    t_0     <- ( s_1 || s_0 ) >>> 15
+    t_1     <- ( s_2 || s_1 ) >>>  6
+    t_2     <- ( s_2 || s_1 ) >>> 21
+    t_3     <- ( s_2 || s_1 ) >>> 27
     r       <- t0 ^ ~( t1 & t2 ) ^ t3
     GPR[rd] <- r_{31.. 0}
   }

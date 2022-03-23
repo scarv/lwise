@@ -2,9 +2,9 @@
 
 ## Notation
 
-- use `GF2N_MUL` to denote multiplication in the Proton finite field.
+- use `GF2N_MUL` to denote multiplication in the Proton finite field
 
-- define various look-up tables, namely
+- define the look-up tables
 
   ```
   SBOX = {

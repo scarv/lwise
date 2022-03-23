@@ -2,9 +2,6 @@
 
 ## Notation
 
-- use `ROL32` (resp. `ROL64`) to denote a 32-bit (resp. 64-bit)  left-rotate,
-- use `ROR32` (resp. `ROR64`) to denote a 32-bit (resp. 64-bit) right-rotate.
-
 <!--- -------------------------------------------------------------------- --->
 
 ## Options
@@ -27,7 +24,7 @@
   xoodyak.xorrol rd, rs1, rs2 {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
-    r       <- ROL32( x, 5 ) ^ ROL32( y, 14 )
+    r       <- ( x <<< 5 ) ^ ( y <<< 14 )
     GPR[rd] <- r
   }
   ```

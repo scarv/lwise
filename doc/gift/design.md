@@ -2,10 +2,10 @@
 
 ## Notation
 
-- Define the function
+- define the function
 
   ```
-  SWAPMOVE32(x,  m,n) {
+  SWAPMOVE32(x,m,n) {
     t = x ^ ( x >> n )
     t = t & m
     t = t ^ ( t << n )
@@ -52,10 +52,10 @@
     x_2     <- GPR[rs1]_{11.. 8}
     x_1     <- GPR[rs1]_{ 7.. 4}
     x_0     <- GPR[rs1]_{ 3.. 0}
-    r       <- ROR4 ( x_7, imm ) || ROR4 ( x_6, imm ) || 
-               ROR4 ( x_5, imm ) || ROR4 ( x_4, imm ) || 
-               ROR4 ( x_3, imm ) || ROR4 ( x_2, imm ) || 
-               ROR4 ( x_1, imm ) || ROR4 ( x_0, imm ) 
+    r       <- ( x_7 >>> imm ) || ( x_6 >>> imm ) || 
+               ( x_5 >>> imm ) || ( x_4 >>> imm ) || 
+               ( x_3 >>> imm ) || ( x_2 >>> imm ) || 
+               ( x_1 >>> imm ) || ( x_0 >>> imm ) 
     GPR[rd] <- r
   }
   
@@ -64,15 +64,15 @@
     x_2     <- GPR[rs1]_{23..16}
     x_1     <- GPR[rs1]_{15.. 8}
     x_0     <- GPR[rs1]_{ 7.. 0}
-    r       <- ROR8 ( x_3, imm ) || ROR8 ( x_2, imm ) || 
-               ROR8 ( x_1, imm ) || ROR8 ( x_0, imm ) 
+    r       <- ( x_3 >>> imm ) || ( x_2 >>> imm ) || 
+               ( x_1 >>> imm ) || ( x_0 >>> imm ) 
     GPR[rd] <- r
   }
   
   gift.rori.h     rd, rs1,      imm {
     x_1     <- GPR[rs1]_{31..16}
     x_0     <- GPR[rs1]_{15.. 0}
-    r       <- ROR16( x_1, imm ) || ROR16( x_0, imm )
+    r       <- ( x_1 >>> imm ) || ( x_0 >>> imm )
     GPR[rd] <- r
   }
     
@@ -124,8 +124,8 @@
       r <- SWAPMOVE32( r, 0x55554444,  1 )
     }
     else if ( imm == 1 ) {
-      r <-     ROR32( x & 0x33333333, 24 )
-      r <- r | ROR32( x & 0xCCCCCCCC, 16 )
+      r <-     ( ( x & 0x33333333 ) >>> 24 )
+      r <- r | ( ( x & 0xCCCCCCCC ) >>> 16 )
       r <- SWAPMOVE32( r, 0x55551100,  1 )
     }
     else if ( imm == 2 ) {
@@ -137,12 +137,12 @@
       r <- r | ( ( x >>  5 ) & 0x00070007 ) | ( ( x & 0x001F001F ) <<  3 )
     }
     else if ( imm == 4 ) {
-      r <-     ROR32( x & 0xAAAAAAAA, 24 )
-      r <- r | ROR32( x & 0x55555555, 16 )
+      r <-     ( ( x & 0xAAAAAAAA ) >>> 24 )
+      r <- r | ( ( x & 0x55555555 ) >>> 16 )
     }
     else if ( imm == 5 ) {
-      r <-     ROR32( x & 0x55555555, 24 )
-      r <- r | ROR32( x & 0xAAAAAAAA, 20 )
+      r <-     ( ( x & 0x55555555 ) >>> 24 )
+      r <- r | ( ( x & 0xAAAAAAAA ) >>> 20 )
     }
     else if ( imm == 6 ) {
       r <-     ( ( x >>  2 ) & 0x03030303 ) | ( ( x & 0x03030303 ) <<  2 )
