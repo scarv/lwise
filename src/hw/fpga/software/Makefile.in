@@ -33,12 +33,10 @@ export FPGA_SWCONF = $(FPGA_DEF_CONF)
 
 # -----------------------------------------------------------------------------
 ifeq "${IMP}" "nist"
-export LWISE_INCLUDES += ${SOC_HAL} ${REPO_HOME}/build/fpga/${ALG} ${SW}/share ${SW}/share/nist ${SW}/share/arch/${ARCH} 
+export LWISE_INCLUDES += ${SW}/share ${SW}/share/nist ${SW}/share/arch/${ARCH} 
 else
-export LWISE_INCLUDES += ${SOC_HAL} ${REPO_HOME}/build/fpga/${ALG} ${SW}/share ${SW}/share/nist ${SW}/share/arch/${ARCH} ${SW}/${ALG}/arch/${ARCH} ${SW}/${ALG}/imp/${IMP} ${SW}/${ALG}/imp/share
+export LWISE_INCLUDES += ${SW}/share ${SW}/share/nist ${SW}/share/arch/${ARCH} ${SW}/${ALG}/arch/${ARCH} ${SW}/${ALG}/imp/${IMP} ${SW}/${ALG}/imp/share
 endif
-
-#export FPGA_INCLUDES = ${SW}/share ${SW}/share/arch/${ARCH} ${SW}/${ALG} ${SW}/${ALG}/arch/${ARCH} ${SW}/${ALG}/imp/${IMP} ${SOC_HAL}
 
 export LWISE_SOURCES  = $(wildcard $(addsuffix /*.c,   ${LWISE_INCLUDES}))
 export LWISE_SOURCES += $(wildcard $(addsuffix /*.cpp, ${LWISE_INCLUDES}))
@@ -46,9 +44,9 @@ export LWISE_SOURCES += $(wildcard $(addsuffix /*.s,   ${LWISE_INCLUDES}))
 export LWISE_SOURCES += $(wildcard $(addsuffix /*.S,   ${LWISE_INCLUDES}))
 export LWISE_HEADERS  = $(wildcard $(addsuffix /*.h,   ${LWISE_INCLUDES}))
 
-export FPGA_INCLUDES := ${LWISE_INCLUDES} ${NIST_INCLUDES}
-export FPGA_SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/fpga/${ALG}/kat.c 
-export FPGA_HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/fpga/${ALG}/kat.h 
+export FPGA_INCLUDES := ${SOC_HAL} ${REPO_HOME}/build/fpga/${ALG} ${LWISE_INCLUDES} ${NIST_INCLUDES}
+export FPGA_SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/fpga/${ALG}/kat.c $(wildcard $(addsuffix /*.c, ${SOC_HAL})) $(wildcard $(addsuffix /*.S, ${SOC_HAL}))
+export FPGA_HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/fpga/${ALG}/kat.h $(wildcard $(addsuffix /*.h, ${SOC_HAL}))
 
 MABI       = $(findstring i,$(ARCH:rv32=i))lp$(ARCH:rv%=%)
 FPGA_GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany

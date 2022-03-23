@@ -40,8 +40,8 @@ ${REPO_HOME}/build/$(ALG)_cop_emulator32 : $(rtl32_src) $(zbk_rtl) $(ROCKETCHIP_
 
 ${REPO_HOME}/build/$(ALG)_xalu_emulator32 : $(rtl32_src) $(zbk_rtl) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
 	cp -f ${REPO_HOME}/src/hw/verilator/bootrom/bootrom.img          $(ROCKETCHIP_REPO)/bootrom/bootrom.img
-	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF32) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL32) RVZBK_RTL=$(RV32ZBK) debug
-	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(XALU_CONF32)-debug  $@
+	$(MAKE) -C $(ROCKETCHIP_REPO)/emulator CONFIG=$(XALU_CONF32) MODEL=$(EMULATORMODEL) ISE_RTL=$(RTL32) RVZBK_RTL=$(RV32ZBK)
+	cp $(ROCKETCHIP_REPO)/emulator/emulator-$(ROCKET)-$(XALU_CONF32)  $@
 
 ${REPO_HOME}/build/$(ALG)_xalu_emulator64 : $(rtl64_src) $(zbk_rtl) $(ROCKETCHIP_REPO)/bootrom/bootrom.img
 	cp -f ${REPO_HOME}/src/hw/verilator/bootrom/bootrom.img          $(ROCKETCHIP_REPO)/bootrom/bootrom.img
@@ -52,44 +52,47 @@ ${REPO_HOME}/build/$(ALG)_xalu_emulator64 : $(rtl64_src) $(zbk_rtl) $(ROCKETCHIP
 #--------------------------------------------------------------------
 # Build software
 #--------------------------------------------------------------------
-EMU_DEF_CONF  = -DSPARKLE_RV32_TYPE1 -DDRIVER_TRIALS_BIST
-EMU_DEF_CONF += -DDRIVER_TRIALS_WARM=1 -DDRIVER_TRIALS_REAL=4 -DDRIVER_MEASURE=1 
-EMU_DEF_CONF += -DCRAXS10_ENC_EXTERN -DTRAXL17_ENC_EXTERN -DSPARKLE_FWD_EXTERN 
-EMU_DEF_CONF += -DCRAXS10_DEC_EXTERN -DTRAXL17_DEC_EXTERN -DSPARKLE_REV_EXTERN
-
+include ${REPO_HOME}/src/hw/verilator/EMU_SWCONF.in
 export EMU_SWCONF ?= ${EMU_DEF_CONF}
 
 export EMU_HAL  = ${REPO_HOME}/src/hw/verilator/hal
-export SOFTWARE = ${REPO_HOME}/src/sw
-export INCLUDES = ${SOFTWARE}/share ${SOFTWARE}/share/arch/${ARCH} ${SOFTWARE}/${ALG} ${SOFTWARE}/${ALG}/arch/${ARCH} ${SOFTWARE}/${ALG}/imp/${IMP} ${EMU_HAL}
 
-export SOURCES  = $(wildcard $(addsuffix /*.c, ${INCLUDES}))
-export SOURCES += $(wildcard $(addsuffix /*.S, ${INCLUDES}))
-export HEADERS  = $(wildcard $(addsuffix /*.h, ${INCLUDES}))
+export EMU_INCLUDES := ${EMU_HAL} ${REPO_HOME}/build/emulate/${ALG} ${LWISE_INCLUDES} ${NIST_INCLUDES}
+export EMU_SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/emulate/${ALG}/kat.c $(wildcard $(addsuffix /*.c, ${EMU_HAL})) $(wildcard $(addsuffix /*.S, ${EMU_HAL}))
+export EMU_HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/emulate/${ALG}/kat.h $(wildcard $(addsuffix /*.h, ${EMU_HAL}))
 
 MABI       = $(findstring i,$(ARCH:rv32=i))lp$(ARCH:rv%=%)
-GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany
-GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T  $(EMU_HAL)/test.ld
+EMU_GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany
+EMU_GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T$(EMU_HAL)/test.ld
 GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
 
-export TARGET   = ${REPO_HOME}/build/driver_emu
+export EMU_TARGET = ${REPO_HOME}/build/emulate/${ALG}/${ARCH}_${ISE}
 # -----------------------------------------------------------------------------
 
-${TARGET}.elf : ${SOURCES} ${HEADERS}
-	${GCC_PREFIX}-gcc ${EMU_SWCONF} ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+${REPO_HOME}/build/emulate/${ALG}       :
+	@mkdir --parents ${@}
 
-${TARGET}.asm : ${TARGET}.elf
+${REPO_HOME}/build/emulate/${ALG}/kat.h : ${NIST_KAT} ${REPO_HOME}/build/emulate/${ALG}
+	@python3 ${SW}/share/kat.py --header < ${<} > ${@}
+
+${REPO_HOME}/build/emulate/${ALG}/kat.c : ${NIST_KAT} ${REPO_HOME}/build/emulate/${ALG}
+	@python3 ${SW}/share/kat.py --source < ${<} > ${@}
+
+${EMU_TARGET}.elf : ${EMU_SOURCES} ${EMU_HEADERS}
+	${GCC_PREFIX}-gcc ${EMU_SWCONF} ${EMU_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${EMU_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+
+${EMU_TARGET}.asm : ${EMU_TARGET}.elf
 	${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
 
-emulate: ${EMULATOR} ${TARGET}.elf ${TARGET}.asm
-	${EMULATOR} -c -m 7100000 ${TARGET}.elf
-emulate-debug : ${EMULATOR} ${TARGET}.elf
-	${EMULATOR} -c -x 500000 -v ${REPO_HOME}/build/emu32_eval.vcd -m 2100000 ${TARGET}.elf
+emulate: ${EMULATOR} ${EMU_TARGET}.elf ${EMU_TARGET}.asm
+	${EMULATOR} -c -m 71100000 ${EMU_TARGET}.elf 
+emulate-debug : ${EMULATOR} ${EMU_TARGET}.elf
+	${EMULATOR} -c -x 500000 -v ${REPO_HOME}/build/emu32_eval.vcd -m 2100000 ${EMU_TARGET}.elf
 
-include ${REPO_HOME}/src/hw/verilator/verify/$(ARCH)/Makefile.in
+#include ${REPO_HOME}/src/hw/verilator/verify/$(ARCH)/Makefile.in
 
 emu-clean : 
-	@rm --force ${TARGET}.elf
-	@rm --force ${TARGET}.asm
+	@rm --force ${EMU_TARGET}.elf
+	@rm --force ${EMU_TARGET}.asm
 
 # =============================================================================
