@@ -4,7 +4,7 @@
 typedef unsigned char u8;
 typedef unsigned int u32;
 
-void skinny128_384_plus(u8* ctext, const u8* ptext, const u32* rtk1, const u32* rtk2_3);
+extern void skinny128_384_plus(u8* ctext, const u8* ptext, const u32* rtk1, const u32* rtk2_3);
 
 #define SKINNY128_384_ROUNDS	40
 

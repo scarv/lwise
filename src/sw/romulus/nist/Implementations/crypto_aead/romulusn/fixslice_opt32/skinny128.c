@@ -88,6 +88,7 @@ void mixcolumns_3(u32* state) {
 * RTK1 and RTK2_3 are given separately to take advantage of the fact that
 * TK2 and TK3 remains the same through the entire data encryption/decryption.
 ******************************************************************************/
+#if !defined(LWISE)
 void skinny128_384_plus(u8* ctext, const u8* ptext, const u32* rtk1,  
 					const u32* rtk2_3) {
 	u32 tmp; 					// used in SWAPMOVE macro
@@ -105,3 +106,4 @@ void skinny128_384_plus(u8* ctext, const u8* ptext, const u32* rtk1,
 	QUADRUPLE_ROUND(state, rtk1+16, rtk2_3+144);
 	unpacking(ctext, state);	// from bitsliced to byte representation
 }
+#endif 
