@@ -350,6 +350,7 @@ void permute_tk(u32* tk, const u8* key, const int rounds) {
 	}
 }
 
+#if !defined(LWISE)
 /******************************************************************************
 * Precompute LFSR2(TK2) ^ LFSR3(TK3) ^ rconst.
 ******************************************************************************/
@@ -371,3 +372,4 @@ void precompute_rtk1(u32* rtk1, const u8* tk1) {
 	memset(rtk1, 0x00, 16*16);
 	permute_tk(rtk1, tk1, 16);
 }
+#endif
