@@ -15,7 +15,7 @@ def rv32( args ) :
     driver.run( args, 'elephant', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
 
   for TYPE in [ 'ELEPHANT_RV32_TYPE1', 'ELEPHANT_RV32_TYPE2' ] :
-    CONF += [TYPE]
+    CONF = [TYPE]
   
     driver.run( args, 'elephant', CONF, 'rv32', 'rv32' )
 
