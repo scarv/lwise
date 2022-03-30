@@ -7,7 +7,7 @@
 typedef unsigned char BYTE;
 typedef unsigned long long SIZE;
 
-void permutation(BYTE* state);
+extern void permutation(BYTE* state);
 
 void lfsr_step(BYTE* output, BYTE* input);
 

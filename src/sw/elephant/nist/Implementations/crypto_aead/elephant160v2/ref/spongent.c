@@ -123,13 +123,4 @@ void permutation(BYTE* state)
 	PrintState(state);
 #endif
 }
-
-#else 
-#include "spongent_imp.h"
-
-void permutation(BYTE* state)
-{
-  Spongent_160(state);
-}
-
 #endif
