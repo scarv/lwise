@@ -6,17 +6,17 @@
 
   ```
   SWAPMOVE32_X(x,y,m,n) {
-    t = y ^ ( x >> n )
-    t = t & m
-    x = x ^ ( t << n )
+    t <- y ^ ( x >> n )
+    t <- t & m
+    x <- x ^ ( t << n )
 
     return x
   }
 
   SWAPMOVE32_Y(x,y,m,n) {
-    t = y ^ ( x >> n )
-    t = t & m
-    y = y ^ ( t      )
+    t <- y ^ ( x >> n )
+    t <- t & m
+    y <- y ^ ( t      )
 
     return y
   }
