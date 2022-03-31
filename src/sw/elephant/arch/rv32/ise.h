@@ -10,40 +10,11 @@
 // ============================================================================
 
 #if ( ELEPHANT_RV32_TYPE2 )
-.macro elephant.bsllxor     rd, rs1, rs2, imm
-.insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2
+.macro elephant.pstep2.x    rd, rs1, rs2, imm
+.insn r CUSTOM_0, 7, \imm+( 0* 8), \rd, \rs1, \rs2
 .endm
-.macro elephant.bup         rd, rs1, rs2, imm
-.insn r CUSTOM_0, 7, \imm+( 2*32), \rd, \rs1, \rs2
-.endm
-
-.macro elephant.pstep1      rd, rs1
-.insn r CUSTOM_1, 6,      ( 0*32), \rd, \rs1,   x0
-.endm
-#endif
-
-// ----------------------------------------------------------------------------
-
-#if ( ELEPHANT_RV32_TYPE3 )
-.macro elephant.bupd        rd, rs1, rs2, imm
-.insn r CUSTOM_0, 7, \imm+( 3*32), \rd, \rs1, \rs2
-.endm
-
-.macro elephant.pstep1      rd, rs1
-.insn r CUSTOM_1, 6,      ( 0*32), \rd, \rs1,   x0
-.endm
-
-.macro elephant.pstep2.0    rd, rs1, rs2, imm
-.insn r CUSTOM_2, 7, \imm+( 0*32), \rd, \rs1, \rs2
-.endm
-.macro elephant.pstep2.8    rd, rs1, rs2, imm
-.insn r CUSTOM_2, 7, \imm+( 1*32), \rd, \rs1, \rs2
-.endm
-.macro elephant.pstep2.16   rd, rs1, rs2, imm
-.insn r CUSTOM_2, 7, \imm+( 2*32), \rd, \rs1, \rs2
-.endm
-.macro elephant.pstep2.24   rd, rs1, rs2, imm
-.insn r CUSTOM_2, 7, \imm+( 3*32), \rd, \rs1, \rs2
+.macro elephant.pstep2.y    rd, rs1, rs2, imm
+.insn r CUSTOM_0, 7, \imm+( 1* 8), \rd, \rs1, \rs2
 .endm
 #endif
 

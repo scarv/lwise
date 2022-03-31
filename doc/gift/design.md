@@ -15,7 +15,7 @@
   }
   ```
   
-  i.e., a 32-bit version of some more general `SWAPMOVE`.
+  i.e., a 32-bit variant of `SWAPMOVE`.
 
 <!--- -------------------------------------------------------------------- --->
 

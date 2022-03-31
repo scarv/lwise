@@ -2,57 +2,14 @@
 | class               | instruction          | format   | f7                  | f3      | custom      |
 +=====================+======================+==========+=====================+=========+=============+
 |                     |                      |          |                     |         |             |
-| ELEPHANT_RV32_TYPE2 | elephant.bsllxor     | 2R+I->1R | 00 : imm5           | 7 = 111 | 0 = 0001011 | 
-| ELEPHANT_RV32_TYPE2 | elephant.bup         | 2R+I->1R | 10 : imm5           | 7 = 111 | 0 = 0001011 |
-|                     |                      |          |                     |         |             |
-| ELEPHANT_RV32_TYPE3 | elephant.bupd        | 2R+I->1R | 11 : imm5           | 7 = 111 | 0 = 0001011 | 
+| ELEPHANT_RV32_TYPE2 | elephant.pstep2.x    | 2R+I->1R | 0000 : imm3         | 7 = 111 | 0 = 0001011 | 
+| ELEPHANT_RV32_TYPE2 | elephant.pstep2.y    | 2R+I->1R | 0001 : imm3         | 7 = 111 | 0 = 0001011 |
 |                     |                      |          |                     |         |             |
 +=====================+======================+==========+=====================+=========+=============+
 
-.macro elephant.bsllxor     rd, rs1, rs2, imm      // elephant.bsllxor        => 00ii iiir rrrr rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_BSLLXOR   0x0000700B
-.endm                                              //                         => #define  MASK_ELEPHANT_BSLLXOR   0xC000707F
-.macro elephant.bup         rd, rs1, rs2, imm      // elephant.bup            => 10ii iiir rrrr rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 7, \imm+( 2*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_BUP       0x8000700B
-.endm                                              //                         => #define  MASK_ELEPHANT_BUP       0xC000707F
-
-.macro elephant.bupd        rd, rs1, rs2, imm      // elephant.bup            => 11ii iiir rrrr rrrr r111 rrrr r000 1011
-.insn r CUSTOM_0, 7, \imm+( 3*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_BUPD      0xC000700B
-.endm                                              //                         => #define  MASK_ELEPHANT_BUPD      0xC000707F
-
-+=====================+======================+==========+=====================+=========+=============+
-| class               | instruction          | format   | f7                  | f3      | custom      |
-+=====================+======================+==========+=====================+=========+=============+
-|                     |                      |          |                     |         |             |
-| ELEPHANT_RV32_TYPE2 | elephant.pstep1      | 1R  ->1R | 00 : 00000          | 6 = 110 | 1 = 0101011 |
-| ELEPHANT_RV32_TYPE3 | elephant.pstep1      | 1R  ->1R | 00 : 00000          | 6 = 110 | 1 = 0101011 |
-|                     |                      |          |                     |         |             |
-+=====================+======================+==========+=====================+=========+=============+
-
-.macro elephant.pstep1      rd, rs1                // elephant.pstep1         => 00ii iii0 0000 rrrr r110 rrrr r010 1011
-.insn r CUSTOM_1, 6,      ( 0*32), \rd, \rs1,   x0 //                         => #define MATCH_ELEPHANT_PSTEP1    0x0000602B
-.endm                                              //                         => #define  MASK_ELEPHANT_PSTEP1    0xC000707F
-
-+=====================+======================+==========+=====================+=========+=============+
-| class               | instruction          | format   | f7                  | f3      | custom      |
-+=====================+======================+==========+=====================+=========+=============+
-|                     |                      |          |                     |         |             |
-| ELEPHANT_RV32_TYPE3 | elephant.pstep2.0    | 2R+I->1R | 00 : imm5           | 7 = 111 | 2 = 1011011 |
-| ELEPHANT_RV32_TYPE3 | elephant.pstep2.8    | 2R+I->1R | 01 : imm5           | 7 = 111 | 2 = 1011011 |
-| ELEPHANT_RV32_TYPE3 | elephant.pstep2.16   | 2R+I->1R | 10 : imm5           | 7 = 111 | 2 = 1011011 |
-| ELEPHANT_RV32_TYPE3 | elephant.pstep2.24   | 2R+I->1R | 11 : imm5           | 7 = 111 | 2 = 1011011 |
-|                     |                      |          |                     |         |             |
-+=====================+======================+==========+=====================+=========+=============+
-
-.macro elephant.pstep2.0    rd, rs1, rs2, imm      // elephant.pstep2.0       => 00ii iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 0*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_0  0x0000705B
-.endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_0  0xC000707F
-.macro elephant.pstep2.8    rd, rs1, rs2, imm      // elephant.pstep2.8       => 01ii iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 1*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_8  0x4000705B
-.endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_8  0xC000707F
-.macro elephant.pstep2.16   rd, rs1, rs2, imm      // elephant.pstep2.16      => 10ii iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 2*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_16 0x8000705B
-.endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_16 0xC000707F
-.macro elephant.pstep2.24   rd, rs1, rs2, imm      // elephant.pstep2.24      => 11ii iiir rrrr rrrr r111 rrrr r101 1011
-.insn r CUSTOM_2, 7, \imm+( 3*32), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_24 0xC000705B
-.endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_24 0xC000707F
+.macro elephant.pstep2.x    rd, rs1, rs2, imm      // elephant.pstep2.x       => 0000 iiir rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7, \imm+( 0* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_X 0x0000700B
+.endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_X 0xF000707F
+.macro elephant.pstep2.y    rd, rs1, rs2, imm      // elephant.pstep2.y       => 0001 iiir rrrr rrrr r111 rrrr r000 1011
+.insn r CUSTOM_0, 7, \imm+( 1* 8), \rd, \rs1, \rs2 //                         => #define MATCH_ELEPHANT_PSTEP2_Y 0x1000700B
+.endm                                              //                         => #define  MASK_ELEPHANT_PSTEP2_Y 0xF000707F
