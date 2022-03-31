@@ -28,6 +28,7 @@
 // the MixColumns computations 
 
 .macro SKINNY_MIXCOL0 s0, t0
+#if   (ROMULUS_RV32_TYPE1)
   rori \t0, \s0, 24
   and  \t0, \t0, t5
   rori \t0, \t0, 30
@@ -40,9 +41,13 @@
   and  \t0, \t0, t5
   rori \t0, \t0, 2
   xor  \s0, \s0, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.mixcolumns \s0, \s0, 0
+#endif 
 .endm
 
 .macro SKINNY_MIXCOL1 s0, t0
+#if   (ROMULUS_RV32_TYPE1)
   rori \t0, \s0, 16
   and  \t0, \t0, a7
   rori \t0, \t0, 30
@@ -54,9 +59,13 @@
   and  \t0, \t0, a7
   rori \t0, \t0, 2
   xor  \s0, \s0, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.mixcolumns \s0, \s0, 1
+#endif
 .endm
 
 .macro SKINNY_MIXCOL2 s0, t0
+#if   (ROMULUS_RV32_TYPE1)
   rori \t0, \s0, 8
   and  \t0, \t0, t6
   rori \t0, \t0, 6
@@ -69,9 +78,13 @@
   and  \t0, \t0, t6
   rori \t0, \t0, 2
   xor  \s0, \s0, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.mixcolumns \s0, \s0, 2
+#endif
 .endm
 
 .macro SKINNY_MIXCOL3 s0, t0
+#if   (ROMULUS_RV32_TYPE1)
   and  \t0, \s0, a6
   rori \t0, \t0, 30
   xor  \s0, \s0, \t0
@@ -81,6 +94,9 @@
   and  \t0, \s0, a6
   rori \t0, \t0, 26
   xor  \s0, \s0, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.mixcolumns \s0, \s0, 3
+#endif
 .endm
 
 .macro SKINNY_MIXCOL s0, s1, s2, s3, t0, idx
@@ -92,6 +108,7 @@
 
 // the quadruple-round routine
 
+#if   (ROMULUS_RV32_TYPE1)
 // swapmove 
 
 .macro SKINNY_SPMV s0, s1, m0, imm, t0
@@ -113,6 +130,7 @@
   xor  \t0, \t0, \t1
   xor  \s0, \t0, \s0
 .endm
+#endif
 
 // swap-only
 
@@ -129,19 +147,40 @@
 .macro SKINNY_SBOX s0, s1, s2, s3, t0 
   or          \t0, \s0, \s1
   xnor        \s3, \s3, \t0
+#if   (ROMULUS_RV32_TYPE1)
   SKINNY_SPMV \s2, \s1,  a1, 1, \t0
-  SKINNY_SPMV \s3, \s2,  a1, 1, \t0 
+  SKINNY_SPMV \s3, \s2,  a1, 1, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.swapmove.x \t0, \s2, \s1, 0    // t0 <- s2
+  romulus.swapmove.y \s1, \s2, \s1, 0    // s1 <- s1
+  romulus.swapmove.y \s2, \s3, \t0, 0    // s2 <- s2 
+  romulus.swapmove.x \s3, \s3, \t0, 0    // s3 <- s3
+#endif 
   or          \t0, \s2, \s3
   xnor        \s1, \s1, \t0
+#if   (ROMULUS_RV32_TYPE1)
   SKINNY_SPMV \s1, \s0,  a1, 1, \t0
-  SKINNY_SPMV \s0, \s3,  a1, 1, \t0 
+  SKINNY_SPMV \s0, \s3,  a1, 1, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.swapmove.y \t0, \s1, \s0, 0    // t0 <- s0
+  romulus.swapmove.x \s1, \s1, \s0, 0    // s1 <- s1
+  romulus.swapmove.x \s0, \t0, \s3, 0    // s0 <- s0
+  romulus.swapmove.y \s3, \t0, \s3, 0    // s3 <- s3 
+#endif  
   or          \t0, \s0, \s1
   xnor        \s3, \s3, \t0
+#if   (ROMULUS_RV32_TYPE1)
   SKINNY_SPMV \s2, \s1,  a1, 1, \t0
-  SKINNY_SPMV \s3, \s2,  a1, 1, \t0 
+  SKINNY_SPMV \s3, \s2,  a1, 1, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.swapmove.x \t0, \s2, \s1, 0    // t0 <- s2
+  romulus.swapmove.y \s1, \s2, \s1, 0    // s1 <- s1
+  romulus.swapmove.y \s2, \s3, \t0, 0    // s2 <- s2 
+  romulus.swapmove.x \s3, \s3, \t0, 0    // s3 <- s3
+#endif 
   or          \t0, \s2, \s3
-  xor         \s1, \s1, \t0  
-  SKINNY_SWAP \s3, \s0,  a1,    \t0 
+  xor         \s1, \s1, \t0
+  SKINNY_SWAP \s3, \s0,  a1,    \t0
 .endm
 
 
@@ -205,6 +244,8 @@
   lw   \s1,  8(\addr)
   lw   \s2,  4(\addr)
   lw   \s3, 12(\addr)
+#if   (ROMULUS_RV32_TYPE1)
+
   SKINNY_SPMV32 \s0, \m0, 3, \t0, \t1
   SKINNY_SPMV32 \s1, \m0, 3, \t0, \t1
   SKINNY_SPMV32 \s2, \m0, 3, \t0, \t1
@@ -215,9 +256,30 @@
   SKINNY_SPMV   \s1, \s2, \m2, 2, \t0
   SKINNY_SPMV   \s3, \s2, \m3, 4, \t0
   SKINNY_SPMV   \s3, \s1, \m3, 2, \t0
+#elif (ROMULUS_RV32_TYPE2)
+
+  romulus.swapmove.x \s0, \s0, \s0, 7
+  romulus.swapmove.x \s1, \s1, \s1, 7
+  romulus.swapmove.x \s2, \s2, \s2, 7
+  romulus.swapmove.x \s3, \s3, \s3, 7
+  romulus.swapmove.y \t0, \s2, \s0, 1    // t0 <- s0
+  romulus.swapmove.x \s2, \s2, \s0, 1    // s2 <- s2
+  romulus.swapmove.y \t1, \s1, \t0, 2    // t1 <- s0
+  romulus.swapmove.x \s1, \s1, \t0, 2    // s1 <- s1
+  romulus.swapmove.y \s0, \s3, \t1, 3    // s0 <- s0
+  romulus.swapmove.x \s3, \s3, \t1, 3    // s3 <- s3
+  romulus.swapmove.y \t0, \s1, \s2, 4    // t0 <- s2
+  romulus.swapmove.x \t1, \s1, \s2, 4    // t1 <- s1
+  romulus.swapmove.y \s2, \s3, \t0, 5    // s2 <- s2
+  romulus.swapmove.x \s3, \s3, \t0, 5    // s3 <- s3
+  romulus.swapmove.y \s1, \s3, \t1, 6    // s1 <- s1
+  romulus.swapmove.x \s3, \s3, \t1, 6    // s3 <- s3
+#endif 
 .endm
 
 .macro SKINNY_UNPACKING addr, s0, s1, s2, s3, t0, t1, m0, m1, m2, m3
+#if   (ROMULUS_RV32_TYPE1)
+
   SKINNY_SPMV   \s3, \s1, \m3, 2, \t0
   SKINNY_SPMV   \s3, \s2, \m3, 4, \t0
   SKINNY_SPMV   \s1, \s2, \m2, 2, \t0
@@ -228,6 +290,25 @@
   SKINNY_SPMV32 \s1, \m0, 3, \t0, \t1
   SKINNY_SPMV32 \s2, \m0, 3, \t0, \t1
   SKINNY_SPMV32 \s3, \m0, 3, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+
+  romulus.swapmove.y \t0, \s3, \s1, 6    // t0 <- s1
+  romulus.swapmove.x \s3, \s3, \s1, 6    // s3 <- s3
+  romulus.swapmove.y \t1, \s3, \s2, 5    // t1 <- s2
+  romulus.swapmove.x \s3, \s3, \s2, 5    // s3 <- s3
+  romulus.swapmove.y \s2, \t0, \t1, 4    // s2 <- s2
+  romulus.swapmove.x \s1, \t0, \t1, 4    // s1 <- s1
+  romulus.swapmove.y \t0, \s3, \s0, 3    // t0 <- s0
+  romulus.swapmove.x \s3, \s3, \s0, 3    // s3 <- s3
+  romulus.swapmove.y \t1, \s1, \t0, 2    // t1 <- s0
+  romulus.swapmove.x \s1, \s1, \t0, 2    // s1 <- s1
+  romulus.swapmove.y \s0, \s2, \t1, 1    // s0 <- s0
+  romulus.swapmove.x \s2, \s2, \t1, 1    // s2 <- s2
+  romulus.swapmove.x \s0, \s0, \s0, 7
+  romulus.swapmove.x \s1, \s1, \s1, 7
+  romulus.swapmove.x \s2, \s2, \s2, 7
+  romulus.swapmove.x \s3, \s3, \s3, 7
+#endif
   sw   \s0,  0(\addr)
   sw   \s1,  8(\addr)
   sw   \s2,  4(\addr)
@@ -341,6 +422,7 @@ skinny128_384_plus:
 // tk permutation 
 
 .macro SKINNY_PERMTK2 r0, k0, t0, t1
+#if   (ROMULUS_RV32_TYPE1)
   rori \t1, \k0, 14
   and  \t0, \t1, s6   // t0 = t1 & 0xcc00cc00
   andi \t1, \k0, 0xff // t1 = k0 & 0x000000ff
@@ -355,9 +437,13 @@ skinny128_384_plus:
   and  \t1, \k0, s4   // t1 = k0 & 0x00cc0000
   srli \t1, \t1, 18
   or   \r0, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.permtk \r0, \k0, 0 
+#endif
 .endm
 
 .macro SKINNY_PERMTK4 r0, k0, t0, t1
+#if   (ROMULUS_RV32_TYPE1)
   rori \t1, \k0, 22
   and  \t0, \t1, s7   // t0 = t1 & 0xcc0000cc
   rori \t1, \k0, 16  
@@ -369,9 +455,13 @@ skinny128_384_plus:
   and  \t1, \k0, s5   // t1 = k0 & 0x00cc00cc
   srli \t1, \t1, 2
   or   \r0, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.permtk \r0, \k0, 1 
+#endif
 .endm
 
 .macro SKINNY_PERMTK6 r0, k0, t0, t1
+#if   (ROMULUS_RV32_TYPE1)
   rori \t1, \k0, 6
   and  \t0, \t1, s10  // t0 = t1 & 0xcccc0000
   rori \t1, \k0, 24
@@ -388,9 +478,13 @@ skinny128_384_plus:
   and  \t1, \k0, a1   // t1 = k0 & 0x00003300
   slli \t1, \t1, 2
   or   \r0, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.permtk \r0, \k0, 2 
+#endif
 .endm
 
 .macro SKINNY_PERMTK8 r0, k0, t0, t1
+#if   (ROMULUS_RV32_TYPE1)
   rori \t1, \k0, 24
   li a1, 0xcc000033
   and  \t0, \t1, a1   // t0 = t1 & 0xcc000033
@@ -405,9 +499,13 @@ skinny128_384_plus:
   and  \t1, \k0, a1   // t1 = k0 & 0x00333300
   srli \t1, \t1, 6
   or   \r0, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.permtk \r0, \k0, 3
+#endif
 .endm
 
 .macro SKINNY_PERMTK10 r0, k0, t0, t1
+#if   (ROMULUS_RV32_TYPE1)
   rori \t1, \k0, 8
   li a1, 0xcc330000
   and  \t0, \t1, a1   // t0 = t1 & 0xcc330000
@@ -426,10 +524,14 @@ skinny128_384_plus:
   li a1, 0x0000cc00 
   and  \t1, \k0, a1   // t1 = k0 & 0x0000cc00
   srli \t1, \t1, 2
-  or   \r0, \t0, \t1       
+  or   \r0, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.permtk \r0, \k0, 4
+#endif       
 .endm
 
 .macro SKINNY_PERMTK12 r0, k0, t0, t1
+#if   (ROMULUS_RV32_TYPE1)
   rori \t1, \k0, 8
   li a1, 0x0000cc33
   and  \t0, \t1, a1   // t0 = t1 & 0x0000cc33
@@ -443,10 +545,14 @@ skinny128_384_plus:
   rori \t1, \k0, 16
   li a1, 0xcc003300
   and  \t1, \t1, a1   // t1 = t1 & 0xcc003300
-  or   \r0, \t0, \t1  
+  or   \r0, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.permtk \r0, \k0, 5
+#endif  
 .endm
 
 .macro SKINNY_PERMTK14 r0, k0, t0, t1
+#if   (ROMULUS_RV32_TYPE1)
   rori \t1, \k0, 24
   and  \t0, \t1, s3   // t0 = t1 & 0x0033cc00
   rori \t1, \k0, 14
@@ -462,6 +568,9 @@ skinny128_384_plus:
   li a1, 0x33003300
   and  \t1, \t1, a1   // t1 = t1 & 0x33003300
   or   \r0, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.permtk \r0, \k0, 6
+#endif
 .endm
 
 .macro SKINNY_PERMTK r0, r1, r2, r3, k0, k1, k2, k3, t0, t1, num
@@ -474,33 +583,41 @@ skinny128_384_plus:
 
 // a single round of the main loop of tk permutation 
 
-.macro SKINNY_RORAND_STEP addr, imm0, r0, imm1, m0, t0
+.macro SKINNY_TKUPD0_STEP addr, imm0, r0, imm1, m0, t0, idx
+#if   (ROMULUS_RV32_TYPE1)
   rori \t0, \r0, \imm1
   and  \t0, \t0, \m0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.tkupd.0 \t0, \r0, \idx
+#endif
   sw   \t0, \imm0(\addr)
 .endm
 
-.macro SKINNY_RORAND addr, imm0, r0, r1, r2, r3, imm1, m0, t0
-  SKINNY_RORAND_STEP \addr, \imm0,    \r0, \imm1, \m0, \t0
-  SKINNY_RORAND_STEP \addr, \imm0+4,  \r1, \imm1, \m0, \t0
-  SKINNY_RORAND_STEP \addr, \imm0+8,  \r2, \imm1, \m0, \t0
-  SKINNY_RORAND_STEP \addr, \imm0+12, \r3, \imm1, \m0, \t0
+.macro SKINNY_TKUPD0 addr, imm0, r0, r1, r2, r3, imm1, m0, t0, idx
+  SKINNY_TKUPD0_STEP \addr, \imm0,    \r0, \imm1, \m0, \t0, \idx
+  SKINNY_TKUPD0_STEP \addr, \imm0+4,  \r1, \imm1, \m0, \t0, \idx
+  SKINNY_TKUPD0_STEP \addr, \imm0+8,  \r2, \imm1, \m0, \t0, \idx
+  SKINNY_TKUPD0_STEP \addr, \imm0+12, \r3, \imm1, \m0, \t0, \idx
 .endm
 
-.macro SKINNY_DRORAD_STEP addr, imm0, r0, imm1, imm2, m0, m1, t0, t1
+.macro SKINNY_TKUPD1_STEP addr, imm0, r0, imm1, imm2, m0, m1, t0, t1, idx
+#if   (ROMULUS_RV32_TYPE1)
   rori \t0, \r0, \imm1
   and  \t0, \t0, \m0
   rori \t1, \r0, \imm2
   and  \t1, \t1, \m1
   or   \t0, \t0, \t1
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.tkupd.1 \t0, \r0, \idx
+#endif
   sw   \t0, \imm0(\addr)
 .endm
 
-.macro SKINNY_DRORAD addr, imm0, r0, r1, r2, r3, imm1, imm2, m0, m1, t0, t1
-  SKINNY_DRORAD_STEP \addr, \imm0,    \r0, \imm1, \imm2, \m0, \m1, \t0, \t1
-  SKINNY_DRORAD_STEP \addr, \imm0+4,  \r1, \imm1, \imm2, \m0, \m1, \t0, \t1
-  SKINNY_DRORAD_STEP \addr, \imm0+8,  \r2, \imm1, \imm2, \m0, \m1, \t0, \t1
-  SKINNY_DRORAD_STEP \addr, \imm0+12, \r3, \imm1, \imm2, \m0, \m1, \t0, \t1
+.macro SKINNY_TKUPD1 addr, imm0, r0, r1, r2, r3, imm1, imm2, m0, m1, t0, t1, idx
+  SKINNY_TKUPD1_STEP \addr, \imm0,    \r0, \imm1, \imm2, \m0, \m1, \t0, \t1, \idx
+  SKINNY_TKUPD1_STEP \addr, \imm0+4,  \r1, \imm1, \imm2, \m0, \m1, \t0, \t1, \idx
+  SKINNY_TKUPD1_STEP \addr, \imm0+8,  \r2, \imm1, \imm2, \m0, \m1, \t0, \t1, \idx
+  SKINNY_TKUPD1_STEP \addr, \imm0+12, \r3, \imm1, \imm2, \m0, \m1, \t0, \t1, \idx
 .endm 
 
 .macro SKINNY_PERMTK1_ROUND_EVEN addr, k0, k1, k2, k3, r0, r1, r2, r3, t0, t1
@@ -511,19 +628,19 @@ skinny128_384_plus:
   SKINNY_STRKEY  \addr,   0, \r2, \r3, \r0, \r1
 
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \k0, \k1, \k2, \k3, \t0, \t1,   2
-  SKINNY_RORAND  \addr,  16, \r0, \r1, \r2, \r3,  26, t6, \t0
-  SKINNY_DRORAD  \addr,  32, \r2, \r3, \r0, \r1,  28, 12, a6, t5, \t0, \t1
+  SKINNY_TKUPD0  \addr,  16, \r0, \r1, \r2, \r3,  26,  t6, \t0,   0
+  SKINNY_TKUPD1  \addr,  32, \r2, \r3, \r0, \r1,  28,  12,  a6,  t5, \t0, \t1, 0
 
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \k0, \k1, \k2, \k3, \t0, \t1,   4
-  SKINNY_DRORAD  \addr,  48, \r0, \r1, \r2, \r3,  14,  6, a7, t5, \t0, \t1
-  SKINNY_RORAND  \addr,  64, \r2, \r3, \r0, \r1,  16, t4, \t0
+  SKINNY_TKUPD1  \addr,  48, \r0, \r1, \r2, \r3,  14,   6,  a7,  t5, \t0, \t1, 1
+  SKINNY_TKUPD0  \addr,  64, \r2, \r3, \r0, \r1,  16,  t4, \t0,   1
 
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \k0, \k1, \k2, \k3, \t0, \t1,   6
-  SKINNY_RORAND  \addr,  80, \r0, \r1, \r2, \r3,  10, t6, \t0
-  SKINNY_DRORAD  \addr,  96, \r2, \r3, \r0, \r1,  12, 28, a6, t5, \t0, \t1
+  SKINNY_TKUPD0  \addr,  80, \r0, \r1, \r2, \r3,  10,  t6, \t0,   2
+  SKINNY_TKUPD1  \addr,  96, \r2, \r3, \r0, \r1,  12,  28,  a6,  t5, \t0, \t1, 2
 
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \k0, \k1, \k2, \k3, \t0, \t1,   8
-  SKINNY_DRORAD  \addr, 112, \r0, \r1, \r2, \r3,  30, 22, a7, t5, \t0, \t1
+  SKINNY_TKUPD1  \addr, 112, \r0, \r1, \r2, \r3,  30,  22,  a7,  t5, \t0, \t1, 3
 .endm
 
 .macro SKINNY_PERMTK1_ROUND_ODD addr, k0, k1, k2, k3, r0, r1, r2, r3, t0, t1
@@ -534,18 +651,18 @@ skinny128_384_plus:
   SKINNY_STRKEY  \addr,   0, \r2, \r3, \r0, \r1
 
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \k0, \k1, \k2, \k3, \t0, \t1,  10
-  SKINNY_RORAND  \addr,  16, \r0, \r1, \r2, \r3,  26,  t6, \t0
-  SKINNY_DRORAD  \addr,  32, \r2, \r3, \r0, \r1,  28,  12, a6, t5, \t0, \t1
+  SKINNY_TKUPD0  \addr,  16, \r0, \r1, \r2, \r3,  26,  t6, \t0,   0
+  SKINNY_TKUPD1  \addr,  32, \r2, \r3, \r0, \r1,  28,  12,  a6,  t5, \t0, \t1, 0
 
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \k0, \k1, \k2, \k3, \t0, \t1,  12
-  SKINNY_DRORAD  \addr,  48, \r0, \r1, \r2, \r3,  14,   6, a7, t5, \t0, \t1
-  SKINNY_RORAND  \addr,  64, \r2, \r3, \r0, \r1,  16,  t4, \t0
+  SKINNY_TKUPD1  \addr,  48, \r0, \r1, \r2, \r3,  14,   6,  a7,  t5, \t0, \t1, 1
+  SKINNY_TKUPD0  \addr,  64, \r2, \r3, \r0, \r1,  16,  t4, \t0,   1
 
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \k0, \k1, \k2, \k3, \t0, \t1,  14
-  SKINNY_RORAND  \addr,  80, \r0, \r1, \r2, \r3,  10,  t6, \t0
-  SKINNY_DRORAD  \addr,  96, \r2, \r3, \r0, \r1,  12,  28, a6, t5, \t0, \t1
+  SKINNY_TKUPD0  \addr,  80, \r0, \r1, \r2, \r3,  10,  t6, \t0,   2
+  SKINNY_TKUPD1  \addr,  96, \r2, \r3, \r0, \r1,  12,  28,  a6,  t5, \t0, \t1, 2
 
-  SKINNY_DRORAD  \addr, 112, \k0, \k1, \k2, \k3,  30,  22, a7, t5, \t0, \t1
+  SKINNY_TKUPD1  \addr, 112, \k0, \k1, \k2, \k3,  30,  22,  a7,  t5, \t0, \t1, 3
 .endm
 
 
@@ -613,6 +730,7 @@ precompute_rtk1:
 // lfsr2: k0, k1, k2, k3 -> k1, k2, k3, k0
 
 .macro SKINNY_LFSR2 k0, k1, k2, k3, t0, m0
+#if   (ROMULUS_RV32_TYPE1)
   and  \t0, \k2, \m0
   xor  \t0, \t0, \k0
   and  \k0, \t0, \m0
@@ -620,11 +738,15 @@ precompute_rtk1:
   slli \t0, \t0, 1
   and  \t0, \t0, \m0
   or   \k0, \k0, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.lfsr2 \k0, \k0, \k2
+#endif
 .endm
 
 // lfsr3: k0, k1, k2, k3 -> k3, k0, k1, k2
 
-.macro SKINNY_LFSR3 k0, k1, k2, k3, t0, m0 
+.macro SKINNY_LFSR3 k0, k1, k2, k3, t0, m0
+#if   (ROMULUS_RV32_TYPE1) 
   and  \t0, \k1, \m0
   srli \t0, \t0, 1
   xor  \t0, \t0, \k3
@@ -633,6 +755,9 @@ precompute_rtk1:
   slli \t0, \t0, 1
   and  \t0, \t0, \m0
   or   \k3, \k3, \t0
+#elif (ROMULUS_RV32_TYPE2)
+  romulus.lfsr3 \k3, \k3, \k1
+#endif
 .endm
 
 .macro SKINNY_XORSW addr, imm, k20, k21, k22, k23, k30, k31, k32, k33, t0
@@ -673,22 +798,22 @@ precompute_rtk1:
 
   SKINNY_LDRKEY  \addr,  16, \r0, \r1, \r2, \r3
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \r0, \r1, \r2, \r3, \t0, \t1,   2
-  SKINNY_RORAND  \addr,  16, \r0, \r1, \r2, \r3,  26, t6, \t0
-  SKINNY_DRORAD  \addr,  32, \r2, \r3, \r0, \r1,  28, 12, a6, t5, \t0, \t1
+  SKINNY_TKUPD0  \addr,  16, \r0, \r1, \r2, \r3,  26,  t6, \t0,   0
+  SKINNY_TKUPD1  \addr,  32, \r2, \r3, \r0, \r1,  28,  12,  a6,  t5, \t0, \t1, 0
 
   SKINNY_LDRKEY  \addr,  48, \r0, \r1, \r2, \r3
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \r0, \r1, \r2, \r3, \t0, \t1,   4
-  SKINNY_DRORAD  \addr,  48, \r0, \r1, \r2, \r3,  14,  6, a7, t5, \t0, \t1
-  SKINNY_RORAND  \addr,  64, \r2, \r3, \r0, \r1,  16, t4, \t0
+  SKINNY_TKUPD1  \addr,  48, \r0, \r1, \r2, \r3,  14,   6,  a7,  t5, \t0, \t1, 1
+  SKINNY_TKUPD0  \addr,  64, \r2, \r3, \r0, \r1,  16,  t4, \t0,   1
 
   SKINNY_LDRKEY  \addr,  80, \r0, \r1, \r2, \r3
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \r0, \r1, \r2, \r3, \t0, \t1,   6
-  SKINNY_RORAND  \addr,  80, \r0, \r1, \r2, \r3,  10, t6, \t0
-  SKINNY_DRORAD  \addr,  96, \r2, \r3, \r0, \r1,  12, 28, a6, t5, \t0, \t1
+  SKINNY_TKUPD0  \addr,  80, \r0, \r1, \r2, \r3,  10,  t6, \t0,   2
+  SKINNY_TKUPD1  \addr,  96, \r2, \r3, \r0, \r1,  12,  28,  a6,  t5, \t0, \t1, 2
 
   SKINNY_LDRKEY  \addr, 112, \r0, \r1, \r2, \r3
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \r0, \r1, \r2, \r3, \t0, \t1,   8
-  SKINNY_DRORAD  \addr, 112, \r0, \r1, \r2, \r3,  30, 22, a7, t5, \t0, \t1
+  SKINNY_TKUPD1  \addr, 112, \r0, \r1, \r2, \r3,  30,  22,  a7,  t5, \t0, \t1, 3
 .endm
 
 .macro SKINNY_PERMTK23_ROUND_ODD addr, r0, r1, r2, r3, t0, t1
@@ -700,21 +825,21 @@ precompute_rtk1:
 
   SKINNY_LDRKEY  \addr,  16, \r0, \r1, \r2, \r3
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \r0, \r1, \r2, \r3, \t0, \t1,  10
-  SKINNY_RORAND  \addr,  16, \r0, \r1, \r2, \r3,  26,  t6, \t0
-  SKINNY_DRORAD  \addr,  32, \r2, \r3, \r0, \r1,  28,  12, a6, t5, \t0, \t1
+  SKINNY_TKUPD0  \addr,  16, \r0, \r1, \r2, \r3,  26,  t6, \t0,   0
+  SKINNY_TKUPD1  \addr,  32, \r2, \r3, \r0, \r1,  28,  12,  a6,  t5, \t0, \t1, 0
 
   SKINNY_LDRKEY  \addr,  48, \r0, \r1, \r2, \r3
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \r0, \r1, \r2, \r3, \t0, \t1,  12
-  SKINNY_DRORAD  \addr,  48, \r0, \r1, \r2, \r3,  14,   6, a7, t5, \t0, \t1
-  SKINNY_RORAND  \addr,  64, \r2, \r3, \r0, \r1,  16,  t4, \t0
+  SKINNY_TKUPD1  \addr,  48, \r0, \r1, \r2, \r3,  14,   6,  a7,  t5, \t0, \t1, 1
+  SKINNY_TKUPD0  \addr,  64, \r2, \r3, \r0, \r1,  16,  t4, \t0,   1
 
   SKINNY_LDRKEY  \addr,  80, \r0, \r1, \r2, \r3
   SKINNY_PERMTK    \r0, \r1, \r2, \r3, \r0, \r1, \r2, \r3, \t0, \t1,  14
-  SKINNY_RORAND  \addr,  80, \r0, \r1, \r2, \r3,  10,  t6, \t0
-  SKINNY_DRORAD  \addr,  96, \r2, \r3, \r0, \r1,  12,  28, a6, t5, \t0, \t1
+  SKINNY_TKUPD0  \addr,  80, \r0, \r1, \r2, \r3,  10,  t6, \t0,   2
+  SKINNY_TKUPD1  \addr,  96, \r2, \r3, \r0, \r1,  12,  28,  a6,  t5, \t0, \t1, 2
 
   SKINNY_LDRKEY  \addr, 112, \r0, \r1, \r2, \r3
-  SKINNY_DRORAD  \addr, 112, \r0, \r1, \r2, \r3,  30,  22, a7, t5, \t0, \t1
+  SKINNY_TKUPD1  \addr, 112, \r0, \r1, \r2, \r3,  30,  22,  a7,  t5, \t0, \t1, 3
 .endm
 
 
