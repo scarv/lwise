@@ -48,4 +48,35 @@
 .endm
 #endif
 
+// ----------------------------------------------------------------------------
+
+#if ( ROMULUS_RV32_TYPE3 )
+.macro romulus.lfsr2        rd, rs1, rs2
+.insn r CUSTOM_0, 7,      ( 4* 8), \rd, \rs1, \rs2
+.endm
+.macro romulus.lfsr3        rd, rs1, rs2
+.insn r CUSTOM_0, 7,      ( 5* 8), \rd, \rs1, \rs2
+.endm
+
+.macro romulus.permtk       rd, rs1,      imm
+.insn r CUSTOM_1, 6, \imm+( 4* 8), \rd, \rs1,   x0
+.endm
+.macro romulus.tkupd.0      rd, rs1,      imm
+.insn r CUSTOM_1, 6, \imm+( 5* 8), \rd, \rs1,   x0
+.endm
+.macro romulus.tkupd.1      rd, rs1,      imm
+.insn r CUSTOM_1, 6, \imm+( 6* 8), \rd, \rs1,   x0
+.endm
+
+.macro romulus.mixcolumns    rd, rs1,      imm
+.insn r CUSTOM_3, 6, \imm+( 0* 8), \rd, \rs1,   x0
+.endm
+.macro romulus.swapmove.x    rd, rs1, rs2, imm
+.insn r CUSTOM_3, 7, \imm+( 1* 8), \rd, \rs1, \rs2
+.endm
+.macro romulus.swapmove.y    rd, rs1, rs2, imm
+.insn r CUSTOM_3, 7, \imm+( 2* 8), \rd, \rs1, \rs2
+.endm
+#endif
+
 // ============================================================================

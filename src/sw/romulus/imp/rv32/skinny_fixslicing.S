@@ -41,7 +41,7 @@
   and  \t0, \t0, t5
   rori \t0, \t0, 2
   xor  \s0, \s0, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.mixcolumns \s0, \s0, 0
 #endif 
 .endm
@@ -59,7 +59,7 @@
   and  \t0, \t0, a7
   rori \t0, \t0, 2
   xor  \s0, \s0, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.mixcolumns \s0, \s0, 1
 #endif
 .endm
@@ -78,7 +78,7 @@
   and  \t0, \t0, t6
   rori \t0, \t0, 2
   xor  \s0, \s0, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.mixcolumns \s0, \s0, 2
 #endif
 .endm
@@ -94,7 +94,7 @@
   and  \t0, \s0, a6
   rori \t0, \t0, 26
   xor  \s0, \s0, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.mixcolumns \s0, \s0, 3
 #endif
 .endm
@@ -150,7 +150,7 @@
 #if   (ROMULUS_RV32_TYPE1)
   SKINNY_SPMV \s2, \s1,  a1, 1, \t0
   SKINNY_SPMV \s3, \s2,  a1, 1, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.swapmove.x \t0, \s2, \s1, 0    // t0 <- s2
   romulus.swapmove.y \s1, \s2, \s1, 0    // s1 <- s1
   romulus.swapmove.y \s2, \s3, \t0, 0    // s2 <- s2 
@@ -161,7 +161,7 @@
 #if   (ROMULUS_RV32_TYPE1)
   SKINNY_SPMV \s1, \s0,  a1, 1, \t0
   SKINNY_SPMV \s0, \s3,  a1, 1, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.swapmove.y \t0, \s1, \s0, 0    // t0 <- s0
   romulus.swapmove.x \s1, \s1, \s0, 0    // s1 <- s1
   romulus.swapmove.x \s0, \t0, \s3, 0    // s0 <- s0
@@ -172,7 +172,7 @@
 #if   (ROMULUS_RV32_TYPE1)
   SKINNY_SPMV \s2, \s1,  a1, 1, \t0
   SKINNY_SPMV \s3, \s2,  a1, 1, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.swapmove.x \t0, \s2, \s1, 0    // t0 <- s2
   romulus.swapmove.y \s1, \s2, \s1, 0    // s1 <- s1
   romulus.swapmove.y \s2, \s3, \t0, 0    // s2 <- s2 
@@ -256,7 +256,7 @@
   SKINNY_SPMV   \s1, \s2, \m2, 2, \t0
   SKINNY_SPMV   \s3, \s2, \m3, 4, \t0
   SKINNY_SPMV   \s3, \s1, \m3, 2, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
 
   romulus.swapmove.x \s0, \s0, \s0, 7
   romulus.swapmove.x \s1, \s1, \s1, 7
@@ -290,7 +290,7 @@
   SKINNY_SPMV32 \s1, \m0, 3, \t0, \t1
   SKINNY_SPMV32 \s2, \m0, 3, \t0, \t1
   SKINNY_SPMV32 \s3, \m0, 3, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
 
   romulus.swapmove.y \t0, \s3, \s1, 6    // t0 <- s1
   romulus.swapmove.x \s3, \s3, \s1, 6    // s3 <- s3
@@ -437,7 +437,7 @@ skinny128_384_plus:
   and  \t1, \k0, s4   // t1 = k0 & 0x00cc0000
   srli \t1, \t1, 18
   or   \r0, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.permtk \r0, \k0, 0 
 #endif
 .endm
@@ -455,7 +455,7 @@ skinny128_384_plus:
   and  \t1, \k0, s5   // t1 = k0 & 0x00cc00cc
   srli \t1, \t1, 2
   or   \r0, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.permtk \r0, \k0, 1 
 #endif
 .endm
@@ -478,7 +478,7 @@ skinny128_384_plus:
   and  \t1, \k0, a1   // t1 = k0 & 0x00003300
   slli \t1, \t1, 2
   or   \r0, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.permtk \r0, \k0, 2 
 #endif
 .endm
@@ -499,7 +499,7 @@ skinny128_384_plus:
   and  \t1, \k0, a1   // t1 = k0 & 0x00333300
   srli \t1, \t1, 6
   or   \r0, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.permtk \r0, \k0, 3
 #endif
 .endm
@@ -525,7 +525,7 @@ skinny128_384_plus:
   and  \t1, \k0, a1   // t1 = k0 & 0x0000cc00
   srli \t1, \t1, 2
   or   \r0, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.permtk \r0, \k0, 4
 #endif       
 .endm
@@ -546,7 +546,7 @@ skinny128_384_plus:
   li a1, 0xcc003300
   and  \t1, \t1, a1   // t1 = t1 & 0xcc003300
   or   \r0, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.permtk \r0, \k0, 5
 #endif  
 .endm
@@ -568,7 +568,7 @@ skinny128_384_plus:
   li a1, 0x33003300
   and  \t1, \t1, a1   // t1 = t1 & 0x33003300
   or   \r0, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.permtk \r0, \k0, 6
 #endif
 .endm
@@ -587,7 +587,7 @@ skinny128_384_plus:
 #if   (ROMULUS_RV32_TYPE1)
   rori \t0, \r0, \imm1
   and  \t0, \t0, \m0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.tkupd.0 \t0, \r0, \idx
 #endif
   sw   \t0, \imm0(\addr)
@@ -607,7 +607,7 @@ skinny128_384_plus:
   rori \t1, \r0, \imm2
   and  \t1, \t1, \m1
   or   \t0, \t0, \t1
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.tkupd.1 \t0, \r0, \idx
 #endif
   sw   \t0, \imm0(\addr)
@@ -738,7 +738,7 @@ precompute_rtk1:
   slli \t0, \t0, 1
   and  \t0, \t0, \m0
   or   \k0, \k0, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.lfsr2 \k0, \k0, \k2
 #endif
 .endm
@@ -755,7 +755,7 @@ precompute_rtk1:
   slli \t0, \t0, 1
   and  \t0, \t0, \m0
   or   \k3, \k3, \t0
-#elif (ROMULUS_RV32_TYPE2)
+#elif (ROMULUS_RV32_TYPE3)
   romulus.lfsr3 \k3, \k3, \k1
 #endif
 .endm
