@@ -40,29 +40,29 @@
 
 // ----------------------------------------------------------------------------
 
-#define MEASURE_PROLOGUE(id)                                                              \
-  uint32_t id ## _tsc_b      =  0;                                                        \
-  uint32_t id ## _tsc_a      =  0;                                                        \
-                                                                                          \
-  uint32_t id ## _tsc_t_mean =  0;                                                        \
-  uint32_t id ## _tsc_t_min  = -1;                                                        \
+#define MEASURE_PROLOGUE(id)                                                                   \
+  uint32_t id ## _tsc_b      =  0;                                                             \
+  uint32_t id ## _tsc_a      =  0;                                                             \
+                                                                                               \
+  uint32_t id ## _tsc_t_mean =  0;                                                             \
+  uint32_t id ## _tsc_t_min  = -1;                                                             \
   uint32_t id ## _tsc_t_max  =  0;
 
-#define MEASURE_STEP(id,...)                                                              \
-  id ## _tsc_b = rdtsc();                                                                 \
-  id( __VA_ARGS__ );                                                                      \
-  id ## _tsc_a = rdtsc();                                                                 \
-                                                                                          \
-  if( i >= trials_warm ) {                                                                \
-    id ## _tsc_t_mean +=    (                   id ## _tsc_a - id ## _tsc_b );            \
-    id ## _tsc_t_min   = MIN( id ## _tsc_t_min, id ## _tsc_a - id ## _tsc_b );            \
-    id ## _tsc_t_max   = MAX( id ## _tsc_t_max, id ## _tsc_a - id ## _tsc_b );            \
+#define MEASURE_STEP(id,...)                                                                   \
+  id ## _tsc_b = rdtsc();                                                                      \
+  id( __VA_ARGS__ );                                                                           \
+  id ## _tsc_a = rdtsc();                                                                      \
+                                                                                               \
+  if( i >= trials_warm ) {                                                                     \
+    id ## _tsc_t_mean +=    (                   id ## _tsc_a - id ## _tsc_b );                 \
+    id ## _tsc_t_min   = MIN( id ## _tsc_t_min, id ## _tsc_a - id ## _tsc_b );                 \
+    id ## _tsc_t_max   = MAX( id ## _tsc_t_max, id ## _tsc_a - id ## _tsc_b );                 \
   }
 
-#define MEASURE_EPILOGUE(id)                                                              \
-    printf( "tsc (mean)    : %s => %f\n", #id, ( float )( id ## _tsc_t_mean ) / trials ); \
-    printf( "tsc (minimum) : %s => %f\n", #id, ( float )( id ## _tsc_t_min )           ); \
-    printf( "tsc (maximum) : %s => %f\n", #id, ( float )( id ## _tsc_t_max )           );
+#define MEASURE_EPILOGUE(id)                                                                   \
+    printf( "tsc (mean)    : %s => %f\n", #id, ( float )( id ## _tsc_t_mean ) / trials_real ); \
+    printf( "tsc (minimum) : %s => %f\n", #id, ( float )( id ## _tsc_t_min )                ); \
+    printf( "tsc (maximum) : %s => %f\n", #id, ( float )( id ## _tsc_t_max )                );
 
 // ============================================================================
 
