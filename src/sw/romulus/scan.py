@@ -25,9 +25,9 @@ def rv32( args ) :
 
       driver.run( args, 'romulus', CONF, 'rv32', 'rv32', NIST_IMP = 'ref'            )
       
-    # there is only unrolled version for fixslicing implementation
-    CONF += [ 'ROMULUS_RV32_UNROLL' ]
-    driver.run( args, 'romulus', CONF, 'rv32', 'rv32', NIST_IMP = 'fixslice_opt32' ) 
+  # there is only unrolled version for fixslicing implementation
+  driver.run( args, 'romulus', ['ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_UNROLL'], 'rv32', 'rv32', NIST_IMP = 'fixslice_opt32' )
+  driver.run( args, 'romulus', ['ROMULUS_RV32_TYPE3', 'ROMULUS_RV32_UNROLL'], 'rv32', 'rv32', NIST_IMP = 'fixslice_opt32' ) 
     
 
 # -----------------------------------------------------------------------------
