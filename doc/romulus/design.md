@@ -6,10 +6,10 @@
 
   ```
   SWAPMOVE32  (x,  m,n) {
-    t = x ^ ( x >> n )
-    t = t & m
-    t = t ^ ( t << n )
-    x = t ^ x
+    t <- x ^ ( x >> n )
+    t <- t & m
+    t <- t ^ ( t << n )
+    x <- t ^ x
 
     return x
   }
