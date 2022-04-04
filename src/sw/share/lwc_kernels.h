@@ -20,8 +20,8 @@ extern void P12(void * state);
 extern void giftb128(uint8_t P[16], const uint8_t K[16], uint8_t C[16]);
 #else
 extern void giftb128_bitslicing(void *P, const void *K, void *C);
-extern void giftb128_fixslicing(void *P, const void *K, void *C);
-extern void precompute_rkeys(void* rkeys, const void* key);
+extern void giftb128_fixslicing(void *P, const void *rkey, void *C);
+extern void precompute_rkeys(void* rkey, const void* key);
 #endif
 
 extern void PHOTON_Permutation(void *state);

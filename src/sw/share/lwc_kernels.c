@@ -57,18 +57,20 @@ void time_kernel() {
 
   MEASURE_EPILOGUE( giftb128_bitslicing );
   #elif defined(GIFT_FIXSLICING) 
+
+  unsigned long long rk_n = 80*4; uint8_t rk[ rk_n ];
+
   MEASURE_PROLOGUE( giftb128_fixslicing );
 
   for( int i = 0; i < trials; i++ ) {
-    rand_bytes( p, p_n );
-    rand_bytes( k, k_n );
-    rand_bytes( c, c_n );
-    MEASURE_STEP( giftb128_fixslicing, p, k, c );
+    rand_bytes(  p,  p_n );
+    rand_bytes( rk, rk_n );
+    rand_bytes(  c,  c_n );
+    MEASURE_STEP( giftb128_fixslicing, p, rk, c );
   }
 
   MEASURE_EPILOGUE( giftb128_fixslicing );
 
-  uint8_t rk[ 80*4 ];
   MEASURE_PROLOGUE( precompute_rkeys );
 
   for( int i = 0; i < trials; i++ ) {
@@ -126,8 +128,8 @@ void time_kernel() {
   MEASURE_EPILOGUE( skinny_128_384_plus_enc );
   #elif ROMULUS_FIXSLICING
   unsigned long long c_n    = 16;    uint8_t  c  [ c_n ];
-  unsigned long long rk1_n  = 4*64;  uint8_t rk1 [ rk1_n ];
-  unsigned long long rk23_n = 4*160; uint8_t rk23[ rk23_n ];
+  unsigned long long rk1_n  = 64*4;  uint8_t rk1 [ rk1_n ];
+  unsigned long long rk23_n = 160*4; uint8_t rk23[ rk23_n ];
 
   MEASURE_PROLOGUE( skinny128_384_plus );
 
