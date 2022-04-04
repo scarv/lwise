@@ -19,16 +19,22 @@ def rv32( args ) :
   for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE2' ] :
     for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
+      # this flag will not be used in code but can indicate the necessary info to users
+      CONF += [ 'ROMULUS_RV32_LUT' ]
 
       if ( UNROLL ) :
         CONF += [ 'ROMULUS_RV32_UNROLL' ]
 
       driver.run( args, 'romulus', CONF, 'rv32', 'rv32', NIST_IMP = 'ref'            )
-      
-  # there is only unrolled version for fixslicing implementation
-  driver.run( args, 'romulus', ['ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_UNROLL'], 'rv32', 'rv32', NIST_IMP = 'fixslice_opt32' )
-  driver.run( args, 'romulus', ['ROMULUS_RV32_TYPE3', 'ROMULUS_RV32_UNROLL'], 'rv32', 'rv32', NIST_IMP = 'fixslice_opt32' ) 
-    
+
+  for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE3' ] :
+    CONF = [ TYPE ]
+    # this flag will not be used in code but can indicate the necessary info to users
+    CONF += [ 'ROMULUS_RV32_FIXSLICING' ]
+    # there is only unrolled version for fixslicing implementation
+    CONF += [ 'ROMULUS_RV32_UNROLL' ]
+
+    driver.run( args, 'romulus', CONF, 'rv32', 'rv32', NIST_IMP = 'fixslice_opt32' )
 
 # -----------------------------------------------------------------------------
 

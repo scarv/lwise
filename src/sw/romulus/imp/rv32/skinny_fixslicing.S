@@ -5,13 +5,13 @@
 
 // ----------------------------------------------------------------------------
 // Register Allocation
-// (Use caller-saved registers to save push/pop instructions)  
+// (use caller-saved registers to save push/pop instructions)  
 //
 // a0-a3:            the address of out, in, rtk_1, rtk_23
 // t0-t3:            state 
 // t4:               temp register
 // a4:               temp address of rtk_1 
-// a1, a5-a7, t5-t6: masks  
+// a1, a5-a7, t5-t6: masks 
 // ----------------------------------------------------------------------------
 
 
@@ -25,7 +25,7 @@
 .endm
 
 
-// the MixColumns computations 
+// MixColumns computations 
 
 .macro SKINNY_MIXCOL0 s0, t0
 #if   (ROMULUS_RV32_TYPE1)
@@ -184,7 +184,7 @@
 .endm
 
 
-// add keys
+// add tweak keys
 
 .macro SKINNY_RTK1 s0, s1, s2, s3, kaddr, imm, k1
   lw   \k1, \imm   (\kaddr)
@@ -321,12 +321,14 @@
 .global skinny128_384_plus
 
 skinny128_384_plus:
-  SKINNY_PROLOGUE 
+  SKINNY_PROLOGUE
+#if   (ROMULUS_RV32_TYPE1) 
   li a5, 0x0a0a0a0a
   li a6, 0x03030303
   li a7, 0x30303030
   li t5, 0x0c0c0c0c
   li t6, 0xc0c0c0c0
+#endif
   SKINNY_PACKING   a1, t0, t1, t2, t3, t4, a4, a5, a7, t5, a6
   li a1, 0x55555555
   //
@@ -369,9 +371,8 @@ skinny128_384_plus:
 // prologue + epilogue 
 
 .macro RKEY_PROLOGUE
+#if   (ROMULUS_RV32_TYPE1)
   addi sp, sp, -48
-  sw   s0,   0(sp)
-  sw   s1,   4(sp)
   sw   s2,   8(sp)
   sw   s3,  12(sp)
   sw   s4,  16(sp)
@@ -382,11 +383,17 @@ skinny128_384_plus:
   sw   s9,  36(sp)
   sw   s10, 40(sp)
   sw   s11, 44(sp)
+#elif  (ROMULUS_RV32_TYPE3)
+  addi sp, sp, -8
+#endif
+  sw   s0,   0(sp)
+  sw   s1,   4(sp)
 .endm
 
 .macro RKEY_EPILOGUE
   lw   s0,   0(sp)
   lw   s1,   4(sp)
+#if   (ROMULUS_RV32_TYPE1)
   lw   s2,   8(sp)
   lw   s3,  12(sp)
   lw   s4,  16(sp)
@@ -398,6 +405,9 @@ skinny128_384_plus:
   lw   s10, 40(sp)
   lw   s11, 44(sp)
   addi sp, sp, 48
+#elif  (ROMULUS_RV32_TYPE3)
+  addi sp, sp, 8
+#endif  
   ret 
 .endm
 
@@ -620,7 +630,7 @@ skinny128_384_plus:
   SKINNY_TKUPD1_STEP \addr, \imm0+12, \r3, \imm1, \imm2, \m0, \m1, \t0, \t1, \idx
 .endm 
 
-.macro SKINNY_PERMTK1_ROUND_EVEN addr, k0, k1, k2, k3, r0, r1, r2, r3, t0, t1
+.macro SKINNY_PERMTK1_ROUND_EVN addr, k0, k1, k2, k3, r0, r1, r2, r3, t0, t1
   and  \r0, \k0, t4
   and  \r1, \k1, t4
   and  \r2, \k2, t4
@@ -668,7 +678,7 @@ skinny128_384_plus:
 
 // ----------------------------------------------------------------------------
 // Register Allocation
-// (Use caller-saved registers to save push/pop instructions)  
+// (use caller-saved registers to save push/pop instructions)  
 //
 // a0-a1:         the address of rtk1 and tk1, resp.
 // a2-a5:         tk
@@ -685,14 +695,17 @@ skinny128_384_plus:
 
 precompute_rtk1:
   RKEY_PROLOGUE
+#if   (ROMULUS_RV32_TYPE1)
   li t4,  0x0a0a0a0a
   li t5,  0x0c0c0c0c
   li t6,  0xc3c3c3c3
   li a6,  0x03030303
   li a7,  0x30303030
+#endif 
   SKINNY_PACKING a1, a2, a3, a4, a5, s0, s1, t4, a7, t5, a6
   //
   li t4,  0xf0f0f0f0
+#if   (ROMULUS_RV32_TYPE1)
   li s2,  0xcc000000   // a fixed mask used in PermTK2 and PermTK14
   li s3,  0x0033cc00   // a fixed mask used in PermTK2 and PermTK14
   li s4,  0x00cc0000   // a fixed mask used in PermTK2 and PermTK14
@@ -704,9 +717,10 @@ precompute_rtk1:
   li s9,  0x00cc3300   // a fixed mask used in PermTK4
   li s10, 0xcccc0000   // a fixed mask used in PermTK6
   li s11, 0x330000cc   // a fixed mask used in PermTK6
-  // For the remaining masks, we use regster a1 to serve as a temp mask.
+  // For the remaining masks, we use register a1 to serve as a temp mask.
+#endif 
   //
-  SKINNY_PERMTK1_ROUND_EVEN a0, a2, a3, a4, a5, t0, t1, t2, t3, s0, s1
+  SKINNY_PERMTK1_ROUND_EVN  a0, a2, a3, a4, a5, t0, t1, t2, t3, s0, s1
   addi a0, a0, 128
   SKINNY_PERMTK1_ROUND_ODD  a0, a2, a3, a4, a5, t0, t1, t2, t3, s0, s1
   //
@@ -715,7 +729,7 @@ precompute_rtk1:
 
 // ----------------------------------------------------------------------------
 // Register Allocation
-// (Use caller-saved registers to save push/pop instructions)  
+// (use caller-saved registers to save push/pop instructions)  
 //
 // a0-a2:         the address of rtk, tk2, and tk3, resp.
 // a2-a5:         tk2 
@@ -724,7 +738,6 @@ precompute_rtk1:
 // t4-t6, a6-a7:  masks
 // s2-s11:        masks in PermTK
 // a2:            the address of LUT (after lfsr)
-//  
 // ----------------------------------------------------------------------------
 
 // lfsr2: k0, k1, k2, k3 -> k1, k2, k3, k0
@@ -789,7 +802,7 @@ precompute_rtk1:
   .endr
 .endm
 
-.macro SKINNY_PERMTK23_ROUND_EVEN addr, r0, r1, r2, r3, t0, t1
+.macro SKINNY_PERMTK23_ROUND_EVN addr, r0, r1, r2, r3, t0, t1
   and  \r0, \r0, t4
   and  \r1, \r1, t4
   and  \r2, \r2, t4
@@ -861,18 +874,23 @@ precompute_rtk1:
 
 precompute_rtk2_3:
   RKEY_PROLOGUE
+#if   (ROMULUS_RV32_TYPE1)
   li t4,  0x0a0a0a0a
   li t5,  0x0c0c0c0c
   li t6,  0xc3c3c3c3
   li a6,  0x03030303
   li a7,  0x30303030
+#endif
   SKINNY_PACKING a2, t0, t1, t2, t3, s0, s1, t4, a7, t5, a6
   SKINNY_PACKING a1, a2, a3, a4, a5, s0, s1, t4, a7, t5, a6
   //
+#if   (ROMULUS_RV32_TYPE1)
   li t4,  0xaaaaaaaa
+#endif
   SKINNY_LFSR_TK23 a0, a2, a3, a4, a5, t0, t1, t2, t3, s0, t4
   //
   li t4,  0xf0f0f0f0
+#if   (ROMULUS_RV32_TYPE1)
   li s2,  0xcc000000   // a fixed mask used in PermTK2 and PermTK14
   li s3,  0x0033cc00   // a fixed mask used in PermTK2 and PermTK14
   li s4,  0x00cc0000   // a fixed mask used in PermTK2 and PermTK14
@@ -885,18 +903,19 @@ precompute_rtk2_3:
   li s10, 0xcccc0000   // a fixed mask used in PermTK6
   li s11, 0x330000cc   // a fixed mask used in PermTK6
   // For the remaining masks, we use regster a1 to serve as a temp mask.
+#endif
   // 
   SKINNY_LDRKEY    a0,  0, t0, t1, t2, t3
   la a2, RCONST32
-  SKINNY_PERMTK23_ROUND_EVEN a0, t0, t1, t2, t3, s0, s1
+  SKINNY_PERMTK23_ROUND_EVN  a0, t0, t1, t2, t3, s0, s1
   addi a0, a0, 128
   SKINNY_PERMTK23_ROUND_ODD  a0, t0, t1, t2, t3, s0, s1
   addi a0, a0, 128
-  SKINNY_PERMTK23_ROUND_EVEN a0, t0, t1, t2, t3, s0, s1
+  SKINNY_PERMTK23_ROUND_EVN  a0, t0, t1, t2, t3, s0, s1
   addi a0, a0, 128  
   SKINNY_PERMTK23_ROUND_ODD  a0, t0, t1, t2, t3, s0, s1
   addi a0, a0, 128
-  SKINNY_PERMTK23_ROUND_EVEN a0, t0, t1, t2, t3, s0, s1
+  SKINNY_PERMTK23_ROUND_EVN  a0, t0, t1, t2, t3, s0, s1
   // SKINNY_ADDRC can be integrated into ROUND to save some instructions
   la a2, RCONST32
   addi a0, a0, -512
