@@ -7,6 +7,7 @@
 // Register Allocation
 // (use caller-saved registers to save push/pop instructions)  
 //
+// a0:         the address of state
 // a2-a6:      state
 // t0-t1, t6:  temp registers
 // ----------------------------------------------------------------------------
