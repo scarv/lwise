@@ -16,7 +16,9 @@ def rv32( args ) :
 
   for TYPE in [ 'ELEPHANT_RV32_TYPE1', 'ELEPHANT_RV32_TYPE2' ] :
     CONF = [TYPE]
-  
+    # there is only unrolled implementation for Elephant on rv32
+    CONF += ['ELEPHANT_RV32_UNROLL']
+
     driver.run( args, 'elephant', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------

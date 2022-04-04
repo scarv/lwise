@@ -2,16 +2,17 @@
 #include "zbkx.h"
 #include "ise.h"
 
+
 // ----------------------------------------------------------------------------
 // Register Allocation
-// (Use caller-saved registers to save push/pop instructions)  
+// (use caller-saved registers to save push/pop instructions)  
 //
 // a0:     the address of state
 // a1-a5:  state
 // a6-a7:  LUTs         for xperm-style SBox
 // t0:     a fixed mask for xperm-style SBox
 // t1:     temp register
-// t2-t4:  masks for SWAPMPVE 
+// t2-t4:  masks for SWAPMOVE 
 // ----------------------------------------------------------------------------
 
 
@@ -44,7 +45,7 @@
 .endm
 
 
-// operations: add round constants + sBoxLayer + pLayer
+// layers: add round constants + sBoxLayer + pLayer
 
 // add round constants
 
@@ -74,10 +75,10 @@
 
 // pLayer 
 // Our pLayer implementation contains two steps:
-// Step1: permute  the bits in the same  32-bit state word
-// Step2: swapmove the bits in different 32-bit state words 
+// step1: permute  the bits in the same  32-bit state word
+// step2: swapmove the bits in different 32-bit state words 
 
-// Step1 can be easily implemented with "unzip" instruction from ZBKB.
+// The step1 can be easily implemented with "unzip" instruction from ZBKB.
 
 // The 1st "unzip" permutes the 32-bit state word as follows: 
 // bits[31:24] 31 29 27 25 23 21 19 17
@@ -96,7 +97,7 @@
   unzip \s0, \s0 
 .endm
 
-// Step2 is composed of series of swapmove and rori instructions. 
+// The step2 is composed of series of swapmove and rori operations. 
 
 #if (ELEPHANT_RV32_TYPE1)
 .macro SPONGENT_SWAPMOVE s0, s1, m0, imm, t0
@@ -110,14 +111,14 @@
 #endif 
 
 .macro SPONGENT_PL s0, s1, s2, s3, s4, t0
-  // step 1
+  // step1
   SPONGENT_PL_STEP1 \s0
   SPONGENT_PL_STEP1 \s1
   SPONGENT_PL_STEP1 \s2
   SPONGENT_PL_STEP1 \s3
   SPONGENT_PL_STEP1 \s4
 
-  // step 2
+  // step2
 #if   (ELEPHANT_RV32_TYPE1)
 
   SPONGENT_SWAPMOVE \s0, \s1, t2, 8 , \t0
@@ -133,18 +134,9 @@
   rori \s3, \s3, 8
 #elif (ELEPHANT_RV32_TYPE2)
 
-  # 0. swapmove(x, y, 0x000000FF, 8)
-  # 1. swapmove(x, y, 0x000000FF, 16)
-  # 2. swapmove(x, y, 0x000000FF, 24)
-  # 3. swapmove(x, y, 0x0000FF00, 8)
-  # 4. swapmove(x, y, 0x000000FF, 24)   x = x >>> 24 
-  # 3. swapmove(x, y, 0x0000FF00, 8)
-  # 5. swapmove(x, y, 0x0000FF00, 16)   x = x >>> 16
-  # 6. swapmove(x, y, 0x00FF0000, 8)    x = x >>> 8
-
   // Because we need two custom instructions to perform each SWAPMOVE, and the 
   // output of each custom instruction will overwrite an input, so we need to 
-  // use some temp regiters to store the intermediate values.  
+  // use some temp registers to store the intermediate values.  
 
   elephant.pstep2.x   t2, \s0, \s1, 0    // t2 <- s0
   elephant.pstep2.y  \s1, \s0, \s1, 0    // s1 <- s1
@@ -174,7 +166,7 @@
 .endm
 
 
-// Spongent-160
+// Spongent-160 permutation
 
 .section .text
 
