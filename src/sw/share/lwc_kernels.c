@@ -106,13 +106,14 @@ void time_kernel() {
   }
 
   MEASURE_EPILOGUE( PHOTON_Permutation );
-#elif defined(romulus) || defined(ROMULUS_RV32_TYPE1) || defined(ROMULUS_RV32_TYPE2)
+#elif defined(romulus) || defined(ROMULUS_RV32_TYPE1) || defined(ROMULUS_RV32_TYPE2) || defined(ROMULUS_RV32_TYPE3) 
   unsigned long long s_n = 16; uint8_t s[ s_n ];
   unsigned long long k_n = 48; uint8_t k[ k_n ];
 
   printf( "sizeof( s ) = %llu\n", s_n );
   printf( "sizeof( k ) = %llu\n", k_n );
 
+  #ifdef ROMULUS_LUT 
   MEASURE_PROLOGUE( skinny_128_384_plus_enc );
 
   for( int i = 0; i < trials; i++ ) {
@@ -123,6 +124,46 @@ void time_kernel() {
   }
 
   MEASURE_EPILOGUE( skinny_128_384_plus_enc );
+  #elif ROMULUS_FIXSLICING
+  unsigned long long c_n    = 16;    uint8_t  c  [ c_n ];
+  unsigned long long rk1_n  = 4*64;  uint8_t rk1 [ rk1_n ];
+  unsigned long long rk23_n = 4*160; uint8_t rk23[ rk23_n ];
+
+  MEASURE_PROLOGUE( skinny128_384_plus );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( s,    s_n );
+    rand_bytes( c,    c_n );
+    rand_bytes( rk1,  rk1_n );
+    rand_bytes( rk23, rk23_n );
+
+    MEASURE_STEP( skinny128_384_plus, c, s, rk1, rk23 );
+  }
+
+  MEASURE_EPILOGUE( skinny128_384_plus );
+
+  MEASURE_PROLOGUE( precompute_rtk1 );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( k, k_n );
+
+    MEASURE_STEP( precompute_rtk1, rk1, k );
+  }
+
+  MEASURE_EPILOGUE( precompute_rtk1 );
+
+  MEASURE_PROLOGUE( precompute_rtk2_3 );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( k, k_n );
+    rand_bytes( c, c_n );
+
+    MEASURE_STEP( precompute_rtk2_3, rk23, c, k );
+  }
+
+  MEASURE_EPILOGUE( precompute_rtk2_3 );
+  #endif
+
 #elif defined(sparkle) || defined(SPARKLE_RV32_TYPE1) || defined(SPARKLE_RV32_TYPE2) || defined(SPARKLE_RV32_TYPE3) || defined(SPARKLE_RV32_TYPE4)
   unsigned long long s_n = SPARKLE_STATE/8; uint8_t s[ s_n ];
 

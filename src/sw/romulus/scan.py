@@ -19,8 +19,8 @@ def rv32( args ) :
   for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE2' ] :
     for UNROLL in [ False, True ] :
       CONF = [ TYPE ]
-      # this flag will not be used in code but can indicate the necessary info to users
-      CONF += [ 'ROMULUS_RV32_LUT' ]
+      # this flag will not be used in code but will be used in kernel measurement
+      CONF += [ 'ROMULUS_LUT' ]
 
       if ( UNROLL ) :
         CONF += [ 'ROMULUS_RV32_UNROLL' ]
@@ -29,8 +29,8 @@ def rv32( args ) :
 
   for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE3' ] :
     CONF = [ TYPE ]
-    # this flag will not be used in code but can indicate the necessary info to users
-    CONF += [ 'ROMULUS_RV32_FIXSLICING' ]
+    # this flag will not be used in code but will be used in kernel measurement
+    CONF += [ 'ROMULUS_FIXSLICING' ]
     # there is only unrolled version for fixslicing implementation
     CONF += [ 'ROMULUS_RV32_UNROLL' ]
 

@@ -25,7 +25,15 @@ extern void precompute_rkeys(void* rkeys, const void* key);
 #endif
 
 extern void PHOTON_Permutation(void *state);
+
+#if defined(romulus) && !defined(LWISE)
 extern void skinny_128_384_plus_enc (void * input, void* userkey);
+#else
+extern void skinny_128_384_plus_enc (void * input, void* userkey);
+extern void skinny128_384_plus(void* ctext, const void* ptext, const void* rtk1, const void* rtk2_3);
+extern void precompute_rtk1(void* rtk1, const void* tk1);
+extern void precompute_rtk2_3(void* rtk, const void* tk2, const void* tk3);
+#endif
 
 #define SPARKLE_STATE 384
 extern void sparkle_opt( void* state, int brans, int steps );
