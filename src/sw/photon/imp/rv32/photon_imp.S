@@ -266,8 +266,7 @@
   and   \t,  \t, \x           // t is 0     / x           now
   xor   \r,  \r, \t           // r is 0 ^ 0 / 0 ^ x       now
 
-  li    \t, 0x0F0F0F0F
-  and   \r,  \r, \t
+  and   \r,  \r, s6
 .endm
 
 .macro PHOTON_STEP r, x, y, imm, m0, m1, t0, t1, t2, t3
@@ -282,7 +281,9 @@
 
 .macro PHOTON_COLUMN r, s0, s1, s2, s3, s4, s5, s6, s7
   PHOTON_PACK        s7, \s0, \s1, \s2, \s3, \s4, \s5, \s6, \s7, a2, a3
+  li   s6,  0x21748FE3
   PHOTON_SBOX        s7, s5, s6, a2
+  li   s6,  0x0F0F0F0F
   PHOTON_STEP        \r, x0, s7, 0 , 0x0C0F0402, 0x0F09010C, a2, a3, s8, s9
   PHOTON_STEP        \r, \r, s7, 4 , 0x020C0404, 0x010E0609, a2, a3, s8, s9
   PHOTON_STEP        \r, \r, s7, 8 , 0x02090D02, 0x0D050508, a2, a3, s8, s9
@@ -398,8 +399,7 @@ PHOTON_Permutation:       PHOTON_PROLOGUE
   sw   s10, 20(sp)
   sw   s11, 24(sp)
   li   s5,  0xDA09B65C
-  li   s6,  0x21748FE3
-  li   s7,  0x88888888
+  # li   s6,  0x21748FE3
   li   s10, 0x01010101
   li   s11, 0x13
   PHOTON_ROUND_EVN
