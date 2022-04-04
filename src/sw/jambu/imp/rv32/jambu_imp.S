@@ -2,17 +2,18 @@
 #include "zbkx.h"
 #include "ise.h"
 
+
 // ----------------------------------------------------------------------------
 // Register Allocation
-// (Use caller-saved registers to save push/pop instructions)  
+// (use caller-saved registers to save push/pop instructions)  
 //
-// a3, a4, a5, a6: state
-// a7, t5, t6, a1: key
-// t0-t4: temp registers 
-// a0: the address of state
-// a1: the address of key 
-// a2: the number of steps
+// a0, a1:          the address of state, key, resp.
+// a2:              the number of steps
+// a3-a6:           state
+// a7, t5, t6, a1:  key
+// t0-t4:           temp registers 
 // ----------------------------------------------------------------------------
+
 
 // prologue + epilogue 
 
@@ -41,7 +42,7 @@
 .endm
 
 
-// operations
+// layers
 
 .macro JAMBU_ROUND_STEP0 r0, s0, s1, t0
 #if   (JAMBU_RV32_TYPE2)
@@ -111,7 +112,7 @@
 .endm
 
 
-// state_update
+// state_update (P640, P1024)
 
 .section .text
 
@@ -122,48 +123,22 @@ state_update:
   JAMBU_LDSTATE  a0, a3, a4, a5, a6
   JAMBU_LDSTATE  a1, a7, t5, t6, a1
   // 
+  .rept 5
   JMABU_ROUND    a3, a4, a5, a6, a7, t1, t2, t3, t4, t0
   JMABU_ROUND    a4, a5, a6, a3, t5, t1, t2, t3, t4, t0
   JMABU_ROUND    a5, a6, a3, a4, t6, t1, t2, t3, t4, t0
   JMABU_ROUND    a6, a3, a4, a5, a1, t1, t2, t3, t4, t0
-
-  JMABU_ROUND    a3, a4, a5, a6, a7, t1, t2, t3, t4, t0
-  JMABU_ROUND    a4, a5, a6, a3, t5, t1, t2, t3, t4, t0
-  JMABU_ROUND    a5, a6, a3, a4, t6, t1, t2, t3, t4, t0
-  JMABU_ROUND    a6, a3, a4, a5, a1, t1, t2, t3, t4, t0
-
-  JMABU_ROUND    a3, a4, a5, a6, a7, t1, t2, t3, t4, t0
-  JMABU_ROUND    a4, a5, a6, a3, t5, t1, t2, t3, t4, t0
-  JMABU_ROUND    a5, a6, a3, a4, t6, t1, t2, t3, t4, t0
-  JMABU_ROUND    a6, a3, a4, a5, a1, t1, t2, t3, t4, t0
-
-  JMABU_ROUND    a3, a4, a5, a6, a7, t1, t2, t3, t4, t0
-  JMABU_ROUND    a4, a5, a6, a3, t5, t1, t2, t3, t4, t0
-  JMABU_ROUND    a5, a6, a3, a4, t6, t1, t2, t3, t4, t0
-  JMABU_ROUND    a6, a3, a4, a5, a1, t1, t2, t3, t4, t0
-
-  JMABU_ROUND    a3, a4, a5, a6, a7, t1, t2, t3, t4, t0
-  JMABU_ROUND    a4, a5, a6, a3, t5, t1, t2, t3, t4, t0
-  JMABU_ROUND    a5, a6, a3, a4, t6, t1, t2, t3, t4, t0
-  JMABU_ROUND    a6, a3, a4, a5, a1, t1, t2, t3, t4, t0
+  .endr
   // 
-  addi a2, a2, -640
-  beqz a2, JAMBU_END
-  // 
+  addi a2, a2, -640     // check it is P640 or P1024 
+  beqz a2, JAMBU_END    // if a2 == 640, then goto JAMBU_END
+  //
+  .rept 3 
   JMABU_ROUND    a3, a4, a5, a6, a7, t1, t2, t3, t4, t0
   JMABU_ROUND    a4, a5, a6, a3, t5, t1, t2, t3, t4, t0
   JMABU_ROUND    a5, a6, a3, a4, t6, t1, t2, t3, t4, t0
   JMABU_ROUND    a6, a3, a4, a5, a1, t1, t2, t3, t4, t0
-
-  JMABU_ROUND    a3, a4, a5, a6, a7, t1, t2, t3, t4, t0
-  JMABU_ROUND    a4, a5, a6, a3, t5, t1, t2, t3, t4, t0
-  JMABU_ROUND    a5, a6, a3, a4, t6, t1, t2, t3, t4, t0
-  JMABU_ROUND    a6, a3, a4, a5, a1, t1, t2, t3, t4, t0
-
-  JMABU_ROUND    a3, a4, a5, a6, a7, t1, t2, t3, t4, t0
-  JMABU_ROUND    a4, a5, a6, a3, t5, t1, t2, t3, t4, t0
-  JMABU_ROUND    a5, a6, a3, a4, t6, t1, t2, t3, t4, t0
-  JMABU_ROUND    a6, a3, a4, a5, a1, t1, t2, t3, t4, t0
+  .endr
   //
 JAMBU_END: 
   JAMBU_STSTATE  a3, a4, a5, a6

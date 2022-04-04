@@ -16,13 +16,11 @@ def rv32( args ) :
     driver.run( args, 'jambu', CONF, 'rv32', 'nist', NIST_IMP = 'opt' )
 
   for TYPE in [ 'JAMBU_RV32_TYPE1', 'JAMBU_RV32_TYPE2', 'JAMBU_RV32_TYPE3' ] :
-    for UNROLL in [ False, True ] :
-      CONF = [ TYPE ]
+    CONF = [ TYPE ]
+    # there is only unrolled implementation for TinyJAMBU on rv32
+    CONF += [ 'JAMBU_RV32_UNROLL' ]
 
-      if ( UNROLL ) :
-        CONF += [ 'JAMBU_RV32_UNROLL' ]
-
-      driver.run( args, 'jambu', CONF, 'rv32', 'rv32' )
+    driver.run( args, 'jambu', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
 
