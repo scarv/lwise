@@ -16,6 +16,8 @@ extern void P6(void * state);
 extern void P12(void * state);
 #endif
 
+extern void permutation(void* state);
+
 #if defined(gift) && !defined(LWISE)
 extern void giftb128(uint8_t P[16], const uint8_t K[16], uint8_t C[16]);
 #else

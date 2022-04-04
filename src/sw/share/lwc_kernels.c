@@ -40,6 +40,19 @@ void time_kernel() {
 
   MEASURE_EPILOGUE( P6 );
 
+#elif defined(elephant) || defined(ELEPHANT_RV32_TYPE1) || defined(ELEPHANT_RV32_TYPE2)
+unsigned long long s_n = 20; uint8_t s[ s_n ];
+
+  MEASURE_PROLOGUE( permutation );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( s, s_n );
+
+    MEASURE_STEP( permutation, s );
+  }
+
+  MEASURE_EPILOGUE( permutation );
+
 #elif defined(gift) || defined(GIFT_RV32_TYPE1) || defined(GIFT_RV32_TYPE2)
   unsigned long long p_n = 16; uint8_t p[ p_n ];
   unsigned long long k_n = 16; uint8_t k[ k_n ];
@@ -57,7 +70,6 @@ void time_kernel() {
 
   MEASURE_EPILOGUE( giftb128_bitslicing );
   #elif defined(GIFT_FIXSLICING) 
-
   unsigned long long rk_n = 80*4; uint8_t rk[ rk_n ];
 
   MEASURE_PROLOGUE( giftb128_fixslicing );
