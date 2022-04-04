@@ -15,9 +15,11 @@ def rv32( args ) :
     driver.run( args, 'gift', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
 
   for TYPE in [ 'GIFT_RV32_TYPE1', 'GIFT_RV32_TYPE2' ] :
-    for METHOD in [ 'GIFT_FIXSLICING', 'GIFT_BITSLICING' ] :
+    for METHOD in [ 'GIFT_BITSLICING', 'GIFT_FIXSLICING'] :
       CONF = [ TYPE, METHOD ]
-  
+      # there is only unrolled implementation for GIFT-COFB on rv32
+      CONF += ['GIFT_RV32_UNROLL']
+
       driver.run( args, 'gift', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------

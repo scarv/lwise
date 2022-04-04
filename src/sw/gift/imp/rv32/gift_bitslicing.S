@@ -5,13 +5,13 @@
 
 // ----------------------------------------------------------------------------
 // Register Allocation
-// (Use caller-saved registers to save push/pop instructions)  
+// (use caller-saved registers to save push/pop instructions)  
 //
+// a0, a1, a2: the address of plaintext, key, ciphertext resp.
 // a3-a6:      cipher state 
 // t2-t6:      key state
 // t1:         temp register
 // t0:         constant
-// a0, a1, a2: the address of plaintext, key, ciphertext resp.
 // ----------------------------------------------------------------------------
 
 
@@ -43,7 +43,8 @@
 
 
 // byte-reverse for the state (cipher, key)
-// byte3, byte2, byte1, byte0 -> byte0, byte1, byte2, byte3
+// byte3 || byte2 || byte1 || byte0 -> 
+// byte0 || byte1 || byte2 || byte3
 
 .macro GIFT_REVERSE s0, s1, s2, s3 
   rev8 \s0, \s0
@@ -53,7 +54,7 @@
 .endm
 
 
-// operations: SubCells + PermBits + AddRoundKey + Add round constant + Key state update 
+// layers: SubCells + PermBits + AddRoundKey + Add round constant + Key state update 
 
 // SubCells
 
@@ -72,9 +73,8 @@
 .endm 
 
 // PermBits
-// The costly permutation operation can be easily implemented with "unzip" and 
-// "rev8" instructions from ZBKB.
-// NOTE: "unzip" is only available on rv32.
+// The costly PermBits layer can be easily implemented with "unzip" and "rev8" 
+// instructions from ZBKB. Also note that "unzip" is only available on rv32.
 
 // The 1st "unzip" permutes the 32-bit state word as follows: 
 // bits[31:24] 31 29 27 25 23 21 19 17
@@ -94,9 +94,9 @@
 // bits[16: 8] 30 26 22 18 14 10  6  2 
 // bits[ 7: 0] 31 27 23 19 15 11  7  3
 
-// The resulting 32-bit state word is the same one needed by s3 (Table 2.2 in 
+// The resulting 32-bit state slice is the same one needed by s3 (Table 2.2 in 
 // the GIFT-COFB spec).
-// For s0, s1, s2, just rotate resulting state word to the right with the 
+// For s0, s1, s2, just rotate the resulting state slice to right with the 
 // corresponding offset.
 
 .macro GIFT_PERMBITS_STEP s0
@@ -139,13 +139,13 @@
 .macro GIFT_KEYSTUPD k3, k4, t0
 #if (GIFT_RV32_TYPE2)
   gift.key.updstd \k4, \k3 
-#else                           // k3 = W6 | w7
-  pack \t0, \k3, \k3            // t0 = W7 | w7
-  rori \k4, \k3, 16             // k4 = W7 | W6
-  pack \k4, \k4, \k4            // k4 = W6 | W6
-  rori \t0, \t0, 12             // t0 = W7 >>> 12 | W7 >>> 12 
-  rori \k4, \k4,  2             // k4 = W6 >>> 2  | W6 >>> 2 
-  pack \k4, \t0, \k4            // k4 = W6 >>> 2  | W7 >>> 12
+#else                           // k3 = W6        || W7
+  pack \t0, \k3, \k3            // t0 = W7        || W7
+  rori \k4, \k3, 16             // k4 = W7        || W6
+  pack \k4, \k4, \k4            // k4 = W6        || W6
+  rori \t0, \t0, 12             // t0 = W7 >>> 12 || W7 >>> 12 
+  rori \k4, \k4,  2             // k4 = W6 >>> 2  || W6 >>> 2 
+  pack \k4, \t0, \k4            // k4 = W6 >>> 2  || W7 >>> 12
 #endif 
 .endm
 
@@ -174,53 +174,53 @@ giftb128_bitslicing:
   GIFT_REVERSE  t3, t4, t5, t6
   li t0, 0x80000000
   //  
-  GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x00000001, t1
-  GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x00000003, t1
-  GIFT_ROUND    a3, a4, a5, a6, t6, t2, t3, t4, t5, 0x00000007, t1
-  GIFT_ROUND    a6, a4, a5, a3, t5, t6, t2, t3, t4, 0x0000000F, t1
-  GIFT_ROUND    a3, a4, a5, a6, t4, t5, t6, t2, t3, 0x0000001F, t1 
+  GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x01, t1
+  GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x03, t1
+  GIFT_ROUND    a3, a4, a5, a6, t6, t2, t3, t4, t5, 0x07, t1
+  GIFT_ROUND    a6, a4, a5, a3, t5, t6, t2, t3, t4, 0x0F, t1
+  GIFT_ROUND    a3, a4, a5, a6, t4, t5, t6, t2, t3, 0x1F, t1 
 
-  GIFT_ROUND    a6, a4, a5, a3, t3, t4, t5, t6, t2, 0x0000003E, t1
-  GIFT_ROUND    a3, a4, a5, a6, t2, t3, t4, t5, t6, 0x0000003D, t1
-  GIFT_ROUND    a6, a4, a5, a3, t6, t2, t3, t4, t5, 0x0000003B, t1
-  GIFT_ROUND    a3, a4, a5, a6, t5, t6, t2, t3, t4, 0x00000037, t1
-  GIFT_ROUND    a6, a4, a5, a3, t4, t5, t6, t2, t3, 0x0000002F, t1
+  GIFT_ROUND    a6, a4, a5, a3, t3, t4, t5, t6, t2, 0x3E, t1
+  GIFT_ROUND    a3, a4, a5, a6, t2, t3, t4, t5, t6, 0x3D, t1
+  GIFT_ROUND    a6, a4, a5, a3, t6, t2, t3, t4, t5, 0x3B, t1
+  GIFT_ROUND    a3, a4, a5, a6, t5, t6, t2, t3, t4, 0x37, t1
+  GIFT_ROUND    a6, a4, a5, a3, t4, t5, t6, t2, t3, 0x2F, t1
 
-  GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x0000001E, t1
-  GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x0000003C, t1
-  GIFT_ROUND    a3, a4, a5, a6, t6, t2, t3, t4, t5, 0x00000039, t1
-  GIFT_ROUND    a6, a4, a5, a3, t5, t6, t2, t3, t4, 0x00000033, t1
-  GIFT_ROUND    a3, a4, a5, a6, t4, t5, t6, t2, t3, 0x00000027, t1 
+  GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x1E, t1
+  GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x3C, t1
+  GIFT_ROUND    a3, a4, a5, a6, t6, t2, t3, t4, t5, 0x39, t1
+  GIFT_ROUND    a6, a4, a5, a3, t5, t6, t2, t3, t4, 0x33, t1
+  GIFT_ROUND    a3, a4, a5, a6, t4, t5, t6, t2, t3, 0x27, t1 
 
-  GIFT_ROUND    a6, a4, a5, a3, t3, t4, t5, t6, t2, 0x0000000E, t1
-  GIFT_ROUND    a3, a4, a5, a6, t2, t3, t4, t5, t6, 0x0000001D, t1
-  GIFT_ROUND    a6, a4, a5, a3, t6, t2, t3, t4, t5, 0x0000003A, t1
-  GIFT_ROUND    a3, a4, a5, a6, t5, t6, t2, t3, t4, 0x00000035, t1
-  GIFT_ROUND    a6, a4, a5, a3, t4, t5, t6, t2, t3, 0x0000002B, t1 
+  GIFT_ROUND    a6, a4, a5, a3, t3, t4, t5, t6, t2, 0x0E, t1
+  GIFT_ROUND    a3, a4, a5, a6, t2, t3, t4, t5, t6, 0x1D, t1
+  GIFT_ROUND    a6, a4, a5, a3, t6, t2, t3, t4, t5, 0x3A, t1
+  GIFT_ROUND    a3, a4, a5, a6, t5, t6, t2, t3, t4, 0x35, t1
+  GIFT_ROUND    a6, a4, a5, a3, t4, t5, t6, t2, t3, 0x2B, t1 
 
-  GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x00000016, t1
-  GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x0000002C, t1
-  GIFT_ROUND    a3, a4, a5, a6, t6, t2, t3, t4, t5, 0x00000018, t1
-  GIFT_ROUND    a6, a4, a5, a3, t5, t6, t2, t3, t4, 0x00000030, t1
-  GIFT_ROUND    a3, a4, a5, a6, t4, t5, t6, t2, t3, 0x00000021, t1 
+  GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x16, t1
+  GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x2C, t1
+  GIFT_ROUND    a3, a4, a5, a6, t6, t2, t3, t4, t5, 0x18, t1
+  GIFT_ROUND    a6, a4, a5, a3, t5, t6, t2, t3, t4, 0x30, t1
+  GIFT_ROUND    a3, a4, a5, a6, t4, t5, t6, t2, t3, 0x21, t1 
 
-  GIFT_ROUND    a6, a4, a5, a3, t3, t4, t5, t6, t2, 0x00000002, t1
-  GIFT_ROUND    a3, a4, a5, a6, t2, t3, t4, t5, t6, 0x00000005, t1
-  GIFT_ROUND    a6, a4, a5, a3, t6, t2, t3, t4, t5, 0x0000000B, t1
-  GIFT_ROUND    a3, a4, a5, a6, t5, t6, t2, t3, t4, 0x00000017, t1
-  GIFT_ROUND    a6, a4, a5, a3, t4, t5, t6, t2, t3, 0x0000002E, t1 
+  GIFT_ROUND    a6, a4, a5, a3, t3, t4, t5, t6, t2, 0x02, t1
+  GIFT_ROUND    a3, a4, a5, a6, t2, t3, t4, t5, t6, 0x05, t1
+  GIFT_ROUND    a6, a4, a5, a3, t6, t2, t3, t4, t5, 0x0B, t1
+  GIFT_ROUND    a3, a4, a5, a6, t5, t6, t2, t3, t4, 0x17, t1
+  GIFT_ROUND    a6, a4, a5, a3, t4, t5, t6, t2, t3, 0x2E, t1 
 
-  GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x0000001C, t1
-  GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x00000038, t1
-  GIFT_ROUND    a3, a4, a5, a6, t6, t2, t3, t4, t5, 0x00000031, t1
-  GIFT_ROUND    a6, a4, a5, a3, t5, t6, t2, t3, t4, 0x00000023, t1
-  GIFT_ROUND    a3, a4, a5, a6, t4, t5, t6, t2, t3, 0x00000006, t1 
+  GIFT_ROUND    a3, a4, a5, a6, t3, t4, t5, t6, t2, 0x1C, t1
+  GIFT_ROUND    a6, a4, a5, a3, t2, t3, t4, t5, t6, 0x38, t1
+  GIFT_ROUND    a3, a4, a5, a6, t6, t2, t3, t4, t5, 0x31, t1
+  GIFT_ROUND    a6, a4, a5, a3, t5, t6, t2, t3, t4, 0x23, t1
+  GIFT_ROUND    a3, a4, a5, a6, t4, t5, t6, t2, t3, 0x06, t1 
 
-  GIFT_ROUND    a6, a4, a5, a3, t3, t4, t5, t6, t2, 0x0000000D, t1
-  GIFT_ROUND    a3, a4, a5, a6, t2, t3, t4, t5, t6, 0x0000001B, t1
-  GIFT_ROUND    a6, a4, a5, a3, t6, t2, t3, t4, t5, 0x00000036, t1
-  GIFT_ROUND    a3, a4, a5, a6, t5, t6, t2, t3, t4, 0x0000002D, t1
-  GIFT_ROUND    a6, a4, a5, a3, t4, t5, t6, t2, t3, 0x0000001A, t1  
+  GIFT_ROUND    a6, a4, a5, a3, t3, t4, t5, t6, t2, 0x0D, t1
+  GIFT_ROUND    a3, a4, a5, a6, t2, t3, t4, t5, t6, 0x1B, t1
+  GIFT_ROUND    a6, a4, a5, a3, t6, t2, t3, t4, t5, 0x36, t1
+  GIFT_ROUND    a3, a4, a5, a6, t5, t6, t2, t3, t4, 0x2D, t1
+  GIFT_ROUND    a6, a4, a5, a3, t4, t5, t6, t2, t3, 0x1A, t1  
   //  
   GIFT_REVERSE  a3, a4, a5, a6
   GIFT_STSTATE  a2, a3, a4, a5, a6  

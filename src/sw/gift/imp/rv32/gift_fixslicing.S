@@ -5,12 +5,16 @@
 
 // ----------------------------------------------------------------------------
 // Register Allocation
-// (Use caller-saved registers to save push/pop instructions)  
+// (use caller-saved registers to save push/pop instructions)  
 //
-// a3-a6:        cipher state
-// t0, t1:       temp registers 
-// t2-t6, s0-s5: masks 
 // a0, a1, a2:   the address of plaintext, key, ciphertext resp.
+// a3-a6:        cipher state
+// t0-t1:        temp registers 
+// t2-t6, s0-s5: masks 
+//
+// Comments:
+// For more details regarding the fixslicing GIFT-COFB, we refer readers/users 
+// to GitHub repo https://github.com/aadomn/gift
 // ----------------------------------------------------------------------------
 
 
@@ -41,6 +45,7 @@
   ret
 .endm
 
+
 // load state + store state 
 
 .macro GIFT_LDSTATE addr, s0, s1, s2, s3
@@ -57,8 +62,10 @@
   sw   \s3, 12(\addr)
 .endm
 
+
 // byte-reverse for the state (cipher, key)
-// byte3, byte2, byte1, byte0 -> byte0, byte1, byte2, byte3
+// byte3 || byte2 || byte1 || byte0 -> 
+// byte0 || byte1 || byte2 || byte3
 
 .macro GIFT_REVERSE s0, s1, s2, s3 
   rev8 \s0, \s0
@@ -84,7 +91,7 @@
   not  \s3, \s3
 .endm 
 
-// swapmove32
+// swapmove32 (a variant of SWAPMOVE)
 
 .macro GIFT_SPMV s0, m0, imm, t0, t1
 #if   (GIFT_RV32_TYPE2)
@@ -165,8 +172,8 @@
 #if   (GIFT_RV32_TYPE2) 
   GIFT_HROR \s1, t5, t6,  8,  8, \t0
 #elif (GIFT_RV32_TYPE1)
-  rev8      \s1, \s1           // s1 = byte0, byte1, byte2, byte3
-  rori      \s1, \s1, 16       // s1 = byte2, byte3, byte0, byte1
+  rev8      \s1, \s1           // s1 = byte0 || byte1 || byte2 || byte3
+  rori      \s1, \s1, 16       // s1 = byte2 || byte3 || byte0 || byte1
 #endif  
   GIFT_HROR \s2, t6, t5, 12,  4, \t0
   lw        \t0,  8(a1)
@@ -312,11 +319,11 @@ giftb128_fixslicing:
 
 // ----------------------------------------------------------------------------
 // Register Allocation
-// (Use caller-saved registers to save push/pop instructions)  
+// (use caller-saved registers to save push/pop instructions)  
 //
-// a4-a7:        cipher state
-// t5, t6:       tmp registers
 // a0, a1:       the address of rkey, key resp.
+// a4-a7:        cipher state
+// t5-t6:        tmp registers
 // t0-t4, a2-a3: masks
 // ----------------------------------------------------------------------------
 
@@ -331,12 +338,12 @@ giftb128_fixslicing:
 #if   (GIFT_RV32_TYPE2)
   gift.key.updstd \k0, \k0
 #elif (GIFT_RV32_TYPE1)   
-  pack \t0, \k0, \k0            // t0 = W7 | w7
-  rori \k0, \k0, 16             // k0 = W7 | W6
-  pack \k0, \k0, \k0            // k0 = W6 | W6
-  rori \t0, \t0, 12             // t0 = W7 >>> 12 | W7 >>> 12 
-  rori \k0, \k0,  2             // k0 = W6 >>> 2  | W6 >>> 2 
-  pack \k0, \t0, \k0            // k0 = W6 >>> 2  | W7 >>> 12
+  pack \t0, \k0, \k0            // t0 = W7        || w7
+  rori \k0, \k0, 16             // k0 = W7        || W6
+  pack \k0, \k0, \k0            // k0 = W6        || W6
+  rori \t0, \t0, 12             // t0 = W7 >>> 12 || W7 >>> 12 
+  rori \k0, \k0,  2             // k0 = W6 >>> 2  || W6 >>> 2 
+  pack \k0, \t0, \k0            // k0 = W6 >>> 2  || W7 >>> 12
 #endif
   sw   \k1, 0(a0)
   sw   \k0, 4(a0)
