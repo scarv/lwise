@@ -9,8 +9,7 @@
 #--------------------------------------------------------------------
 RTL32 =$(REPO_HOME)/src/hw/rtl/$(ALG)/rv32
 
-rtl32_ise_src= $(RTL32)/$(ALG)_ise_v2.v \
-               $(RTL32)/$(ALG)_ise_v3.v 
+rtl32_ise_src= $(RTL32)/$(ALG)_ise.v 
 
 rtl32_cop_src = $(RTL32)/cop_ise.v 
 rtl32_xalu_src= $(RTL32)/xalu_ise.v 
