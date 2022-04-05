@@ -194,6 +194,8 @@
 
 #if  ( PHOTON_RV32_TYPE1 )
 
+// r <- s7 || s6 || s5 || s4 || s3 || s2 || s1 || s0
+
 .macro PHOTON_PACK r, s0, s1, s2, s3, s4, s5, s6, s7, t0, t1
   andi   \r,  \s0, 0x0F
   andi   \t0, \s1, 0xF0
@@ -219,79 +221,112 @@
   xor    \r,  \r,  \t0
 .endm
 
-.macro PHOTON_SBOX s0, lut0, lut1, t0
+// s <- SBox[s7] || SBox[s6] || SBox[s5] || SBox[s4] || 
+//      SBox[s3] || SBox[s2] || SBox[s1] || SBox[s0]
+
+.macro PHOTON_SBOX s0, t0
+  li      s5, 0xDA09B65C
+  li      s6, 0x21748FE3
   li     \t0, 0x88888888
   xor    \t0, \s0, \t0
-  xperm4 \s0, \lut0, \s0
-  xperm4 \t0, \lut1, \t0
-  xor    \s0, \s0,   \t0
+  xperm4 \s0,  s5, \s0
+  xperm4 \t0,  s6, \t0
+  xor    \s0, \s0, \t0
 .endm
 
-.macro PHOTON_GF2NMULX4 r, imm, y, t, x
-  li    \x,  \imm
-  srli  \t,  \y,  3           // t is 0     / 1           now
-  sub   \t,  x0, \t           // t is 0     / 0xFFFFFFFF  now
-  and   \t,  \t, \x           // t is 0     / x           now
-  xor   \r,  x0, \t           // r is 0 ^ 0 / 0 ^ x       now
+// r0 <- y * (0 || M6 || 0 || M4 || 0 || M2 || 0 || M0)
+// r1 <- y * (0 || M7 || 0 || M5 || 0 || M3 || 0 || M1)
+// r0 <- r0 ^ (r1 << 4) 
 
-  slli  \r,  \r,  1   
-  srli  \t,  \r,  4
-  and   \t,  \t,  s10         // t is 0/1    || 0/1    || 0/1    || 0/1    now
-  mul   \t,  \t,  s11         // t is 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 now
-  xor   \r,  \r,  \t
-  srli  \t,  \y,  2
-  andi  \t,  \t,  1
-  sub   \t,  x0, \t           // t is 0     / 0xFFFFFFFF  now
-  and   \t,  \t, \x           // t is 0     / x           now
-  xor   \r,  \r, \t           // r is 0 ^ 0 / 0 ^ x       now
+.macro PHOTON_GF2NMULX8 r0, r1, imm0, imm1, y, t0, t1, x0, x1
+  li    \x0,  \imm0
+  li    \x1,  \imm1
+  srli  \t0,  \y,  3          // t0 = 0     / 1 
+  andi  \t0, \t0,  1          
+  sub   \t0,  x0, \t0         // t0 = 0     / 0xFFFFFFFF  
+  and   \t1, \t0, \x1         // t1 = 0     / x1
+  and   \t0, \t0, \x0         // t0 = 0     / x0
 
-  slli  \r,  \r,  1   
-  srli  \t,  \r,  4
-  and   \t,  \t,  s10         // t is 0/1    || 0/1    || 0/1    || 0/1    now
-  mul   \t,  \t,  s11         // t is 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 now
-  xor   \r,  \r,  \t
-  srli  \t,  \y,  1
-  andi  \t,  \t,  1
-  sub   \t,  x0, \t           // t is 0     / 0xFFFFFFFF  now
-  and   \t,  \t, \x           // t is 0     / x           now
-  xor   \r,  \r, \t           // r is 0 ^ 0 / 0 ^ x       now   
+  slli  \r0, \t0,  1          
+  srli  \t0, \r0,  4
+  and   \t0, \t0,  s10        // t0 = 0/1    || 0/1    || 0/1    || 0/1    
+  mul   \t0, \t0,  s11        // t0 = 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 
+  xor   \r0, \r0,  \t0
+  slli  \r1, \t1,  1          
+  srli  \t1, \r1,  4
+  and   \t1, \t1,  s10        // t1 = 0/1    || 0/1    || 0/1    || 0/1    
+  mul   \t1, \t1,  s11        // t1 = 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 
+  xor   \r1, \r1,  \t1
 
-  slli  \r,  \r,  1   
-  srli  \t,  \r,  4
-  and   \t,  \t,  s10         // t is 0/1    || 0/1    || 0/1    || 0/1    now
-  mul   \t,  \t,  s11         // t is 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 now
-  xor   \r,  \r,  \t
-  andi  \t,  \y,  1
-  sub   \t,  x0, \t           // t is 0     / 0xFFFFFFFF  now
-  and   \t,  \t, \x           // t is 0     / x           now
-  xor   \r,  \r, \t           // r is 0 ^ 0 / 0 ^ x       now
+  srli  \t0,  \y,  2
+  andi  \t0, \t0,  1
+  sub   \t0,  x0, \t0         // t0 = 0     / 0xFFFFFFFF  
+  and   \t1, \t0, \x1         // t1 = 0     / x1
+  and   \t0, \t0, \x0         // t0 = 0     / x0
+  xor   \r1, \r1, \t1
+  xor   \r0, \r0, \t0 
 
-  and   \r,  \r, s6
+  slli  \r0, \r0,  1          
+  srli  \t0, \r0,  4
+  and   \t0, \t0,  s10        // t0 = 0/1    || 0/1    || 0/1    || 0/1    
+  mul   \t0, \t0,  s11        // t0 = 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 
+  xor   \r0, \r0,  \t0
+  slli  \r1, \r1,  1          
+  srli  \t1, \r1,  4
+  and   \t1, \t1,  s10        // t1 = 0/1    || 0/1    || 0/1    || 0/1    
+  mul   \t1, \t1,  s11        // t1 = 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 
+  xor   \r1, \r1,  \t1        
+
+  srli  \t0,  \y,  1
+  andi  \t0, \t0,  1
+  sub   \t0,  x0, \t0         // t0 = 0     / 0xFFFFFFFF  
+  and   \t1, \t0, \x1         // t1 = 0     / x1
+  and   \t0, \t0, \x0         // t0 = 0     / x0
+  xor   \r1, \r1, \t1
+  xor   \r0, \r0, \t0 
+
+  slli  \r0, \r0,  1          
+  srli  \t0, \r0,  4
+  and   \t0, \t0,  s10        // t0 = 0/1    || 0/1    || 0/1    || 0/1    
+  mul   \t0, \t0,  s11        // t0 = 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 
+  xor   \r0, \r0,  \t0
+  slli  \r1, \r1,  1          
+  srli  \t1, \r1,  4
+  and   \t1, \t1,  s10        // t1 = 0/1    || 0/1    || 0/1    || 0/1    
+  mul   \t1, \t1,  s11        // t1 = 0/0x13 || 0/0x13 || 0/0x13 || 0/0x13 
+  xor   \r1, \r1,  \t1
+
+  andi  \t0,  \y,  1
+  sub   \t0,  x0, \t0         // t0 = 0     / 0xFFFFFFFF  
+  and   \t1, \t0, \x1         // t1 = 0     / x1
+  and   \t0, \t0, \x0         // t0 = 0     / x0
+  xor   \r1, \r1, \t1
+  xor   \r0, \r0, \t0
+
+  li    \t0,  0x0F0F0F0F
+  and   \r0, \r0, \t0
+  and   \r1, \r1, \t0
+  slli  \r1, \r1, 4
+  xor   \r0, \r0, \r1    
 .endm
 
-.macro PHOTON_STEP r, x, y, imm, m0, m1, t0, t1, t2, t3
-  srli \t0, \y, \imm
-  andi \t0, \t0, 0x0F
-  PHOTON_GF2NMULX4 \t1, \m0, \t0, \t2, \t3
-  xor  \r,  \x,  \t1 
-  PHOTON_GF2NMULX4 \t1, \m1, \t0, \t2, \t3
-  slli \t1, \t1, 4
-  xor  \r,  \r,  \t1        
+.macro PHOTON_STEP r, x, y, m0, m1, r0, r1, t0, t1, x0, x1
+  PHOTON_GF2NMULX8 \r0, \r1, \m0, \m1, \y, \t0, \t1, \x0, \x1
+  xor  \r, \x, \r0
+  srli \y, \y, 4       
 .endm
 
 .macro PHOTON_COLUMN r, s0, s1, s2, s3, s4, s5, s6, s7
   PHOTON_PACK        s7, \s0, \s1, \s2, \s3, \s4, \s5, \s6, \s7, a2, a3
-  li   s6,  0x21748FE3
-  PHOTON_SBOX        s7, s5, s6, a2
-  li   s6,  0x0F0F0F0F
-  PHOTON_STEP        \r, x0, s7, 0 , 0x0C0F0402, 0x0F09010C, a2, a3, s8, s9
-  PHOTON_STEP        \r, \r, s7, 4 , 0x020C0404, 0x010E0609, a2, a3, s8, s9
-  PHOTON_STEP        \r, \r, s7, 8 , 0x02090D02, 0x0D050508, a2, a3, s8, s9
-  PHOTON_STEP        \r, \r, s7, 12, 0x0A0D0D0B, 0x0A0F010D, a2, a3, s8, s9
-  PHOTON_STEP        \r, \r, s7, 16, 0x030E0902, 0x05040C07, a2, a3, s8, s9
-  PHOTON_STEP        \r, \r, s7, 20, 0x01050408, 0x0A0C0D07, a2, a3, s8, s9
-  PHOTON_STEP        \r, \r, s7, 24, 0x010E0D05, 0x02090F05, a2, a3, s8, s9
-  PHOTON_STEP        \r, \r, s7, 28, 0x0E0D0906, 0x03060E02, a2, a3, s8, s9
+  PHOTON_SBOX        s7, a2
+  PHOTON_STEP        \r, x0, s7, 0x0C0F0402, 0x0F09010C, a2, a3, s5, s6, s8, s9
+  PHOTON_STEP        \r, \r, s7, 0x020C0404, 0x010E0609, a2, a3, s5, s6, s8, s9
+  PHOTON_STEP        \r, \r, s7, 0x02090D02, 0x0D050508, a2, a3, s5, s6, s8, s9
+  PHOTON_STEP        \r, \r, s7, 0x0A0D0D0B, 0x0A0F010D, a2, a3, s5, s6, s8, s9
+  PHOTON_STEP        \r, \r, s7, 0x030E0902, 0x05040C07, a2, a3, s5, s6, s8, s9
+  PHOTON_STEP        \r, \r, s7, 0x01050408, 0x0A0C0D07, a2, a3, s5, s6, s8, s9
+  PHOTON_STEP        \r, \r, s7, 0x010E0D05, 0x02090F05, a2, a3, s5, s6, s8, s9
+  PHOTON_STEP        \r, \r, s7, 0x0E0D0906, 0x03060E02, a2, a3, s5, s6, s8, s9
 .endm
 
 #endif
@@ -398,8 +433,6 @@ PHOTON_Permutation:       PHOTON_PROLOGUE
   sw   s9,  16(sp)
   sw   s10, 20(sp)
   sw   s11, 24(sp)
-  li   s5,  0xDA09B65C
-  # li   s6,  0x21748FE3
   li   s10, 0x01010101
   li   s11, 0x13
   PHOTON_ROUND_EVN
