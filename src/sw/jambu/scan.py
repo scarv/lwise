@@ -20,7 +20,7 @@ def rv32( args ) :
     # there is only unrolled implementation for TinyJAMBU on rv32
     CONF += [ 'JAMBU_RV32_UNROLL' ]
 
-    driver.run( args, 'jambu', CONF, 'rv32', 'rv32' )
+    driver.run( args, 'jambu', CONF, 'rv32', 'rv32', NIST_IMP = 'opt' )
 
 # -----------------------------------------------------------------------------
 
