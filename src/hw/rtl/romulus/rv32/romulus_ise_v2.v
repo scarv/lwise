@@ -1,4 +1,4 @@
-module romulus_ise(
+module romulus_ise_v2(
 input  wire [31:0]  rs1,
 input  wire [31:0]  rs2,
 input  wire [ 2:0]  imm,
