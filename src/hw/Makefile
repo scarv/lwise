@@ -22,8 +22,8 @@ endif
 
 export PORT ?= /dev/ttyUSB0
 export ALG  ?= sparkle
-export ARCH ?= rv64
-export IMP  ?= rv64
+export ARCH ?= rv32
+export IMP  ?= rv32
 export ISE  ?= xalu
 
 # =============================================================================

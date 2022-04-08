@@ -16,7 +16,7 @@ include ${SW}/${ALG}/Makefile.in
 
 # interested kernels in LWC algorithms
 ifeq "${IMP}" "nist"
-KERNEL         = P6 giftb128 PHOTON_Permutation skinny_128_384_plus_enc sparkle_opt state_update Xoodoo_Permute_Nrounds
+KERNEL         = P6_nist giftb128 PHOTON_Permutation skinny_128_384_plus_enc sparkle_opt state_update Xoodoo_Permute_Nrounds
 else 
 KERNEL         = P6 
 KERNEL        += Spongent160_4x40b Spongent160_5x32b 
@@ -29,7 +29,7 @@ KERNEL        += Xoodoo_Permute_12rounds
 endif
 
 include ${REPO_HOME}/src/hw/fpga/software/FPGA_SWCONF.in
-export FPGA_SWCONF = $(FPGA_DEF_CONF)
+export FPGA_SWCONF ?= $(FPGA_DEF_CONF)
 
 # -----------------------------------------------------------------------------
 ifeq "${IMP}" "nist"

@@ -9,6 +9,13 @@
 
 extern void rand_bytes(uint8_t* x, int n );
 
+//because P6 in the nist implementation is a static inline function.
+#if defined(ascon)
+void P6_nist(state_t* s){
+  P6(s);
+}
+#endif
+
 void time_kernel() {
   int trials_warm = DRIVER_TRIALS_WARM;
   int trials_real = DRIVER_TRIALS_REAL;
@@ -16,24 +23,18 @@ void time_kernel() {
   int trials      = trials_warm + trials_real;
 
 #if defined(ascon) || defined(ASCON_RV32_TYPE1) || defined(ASCON_RV32_TYPE2)
+  #if defined(ASCON_RV32_TYPE1) || defined(ASCON_RV32_TYPE2)
   unsigned long long s_n = 40; uint8_t s[ s_n ];
-
+  #else
+  unsigned long long s_n = 40; uint8_t s_a[ s_n ];
+  state_t * s = (state_t *) s_a;
+  #endif
   printf( "sizeof( s ) = %llu\n", s_n );
-
-  MEASURE_PROLOGUE( P12 );
-
-  for( int i = 0; i < trials; i++ ) {
-    rand_bytes( s, s_n );
-
-    MEASURE_STEP( P12, s );
-  }
-
-  MEASURE_EPILOGUE( P12 );
 
   MEASURE_PROLOGUE( P6 );
 
   for( int i = 0; i < trials; i++ ) {
-    rand_bytes( s, s_n );
+    rand_bytes((uint8_t*) s, s_n );
 
     MEASURE_STEP( P6, s );
   }
