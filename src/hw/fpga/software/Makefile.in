@@ -88,6 +88,9 @@ ${FPGA_TARGET}.asm : ${FPGA_TARGET}
 fpga-run : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
 	@$(FPGA)/script/upload.py --port $(PORT) --baud 115200 upload $(FPGA_OUTBIN) --stdout
 
+fpga-scan : 
+	@PYTHONPATH="$(FPGA)/script/" python3 ${SW}/${ALG}/fpga-scan.py --nist --rv32
+
 #all   : ${TARGET}.elf ${TARGET}.asm
 fpga-clean : 
 	@rm --force ${FPGA_TARGET}
