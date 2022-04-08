@@ -62,7 +62,7 @@ ${REPO_HOME}/build/${ALG}/kat.c : ${NIST_KAT}
 	@python3 ./share/kat.py --source < ${<} > ${@}
 
 ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf : ${SOURCES} 
-	@${GCC_PREFIX}-gcc ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -O3 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+	@${GCC_PREFIX}-gcc ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -O3 -o ${@} $(filter %.c, ${^}) $(filter %.cpp, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
 	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
