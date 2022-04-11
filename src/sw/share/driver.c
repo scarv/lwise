@@ -66,7 +66,7 @@ void rand_bytes(           uint8_t* x, int n ) {
 #endif
 
 // ============================================================================
-
+#ifndef DRIVER_TEST_BYPASS
 void test_encrypt() {
   for( int i = 0; KAT[ i ].i >= 0; i++ ) {
     unsigned long long k_n = KAT[ i ].k_n; uint8_t k[ k_n ]; parse_bytes( k, KAT[ i ].k, KAT[ i ].k_n );
@@ -120,7 +120,7 @@ void test_decrypt() {
 
   printf( "!! passed\n" );
 }
-
+#endif
 // ----------------------------------------------------------------------------
 
 void time_encrypt() {
@@ -191,7 +191,7 @@ void time_decrypt() {
 
 int main( int argc, char* argv[] ) {
   rand_bytes_init();
-
+#ifndef DRIVER_TEST_BYPASS
   printf( "++ test : encrypt\n" );
   test_encrypt();
   printf( "-- test : encrypt\n" );
@@ -199,7 +199,7 @@ int main( int argc, char* argv[] ) {
   printf( "++ test : decrypt\n" );
   test_decrypt();
   printf( "-- test : decrypt\n" );
-
+#endif
   printf( "++ time : encrypt\n" );
   time_encrypt();
   printf( "-- time : encrypt\n" );

@@ -16,13 +16,13 @@ include ${SW}/${ALG}/Makefile.in
 
 # interested kernels in LWC algorithms
 ifeq "${IMP}" "nist"
-KERNEL         = P6_nist giftb128 PHOTON_Permutation skinny_128_384_plus_enc sparkle_opt state_update Xoodoo_Permute_Nrounds
+KERNEL         = P6_nist permutation giftb128 PHOTON_Permutation skinny_128_384_plus_enc skinny128_384_plus sparkle_opt state_update Xoodoo_Permute_Nrounds
 else 
 KERNEL         = P6 
-KERNEL        += Spongent160_4x40b Spongent160_5x32b 
+KERNEL        += permutation
 KERNEL        += giftb128_bitslicing giftb128_fixslicing precompute_rkeys 
 KERNEL        += PHOTON_Permutation 
-KERNEL        += skinny_128_384_plus_enc 
+KERNEL        += skinny_128_384_plus_enc skinny128_384_plus precompute_rtk1 precompute_rtk2_3
 KERNEL        += sparkle_opt 
 KERNEL        += state_update 
 KERNEL        += Xoodoo_Permute_12rounds
