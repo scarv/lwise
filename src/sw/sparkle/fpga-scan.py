@@ -9,6 +9,9 @@ import driver, itertools
 # =============================================================================
 
 def rv32( args ) :
+  if ( args.prog ) :
+    driver.program_fpga( args, 'sparkle', 'rv32', 'xalu' )
+
   if ( args.nist ) :
     CONF  = [ 'DRIVER_TEST_BYPASS' ]
     driver.run( args, 'sparkle', CONF, 'rv32', 'nist', NIST_IMP = 'opt' )

@@ -9,14 +9,17 @@ import driver, itertools
 # =============================================================================
 
 def rv32( args ) :
+  if ( args.prog ) :
+    driver.program_fpga( args, 'ascon', 'rv32', 'xalu' )
   if ( args.nist ) :
-    CONF = []
+    CONF = ['DRIVER_TEST_BYPASS']
     driver.run( args, 'ascon', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
 
   for TYPE in [ 'ASCON_RV32_TYPE1', 'ASCON_RV32_TYPE2' ] :
     CONF = [ TYPE ]
     # there is only unrolled implementation for Ascon on rv32
     CONF += ['ASCON_RV32_UNROLL']
+    CONF += ['DRIVER_TEST_BYPASS']
     driver.run( args, 'ascon', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------

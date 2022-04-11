@@ -9,6 +9,9 @@ import driver, itertools
 # =============================================================================
 
 def rv32( args ) :
+  if ( args.prog ) :
+    driver.program_fpga( args, 'gift', 'rv32', 'xalu' )
+
   if ( args.nist ) :
     CONF = ['DRIVER_TEST_BYPASS']
     driver.run( args, 'gift', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )

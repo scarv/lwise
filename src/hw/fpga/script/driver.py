@@ -22,12 +22,12 @@ def run( args, ALG, CONF, ARCH, IMP, NIST_IMP = None ) :
 
   env = dict()
 
+  env[ 'REPO_HOME'    ] = os.environ[ 'REPO_HOME'    ]
+  env[ 'REPO_VERSION' ] = os.environ[ 'REPO_VERSION' ]
+
   env[ 'PORT'            ] = os.environ[ 'PORT'    ]
   env[ 'RISCV_ROCKET'    ] = os.environ[ 'RISCV_ROCKET'    ]
   env[ 'ROCKETCHIP_REPO' ] = os.environ[ 'ROCKETCHIP_REPO' ]
-
-  env[ 'REPO_HOME'    ] = os.environ[ 'REPO_HOME'    ]
-  env[ 'REPO_VERSION' ] = os.environ[ 'REPO_VERSION' ]
 
   if ( NIST_IMP != None ) :
     env.update( { 'ALG' : ALG, 'FPGA_SWCONF' : CONF, 'ARCH' : ARCH, 'IMP' : IMP, 'NIST_IMP' : NIST_IMP } )
@@ -38,6 +38,21 @@ def run( args, ALG, CONF, ARCH, IMP, NIST_IMP = None ) :
 
   print( '<<<'                                )
 
+def program_fpga( args, ALG, ARCH, ISE = 'xalu' ) :
+  print( '>>> ALG = "%s", ARCH = "%s", ISE = "%s"' % ( ALG, ARCH, ISE ) )
+  print( '>>> Program FPGA ...')
+
+  env = dict()
+  env[ 'PATH'            ] = os.environ[ 'PATH'            ]
+  env[ 'HOME'            ] = os.environ[ 'HOME'            ]
+  env[ 'REPO_HOME'       ] = os.environ[ 'REPO_HOME'       ]
+  env[ 'REPO_VERSION'    ] = os.environ[ 'REPO_VERSION'    ]
+  env[ 'RISCV_ROCKET'    ] = os.environ[ 'RISCV_ROCKET'    ]
+  env[ 'ROCKETCHIP_REPO' ] = os.environ[ 'ROCKETCHIP_REPO' ]
+
+  env.update( { 'ALG' : ALG, 'ARCH' : ARCH, 'ISE' : ISE } )
+  subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/hw' ), 'program-fpga' ], env = env, stdout=subprocess.DEVNULL)
+  print( '>>> Done.')
 # -----------------------------------------------------------------------------
 
 def main( rv32, rv64 ) :
@@ -47,6 +62,8 @@ def main( rv32, rv64 ) :
   parser.add_argument( '--rv64',        dest = 'rv64',        action = 'store_true',        default = False )
 
   parser.add_argument( '--nist',        dest = 'nist',        action = 'store_true',        default = False )
+
+  parser.add_argument( '--prog',        dest = 'prog',        action = 'store_true',        default = False )
 
   parser.add_argument( '--trials-warm', dest = 'trials_warm', action = 'store', type = int, default = 10  )
   parser.add_argument( '--trials-real', dest = 'trials_real', action = 'store', type = int, default = 50  )

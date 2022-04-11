@@ -10,6 +10,8 @@ export FPGA            = $(REPO_HOME)/src/hw/fpga
 export BOARD          ?= sakura-x
 export SOC	           = $(ARCH)-rocket
 
+ALGs = ascon elephant gift grain photon romulus sparkle jambu xoodyak
+
 VIVADO_PROJECT = $(ALG)-$(SOC)-$(ISE)-imp
 prog_mem       = $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin/prog.mem
 
@@ -79,5 +81,11 @@ vivado: $(vivado_project_file)
 #--------------------------------------------------------------------
 include ${REPO_HOME}/src/hw/fpga/software/Makefile.in
 
+fpga-scan : 
+	@PYTHONPATH="$(FPGA)/script/" python3 ${SW}/${ALG}/fpga-scan.py --prog --nist --rv32
 
+fpga-scan-all : 
+	@$(foreach ALG, $(ALGs), \
+		PYTHONPATH="$(FPGA)/script/" python3 ${SW}/${ALG}/fpga-scan.py --prog --nist --rv32; \
+	)
 

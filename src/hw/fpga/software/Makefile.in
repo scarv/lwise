@@ -76,7 +76,7 @@ ${REPO_HOME}/build/fpga/${ALG}/kat.c : ${NIST_KAT} ${REPO_HOME}/build/fpga/${ALG
 	@python3 ${SW}/share/kat.py --source < ${<} > ${@}
 
 ${FPGA_TARGET} : ${FPGA_SOURCES} ${FPGA_HEADERS} 
-	${GCC_PREFIX}-gcc ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
+	@${GCC_PREFIX}-gcc ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
 $(FPGA_OUTBIN) : $(FPGA_TARGET)
 	@${GCC_PREFIX}-objcopy -O binary $< $@
@@ -88,8 +88,6 @@ ${FPGA_TARGET}.asm : ${FPGA_TARGET}
 fpga-run : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
 	@$(FPGA)/script/upload.py --port $(PORT) --baud 115200 upload $(FPGA_OUTBIN) --stdout
 
-fpga-scan : 
-	@PYTHONPATH="$(FPGA)/script/" python3 ${SW}/${ALG}/fpga-scan.py --nist --rv32
 
 #all   : ${TARGET}.elf ${TARGET}.asm
 fpga-clean : 

@@ -9,16 +9,18 @@ import driver, itertools
 # =============================================================================
 
 def rv32( args ) :
+  if ( args.prog ) :
+    driver.program_fpga( args, 'jambu', 'rv32', 'xalu' )
   if ( args.nist ) :
-    CONF = []
+    CONF = [ 'DRIVER_TEST_BYPASS'  ] 
 #    driver.run( args, 'jambu', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
     driver.run( args, 'jambu', CONF, 'rv32', 'nist', NIST_IMP = 'opt' )
 
   for TYPE in [ 'JAMBU_RV32_TYPE1', 'JAMBU_RV32_TYPE2', 'JAMBU_RV32_TYPE3' ] :
     CONF = [ TYPE ]
     # there is only unrolled implementation for TinyJAMBU on rv32
-    CONF += [ 'JAMBU_RV32_UNROLL' ]
-
+    CONF += [ 'JAMBU_RV32_UNROLL'  ]
+    CONF += [ 'DRIVER_TEST_BYPASS' ] 
     driver.run( args, 'jambu', CONF, 'rv32', 'rv32', NIST_IMP = 'opt' )
 
 # -----------------------------------------------------------------------------
