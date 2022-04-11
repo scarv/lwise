@@ -13,7 +13,9 @@
 #include "share.h"
 #include "rdtsc.h"
 
+#ifndef DRIVER_TEST_BYPASS
 #include   "kat.h"
+#endif
 
 #include         "api.h"
 #include "crypto_aead.h"
