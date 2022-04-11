@@ -12,39 +12,42 @@
 // - removed all SIMD (AVX512) code
 // - converted C++ function to pure C code
 // - added type casts to get rid of wanrings
+// - fixed a couple of alignment issues!!!
 // - added some basic test code
 
 #include "grain128aead-v2_opt.h"
-#include <memory.h>
+// #include <memory.h>
 #include <string.h>
 
 // ------------------------------------------------------------------
 // Internals
 // ------------------------------------------------------------------
-#define N64(byte) (*(u64*)(((u8*)grain->nfsr) + (byte)))
-#define L64(byte) (*(u64*)(((u8*)grain->lfsr) + (byte)))
-#define N32(byte) (*(u32*)(((u8*)grain->nfsr) + (byte)))
-#define L32(byte) (*(u32*)(((u8*)grain->lfsr) + (byte)))
+#define N64(byte) (*(u64*) (((u8*) grain->nfsr) + (byte)))
+#define L64(byte) (*(u64*) (((u8*) grain->lfsr) + (byte)))
+#define N32(byte) (*(u32*) (((u8*) grain->nfsr) + (byte)))
+#define L32(byte) (*(u32*) (((u8*) grain->lfsr) + (byte)))
 
 #ifdef __GRAIN_DEBUG_PRINTS__
 #include <stdio.h>
 int ctr = 0;
 #endif
 
+#define grain_keystream32(g) grain_keystream32_aligned(g) 
+
 // Performs 32 clocks of the cipher and return 32-bit value of y
-static inline u32 grain_keystream32(grain_ctx *grain)
+static inline u32 grain_keystream32_unaligned(grain_ctx *grain)
 {
 #ifdef __GRAIN_DEBUG_PRINTS__
 	printf("=== time %d ===\n", ctr);
 	printf("A=%016llx R=%016llx S=%016llx A^R=%016llx\n", grain->A, grain->R, grain->S, grain->A ^ grain->R);
-	printf("LFSR="); for (int i = 0; i < 16; i++) printf("%02x ", (int)grain->lfsr[i]); printf("\n");
-	printf("NFSR="); for (int i = 0; i < 16; i++) printf("%02x ", (int)grain->nfsr[i]);printf("\n");
+	printf("LFSR="); for (int i = 0; i < 16; i++) printf("%02x ", (int) grain->lfsr[i]); printf("\n");
+	printf("NFSR="); for (int i = 0; i < 16; i++) printf("%02x ", (int) grain->nfsr[i]); printf("\n");
 	ctr += 32;
 #endif
 
 #if 0 /* Legacy expressions for debug purposes */
-#define st(x)  (u32)(*(u64*)(grain->lfsr + ((x)/8) ) >> ((x)%8))
-#define bt(x)  (u32)(*(u64*)(grain->nfsr + ((x)/8) ) >> ((x)%8))
+#define st(x)  (u32) (*(u64*) (grain->lfsr + ((x)/8)) >> ((x)%8))
+#define bt(x)  (u32) (*(u64*) (grain->nfsr + ((x)/8)) >> ((x)%8))
 
 	u32 y = (bt(12) & st(8)) ^ (st(13) & st(20)) ^ (bt(95) & st(42)) ^ (st(60) & st(79)) ^ (bt(12) & bt(95) & st(94))
 		^ st(93) ^ bt(2) ^ bt(15) ^ bt(36) ^ bt(45) ^ bt(64) ^ bt(73) ^ bt(89);
@@ -85,7 +88,7 @@ static inline u32 grain_keystream32(grain_ctx *grain)
 
 	u64 nn2_21 = nn2 >> 21;
 
-	u32 y = (u32)(nn2 ^ nn0_2 ^ (nn1 >> 4) ^ ((nn2 ^ nn2_p16) >> 25) ^ ((ln1 >> 28) & (ln2 >> 15)) ^
+	u32 y = (u32) (nn2 ^ nn0_2 ^ (nn1 >> 4) ^ ((nn2 ^ nn2_p16) >> 25) ^ ((ln1 >> 28) & (ln2 >> 15)) ^
 		((ln2_17 ^ (nn0 & (ln0 << 4))) >> 12) ^ (((ln0 & ln0_7) ^ nn1 ^ nn0_2) >> 13) ^
 		(((ln1 & nn2_21) ^ (nn0_2 & nn2_21 & (ln2 >> 20))) >> 10));
 #endif
@@ -94,6 +97,50 @@ static inline u32 grain_keystream32(grain_ctx *grain)
 	printf("y=%08x\n", y);
 #endif
 	return y;
+}
+
+// Modified version with (hopefully) fewer alignment issues
+static inline u32 grain_keystream32_aligned(grain_ctx *grain)
+{
+	u32 *lptr = (u32 *) grain->lfsr;  // lsfr is hopefully word-aligned
+	u32 *nptr = (u32 *) grain->nfsr;  // nsfr is hopefully word-aligned
+
+	u64 ln0 = (((u64) lptr[1]) << 32) | lptr[0],
+		ln1 = (((u64) lptr[2]) << 32) | lptr[1],
+		ln2 = (((u64) lptr[3]) << 32) | lptr[2],
+		ln3 = (((u64) lptr[3]));
+	u64 nn0 = (((u64) nptr[1]) << 32) | nptr[0],
+		nn1 = (((u64) nptr[2]) << 32) | nptr[1],
+		nn2 = (((u64) nptr[3]) << 32) | nptr[2],
+		nn3 = (((u64) nptr[3]));
+
+	// g      s0    b0        b26       b96       b56             b91 + b27b59
+	u32 nn4 = (u32) (ln0 ^ nn0 ^ (nn0 >> 26) ^ nn3 ^ (nn1 >> 24) ^ (((nn0 & nn1) ^ nn2) >> 27) ^
+		//     b3b67                   b11b13                        b17b18
+		((nn0 & nn2) >> 3) ^ ((nn0 >> 11) & (nn0 >> 13)) ^ ((nn0 >> 17) & (nn0 >> 18)) ^
+		//       b40b48                        b61b65                      b68b84
+		((nn1 >> 8) & (nn1 >> 16)) ^ ((nn1 >> 29) & (nn2 >> 1)) ^ ((nn2 >> 4) & (nn2 >> 20)) ^
+		//                   b88b92b93b95
+		((nn2 >> 24) & (nn2 >> 28) & (nn2 >> 29) & (nn2 >> 31)) ^
+		//              b22b24b25                                  b70b78b82
+		((nn0 >> 22) & (nn0 >> 24) & (nn0 >> 25)) ^ ((nn2 >> 6) & (nn2 >> 14) & (nn2 >> 18)));
+
+	nptr[0] = nptr[1];
+	nptr[1] = nptr[2];
+	nptr[2] = nptr[3];
+	nptr[3] = (u32) nn4;
+
+	// f
+	u32 ln4 = (u32) ((ln0 ^ ln3) ^ ((ln1 ^ ln2) >> 6) ^ (ln0 >> 7) ^ (ln2 >> 17));
+
+	lptr[0] = lptr[1];
+	lptr[1] = lptr[2];
+	lptr[2] = lptr[3];
+	lptr[3] = (u32) ln4;
+
+	return (u32) ((nn0 >> 2) ^ (nn0 >> 15) ^ (nn1 >> 4) ^ (nn1 >> 13) ^ nn2 ^ (nn2 >> 9) ^ (nn2 >> 25) ^ (ln2 >> 29) ^
+		((nn0 >> 12) & (ln0 >> 8)) ^ ((ln0 >> 13) & (ln0 >> 20)) ^ ((nn2 >> 31) & (ln1 >> 10)) ^
+		((ln1 >> 28) & (ln2 >> 15)) ^ ((nn0 >> 12) & (nn2 >> 31) & (ln2 >> 30)));
 }
 
 static inline void grain_init(grain_ctx *grain, const u8 *key, const u8 *iv)
@@ -105,17 +152,18 @@ static inline void grain_init(grain_ctx *grain, const u8 *key, const u8 *iv)
 
 	// 320 + 64 clocks of Initialisation & Key-Reintroduction
 	for (int i = -10; i < 2; i++)
-	{	u32 ks = grain_keystream32(grain);
+	{
+		u32 ks = grain_keystream32(grain);
 		L32(12) ^= ks;
 		N32(12) ^= ks;
 		if (i < 0) continue;
-		L32(12) ^= ((u32*)key)[i + 2];
-		N32(12) ^= ((u32*)key)[i];
+		L32(12) ^= ((u32*) key)[i + 2];
+		N32(12) ^= ((u32*) key)[i];
 	}
 
 	// 128 clocks of A/R initialisation
 	for (int i = 0; i < 4; i++)
-		((u32*)(&grain->A))[i] = grain_keystream32(grain);
+		((u32*) (&grain->A))[i] = grain_keystream32(grain);
 }
 
 /* Deinterleave 64 bits of the keystream */
@@ -123,14 +171,14 @@ static inline void grain_getz(grain_ctx *grain)
 {
 	u64 tmp, x;
 	x = grain_keystream32(grain);
-	x |= ((u64)grain_keystream32(grain)) << 32;
+	x |= ((u64) grain_keystream32(grain)) << 32;
 	tmp = (x ^ (x >> 1)) & 0x2222222222222222ULL; x ^= tmp ^ (tmp << 1); // a(Ab)Bc(Cd)De(Ef)Fg(Gh)H
 	tmp = (x ^ (x >> 2)) & 0x0c0c0c0c0c0c0c0cULL; x ^= tmp ^ (tmp << 2); // ab(ABcd)CDef(EFgh)GH
 	tmp = (x ^ (x >> 4)) & 0x00f000f000f000f0ULL; x ^= tmp ^ (tmp << 4); // abcd(ABCDefgh)EFGH
 	tmp = (x ^ (x >> 8)) & 0x0000ff000000ff00ULL; x ^= tmp ^ (tmp << 8); // ...
 	tmp = (x ^ (x >> 16)) & 0x00000000ffff0000ULL; x ^= tmp ^ (tmp << 16);
 	grain->S = x >> 32;
-	*(u32*)grain->z = (u32) x;
+	*(u32*) grain->z = (u32) x;
 }
 
 /* Classical bitwise solution, variable length = [0..4] */
@@ -141,7 +189,7 @@ static inline void grain_auth(grain_ctx *grain, u8 * data, int bytes)
 		u8 msg = data[t];
 		for (int i = 0; i < 8; ++i, grain->S >>= 1, msg >>= 1)
 		{
-			u64 mask = (u64)-(long long)(msg & 1);
+			u64 mask = (u64) -((long long) (msg & 1));
 			grain->A ^= grain->R & mask;
 			grain->R = (grain->R >> 1) | (grain->S << 63);
 		}
@@ -166,13 +214,15 @@ int crypto_aead_encrypt(
 	const unsigned char *iv,
 	const unsigned char *k)
 {
+	u64 tmp;
 	grain_ctx grain;
 	grain_init(&grain, k, iv);
 
 	// DER encoding of the adlen
 	u8 der[9];
 	int der_len;
-	*(u64*)(der + 1) = adlen;
+	// *(u64*) (der + 1) = adlen;
+	memcpy(der + 1, &adlen, 8);
 
 	der[0] = 0x80;
 	for (der_len = 8; !der[der_len]; --der_len);
@@ -242,7 +292,9 @@ int crypto_aead_encrypt(
 		c[i] = m[i] ^ grain.z[rem];
 
 	// append MAC to ciphertext
-	*(u64*)(c + mlen) = grain.A ^ grain.R;
+	// *(u64*)(c + mlen) = grain.A ^ grain.R;
+	tmp = grain.A ^ grain.R;
+	memcpy(c + mlen, &tmp, 8);
 	*clen = i + 8;
 
 	return 0;
@@ -255,19 +307,20 @@ int crypto_aead_decrypt(
 	const unsigned char *c, unsigned long long clen,
 	const unsigned char *ad, unsigned long long adlen,
 	const unsigned char *iv,
-	const unsigned char *k
-)
+	const unsigned char *k)
 {
 	if (clen < 8) return -1;
 	clen -= 8;
 
+	u64 tmp;
 	grain_ctx grain;
 	grain_init(&grain, k, iv);
 
 	// DER encoding of the adlen
 	u8 der[9];
 	int der_len;
-	*(u64*)(der + 1) = adlen;
+	// *(u64*) (der + 1) = adlen;
+	memcpy(der + 1, &adlen, 8);
 
 	der[0] = 0x80;
 	for (der_len = 8; !der[der_len]; --der_len);
@@ -337,7 +390,8 @@ int crypto_aead_decrypt(
 
 	*mlen = i;
 	// verify MAC
-	if (*(u64*) (c + clen) ^ grain.A ^ grain.R)
+	memcpy(&tmp, c + clen, 8);
+	if (tmp ^ grain.A ^ grain.R)
 		return -1;
 
 	return 0;
@@ -345,7 +399,75 @@ int crypto_aead_decrypt(
 
 
 
-/*
+
+
+
+
+
+
+
+
+
+
+void test_grain_keystream32(void)
+{
+	grain_ctx grainctx;
+	grain_ctx *grain = &grainctx;
+	u8 iv[12] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+	u8 key[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+	u32 ks;
+	int i;
+
+	// load key, and IV along with padding
+	memcpy(grain->nfsr, key, 16);
+	memcpy(grain->lfsr, iv, 12);
+	L32(12) = 0x7fffffffUL;
+
+	// test latest version of grain_keystream32
+	printf("original version of grain_keystream32():\n");
+	for (i = -10; i < 2; i++)
+	{
+		ks = grain_keystream32(grain);
+		printf("%08x ", ks);
+		L32(12) ^= ks;
+		N32(12) ^= ks;
+		if (i < 0) continue;
+		L32(12) ^= ((u32*) key)[i + 2];
+		N32(12) ^= ((u32*) key)[i];
+	}
+	printf("\n");
+
+	// load key, and IV along with padding
+	memcpy(grain->nfsr, key, 16);
+	memcpy(grain->lfsr, iv, 12);
+	L32(12) = 0x7fffffffUL;
+
+	// test aligned version of grain_keystream32
+	printf("aligned version of grain_keystream32():\n");
+	for (i = -10; i < 2; i++)
+	{
+		ks = grain_keystream32_aligned(grain);
+		printf("%08x ", ks);
+		L32(12) ^= ks;
+		N32(12) ^= ks;
+		if (i < 0) continue;
+		L32(12) ^= ((u32*) key)[i + 2];
+		N32(12) ^= ((u32*) key)[i];
+	}
+	printf("\n");
+}
+
+
+
+
+
+
+
+
+
+
+
+
 #define MAX_AD_LEN  256
 #define MAX_MSG_LEN 256
 
@@ -390,7 +512,7 @@ void test_grain128(void)
 	printf("AEAD output for adlen = %i, mlen = %i:\n", (int) adlen, (int )mlen);
 	print_buffer("CT = ", c, (size_t) mlen);
 	print_buffer("AT = ", c + mlen, (size_t) CRYPTO_ABYTES);
-	// Expected result for Grain-128AEADv2 with adlen = 8 and mlen = 8:
+	// Expected result for Grain-128AEADv2 with adlen = 16 and mlen = 16:
 	// CT = 80B53BE28E938BAE76B64CCD53BE4DE5
 	// AT = FB0720DE18EA8FAE
 
@@ -399,7 +521,7 @@ void test_grain128(void)
 	printf("AEAD output for adlen = %i, mlen = %i:\n", (int) adlen, (int) mlen);
 	print_buffer("CT = ", c, (size_t) mlen);
 	print_buffer("AT = ", c + mlen, (size_t) CRYPTO_ABYTES);
-	// Expected result for Grain-128AEADv2 with adlen = 0 and mlen = 32:
+	// Expected result for Grain-128AEADv2 with adlen = 32 and mlen = 0:
 	// CT = 
 	// AT = 41F7A9669AE4779F
 
@@ -421,4 +543,3 @@ void test_grain128(void)
 	// CT = 21678706FB8AB6369ED9B5AFA619F8B2..E613AEE1E81EBD49AC9BB087B85BE30F
 	// AT = 3BD020C635C0ECDF
 }
-*/
