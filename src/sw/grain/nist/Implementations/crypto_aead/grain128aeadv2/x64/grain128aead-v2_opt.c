@@ -35,9 +35,10 @@ int ctr = 0;
 #endif
 
 // function prototypes
-u32 grain_keystream32_unaligned(grain_ctx *grain);
-u32 grain_keystream32_aligned(grain_ctx *grain);
+static inline u32 grain_keystream32_unaligned(grain_ctx *grain);
+static inline u32 grain_keystream32_aligned(grain_ctx *grain);
 u32 grain_keystream32_ise(grain_ctx *grain);
+extern u32 grain_keystream32_rv32(grain_ctx *grain);
 
 // define here the keystream function to be used
 #define grain_keystream32(g) grain_keystream32_ise(g) 
@@ -471,7 +472,7 @@ static inline u32 grain_gnn2(u32 nn2hi, u32 nn2lo)
 // operations of output-computation that use nn0 as input
 static inline u32 grain_onn0(u32 nn0hi, u32 nn0lo)
 {
-	u64 nn0 = (((u64)nn0hi) << 32) | nn0lo;
+	u64 nn0 = (((u64) nn0hi) << 32) | nn0lo;
 	u32 res = (u32) ((nn0 >> 2) ^ (nn0 >> 15));
 
 	return res;
@@ -480,7 +481,7 @@ static inline u32 grain_onn0(u32 nn0hi, u32 nn0lo)
 // operations of output-computation that use nn1 as input
 static inline u32 grain_onn1(u32 nn1hi, u32 nn1lo)
 {
-	u64 nn1 = (((u64)nn1hi) << 32) | nn1lo;
+	u64 nn1 = (((u64) nn1hi) << 32) | nn1lo;
 	u32 res = (u32) ((nn1 >> 4) ^ (nn1 >> 13));
 
 	return res;
@@ -612,6 +613,26 @@ void test_grain_keystream32(void)
 		N32(12) ^= ((u32*) key)[i];
 	}
 	printf("\n");
+
+#if defined(__riscv_xlen) && (__riscv_xlen == 32)
+	// load key, and IV along with padding
+	memcpy(grain->nfsr, key, 16);
+	memcpy(grain->lfsr, iv, 12);
+	L32(12) = 0x7fffffffUL;
+	// test asm version of grain_keystream32
+	printf("asm version of grain_keystream32():\n");
+	for (i = -10; i < 2; i++)
+	{
+		ks = grain_keystream32_rv32(grain);
+		printf("%08x ", ks);
+		L32(12) ^= ks;
+		N32(12) ^= ks;
+		if (i < 0) continue;
+		L32(12) ^= ((u32*) key)[i + 2];
+		N32(12) ^= ((u32*) key)[i];
+	}
+	printf("\n");
+#endif
 }
 
 
