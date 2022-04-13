@@ -10,9 +10,11 @@
 
 // Modifications by Johann Groszschaedl:
 // - removed all SIMD (AVX512) code
-// - converted C++ function to pure C code
-// - added type casts to get rid of wanrings
-// - fixed a couple of alignment issues!!!
+// - converted the C++ function to pure C code
+// - added a few type casts to get rid of wanrings
+// - fixed alignment issues in the high-level encrypt and decrypt finction
+// - renamed original grain_keystream32 function to grain_keystream32_unaligned
+// - added grain_keystream32_aligned function that has fewer alignment issues
 // - added some basic test code
 
 #include "grain128aead-v2_opt.h"
@@ -32,7 +34,13 @@
 int ctr = 0;
 #endif
 
-#define grain_keystream32(g) grain_keystream32_aligned(g) 
+// function prototypes
+u32 grain_keystream32_unaligned(grain_ctx *grain);
+u32 grain_keystream32_aligned(grain_ctx *grain);
+u32 grain_keystream32_ise(grain_ctx *grain);
+
+// define here the keystream function to be used
+#define grain_keystream32(g) grain_keystream32_ise(g) 
 
 // Performs 32 clocks of the cipher and return 32-bit value of y
 static inline u32 grain_keystream32_unaligned(grain_ctx *grain)
@@ -97,50 +105,6 @@ static inline u32 grain_keystream32_unaligned(grain_ctx *grain)
 	printf("y=%08x\n", y);
 #endif
 	return y;
-}
-
-// Modified version with (hopefully) fewer alignment issues
-static inline u32 grain_keystream32_aligned(grain_ctx *grain)
-{
-	u32 *lptr = (u32 *) grain->lfsr;  // lsfr is hopefully word-aligned
-	u32 *nptr = (u32 *) grain->nfsr;  // nsfr is hopefully word-aligned
-
-	u64 ln0 = (((u64) lptr[1]) << 32) | lptr[0],
-		ln1 = (((u64) lptr[2]) << 32) | lptr[1],
-		ln2 = (((u64) lptr[3]) << 32) | lptr[2],
-		ln3 = (((u64) lptr[3]));
-	u64 nn0 = (((u64) nptr[1]) << 32) | nptr[0],
-		nn1 = (((u64) nptr[2]) << 32) | nptr[1],
-		nn2 = (((u64) nptr[3]) << 32) | nptr[2],
-		nn3 = (((u64) nptr[3]));
-
-	// g      s0    b0        b26       b96       b56             b91 + b27b59
-	u32 nn4 = (u32) (ln0 ^ nn0 ^ (nn0 >> 26) ^ nn3 ^ (nn1 >> 24) ^ (((nn0 & nn1) ^ nn2) >> 27) ^
-		//     b3b67                   b11b13                        b17b18
-		((nn0 & nn2) >> 3) ^ ((nn0 >> 11) & (nn0 >> 13)) ^ ((nn0 >> 17) & (nn0 >> 18)) ^
-		//       b40b48                        b61b65                      b68b84
-		((nn1 >> 8) & (nn1 >> 16)) ^ ((nn1 >> 29) & (nn2 >> 1)) ^ ((nn2 >> 4) & (nn2 >> 20)) ^
-		//                   b88b92b93b95
-		((nn2 >> 24) & (nn2 >> 28) & (nn2 >> 29) & (nn2 >> 31)) ^
-		//              b22b24b25                                  b70b78b82
-		((nn0 >> 22) & (nn0 >> 24) & (nn0 >> 25)) ^ ((nn2 >> 6) & (nn2 >> 14) & (nn2 >> 18)));
-
-	nptr[0] = nptr[1];
-	nptr[1] = nptr[2];
-	nptr[2] = nptr[3];
-	nptr[3] = (u32) nn4;
-
-	// f
-	u32 ln4 = (u32) ((ln0 ^ ln3) ^ ((ln1 ^ ln2) >> 6) ^ (ln0 >> 7) ^ (ln2 >> 17));
-
-	lptr[0] = lptr[1];
-	lptr[1] = lptr[2];
-	lptr[2] = lptr[3];
-	lptr[3] = (u32) ln4;
-
-	return (u32) ((nn0 >> 2) ^ (nn0 >> 15) ^ (nn1 >> 4) ^ (nn1 >> 13) ^ nn2 ^ (nn2 >> 9) ^ (nn2 >> 25) ^ (ln2 >> 29) ^
-		((nn0 >> 12) & (ln0 >> 8)) ^ ((ln0 >> 13) & (ln0 >> 20)) ^ ((nn2 >> 31) & (ln1 >> 10)) ^
-		((ln1 >> 28) & (ln2 >> 15)) ^ ((nn0 >> 12) & (nn2 >> 31) & (ln2 >> 30)));
 }
 
 static inline void grain_init(grain_ctx *grain, const u8 *key, const u8 *iv)
@@ -402,10 +366,187 @@ int crypto_aead_decrypt(
 
 
 
+// Modified version with (hopefully) fewer alignment issues
+static inline u32 grain_keystream32_aligned(grain_ctx *grain)
+{
+	u32 *lptr = (u32 *) grain->lfsr;  // lsfr is hopefully word-aligned
+	u32 *nptr = (u32 *) grain->nfsr;  // nsfr is hopefully word-aligned
+
+	u64 ln0 = (((u64) lptr[1]) << 32) | lptr[0],
+		ln1 = (((u64) lptr[2]) << 32) | lptr[1],
+		ln2 = (((u64) lptr[3]) << 32) | lptr[2],
+		ln3 = (((u64) lptr[3]));
+	u64 nn0 = (((u64) nptr[1]) << 32) | nptr[0],
+		nn1 = (((u64) nptr[2]) << 32) | nptr[1],
+		nn2 = (((u64) nptr[3]) << 32) | nptr[2],
+		nn3 = (((u64) nptr[3]));
+
+	// g      s0    b0        b26       b96       b56             b91 + b27b59
+	u32 nn4 = (u32) (ln0 ^ nn0 ^ (nn0 >> 26) ^ nn3 ^ (nn1 >> 24) ^ (((nn0 & nn1) ^ nn2) >> 27) ^
+		//     b3b67                   b11b13                        b17b18
+		((nn0 & nn2) >> 3) ^ ((nn0 >> 11) & (nn0 >> 13)) ^ ((nn0 >> 17) & (nn0 >> 18)) ^
+		//       b40b48                        b61b65                      b68b84
+		((nn1 >> 8) & (nn1 >> 16)) ^ ((nn1 >> 29) & (nn2 >> 1)) ^ ((nn2 >> 4) & (nn2 >> 20)) ^
+		//                   b88b92b93b95
+		((nn2 >> 24) & (nn2 >> 28) & (nn2 >> 29) & (nn2 >> 31)) ^
+		//              b22b24b25                                  b70b78b82
+		((nn0 >> 22) & (nn0 >> 24) & (nn0 >> 25)) ^ ((nn2 >> 6) & (nn2 >> 14) & (nn2 >> 18)));
+
+	nptr[0] = nptr[1];
+	nptr[1] = nptr[2];
+	nptr[2] = nptr[3];
+	nptr[3] = nn4;
+
+	// f
+	u32 ln4 = (u32) ((ln0 ^ ln3) ^ ((ln1 ^ ln2) >> 6) ^ (ln0 >> 7) ^ (ln2 >> 17));
+
+	lptr[0] = lptr[1];
+	lptr[1] = lptr[2];
+	lptr[2] = lptr[3];
+	lptr[3] = ln4;
+
+	return (u32) ((nn0 >> 2) ^ (nn0 >> 15) ^ (nn1 >> 4) ^ (nn1 >> 13) ^ nn2 ^ (nn2 >> 9) ^ (nn2 >> 25) ^ (ln2 >> 29) ^
+		((nn0 >> 12) & (ln0 >> 8)) ^ ((ln0 >> 13) & (ln0 >> 20)) ^ ((nn2 >> 31) & (ln1 >> 10)) ^
+		((ln1 >> 28) & (ln2 >> 15)) ^ ((nn0 >> 12) & (nn2 >> 31) & (ln2 >> 30)));
+}
 
 
 
 
+
+///////////////////////////////////
+// CUSTOM INSTRUCTIONS FOR GRAIN //
+///////////////////////////////////
+
+// extract a 32-bit word from a 64-bit word
+static inline u32 grain_extr(u32 hi, u32 lo, int imm)
+{
+	u64 tmp = (((u64) hi) << 32) | lo;
+	return (u32) (tmp >> imm);
+}
+
+// operations of f-function that use ln2 as input
+static inline u32 grain_fln2(u32 ln2hi, u32 ln2lo)
+{
+	u64 ln2 = (((u64) ln2hi) << 32) | ln2lo;
+	u32 res = (u32) ((ln2 >> 6) ^ (ln2 >> 17));
+
+	return res;
+}
+
+// operations of g-function that use nn0 as input
+static inline u32 grain_gnn0(u32 nn0hi, u32 nn0lo)
+{
+	u64 nn0 = (((u64) nn0hi) << 32) | nn0lo;
+	u32 res;
+
+	res = (u32) (nn0 ^ (nn0 >> 26) ^ ((nn0 >> 11) & (nn0 >> 13)) ^ \
+		((nn0 >> 17) & (nn0 >> 18)) ^ ((nn0 >> 22) & (nn0 >> 24) & (nn0 >> 25)));
+
+	return res;
+}
+
+// operations of g-function that use nn1 as input
+static inline u32 grain_gnn1(u32 nn1hi, u32 nn1lo)
+{
+	u64 nn1 = (((u64) nn1hi) << 32) | nn1lo;
+	u32 res = (u32) ((nn1 >> 24) ^ ((nn1 >> 8) & (nn1 >> 16)));
+
+	return res;
+}
+
+// operations of g-function that use nn2 as input
+static inline u32 grain_gnn2(u32 nn2hi, u32 nn2lo)
+{
+	u64 nn2 = (((u64) nn2hi) << 32) | nn2lo;
+	u32 res;
+
+	res = (u32) (((nn2 >> 4) & (nn2 >> 20)) ^                   \
+		((nn2 >> 24) & (nn2 >> 28) & (nn2 >> 29) & (nn2 >> 31)) ^ \
+		((nn2 >> 6) & (nn2 >> 14) & (nn2 >> 18)) ^ (nn2 >> 27));
+
+	return res;
+}
+
+// operations of output-computation that use nn0 as input
+static inline u32 grain_onn0(u32 nn0hi, u32 nn0lo)
+{
+	u64 nn0 = (((u64)nn0hi) << 32) | nn0lo;
+	u32 res = (u32) ((nn0 >> 2) ^ (nn0 >> 15));
+
+	return res;
+}
+
+// operations of output-computation that use nn1 as input
+static inline u32 grain_onn1(u32 nn1hi, u32 nn1lo)
+{
+	u64 nn1 = (((u64)nn1hi) << 32) | nn1lo;
+	u32 res = (u32) ((nn1 >> 4) ^ (nn1 >> 13));
+
+	return res;
+}
+
+// operations of output-computation that use nn2 as input
+static inline u32 grain_onn2(u32 nn2hi, u32 nn2lo)
+{
+	u64 nn2 = (((u64) nn2hi) << 32) | nn2lo;
+	u32 res = (u32) (nn2 ^ (nn2 >> 9) ^ (nn2 >> 25));
+
+	return res;
+}
+
+// operations of output-computation that use ln0 as input
+static inline u32 grain_oln0(u32 ln0hi, u32 ln0lo)
+{
+	u64 ln0 = (((u64) ln0hi) << 32) | ln0lo;
+	u32 res = (u32) ((ln0 >> 13) & (ln0 >> 20));
+
+	return res;
+}
+
+
+// ise-supported version of grain_keystream32
+u32 grain_keystream32_ise(grain_ctx *grain)
+{
+	u32 *lptr = (u32 *) grain->lfsr;  // lsfr is hopefully word-aligned
+	u32 *nptr = (u32 *) grain->nfsr;  // nsfr is hopefully word-aligned
+
+	u32 ln0 = lptr[0], ln1 = lptr[1], ln2 = lptr[2], ln3 = lptr[3];
+	u32 nn0 = nptr[0], nn1 = nptr[1], nn2 = nptr[2], nn3 = nptr[3];
+	u32 rval;
+
+	// g-function
+	u32 nn4 = ln0 ^ grain_gnn0(nn1, nn0) ^ \
+		grain_gnn1(nn2, nn1) ^ grain_gnn2(nn3, nn2) ^ nn3 ^  \
+		(grain_extr(nn1, nn0, 3) & grain_extr(nn3, nn2, 3)) ^ \
+		(grain_extr(nn2, nn1, 29) & grain_extr(nn3, nn2, 1)) ^ \
+		(grain_extr(nn1, nn0, 27) & grain_extr(nn2, nn1, 27));
+
+	nptr[0] = nptr[1];
+	nptr[1] = nptr[2];
+	nptr[2] = nptr[3];
+	nptr[3] = nn4;
+
+	// f-function
+	u32 ln4 = ln0 ^ ln3 ^ grain_extr(ln2, ln1, 6) ^ \
+		grain_fln2(ln3, ln2) ^ grain_extr(ln1, ln0, 7);
+  
+	lptr[0] = lptr[1];
+	lptr[1] = lptr[2];
+	lptr[2] = lptr[3];
+	lptr[3] = ln4;
+
+	// 32-bit output
+	rval = grain_onn0(nn1, nn0) ^ grain_onn1(nn2, nn1) ^      \
+		grain_onn2(nn3, nn2) ^ grain_oln0(ln1, ln0) ^           \
+		(grain_extr(nn1, nn0, 12) & grain_extr(ln1, ln0, 8)) ^  \
+		(grain_extr(nn3, nn2, 31) & grain_extr(ln2, ln1, 10)) ^ \
+		(grain_extr(ln2, ln1, 28) & grain_extr(ln3, ln2, 15)) ^ \
+		(grain_extr(nn1, nn0, 12) & grain_extr(nn3, nn2, 31) &  \
+		grain_extr(ln3, ln2, 30)) ^ grain_extr(ln3, ln2, 29);
+
+	return rval;
+}
 
 
 
@@ -422,7 +563,6 @@ void test_grain_keystream32(void)
 	memcpy(grain->nfsr, key, 16);
 	memcpy(grain->lfsr, iv, 12);
 	L32(12) = 0x7fffffffUL;
-
 	// test latest version of grain_keystream32
 	printf("original version of grain_keystream32():\n");
 	for (i = -10; i < 2; i++)
@@ -441,7 +581,6 @@ void test_grain_keystream32(void)
 	memcpy(grain->nfsr, key, 16);
 	memcpy(grain->lfsr, iv, 12);
 	L32(12) = 0x7fffffffUL;
-
 	// test aligned version of grain_keystream32
 	printf("aligned version of grain_keystream32():\n");
 	for (i = -10; i < 2; i++)
@@ -455,16 +594,25 @@ void test_grain_keystream32(void)
 		N32(12) ^= ((u32*) key)[i];
 	}
 	printf("\n");
+
+	// load key, and IV along with padding
+	memcpy(grain->nfsr, key, 16);
+	memcpy(grain->lfsr, iv, 12);
+	L32(12) = 0x7fffffffUL;
+	// test ise version of grain_keystream32
+	printf("ise version of grain_keystream32():\n");
+	for (i = -10; i < 2; i++)
+	{
+		ks = grain_keystream32_ise(grain);
+		printf("%08x ", ks);
+		L32(12) ^= ks;
+		N32(12) ^= ks;
+		if (i < 0) continue;
+		L32(12) ^= ((u32*) key)[i + 2];
+		N32(12) ^= ((u32*) key)[i];
+	}
+	printf("\n");
 }
-
-
-
-
-
-
-
-
-
 
 
 
