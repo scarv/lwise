@@ -20,7 +20,7 @@
 #include "grain128aead-v2_opt.h"
 // #include <memory.h>
 #include <string.h>
-
+#undef grain
 // ------------------------------------------------------------------
 // Internals
 // ------------------------------------------------------------------
@@ -41,7 +41,11 @@ u32 grain_keystream32_ise(grain_ctx *grain);
 extern u32 grain_keystream32_rv32(grain_ctx *grain);
 
 // define here the keystream function to be used
-#define grain_keystream32(g) grain_keystream32_ise(g) 
+#ifdef GRAIN_RV32_TYPE1
+#define grain_keystream32(g) grain_keystream32_rv32(g) 
+#else
+#define grain_keystream32(g) grain_keystream32_aligned(g) 
+#endif
 
 // Performs 32 clocks of the cipher and return 32-bit value of y
 static inline u32 grain_keystream32_unaligned(grain_ctx *grain)
@@ -191,6 +195,7 @@ int crypto_aead_encrypt(
 
 	der[0] = 0x80;
 	for (der_len = 8; !der[der_len]; --der_len);
+
 	if ((der_len <= 1) && (der[1] < 128))
 	{
 		der[0] = der[1];
@@ -214,7 +219,7 @@ int crypto_aead_encrypt(
 	grain_auth(&grain, der + i, (int) der_len - (int) i);
 
 	// Authenticate AD
-	long long rem = GRAIN_Z_BLOCK - (der_len % GRAIN_Z_BLOCK);
+	long long rem = GRAIN_Z_BLOCK - (der_len & (GRAIN_Z_BLOCK -1));
 
 	if ((long long) adlen < rem)
 	{
@@ -248,7 +253,11 @@ int crypto_aead_encrypt(
 	for (; i <= ((long long) mlen - GRAIN_Z_BLOCK); i += GRAIN_Z_BLOCK)
 	{
 		grain_authF(&grain, (u8*) m + (int) i);
-		*(GRAIN_Z_TYPE*)(c + i) = *(GRAIN_Z_TYPE*)(m + i) ^ *(GRAIN_Z_TYPE*)(grain.z);
+		//*(GRAIN_Z_TYPE*)(c + i) = *(GRAIN_Z_TYPE*)(m + i) ^ *(GRAIN_Z_TYPE*)(grain.z);
+        *(c + i)   = *(m + i  ) ^ *(grain.z);
+        *(c + i+1) = *(m + i+1) ^ *(grain.z+1);
+        *(c + i+2) = *(m + i+2) ^ *(grain.z+2);
+        *(c + i+3) = *(m + i+3) ^ *(grain.z+3);
 		grain_getz(&grain);
 	}
 
@@ -312,7 +321,7 @@ int crypto_aead_decrypt(
 	grain_auth(&grain, der + i, (int) der_len - (int) i);
 
 	// Authenticate AD
-	long long rem = GRAIN_Z_BLOCK - (der_len % GRAIN_Z_BLOCK);
+    long long rem  = GRAIN_Z_BLOCK - (der_len & (GRAIN_Z_BLOCK -1));
 
 	if ((long long) adlen < rem)
 	{
@@ -344,7 +353,11 @@ int crypto_aead_decrypt(
 	grain_getz(&grain);
 	for (; i <= ((long long) clen - GRAIN_Z_BLOCK); i += GRAIN_Z_BLOCK)
 	{
-		*(GRAIN_Z_TYPE*)(m + i) = *(GRAIN_Z_TYPE*)(c + i) ^ *(GRAIN_Z_TYPE*)(grain.z);
+		//*(GRAIN_Z_TYPE*)(m + i) = *(GRAIN_Z_TYPE*)(c + i) ^ *(GRAIN_Z_TYPE*)(grain.z);
+        *(m + i  ) = *(c + i  ) ^ *(grain.z);
+        *(m + i+1) = *(c + i+1) ^ *(grain.z+1);
+        *(m + i+2) = *(c + i+2) ^ *(grain.z+2);
+        *(m + i+3) = *(c + i+3) ^ *(grain.z+3);
 		grain_authF(&grain, (u8*) m + i);
 		grain_getz(&grain);
 	}
@@ -623,7 +636,9 @@ void test_grain_keystream32(void)
 	printf("asm version of grain_keystream32():\n");
 	for (i = -10; i < 2; i++)
 	{
+#ifdef GRAIN_RV32_TYPE1
 		ks = grain_keystream32_rv32(grain);
+#endif
 		printf("%08x ", ks);
 		L32(12) ^= ks;
 		N32(12) ^= ks;

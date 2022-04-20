@@ -11,6 +11,7 @@ void time_kernel();
 
 #if defined(ascon) && !defined(LWISE)
 #include "permutations.h"
+#include "grain128aead-v2_opt.h"
 #else
 extern void P6(void * state);
 extern void P12(void * state);
@@ -25,6 +26,8 @@ extern void giftb128_bitslicing(void *P, const void *K, void *C);
 extern void giftb128_fixslicing(void *P, const void *rkey, void *C);
 extern void precompute_rkeys(void* rkey, const void* key);
 #endif
+
+//extern u32 grain_keystream32_rv32(grain_ctx *grain);
 
 extern void PHOTON_Permutation(void *state);
 

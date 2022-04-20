@@ -15,7 +15,7 @@ def rv32( args ) :
   if ( args.nist ) :
     CONF  = [ 'DRIVER_TEST_BYPASS'  ]
     driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'ref'            )
-#    driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'opt32t'         )
+    driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'fixslice_opt32' )
 
   for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE2' ] :
     CONF = [ TYPE ]
@@ -25,9 +25,9 @@ def rv32( args ) :
     CONF += [ 'DRIVER_TEST_BYPASS'  ]
     driver.run( args, 'romulus', CONF, 'rv32', 'rv32', NIST_IMP = 'ref'            )
 
-  if ( args.nist ) :
-    CONF = [ 'DRIVER_TEST_BYPASS'   ]
-    driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'fixslice_opt32' )
+#  if ( args.nist ) :
+#    CONF = [ 'DRIVER_TEST_BYPASS'   ]
+#    driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'fixslice_opt32' )
 
   for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE3' ] :
     CONF = [ TYPE ]
