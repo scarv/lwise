@@ -9,9 +9,8 @@
 #define __LWC_KERNELS_H
 void time_kernel();
 
-#if defined(ascon) && !defined(LWISE)
+#if defined(ascon_alg) && !defined(LWISE)
 #include "permutations.h"
-#include "grain128aead-v2_opt.h"
 #else
 extern void P6(void * state);
 extern void P12(void * state);
@@ -19,7 +18,7 @@ extern void P12(void * state);
 
 extern void permutation(void* state);
 
-#if defined(gift) && !defined(LWISE)
+#if defined(gift_alg) && !defined(LWISE)
 extern void giftb128(uint8_t P[16], const uint8_t K[16], uint8_t C[16]);
 #else
 extern void giftb128_bitslicing(void *P, const void *K, void *C);
@@ -27,11 +26,13 @@ extern void giftb128_fixslicing(void *P, const void *rkey, void *C);
 extern void precompute_rkeys(void* rkey, const void* key);
 #endif
 
-//extern u32 grain_keystream32_rv32(grain_ctx *grain);
+#if defined(grain_alg) || defined(GRAIN_RV32_TYPE1) || defined(GRAIN_RV32_TYPE2)
+#include "grain128aead-v2_opt.h"
+#endif
 
 extern void PHOTON_Permutation(void *state);
 
-#if defined(romulus) && !defined(LWISE)
+#if defined(romulus_alg) && !defined(LWISE)
 extern void skinny_128_384_plus_enc (void * input, void* userkey);
 #else
 extern void skinny_128_384_plus_enc (void * input, void* userkey);
@@ -48,4 +49,4 @@ extern void state_update(void *state, const void *key, unsigned int number_of_st
 
 extern void Xoodoo_Permute_12rounds( void * state);
 
-#endif
+#endif // __LWC_KERNELS_H

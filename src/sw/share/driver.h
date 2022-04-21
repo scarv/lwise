@@ -19,7 +19,7 @@
 
 #include         "api.h"
 #include "crypto_aead.h"
-#include "grain128aead-v2_opt.h"
+
 // ----------------------------------------------------------------------------
 
 #if !defined( DRIVER_TRIALS_WARM )

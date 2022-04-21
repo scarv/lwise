@@ -60,6 +60,18 @@ typedef struct
 	u8 z[GRAIN_Z_BLOCK]; // Message-keystream
 } grain_ctx;
 
+// function prototypes
+static inline u32 grain_keystream32_unaligned(grain_ctx *grain);
+u32 grain_keystream32_aligned(grain_ctx *grain);
+u32 grain_keystream32_ise(grain_ctx *grain);
+extern u32 grain_keystream32_rv32(grain_ctx *grain);
+
+// define here the keystream function to be used
+#ifdef GRAIN_RV32_TYPE1
+#define grain_keystream32(g) grain_keystream32_rv32(g) 
+#else
+#define grain_keystream32(g) grain_keystream32_aligned(g) 
+#endif
 
 // ------------------------------------------------------------------
 // NIST API

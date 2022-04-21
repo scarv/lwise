@@ -10,7 +10,7 @@
 extern void rand_bytes(uint8_t* x, int n );
 
 //because P6 in the nist implementation is a static inline function.
-#if defined(ascon)
+#if defined(ascon_alg)
 void P6_nist(state_t* s){
   P6(s);
 }
@@ -22,7 +22,7 @@ void time_kernel() {
 
   int trials      = trials_warm + trials_real;
 
-#if defined(ascon) || defined(ASCON_RV32_TYPE1) || defined(ASCON_RV32_TYPE2)
+#if defined(ascon_alg) || defined(ASCON_RV32_TYPE1) || defined(ASCON_RV32_TYPE2)
   #if defined(ASCON_RV32_TYPE1) || defined(ASCON_RV32_TYPE2)
   unsigned long long s_n = 40; uint8_t s[ s_n ];
   #else
@@ -41,7 +41,7 @@ void time_kernel() {
 
   MEASURE_EPILOGUE( P6 );
 
-#elif defined(elephant) || defined(ELEPHANT_RV32_TYPE1) || defined(ELEPHANT_RV32_TYPE2)
+#elif defined(elephant_alg) || defined(ELEPHANT_RV32_TYPE1) || defined(ELEPHANT_RV32_TYPE2)
 unsigned long long s_n = 20; uint8_t s[ s_n ];
 
   MEASURE_PROLOGUE( permutation );
@@ -54,20 +54,7 @@ unsigned long long s_n = 20; uint8_t s[ s_n ];
 
   MEASURE_EPILOGUE( permutation );
 
-/*#elif defined(GRAIN_RV32_TYPE1) || defined(GRAIN_RV32_TYPE2)
-unsigned long long s_n = 20; uint8_t s[ s_n ];
-
-  MEASURE_PROLOGUE( grain_keystream32_rv32 );
-
-  for( int i = 0; i < trials; i++ ) {
-    rand_bytes( s, s_n );
-
-    MEASURE_STEP( grain_keystream32_rv32, s );
-  }
-
-  MEASURE_EPILOGUE( grain_keystream32_rv32 );
-*/
-#elif defined(gift) || defined(GIFT_RV32_TYPE1) || defined(GIFT_RV32_TYPE2)
+#elif defined(gift_alg) || defined(GIFT_RV32_TYPE1) || defined(GIFT_RV32_TYPE2)
   unsigned long long p_n = 16; uint8_t p[ p_n ];
   unsigned long long k_n = 16; uint8_t k[ k_n ];
   unsigned long long c_n = 16; uint8_t c[ c_n ];
@@ -120,7 +107,20 @@ unsigned long long s_n = 20; uint8_t s[ s_n ];
   MEASURE_EPILOGUE( giftb128 );
   #endif
 
-#elif defined(photon) || defined(PHOTON_RV32_TYPE1) || defined(PHOTON_RV32_TYPE2)
+#elif defined(grain_alg) || defined(GRAIN_RV32_TYPE1) || defined(GRAIN_RV32_TYPE2)
+unsigned long long s_n =44; uint8_t s[ s_n ];
+
+  MEASURE_PROLOGUE( grain_keystream32 );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( s, s_n );
+
+    MEASURE_STEP( grain_keystream32, (grain_ctx *) s );
+  }
+
+  MEASURE_EPILOGUE( grain_keystream32 );
+
+#elif defined(photon_alg) || defined(PHOTON_RV32_TYPE1) || defined(PHOTON_RV32_TYPE2)
   unsigned long long s_n = 32; uint8_t s[ s_n ];
 
   printf( "sizeof( s ) = %llu\n", s_n );
@@ -134,7 +134,7 @@ unsigned long long s_n = 20; uint8_t s[ s_n ];
   }
 
   MEASURE_EPILOGUE( PHOTON_Permutation );
-#elif defined(romulus) || defined(ROMULUS_RV32_TYPE1) || defined(ROMULUS_RV32_TYPE2) || defined(ROMULUS_RV32_TYPE3) 
+#elif defined(romulus_alg) || defined(ROMULUS_RV32_TYPE1) || defined(ROMULUS_RV32_TYPE2) || defined(ROMULUS_RV32_TYPE3) 
   unsigned long long s_n = 16; uint8_t s[ s_n ];
   unsigned long long k_n = 48; uint8_t k[ k_n ];
 
@@ -192,7 +192,7 @@ unsigned long long s_n = 20; uint8_t s[ s_n ];
   MEASURE_EPILOGUE( precompute_rtk2_3 );
   #endif
 
-#elif defined(sparkle) || defined(SPARKLE_RV32_TYPE1) || defined(SPARKLE_RV32_TYPE2) || defined(SPARKLE_RV32_TYPE3) || defined(SPARKLE_RV32_TYPE4)
+#elif defined(sparkle_alg) || defined(SPARKLE_RV32_TYPE1) || defined(SPARKLE_RV32_TYPE2) || defined(SPARKLE_RV32_TYPE3) || defined(SPARKLE_RV32_TYPE4)
   unsigned long long s_n = SPARKLE_STATE/8; uint8_t s[ s_n ];
 
   printf( "sizeof( s ) = %llu\n", s_n );
@@ -221,7 +221,7 @@ unsigned long long s_n = 20; uint8_t s[ s_n ];
 
   MEASURE_EPILOGUE( state_update );
 
-#elif defined(xoodyak) || defined(XOODYAK_RV32_TYPE1) || defined(XOODYAK_RV32_TYPE2)
+#elif defined(xoodyak_alg) || defined(XOODYAK_RV32_TYPE1) || defined(XOODYAK_RV32_TYPE2)
   unsigned long long s_n = 48; uint8_t s[ s_n ];
 
   printf( "sizeof( s ) = %llu\n", s_n );

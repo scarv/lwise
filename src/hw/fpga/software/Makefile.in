@@ -16,16 +16,17 @@ include ${SW}/${ALG}/Makefile.in
 
 # interested kernels in LWC algorithms
 ifeq "${IMP}" "nist"
-KERNEL         = P6_nist permutation giftb128 PHOTON_Permutation skinny_128_384_plus_enc skinny128_384_plus sparkle_opt state_update Xoodoo_Permute_Nrounds
+    KERNEL     = P6_nist grain_keystream32_aligned permutation giftb128 PHOTON_Permutation skinny_128_384_plus_enc skinny128_384_plus sparkle_opt state_update Xoodoo_Permute_Nrounds
 else 
-KERNEL         = P6 
-KERNEL        += permutation
-KERNEL        += giftb128_bitslicing giftb128_fixslicing precompute_rkeys 
-KERNEL        += PHOTON_Permutation 
-KERNEL        += skinny_128_384_plus_enc skinny128_384_plus precompute_rtk1 precompute_rtk2_3
-KERNEL        += sparkle_opt 
-KERNEL        += state_update 
-KERNEL        += Xoodoo_Permute_12rounds
+    KERNEL     = P6 
+    KERNEL    += permutation
+    KERNEL    += grain_keystream32_rv32
+    KERNEL    += giftb128_bitslicing giftb128_fixslicing precompute_rkeys 
+    KERNEL    += PHOTON_Permutation 
+    KERNEL    += skinny_128_384_plus_enc skinny128_384_plus precompute_rtk1 precompute_rtk2_3
+    KERNEL    += sparkle_opt 
+    KERNEL    += state_update 
+    KERNEL    += Xoodoo_Permute_12rounds
 endif
 
 include ${REPO_HOME}/src/hw/fpga/software/FPGA_SWCONF.in
@@ -55,7 +56,7 @@ GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
 
 # pass-through environment variable as macros for use in source code
 ifeq "${IMP}" "nist"
-FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -D${ALG}
+FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -D${ALG}_alg
 else
 FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
 endif
