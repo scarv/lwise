@@ -51,28 +51,43 @@
 
 .macro SPONGENT_ADDRC s0, s4, rci, icr, t0
   xori \s0, \s0, \rci
+#if   (ELEPHANT_RV32_TYPE1)
   li   \t0, \icr
   slli \t0, \t0, 24
   xor  \s4, \s4, \t0
+#elif (ELEPHANT_RV32_TYPE2)
+  elephant.xoricr \s4, \s4, \icr
+#endif
 .endm
 
 // sBoxLayer (xperm-style SBox)
 
+#if   (ELEPHANT_RV32_TYPE1)
 .macro SPONGENT_SBOX s0, lut0, lut1, t0
   xperm4 \t0, \lut0,  \s0
   xor    \s0, \s0,     t0
   xperm4 \s0, \lut1,  \s0
   xor    \s0, \s0,    \t0
 .endm
+#endif
 
 .macro SPONGENT_SBL s0, s1, s2, s3, s4, lut0, lut1, t0
+#if   (ELEPHANT_RV32_TYPE1)
   SPONGENT_SBOX  \s0, \lut0, \lut1, \t0
   SPONGENT_SBOX  \s1, \lut0, \lut1, \t0
   SPONGENT_SBOX  \s2, \lut0, \lut1, \t0
   SPONGENT_SBOX  \s3, \lut0, \lut1, \t0
   SPONGENT_SBOX  \s4, \lut0, \lut1, \t0
+#elif (ELEPHANT_RV32_TYPE2)
+  elephant.sstep \s0, \s0
+  elephant.sstep \s1, \s1
+  elephant.sstep \s2, \s2
+  elephant.sstep \s3, \s3
+  elephant.sstep \s4, \s4
+#endif
 .endm
 
+#if   (ELEPHANT_RV32_TYPE1)
 // pLayer 
 // Our pLayer implementation contains two steps:
 // step1: permute  the bits in the same  32-bit state word
@@ -99,7 +114,6 @@
 
 // The step2 is composed of series of swapmove and rori operations. 
 
-#if (ELEPHANT_RV32_TYPE1)
 .macro SPONGENT_SWAPMOVE s0, s1, m0, imm, t0
   srli \t0, \s0, \imm
   xor  \t0, \t0, \s1
@@ -111,12 +125,14 @@
 #endif 
 
 .macro SPONGENT_PL s0, s1, s2, s3, s4, t0
-  // step1
+  // step1 (in TYPE2, step 1 is integrated in the "sstep" instruction)
+#if (ELEPHANT_RV32_TYPE1)
   SPONGENT_PL_STEP1 \s0
   SPONGENT_PL_STEP1 \s1
   SPONGENT_PL_STEP1 \s2
   SPONGENT_PL_STEP1 \s3
   SPONGENT_PL_STEP1 \s4
+#endif
 
   // step2
 #if   (ELEPHANT_RV32_TYPE1)
@@ -138,22 +154,22 @@
   // output of each custom instruction will overwrite an input, so we need to 
   // use some temp registers to store the intermediate values.  
 
-  elephant.pstep2.x   t2, \s0, \s1, 0    // t2 <- s0
-  elephant.pstep2.y  \s1, \s0, \s1, 0    // s1 <- s1
-  elephant.pstep2.x   t3,  t2, \s2, 1    // t3 <- s0
-  elephant.pstep2.y  \s2,  t2, \s2, 1    // s2 <- s2
-  elephant.pstep2.x  \s0,  t3, \s3, 2    // s0 <- s0
-  elephant.pstep2.y  \s3,  t3, \s3, 2    // s3 <- s3
-  elephant.pstep2.x   t2, \s1, \s2, 3    // t2 <- s1
-  elephant.pstep2.y  \s2, \s1, \s2, 3    // s2 <- s2
-  elephant.pstep2.x  \s1,  t2, \s4, 4    // s1 <- s1
-  elephant.pstep2.y  \s4,  t2, \s4, 4    // s4 <- s4
-  elephant.pstep2.x   t2, \s2, \s3, 3    // t2 <- s2
-  elephant.pstep2.y   t3, \s2, \s3, 3    // t3 <- s3
-  elephant.pstep2.x  \s2,  t2, \s4, 5    // s2 <- s2
-  elephant.pstep2.y  \s4,  t2, \s4, 5    // s4 <- s4
-  elephant.pstep2.x  \s3,  t3, \s4, 6    // s3 <- s3
-  elephant.pstep2.y  \s4,  t3, \s4, 6    // s4 <- s4  
+  elephant.pstep.x   t2, \s0, \s1, 0    // t2 <- s0
+  elephant.pstep.y  \s1, \s0, \s1, 0    // s1 <- s1
+  elephant.pstep.x   t3,  t2, \s2, 1    // t3 <- s0
+  elephant.pstep.y  \s2,  t2, \s2, 1    // s2 <- s2
+  elephant.pstep.x  \s0,  t3, \s3, 2    // s0 <- s0
+  elephant.pstep.y  \s3,  t3, \s3, 2    // s3 <- s3
+  elephant.pstep.x   t2, \s1, \s2, 3    // t2 <- s1
+  elephant.pstep.y  \s2, \s1, \s2, 3    // s2 <- s2
+  elephant.pstep.x  \s1,  t2, \s4, 4    // s1 <- s1
+  elephant.pstep.y  \s4,  t2, \s4, 4    // s4 <- s4
+  elephant.pstep.x   t2, \s2, \s3, 3    // t2 <- s2
+  elephant.pstep.y   t3, \s2, \s3, 3    // t3 <- s3
+  elephant.pstep.x  \s2,  t2, \s4, 5    // s2 <- s2
+  elephant.pstep.y  \s4,  t2, \s4, 5    // s4 <- s4
+  elephant.pstep.x  \s3,  t3, \s4, 6    // s3 <- s3
+  elephant.pstep.y  \s4,  t3, \s4, 6    // s4 <- s4  
 #endif
 .endm
 
