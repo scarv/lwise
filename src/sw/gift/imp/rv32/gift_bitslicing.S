@@ -99,17 +99,16 @@
 // For s0, s1, s2, just rotate the resulting state slice to right with the 
 // corresponding offset.
 
+#if   (GIFT_RV32_TYPE1)
 .macro GIFT_PERMBITS_STEP s0
-#if (GIFT_RV32_TYPE2)
-  gift.key.reorg \s0, \s0, 3
-#else
   unzip \s0, \s0
   unzip \s0, \s0 
   rev8  \s0, \s0
-#endif
 .endm
+#endif
 
 .macro GIFT_PERMBITS s0, s1, s2, s3
+#if   (GIFT_RV32_TYPE1)
   GIFT_PERMBITS_STEP \s0
   GIFT_PERMBITS_STEP \s1
   GIFT_PERMBITS_STEP \s2
@@ -117,6 +116,12 @@
   rori \s0, \s0,  24 
   rori \s1, \s1,  16 
   rori \s2, \s2,   8 
+#elif  (GIFT_RV32_TYPE3)
+  gift.permbits.step \s0, \s0, 24
+  gift.permbits.step \s1, \s1, 16
+  gift.permbits.step \s2, \s2,  8
+  gift.permbits.step \s3, \s3,  0
+#endif
 .endm
 
 // AddRoundKey
@@ -137,9 +142,9 @@
 // This halfword-wise rotation can be optimized with "pack" and "rori". 
 
 .macro GIFT_KEYSTUPD k3, k4, t0
-#if (GIFT_RV32_TYPE2)
+#if   (GIFT_RV32_TYPE3)
   gift.key.updstd \k4, \k3 
-#else                           // k3 = W6        || W7
+#elif (GIFT_RV32_TYPE1)         // k3 = W6        || W7
   pack \t0, \k3, \k3            // t0 = W7        || W7
   rori \k4, \k3, 16             // k4 = W7        || W6
   pack \k4, \k4, \k4            // k4 = W6        || W6
