@@ -109,10 +109,10 @@
   gift.key.updstd rd, rs1           {
     x       <- GPR[rs1]
 
-      r <-     ( ( x >> 12 ) & 0x0000000F ) 
-      r <- r | ( ( x & 0x00000FFF ) <<  4 )
-      r <- r | ( ( x >>  2 ) & 0x3FFF0000 ) 
-      r <- r | ( ( x & 0x00030000 ) << 14 )
+    r       <-     ( ( x >> 12 ) & 0x0000000F ) 
+    r       <- r | ( ( x & 0x00000FFF ) <<  4 )
+    r       <- r | ( ( x >>  2 ) & 0x3FFF0000 ) 
+    r       <- r | ( ( x & 0x00030000 ) << 14 )
 
     GPR[rd] <- r
   }
@@ -173,11 +173,11 @@
   gift.permbits.step rd, rs1, imm   {
     x       <- GPR[rs1]  
 
-    r <- SWAPMOVE32( x, 0x0A0A0A0A,  3 )
-    r <- SWAPMOVE32( r, 0x00CC00CC,  6 )
-    r <- SWAPMOVE32( r, 0x0000F0F0, 12 )
-    r <- SWAPMOVE32( r, 0x000000FF, 24 )
-    r <- r >>> imm
+    r       <- SWAPMOVE32( x, 0x0A0A0A0A,  3 )
+    r       <- SWAPMOVE32( r, 0x00CC00CC,  6 )
+    r       <- SWAPMOVE32( r, 0x0000F0F0, 12 )
+    r       <- SWAPMOVE32( r, 0x000000FF, 24 )
+    r       <- r >>> imm
 
     GPR[rd] <- r
   }
@@ -185,10 +185,10 @@
   gift.key.updstd rd, rs1           {
     x       <- GPR[rs1]
 
-    r <-     ( ( x >> 12 ) & 0x0000000F ) 
-    r <- r | ( ( x & 0x00000FFF ) <<  4 )
-    r <- r | ( ( x >>  2 ) & 0x3FFF0000 ) 
-    r <- r | ( ( x & 0x00030000 ) << 14 )
+    r       <-     ( ( x >> 12 ) & 0x0000000F ) 
+    r       <- r | ( ( x & 0x00000FFF ) <<  4 )
+    r       <- r | ( ( x >>  2 ) & 0x3FFF0000 ) 
+    r       <- r | ( ( x & 0x00030000 ) << 14 )
 
     GPR[rd] <- r
   }
