@@ -10,11 +10,19 @@
 // ============================================================================
 
 #if ( ELEPHANT_RV32_TYPE2 )
-.macro elephant.pstep2.x    rd, rs1, rs2, imm
+.macro elephant.pstep.x     rd, rs1, rs2, imm
 .insn r CUSTOM_0, 7, \imm+( 0* 8), \rd, \rs1, \rs2
 .endm
-.macro elephant.pstep2.y    rd, rs1, rs2, imm
+.macro elephant.pstep.y     rd, rs1, rs2, imm
 .insn r CUSTOM_0, 7, \imm+( 1* 8), \rd, \rs1, \rs2
+.endm
+
+.macro elephant.sstep      rd, rs1
+.insn r CUSTOM_0, 6,      ( 2* 8), \rd, \rs1,   x0
+.endm
+
+.macro elephant.xoricr     rd, rs1,      imm
+.insn i CUSTOM_1, 6,               \rd, \rs1, \imm
 .endm
 #endif
 
