@@ -28,7 +28,7 @@
 |                     |                      |          |                     |         |             |
 +=====================+======================+==========+=====================+=========+=============+
 
-.macro elephant.xoricr     rd, rs1,      imm       // elephant.xorirc         => iiii iiii iiii rrrr r110 rrrr r010 1011
+.macro elephant.xoricr     rd, rs1,      imm       // elephant.xoricr         => iiii iiii iiii rrrr r110 rrrr r010 1011
 .insn i CUSTOM_1, 6,               \rd, \rs1, \imm //                         => #define MATCH_ELEPHANT_XORICR  0x0000602B
 .endm                                              //                         => #define  MASK_ELEPHANT_XORICR  0x0000707F
 
