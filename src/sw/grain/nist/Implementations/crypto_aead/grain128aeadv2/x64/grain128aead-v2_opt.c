@@ -206,7 +206,8 @@ int crypto_aead_encrypt(
 	grain_auth(&grain, der + i, (int) der_len - (int) i);
 
 	// Authenticate AD
-	long long rem = GRAIN_Z_BLOCK - (der_len & (GRAIN_Z_BLOCK -1));
+	// long long rem = GRAIN_Z_BLOCK - (der_len % GRAIN_Z_BLOCK);
+	long long rem = GRAIN_Z_BLOCK - (der_len & (GRAIN_Z_BLOCK - 1));
 
 	if ((long long) adlen < rem)
 	{
@@ -240,11 +241,8 @@ int crypto_aead_encrypt(
 	for (; i <= ((long long) mlen - GRAIN_Z_BLOCK); i += GRAIN_Z_BLOCK)
 	{
 		grain_authF(&grain, (u8*) m + (int) i);
-		//*(GRAIN_Z_TYPE*)(c + i) = *(GRAIN_Z_TYPE*)(m + i) ^ *(GRAIN_Z_TYPE*)(grain.z);
-        *(c + i)   = *(m + i  ) ^ *(grain.z);
-        *(c + i+1) = *(m + i+1) ^ *(grain.z+1);
-        *(c + i+2) = *(m + i+2) ^ *(grain.z+2);
-        *(c + i+3) = *(m + i+3) ^ *(grain.z+3);
+		// *(GRAIN_Z_TYPE *) (c + i) = *(GRAIN_Z_TYPE *) (m + i) ^ *(GRAIN_Z_TYPE *) (grain.z);
+		for (int j = 0; j < 4; j++) c[i + j] = m[i + j] ^ grain.z[j];
 		grain_getz(&grain);
 	}
 
@@ -308,7 +306,8 @@ int crypto_aead_decrypt(
 	grain_auth(&grain, der + i, (int) der_len - (int) i);
 
 	// Authenticate AD
-    long long rem  = GRAIN_Z_BLOCK - (der_len & (GRAIN_Z_BLOCK -1));
+	// long long rem = GRAIN_Z_BLOCK - (der_len % GRAIN_Z_BLOCK);
+	long long rem  = GRAIN_Z_BLOCK - (der_len & (GRAIN_Z_BLOCK - 1));
 
 	if ((long long) adlen < rem)
 	{
@@ -340,11 +339,8 @@ int crypto_aead_decrypt(
 	grain_getz(&grain);
 	for (; i <= ((long long) clen - GRAIN_Z_BLOCK); i += GRAIN_Z_BLOCK)
 	{
-		//*(GRAIN_Z_TYPE*)(m + i) = *(GRAIN_Z_TYPE*)(c + i) ^ *(GRAIN_Z_TYPE*)(grain.z);
-        *(m + i  ) = *(c + i  ) ^ *(grain.z);
-        *(m + i+1) = *(c + i+1) ^ *(grain.z+1);
-        *(m + i+2) = *(c + i+2) ^ *(grain.z+2);
-        *(m + i+3) = *(c + i+3) ^ *(grain.z+3);
+		// *(GRAIN_Z_TYPE *) (m + i) = *(GRAIN_Z_TYPE *) (c + i) ^ *(GRAIN_Z_TYPE *) (grain.z);
+		for (int j = 0; j < 4; j ++) m[i + j] = c[i + j] ^ grain.z[j];
 		grain_authF(&grain, (u8*) m + i);
 		grain_getz(&grain);
 	}
@@ -426,11 +422,20 @@ static inline u32 grain_extr(u32 hi, u32 lo, int imm)
 	return (u32) (tmp >> imm);
 }
 
+// operations of f-function that use ln0 as input
+static inline u32 grain_fln0(u32 ln0hi, u32 ln0lo)
+{
+	u64 ln0 = (((u64) ln0hi) << 32) | ln0lo;
+	u32 res = ln0lo ^ ((u32) (ln0 >> 7));
+
+	return res;
+}
+
 // operations of f-function that use ln2 as input
 static inline u32 grain_fln2(u32 ln2hi, u32 ln2lo)
 {
 	u64 ln2 = (((u64) ln2hi) << 32) | ln2lo;
-	u32 res = (u32) ((ln2 >> 6) ^ (ln2 >> 17));
+	u32 res = ln2hi ^ ((u32)((ln2 >> 6) ^ (ln2 >> 17)));
 
 	return res;
 }
@@ -462,15 +467,15 @@ static inline u32 grain_gnn2(u32 nn2hi, u32 nn2lo)
 	u64 nn2 = (((u64) nn2hi) << 32) | nn2lo;
 	u32 res;
 
-	res = (u32) (((nn2 >> 4) & (nn2 >> 20)) ^                   \
+	res = nn2hi ^ ((u32) (((nn2 >> 4) & (nn2 >> 20)) ^          \
 		((nn2 >> 24) & (nn2 >> 28) & (nn2 >> 29) & (nn2 >> 31)) ^ \
-		((nn2 >> 6) & (nn2 >> 14) & (nn2 >> 18)) ^ (nn2 >> 27));
+		((nn2 >> 6) & (nn2 >> 14) & (nn2 >> 18)) ^ (nn2 >> 27)));
 
 	return res;
 }
 
-// operations of output-computation that use nn0 as input
-static inline u32 grain_onn0(u32 nn0hi, u32 nn0lo)
+// operations of h-function that use nn0 as input
+static inline u32 grain_hnn0(u32 nn0hi, u32 nn0lo)
 {
 	u64 nn0 = (((u64) nn0hi) << 32) | nn0lo;
 	u32 res = (u32) ((nn0 >> 2) ^ (nn0 >> 15));
@@ -478,8 +483,8 @@ static inline u32 grain_onn0(u32 nn0hi, u32 nn0lo)
 	return res;
 }
 
-// operations of output-computation that use nn1 as input
-static inline u32 grain_onn1(u32 nn1hi, u32 nn1lo)
+// operations of h-function that use nn1 as input
+static inline u32 grain_hnn1(u32 nn1hi, u32 nn1lo)
 {
 	u64 nn1 = (((u64) nn1hi) << 32) | nn1lo;
 	u32 res = (u32) ((nn1 >> 4) ^ (nn1 >> 13));
@@ -487,8 +492,8 @@ static inline u32 grain_onn1(u32 nn1hi, u32 nn1lo)
 	return res;
 }
 
-// operations of output-computation that use nn2 as input
-static inline u32 grain_onn2(u32 nn2hi, u32 nn2lo)
+// operations of h-function that use nn2 as input
+static inline u32 grain_hnn2(u32 nn2hi, u32 nn2lo)
 {
 	u64 nn2 = (((u64) nn2hi) << 32) | nn2lo;
 	u32 res = (u32) (nn2 ^ (nn2 >> 9) ^ (nn2 >> 25));
@@ -496,8 +501,8 @@ static inline u32 grain_onn2(u32 nn2hi, u32 nn2lo)
 	return res;
 }
 
-// operations of output-computation that use ln0 as input
-static inline u32 grain_oln0(u32 ln0hi, u32 ln0lo)
+// operations of h-function that use ln0 as input
+static inline u32 grain_hln0(u32 ln0hi, u32 ln0lo)
 {
 	u64 ln0 = (((u64) ln0hi) << 32) | ln0lo;
 	u32 res = (u32) ((ln0 >> 13) & (ln0 >> 20));
@@ -514,39 +519,36 @@ u32 grain_keystream32_ise(grain_ctx *grain)
 
 	u32 ln0 = lptr[0], ln1 = lptr[1], ln2 = lptr[2], ln3 = lptr[3];
 	u32 nn0 = nptr[0], nn1 = nptr[1], nn2 = nptr[2], nn3 = nptr[3];
-	u32 rval;
+	u32 tmp;
 
 	// g-function
-	u32 nn4 = ln0 ^ grain_gnn0(nn1, nn0) ^ \
-		grain_gnn1(nn2, nn1) ^ grain_gnn2(nn3, nn2) ^ nn3 ^  \
-		(grain_extr(nn1, nn0, 3) & grain_extr(nn3, nn2, 3)) ^ \
-		(grain_extr(nn2, nn1, 29) & grain_extr(nn3, nn2, 1)) ^ \
+	tmp = ln0 ^ grain_gnn0(nn1, nn0) ^ grain_gnn1(nn2, nn1) ^ grain_gnn2(nn3, nn2) ^  \
+		(grain_extr(nn1, nn0,  3) & grain_extr(nn3, nn2,  3)) ^ \
+		(grain_extr(nn2, nn1, 29) & grain_extr(nn3, nn2,  1)) ^ \
 		(grain_extr(nn1, nn0, 27) & grain_extr(nn2, nn1, 27));
 
 	nptr[0] = nptr[1];
 	nptr[1] = nptr[2];
 	nptr[2] = nptr[3];
-	nptr[3] = nn4;
+	nptr[3] = tmp;
 
 	// f-function
-	u32 ln4 = ln0 ^ ln3 ^ grain_extr(ln2, ln1, 6) ^ \
-		grain_fln2(ln3, ln2) ^ grain_extr(ln1, ln0, 7);
-  
+	tmp =  grain_fln2(ln3, ln2) ^ grain_extr(ln2, ln1, 6) ^ grain_fln0(ln1, ln0);
+
 	lptr[0] = lptr[1];
 	lptr[1] = lptr[2];
 	lptr[2] = lptr[3];
-	lptr[3] = ln4;
+	lptr[3] = tmp;
 
-	// 32-bit output
-	rval = grain_onn0(nn1, nn0) ^ grain_onn1(nn2, nn1) ^      \
-		grain_onn2(nn3, nn2) ^ grain_oln0(ln1, ln0) ^           \
-		(grain_extr(nn1, nn0, 12) & grain_extr(ln1, ln0, 8)) ^  \
+	// h-function
+	tmp = grain_hnn0(nn1, nn0) ^ grain_hnn1(nn2, nn1) ^ grain_hnn2(nn3, nn2) ^ \
+		grain_hln0(ln1, ln0) ^ grain_extr(ln3, ln2, 29) ^       \
+		(grain_extr(nn1, nn0, 12) & grain_extr(ln1, ln0,  8)) ^ \
 		(grain_extr(nn3, nn2, 31) & grain_extr(ln2, ln1, 10)) ^ \
 		(grain_extr(ln2, ln1, 28) & grain_extr(ln3, ln2, 15)) ^ \
-		(grain_extr(nn1, nn0, 12) & grain_extr(nn3, nn2, 31) &  \
-		grain_extr(ln3, ln2, 30)) ^ grain_extr(ln3, ln2, 29);
+		(grain_extr(nn1, nn0, 12) & grain_extr(nn3, nn2, 31) & grain_extr(ln3, ln2, 30));
 
-	return rval;
+	return tmp;
 }
 
 
