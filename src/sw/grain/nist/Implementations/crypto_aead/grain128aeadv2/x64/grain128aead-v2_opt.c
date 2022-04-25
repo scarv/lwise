@@ -467,9 +467,9 @@ static inline u32 grain_gnn2(u32 nn2hi, u32 nn2lo)
 	u64 nn2 = (((u64) nn2hi) << 32) | nn2lo;
 	u32 res;
 
-	res = nn2hi ^ ((u32) (((nn2 >> 4) & (nn2 >> 20)) ^          \
+	res = nn2hi ^ ((u32) ((nn2 >> 27) ^ ((nn2 >> 4) & (nn2 >> 20)) ^  \
 		((nn2 >> 24) & (nn2 >> 28) & (nn2 >> 29) & (nn2 >> 31)) ^ \
-		((nn2 >> 6) & (nn2 >> 14) & (nn2 >> 18)) ^ (nn2 >> 27)));
+		((nn2 >> 6) & (nn2 >> 14) & (nn2 >> 18))));
 
 	return res;
 }
@@ -533,7 +533,7 @@ u32 grain_keystream32_ise(grain_ctx *grain)
 	nptr[3] = tmp;
 
 	// f-function
-	tmp =  grain_fln2(ln3, ln2) ^ grain_extr(ln2, ln1, 6) ^ grain_fln0(ln1, ln0);
+	tmp = grain_fln0(ln1, ln0) ^ grain_extr(ln2, ln1, 6) ^ grain_fln2(ln3, ln2);
 
 	lptr[0] = lptr[1];
 	lptr[1] = lptr[2];
