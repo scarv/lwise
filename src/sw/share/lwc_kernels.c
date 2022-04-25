@@ -54,7 +54,7 @@ unsigned long long s_n = 20; uint8_t s[ s_n ];
 
   MEASURE_EPILOGUE( permutation );
 
-#elif defined(gift_alg) || defined(GIFT_RV32_TYPE1) || defined(GIFT_RV32_TYPE2)
+#elif defined(gift_alg) || defined(GIFT_RV32_TYPE1) || defined(GIFT_RV32_TYPE2) || defined(GIFT_RV32_TYPE3)
   unsigned long long p_n = 16; uint8_t p[ p_n ];
   unsigned long long k_n = 16; uint8_t k[ k_n ];
   unsigned long long c_n = 16; uint8_t c[ c_n ];

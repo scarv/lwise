@@ -32,4 +32,16 @@
 .endm
 #endif
 
+// ----------------------------------------------------------------------------
+
+#if ( GIFT_RV32_TYPE3 )
+.macro gift.key.updstd      rd, rs1
+.insn r CUSTOM_1, 6,      ( 1*32), \rd, \rs1,   x0
+.endm
+
+.macro gift.permbits.step   rd, rs1,      imm
+.insn r CUSTOM_1, 6, \imm+( 3*32), \rd, \rs1,   x0
+.endm
+#endif
+
 // ============================================================================
