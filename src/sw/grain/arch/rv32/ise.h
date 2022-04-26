@@ -11,29 +11,32 @@
 .insn r CUSTOM_0, 7, \imm+( 0*32), \rd, \rs1, \rs2
 .endm
 
+.macro grain.fln0           rd, rs1, rs2
+.insn r CUSTOM_0, 7,      ( 0* 8), \rd, \rs1, \rs2
+.endm
 .macro grain.fln2           rd, rs1, rs2
-.insn r CUSTOM_0, 7,      ( 0*16), \rd, \rs1, \rs2
+.insn r CUSTOM_0, 7,      ( 1* 8), \rd, \rs1, \rs2
 .endm
 .macro grain.gnn0           rd, rs1, rs2
-.insn r CUSTOM_0, 7,      ( 1*16), \rd, \rs1, \rs2
+.insn r CUSTOM_0, 7,      ( 2* 8), \rd, \rs1, \rs2
 .endm
 .macro grain.gnn1           rd, rs1, rs2
-.insn r CUSTOM_0, 7,      ( 2*16), \rd, \rs1, \rs2
+.insn r CUSTOM_0, 7,      ( 3* 8), \rd, \rs1, \rs2
 .endm
 .macro grain.gnn2           rd, rs1, rs2
-.insn r CUSTOM_0, 7,      ( 3*16), \rd, \rs1, \rs2
+.insn r CUSTOM_0, 7,      ( 4* 8), \rd, \rs1, \rs2
 .endm
-.macro grain.onn0           rd, rs1, rs2
-.insn r CUSTOM_0, 7,      ( 4*16), \rd, \rs1, \rs2
+.macro grain.hnn0           rd, rs1, rs2
+.insn r CUSTOM_0, 7,      ( 5* 8), \rd, \rs1, \rs2
 .endm
-.macro grain.onn1           rd, rs1, rs2
-.insn r CUSTOM_0, 7,      ( 5*16), \rd, \rs1, \rs2
+.macro grain.hnn1           rd, rs1, rs2
+.insn r CUSTOM_0, 7,      ( 6* 8), \rd, \rs1, \rs2
 .endm
-.macro grain.onn2           rd, rs1, rs2
-.insn r CUSTOM_0, 7,      ( 6*16), \rd, \rs1, \rs2
+.macro grain.hnn2           rd, rs1, rs2
+.insn r CUSTOM_0, 7,      ( 7* 8), \rd, \rs1, \rs2
 .endm
-.macro grain.oln0           rd, rs1, rs2
-.insn r CUSTOM_0, 7,      ( 7*16), \rd, \rs1, \rs2
+.macro grain.hln0           rd, rs1, rs2
+.insn r CUSTOM_0, 7,      ( 8* 8), \rd, \rs1, \rs2
 .endm
 #endif
 

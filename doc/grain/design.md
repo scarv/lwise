@@ -29,11 +29,19 @@
     GPR[rd] <- r_{31.. 0}
   }
 
+  grain.fln0 rd, rs1, rs2      {
+    x_hi    <- GPR[rs1]
+    x_lo    <- GPR[rs2]
+    x       <- x_hi || x_lo
+    r       <- ( x_lo ) ^ ( x >> 7 )
+    GPR[rd] <- r_{31.. 0}
+  }
+
   grain.fln2 rd, rs1, rs2      {
     x_hi    <- GPR[rs1]
     x_lo    <- GPR[rs2]
     x       <- x_hi || x_lo
-    r       <- ( x >> 6 ) ^ ( x >> 17 )
+    r       <- ( x_hi ) ^ ( x >> 6 ) ^ ( x >> 17 )
     GPR[rd] <- r_{31.. 0}
   }
 
@@ -41,7 +49,7 @@
     x_hi    <- GPR[rs1]
     x_lo    <- GPR[rs2]
     x       <- x_hi || x_lo
-    r       <- ( x ) ^ ( x >> 26 ) ^ ( ( x >> 11 ) & ( x >> 13 ) ) ^ ( ( x >> 17 ) & ( x >> 18 ) ) ^ ( ( x >> 22 ) & ( x >> 24 ) & ( x >> 25 ) )
+    r       <- ( x_lo ) ^ ( x >> 26 ) ^ ( ( x >> 11 ) & ( x >> 13 ) ) ^ ( ( x >> 17 ) & ( x >> 18 ) ) ^ ( ( x >> 22 ) & ( x >> 24 ) & ( x >> 25 ) )
     GPR[rd] <- r_{31.. 0}
   }
 
@@ -57,11 +65,11 @@
     x_hi    <- GPR[rs1]
     x_lo    <- GPR[rs2]
     x       <- x_hi || x_lo
-    r       <- ( ( x >> 4 ) & ( x >> 20 ) ) ^ ( ( x >> 24 ) & ( x >> 28 ) & ( x >> 29 ) & ( x >> 31 ) ) ^ ( ( x >> 6 ) & ( x >> 14 ) & ( x >> 18 ) ) ^ ( x >> 27 )
+    r       <- ( x_hi ) ^ ( x >> 27 ) ^ ( ( x >> 4 ) & ( x >> 20 ) ) ^ ( ( x >> 24 ) & ( x >> 28 ) & ( x >> 29 ) & ( x >> 31 ) ) ^ ( ( x >> 6 ) & ( x >> 14 ) & ( x >> 18 ) )
     GPR[rd] <- r_{31.. 0}
   }
 
-  grain.onn0 rd, rs1, rs2      {
+  grain.hnn0 rd, rs1, rs2      {
     x_hi    <- GPR[rs1]
     x_lo    <- GPR[rs2]
     x       <- x_hi || x_lo
@@ -69,7 +77,7 @@
     GPR[rd] <- r_{31.. 0}
   }
 
-  grain.onn1 rd, rs1, rs2      {
+  grain.hnn1 rd, rs1, rs2      {
     x_hi    <- GPR[rs1]
     x_lo    <- GPR[rs2]
     x       <- x_hi || x_lo
@@ -77,15 +85,15 @@
     GPR[rd] <- r_{31.. 0}
   }
 
-  grain.onn2 rd, rs1, rs2      {
+  grain.hnn2 rd, rs1, rs2      {
     x_hi    <- GPR[rs1]
     x_lo    <- GPR[rs2]
     x       <- x_hi || x_lo
-    r       <- ( x ) ^ ( x >> 9 ) ^ ( x >> 25 )
+    r       <- ( x_lo ) ^ ( x >> 9 ) ^ ( x >> 25 )
     GPR[rd] <- r_{31.. 0}
   }
 
-  grain.oln0 rd, rs1, rs2      {
+  grain.hln0 rd, rs1, rs2      {
     x_hi    <- GPR[rs1]
     x_lo    <- GPR[rs2]
     x       <- x_hi || x_lo
