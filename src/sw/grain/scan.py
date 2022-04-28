@@ -13,15 +13,14 @@ def rv32( args ) :
     CONF = []
 
     driver.run( args, 'grain', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
+    driver.run( args, 'grain', CONF, 'rv32', 'nist', NIST_IMP = 'x64' )
 
   for TYPE in [ 'GRAIN_RV32_TYPE1', 'GRAIN_RV32_TYPE2' ] :
-    for UNROLL in [ False, True ] :
-      CONF = [ TYPE ]
-
-      if ( UNROLL ) :
-        CONF += [ 'GRAIN_RV32_UNROLL' ]
+    CONF = [ TYPE ]
+    # there is only unrolled implementation for Grain on rv32
+    CONF += [ 'GRAIN_RV32_UNROLL' ]
   
-      driver.run( args, 'grain', CONF, 'rv32', 'rv32' )
+    driver.run( args, 'grain', CONF, 'rv32', 'rv32', NIST_IMP = 'x64' )
 
 # -----------------------------------------------------------------------------
 

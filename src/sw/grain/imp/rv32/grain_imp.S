@@ -1,3 +1,7 @@
+#include "zbkb.h"
+#include "zbkx.h"
+#include "ise.h"
+
 .section .text
 .balign 4
 
@@ -79,27 +83,40 @@
 
 // extract a 32-bit word from a 64-bit word
 .macro GRAIN_EXTR res:req, hi:req, lo:req, imm:req
-    srli    trr, \lo, \imm
-    slli    \res, \hi, 32-(\imm)
-    or      \res, \res, trr
+#if   (GRAIN_RV32_TYPE1)
+    srli        trr, \lo, \imm
+    slli        \res, \hi, 32-(\imm)
+    or          \res, \res, trr
+#elif (GRAIN_RV32_TYPE2)
+    grain.extr  \res, \hi, \lo, \imm
+#endif
 .endm
 
 // operations of f-function that use ln0 as input
 .macro GRAIN_FLN0 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     GRAIN_EXTR  tr4, \hi, \lo, 7
     xor         \res, \lo, tr4
+#elif (GRAIN_RV32_TYPE2)
+    grain.fln0  \res, \hi, \lo
+#endif
 .endm
 
 // operations of f-function that use ln2 as input
 .macro GRAIN_FLN2 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     GRAIN_EXTR  tr4, \hi, \lo, 6
     GRAIN_EXTR  \res, \hi, \lo, 17
     xor         \res, \res, tr4
     xor         \res, \res, \hi
+#elif (GRAIN_RV32_TYPE2)
+    grain.fln2  \res, \hi, \lo
+#endif    
 .endm
 
 // operations of g-function that use nn0 as input
 .macro GRAIN_GNN0 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     // ((nn0 >> 22) & (nn0 >> 24) & (nn0 >> 25))
     GRAIN_EXTR  tr4, \hi, \lo, 22
     GRAIN_EXTR  tr3, \hi, \lo, 24
@@ -120,10 +137,14 @@
     GRAIN_EXTR  tr3, \hi, \lo, 26
     xor         tr4, tr4, tr3
     xor         \res, \lo, tr4
+#elif (GRAIN_RV32_TYPE2)
+    grain.gnn0  \res, \hi, \lo
+#endif
 .endm
 
 // operations of g-function that use nn1 as input
 .macro GRAIN_GNN1 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     // ((nn1 >> 8) & (nn1 >> 16))
     GRAIN_EXTR  tr4, \hi, \lo, 8
     GRAIN_EXTR  tr3, \hi, \lo, 16
@@ -131,10 +152,14 @@
     // res = (nn1 >> 24) ^ ...
     GRAIN_EXTR  tr3, \hi, \lo, 24
     xor         \res, tr4, tr3
+#elif (GRAIN_RV32_TYPE2)
+    grain.gnn1  \res, \hi, \lo
+#endif
 .endm
 
 // operations of g-function that use nn2 as input
 .macro GRAIN_GNN2 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     // ((nn2 >> 24) & (nn2 >> 28) & (nn2 >> 29) & (nn2 >> 31))
     GRAIN_EXTR  tr4, \hi, \lo, 24
     GRAIN_EXTR  tr3, \hi, \lo, 28
@@ -159,39 +184,58 @@
     GRAIN_EXTR  tr3, \hi, \lo, 27
     xor         tr3, tr3, \hi
     xor         \res, tr3, tr4
+#elif (GRAIN_RV32_TYPE2)
+   grain.gnn2  \res, \hi, \lo
+#endif
 .endm
 
 // operations of h-function that use nn0 as input
 .macro GRAIN_HNN0 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     // res = ((nn0 >> 2) ^ (nn0 >> 15))
     GRAIN_EXTR  tr4, \hi, \lo, 2
     GRAIN_EXTR  tr3, \hi, \lo, 15
     xor         \res, tr4, tr3
+#elif (GRAIN_RV32_TYPE2)
+   grain.hnn0  \res, \hi, \lo
+#endif 
 .endm
 
 // operations of h-function that use nn1 as input
 .macro GRAIN_HNN1 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     // res = ((nn1 >> 4) ^ (nn1 >> 13))
     GRAIN_EXTR  tr4, \hi, \lo, 4
     GRAIN_EXTR  tr3, \hi, \lo, 13
     xor         \res, tr4, tr3
+#elif (GRAIN_RV32_TYPE2)
+    grain.hnn1  \res, \hi, \lo
+#endif
 .endm
 
 // operations of h-function that use nn2 as input
 .macro GRAIN_HNN2 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     // res = nn2 ^ (nn2 >> 9) ^ (nn2 >> 25)
     GRAIN_EXTR  tr4, \hi, \lo, 9
     GRAIN_EXTR  tr3, \hi, \lo, 25
     xor         tr4, tr4, tr3
     xor         \res, \lo, tr4
+#elif (GRAIN_RV32_TYPE2)
+    grain.hnn2  \res, \hi, \lo
+#endif
 .endm
 
 // operations of h-function that use ln0 as input
 .macro GRAIN_HLN0 res:req, hi:req, lo:req
+#if   (GRAIN_RV32_TYPE1)
     // res = ((ln0 >> 13) & (ln0 >> 20))
     GRAIN_EXTR  tr4, \hi, \lo, 13
     GRAIN_EXTR  tr3, \hi, \lo, 20
     and         \res, tr4, tr3
+#elif (GRAIN_RV32_TYPE2)
+    grain.hln0  \res, \hi, \lo
+#endif
 .endm
 
 // f-function to compute a word of the LFSR

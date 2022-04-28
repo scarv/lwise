@@ -67,7 +67,7 @@ u32 grain_keystream32_ise(grain_ctx *grain);
 extern u32 grain_keystream32_rv32(grain_ctx *grain);
 
 // define here the keystream function to be used
-#ifdef GRAIN_RV32_TYPE1
+#if defined(LWISE)
 #define grain_keystream32(g) grain_keystream32_rv32(g) 
 #else
 #define grain_keystream32(g) grain_keystream32_aligned(g) 
