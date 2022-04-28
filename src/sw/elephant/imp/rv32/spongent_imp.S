@@ -51,13 +51,8 @@
 
 .macro SPONGENT_ADDRC s0, s4, rci, icr, t0
   xori \s0, \s0, \rci
-#if   (ELEPHANT_RV32_TYPE1)
-  li   \t0, \icr
-  slli \t0, \t0, 24
+  lui  \t0, \icr<<12
   xor  \s4, \s4, \t0
-#elif (ELEPHANT_RV32_TYPE2)
-  elephant.xoricr \s4, \s4, \icr
-#endif
 .endm
 
 // sBoxLayer (xperm-style SBox)
