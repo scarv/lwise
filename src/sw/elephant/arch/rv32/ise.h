@@ -20,10 +20,6 @@
 .macro elephant.sstep      rd, rs1
 .insn r CUSTOM_0, 6,      ( 2* 8), \rd, \rs1,   x0
 .endm
-
-.macro elephant.xoricr     rd, rs1,      imm
-.insn i CUSTOM_1, 6,               \rd, \rs1, \imm
-.endm
 #endif
 
 // ============================================================================

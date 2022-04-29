@@ -43,30 +43,6 @@
 - `ELEPHANT_RV32_TYPE2`: base ISA plus ISE.
 
   ```
-  elephant.xoricr  rd, rs1,      imm {
-    x       <- GPR[rs1]
-
-    r       <- x ^ ( imm << 24 )
-
-    GPR[rd] <- r
-  }  
-
-  elephant.sstep   rd, rs1           {
-    x       <- GPR[rs1]
-
-    r       <- SBOX[ x_{31..28} ] || SBOX[ x_{27..24} ] ||
-               SBOX[ x_{23..20} ] || SBOX[ x_{19..16} ] ||
-               SBOX[ x_{15..12} ] || SBOX[ x_{11.. 8} ] ||
-               SBOX[ x_{ 7.. 4} ] || SBOX[ x_{ 3.. 0} ] 
-               
-    r       <- SWAPMOVE32( r, 0x0A0A0A0A,  3 )
-    r       <- SWAPMOVE32( r, 0x00CC00CC,  6 )
-    r       <- SWAPMOVE32( r, 0x0000F0F0, 12 )
-    r       <- SWAPMOVE32( r, 0x0000FF00,  8 )
-
-    GPR[rd] <- r
-  }
-
   elephant.pstep.x rd, rs1, rs2, imm {
     x       <- GPR[rs1]
     y       <- GPR[rs2]
@@ -121,6 +97,22 @@
     else if ( imm == 6 ) {
       r <- SWAPMOVE32_Y( x, y, 0x00FF0000,  8 )
     }
+
+    GPR[rd] <- r
+  }
+
+  elephant.sstep   rd, rs1           {
+    x       <- GPR[rs1]
+
+    r       <- SBOX[ x_{31..28} ] || SBOX[ x_{27..24} ] ||
+               SBOX[ x_{23..20} ] || SBOX[ x_{19..16} ] ||
+               SBOX[ x_{15..12} ] || SBOX[ x_{11.. 8} ] ||
+               SBOX[ x_{ 7.. 4} ] || SBOX[ x_{ 3.. 0} ] 
+               
+    r       <- SWAPMOVE32( r, 0x0A0A0A0A,  3 )
+    r       <- SWAPMOVE32( r, 0x00CC00CC,  6 )
+    r       <- SWAPMOVE32( r, 0x0000F0F0, 12 )
+    r       <- SWAPMOVE32( r, 0x0000FF00,  8 )
 
     GPR[rd] <- r
   }
