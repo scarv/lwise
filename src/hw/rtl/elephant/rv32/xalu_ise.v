@@ -32,18 +32,21 @@ wire        elephant_ise_sel;
 wire [31:0] elephant_ise_rd;  
 generate 
     if (ISE_V[1] == 1'b1) begin : ELEPHANT_ISE_IMP
-wire   op_pstep2_x  = ( funct[6:3] == 4'b0000 ) && (ise_fn[1:0] == CUSTOM_0);
-wire   op_pstep2_y  = ( funct[6:3] == 4'b0001 ) && (ise_fn[1:0] == CUSTOM_0);
+wire   op_pstep_x = ( funct[6:3] == 4'b0000 ) && (ise_fn[1:0] == CUSTOM_0);
+wire   op_pstep_y = ( funct[6:3] == 4'b0001 ) && (ise_fn[1:0] == CUSTOM_0);
+wire   op_sstep   = ( funct[6:3] == 4'b0010 ) && (ise_fn[1:0] == CUSTOM_0);
 
-assign elephant_ise_sel  = op_pstep2_x | op_pstep2_y;
+
+assign elephant_ise_sel  = op_pstep_x | op_pstep_y | op_sstep;
 
 elephant_ise elephant_ise_v2_ins(
     .rs1(            ise_in1         ),
     .rs2(            ise_in2         ),
     .rd (            elephant_ise_rd ),
     .imm(            funct[2:0]      ),
-    .op_pstep2_x(    op_pstep2_x     ),
-    .op_pstep2_y(    op_pstep2_y     )
+    .op_pstep_x(    op_pstep_x     ),
+    .op_pstep_y(    op_pstep_y     ),
+    .op_sstep  (    op_sstep       )
 );
 end else begin            : No_ELEPHANT_ISE
 assign  elephant_ise_sel =  1'b0;
