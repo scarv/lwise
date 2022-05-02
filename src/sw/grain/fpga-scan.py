@@ -16,7 +16,7 @@ def rv32( args ) :
 
     driver.run( args, 'grain', CONF, 'rv32', 'nist', NIST_IMP = 'x64' )
 
-  for TYPE in [ 'GRAIN_RV32_TYPE1' ] :
+  for TYPE in [ 'GRAIN_RV32_TYPE1', 'GRAIN_RV32_TYPE2'] :
     CONF = [ TYPE ]
     CONF += [ 'GRAIN_RV32_UNROLL' ]
     CONF += ['DRIVER_TEST_BYPASS']
