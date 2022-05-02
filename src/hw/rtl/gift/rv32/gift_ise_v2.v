@@ -1,11 +1,11 @@
-module gift_ise(
+module gift_ise_v2(
 input  wire [31:0]  rs1,
 input  wire [31:0]  rs2,
 input  wire [ 4:0]  imm,
 
-input  wire         op_keyupdate, 
-input  wire         op_keyarrange,
-input  wire         op_fskeyupdate, //FixslicedKeyUpdate
+input  wire         op_key_reorg,
+input  wire         op_key_updstd, 
+input  wire         op_key_updfix, //FixslicedKeyUpdate
 input  wire         op_swapmove,
 input  wire         op_rori_n,      //used in Fixsliced
 input  wire         op_rori_b,      //used in Fixsliced
@@ -14,7 +14,6 @@ input  wire         op_rori_h,      //used in Fixsliced
 
 output wire [31:0]  rd
 );
-parameter [0:0] FIXSLICE = 1'b1;
 
 `define rotmsk( x, A, M )    ({ x[ A-1:0], x[31: A] } & M)                  //right rotation and mask
 `define mskshl( x, A, M )    ({ x[31-A:0],{A{ 1'b0}}} &(M<<A))
@@ -59,13 +58,13 @@ wire [31:0] rs1_rsh   = `rsh(rs1, imm, rsh0);
 wire [31:0] rt1_lsh   = `lsh(rt1, imm, lsh0);
 
 
-wire [31:0] keyupdate = `shrmsk(rs1, 12, 32'h0000000f) | `mskshl(rs1,  4, 32'h00000fff) |
+wire [31:0] key_updstd = `shrmsk(rs1, 12, 32'h0000000f) | `mskshl(rs1,  4, 32'h00000fff) |
                         `shrmsk(rs1,  2, 32'h3fff0000) | `mskshl(rs1, 14, 32'h00030000) ;                        
              
-wire keyarrange_0 = op_keyarrange && (imm == 0);  
-wire keyarrange_1 = op_keyarrange && (imm == 1);  
-wire keyarrange_2 = op_keyarrange && (imm == 2);  
-wire keyarrange_3 = op_keyarrange && (imm == 3);  
+wire key_reorg_0 = op_key_reorg && (imm == 0);  
+wire key_reorg_1 = op_key_reorg && (imm == 1);  
+wire key_reorg_2 = op_key_reorg && (imm == 2);  
+wire key_reorg_3 = op_key_reorg && (imm == 3);  
 
 wire [31:0]  ka00 = `swapmvc(rs1 ,  9, 32'h00550055, _ka00);
 wire [31:0]  ka01 = `swapmvc(ka00, 18, 32'h00003333, _ka01);
@@ -87,24 +86,22 @@ wire [31:0]  ka31 = `swapmvc(ka30,  6, 32'h00cc00cc, _ka31);
 wire [31:0]  ka32 = `swapmvc(ka31, 12, 32'h0000f0f0, _ka32);
 wire [31:0]  ka3  = `swapmvc(ka32, 24, 32'h000000ff, _ka33);
 
-wire [31:0] fskeyupdate;
+wire [31:0] key_updfix;
 wire [31:0] swapmove;
 wire [31:0] rori_h;
 wire [31:0] rori_b;
 wire [31:0] rori_n;
 
-generate 
-    if (FIXSLICE[0] == 1'b1) begin :                                                      FIXSLICE_IMP
-wire     fskeyupdate_0 = op_fskeyupdate && (imm == 0);  
-wire     fskeyupdate_1 = op_fskeyupdate && (imm == 1);  
-wire     fskeyupdate_2 = op_fskeyupdate && (imm == 2);  
-wire     fskeyupdate_3 = op_fskeyupdate && (imm == 3);  
-wire     fskeyupdate_4 = op_fskeyupdate && (imm == 4);  
-wire     fskeyupdate_5 = op_fskeyupdate && (imm == 5);  
-wire     fskeyupdate_6 = op_fskeyupdate && (imm == 6);  
-wire     fskeyupdate_7 = op_fskeyupdate && (imm == 7);  
-wire     fskeyupdate_8 = op_fskeyupdate && (imm == 8);  
-wire     fskeyupdate_9 = op_fskeyupdate && (imm == 9);  
+wire     key_updfix_0 = op_key_updfix && (imm == 0);  
+wire     key_updfix_1 = op_key_updfix && (imm == 1);  
+wire     key_updfix_2 = op_key_updfix && (imm == 2);  
+wire     key_updfix_3 = op_key_updfix && (imm == 3);  
+wire     key_updfix_4 = op_key_updfix && (imm == 4);  
+wire     key_updfix_5 = op_key_updfix && (imm == 5);  
+wire     key_updfix_6 = op_key_updfix && (imm == 6);  
+wire     key_updfix_7 = op_key_updfix && (imm == 7);  
+wire     key_updfix_8 = op_key_updfix && (imm == 8);  
+wire     key_updfix_9 = op_key_updfix && (imm == 9);  
 
 wire [31:0]        rt0 = `swapmvc(rs1, 16, 32'h00003333, _rt0);
 wire [31:0] fs_upkey_0 = `swapmvc(rt0,  1, 32'h55554444, _fs0);
@@ -135,16 +132,16 @@ wire [31:0] fs_upkey_8 = `shrmsk(rs1,  4, 32'h0fff0000) | `mskshl(rs1, 12, 32'h0
 wire [31:0] fs_upkey_9 = `shrmsk(rs1,  6, 32'h03ff0000) | `mskshl(rs1, 10, 32'h003f0000) |
                          `shrmsk(rs1,  4, 32'h00000fff) | `mskshl(rs1, 12, 32'h0000000f) ;
 
-assign fskeyupdate = {32{ fskeyupdate_0 }} & fs_upkey_0 |
-                     {32{ fskeyupdate_1 }} & fs_upkey_1 |
-                     {32{ fskeyupdate_2 }} & fs_upkey_2 |
-                     {32{ fskeyupdate_3 }} & fs_upkey_3 |
-                     {32{ fskeyupdate_4 }} & fs_upkey_4 |
-                     {32{ fskeyupdate_5 }} & fs_upkey_5 |
-                     {32{ fskeyupdate_6 }} & fs_upkey_6 |
-                     {32{ fskeyupdate_7 }} & fs_upkey_7 |
-                     {32{ fskeyupdate_8 }} & fs_upkey_8 |
-                     {32{ fskeyupdate_9 }} & fs_upkey_9 ;
+assign key_updfix = {32{ key_updfix_0 }} & fs_upkey_0 |
+                    {32{ key_updfix_1 }} & fs_upkey_1 |
+                    {32{ key_updfix_2 }} & fs_upkey_2 |
+                    {32{ key_updfix_3 }} & fs_upkey_3 |
+                    {32{ key_updfix_4 }} & fs_upkey_4 |
+                    {32{ key_updfix_5 }} & fs_upkey_5 |
+                    {32{ key_updfix_6 }} & fs_upkey_6 |
+                    {32{ key_updfix_7 }} & fs_upkey_7 |
+                    {32{ key_updfix_8 }} & fs_upkey_8 |
+                    {32{ key_updfix_9 }} & fs_upkey_9 ;
 
 assign  swapmove  = `swapmv(rs1, rs1_rsh, rs2, rt1, rt1_lsh);
 
@@ -163,26 +160,17 @@ assign  rori_n[4*4 +: 4] = `rori4( rs1, imm, 4, i4_4 );
 assign  rori_n[3*4 +: 4] = `rori4( rs1, imm, 3, i4_3 );
 assign  rori_n[2*4 +: 4] = `rori4( rs1, imm, 2, i4_2 );
 assign  rori_n[1*4 +: 4] = `rori4( rs1, imm, 1, i4_1 );
-assign  rori_n[0   +: 4] = `rori4( rs1, imm, 0, i4_0 );
+assign  rori_n[0   +: 4] = `rori4( rs1, imm, 0, i4_0 );           
 
-end else begin       :                                                                      No_FIXSLICE
-assign fskeyupdate = 32'd0;
-assign swapmove    = 32'b0;
-assign rori_h      = 32'd0;
-assign rori_b      = 32'd0;
-assign rori_n      = 32'd0;
-end
-endgenerate              
-
-assign        rd  = {32{keyarrange_0  }} & ka0         |
-                    {32{keyarrange_1  }} & ka1         |
-                    {32{keyarrange_2  }} & ka2         |
-                    {32{keyarrange_3  }} & ka3         |
-                    {32{op_keyupdate  }} & keyupdate   |
-                    {32{op_fskeyupdate}} & fskeyupdate |
-                    {32{op_swapmove   }} & swapmove    |
-                    {32{op_rori_n     }} & rori_n      |
-                    {32{op_rori_b     }} & rori_b      |
-                    {32{op_rori_h     }} & rori_h      ;   
+assign        rd  = {32{key_reorg_0   }} & ka0        |
+                    {32{key_reorg_1   }} & ka1        |
+                    {32{key_reorg_2   }} & ka2        |
+                    {32{key_reorg_3   }} & ka3        |
+                    {32{op_key_updstd }} & key_updstd |
+                    {32{op_key_updfix }} & key_updfix |
+                    {32{op_swapmove   }} & swapmove   |
+                    {32{op_rori_n     }} & rori_n     |
+                    {32{op_rori_b     }} & rori_b     |
+                    {32{op_rori_h     }} & rori_h     ;   
 endmodule
 
