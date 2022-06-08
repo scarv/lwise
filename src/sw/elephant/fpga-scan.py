@@ -12,14 +12,14 @@ def rv32( args ) :
   if ( args.prog ) :
     driver.program_fpga( args, 'elephant', 'rv32', 'xalu' )
   if ( args.nist ) :
-    CONF = ['DRIVER_TEST_BYPASS']
+    CONF = ['DRIVER_BYPASS_TEST']
     driver.run( args, 'elephant', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
 
   for TYPE in [ 'ELEPHANT_RV32_TYPE1', 'ELEPHANT_RV32_TYPE2' ] :
     CONF = [TYPE]
     # there is only unrolled implementation for Elephant on rv32
     CONF += ['ELEPHANT_RV32_UNROLL']
-    CONF += ['DRIVER_TEST_BYPASS']
+    CONF += ['DRIVER_BYPASS_TEST']
     driver.run( args, 'elephant', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------

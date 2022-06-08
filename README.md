@@ -138,6 +138,8 @@ such as execution latency.*
   | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness (rather than `rand`)                                                      |
   | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase (default is   `10`) |
   | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase (default is `1000`) |
+  | `DRIVER_BYPASS_TEST` | bypass the driver phase for verification, e.g., vs. the KAT material                                                  |
+  | `DRIVER_BYPASS_TIME` | bypass the driver phase for   evaluation, i.e., measurement of execution latency                                      |
   | `DRIVER_SIZEOF_A`    | number of bytes in `a`, i.e., additional data                                                     (default is   `16`) |
   | `DRIVER_SIZEOF_M`    | number of bytes in `m`, i.e.,  plaintext data                                                     (default is   `16`) |
 

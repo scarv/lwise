@@ -13,14 +13,14 @@ def rv32( args ) :
     driver.program_fpga( args, 'xoodyak', 'rv32', 'xalu' )
 
   if ( args.nist ) :
-    CONF = [ 'DRIVER_TEST_BYPASS'  ]  
+    CONF = [ 'DRIVER_BYPASS_TEST'  ]  
     driver.run( args, 'xoodyak', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
 
   for TYPE in [ 'XOODYAK_RV32_TYPE1', 'XOODYAK_RV32_TYPE2' ] :
     CONF = [ TYPE ]
     # there is only unrolled implementation for Xoodyak on rv32
     CONF += [ 'XOODYAK_RV32_UNROLL' ]    
-    CONF += [ 'DRIVER_TEST_BYPASS'  ]  
+    CONF += [ 'DRIVER_BYPASS_TEST'  ]  
     driver.run( args, 'xoodyak', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------

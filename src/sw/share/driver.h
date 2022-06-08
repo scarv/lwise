@@ -13,7 +13,7 @@
 #include "share.h"
 #include "rdtsc.h"
 
-#ifndef DRIVER_TEST_BYPASS
+#if !defined( DRIVER_BYPASS_TEST )
 #include   "kat.h"
 #endif
 

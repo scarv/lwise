@@ -13,7 +13,7 @@ def rv32( args ) :
     driver.program_fpga( args, 'romulus', 'rv32', 'xalu' )
 
   if ( args.nist ) :
-    CONF  = [ 'DRIVER_TEST_BYPASS'  ]
+    CONF  = [ 'DRIVER_BYPASS_TEST'  ]
     driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'ref'            )
     driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'fixslice_opt32' )
 
@@ -22,11 +22,11 @@ def rv32( args ) :
     # this flag will not be used in code but will be used in kernel measurement
     CONF += [ 'ROMULUS_LUT' ]
     CONF += [ 'ROMULUS_RV32_UNROLL' ]
-    CONF += [ 'DRIVER_TEST_BYPASS'  ]
+    CONF += [ 'DRIVER_BYPASS_TEST'  ]
     driver.run( args, 'romulus', CONF, 'rv32', 'rv32', NIST_IMP = 'ref'            )
 
 #  if ( args.nist ) :
-#    CONF = [ 'DRIVER_TEST_BYPASS'   ]
+#    CONF = [ 'DRIVER_BYPASS_TEST'   ]
 #    driver.run( args, 'romulus', CONF, 'rv32', 'nist', NIST_IMP = 'fixslice_opt32' )
 
   for TYPE in [ 'ROMULUS_RV32_TYPE1', 'ROMULUS_RV32_TYPE3' ] :
@@ -34,7 +34,7 @@ def rv32( args ) :
     # this flag will not be used in code but will be used in kernel measurement
     CONF += [ 'ROMULUS_FIXSLICING'  ]
     CONF += [ 'ROMULUS_RV32_UNROLL' ]
-    CONF += [ 'DRIVER_TEST_BYPASS'  ]
+    CONF += [ 'DRIVER_BYPASS_TEST'  ]
     driver.run( args, 'romulus', CONF, 'rv32', 'rv32', NIST_IMP = 'fixslice_opt32' )
 
 # -----------------------------------------------------------------------------

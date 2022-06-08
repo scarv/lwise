@@ -13,14 +13,14 @@ def rv32( args ) :
     driver.program_fpga( args, 'photon', 'rv32', 'xalu' )
 
   if ( args.nist ) :
-    CONF = ['DRIVER_TEST_BYPASS']
+    CONF = ['DRIVER_BYPASS_TEST']
     driver.run( args, 'photon', CONF, 'rv32', 'nist', NIST_IMP = 'ref'           )
 
 
   for TYPE in [ 'PHOTON_RV32_TYPE1', 'PHOTON_RV32_TYPE2' ] :
     CONF = [ TYPE ]
     CONF += [ 'PHOTON_RV32_UNROLL' ]
-    CONF += [ 'DRIVER_TEST_BYPASS' ]
+    CONF += [ 'DRIVER_BYPASS_TEST' ]
 
     driver.run( args, 'photon', CONF, 'rv32', 'rv32' )
 

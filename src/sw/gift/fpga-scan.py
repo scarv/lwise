@@ -13,7 +13,7 @@ def rv32( args ) :
     driver.program_fpga( args, 'gift', 'rv32', 'xalu' )
 
   if ( args.nist ) :
-    CONF = ['DRIVER_TEST_BYPASS']
+    CONF = ['DRIVER_BYPASS_TEST']
     driver.run( args, 'gift', CONF, 'rv32', 'nist', NIST_IMP = 'ref' )
 
   for TYPE in [ 'GIFT_RV32_TYPE1', 'GIFT_RV32_TYPE2' ] :
@@ -21,7 +21,7 @@ def rv32( args ) :
       CONF = [ TYPE, METHOD ]
       # there is only unrolled implementation for GIFT-COFB on rv32
       CONF += ['GIFT_RV32_UNROLL']
-      CONF += ['DRIVER_TEST_BYPASS']
+      CONF += ['DRIVER_BYPASS_TEST']
 
       driver.run( args, 'gift', CONF, 'rv32', 'rv32' )
 

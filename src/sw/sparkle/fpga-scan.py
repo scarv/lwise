@@ -13,7 +13,7 @@ def rv32( args ) :
     driver.program_fpga( args, 'sparkle', 'rv32', 'xalu' )
 
   if ( args.nist ) :
-    CONF  = [ 'DRIVER_TEST_BYPASS' ]
+    CONF  = [ 'DRIVER_BYPASS_TEST' ]
     driver.run( args, 'sparkle', CONF, 'rv32', 'nist', NIST_IMP = 'opt' )
 
   for TYPE in [ 'SPARKLE_RV32_TYPE1', 'SPARKLE_RV32_TYPE2', 'SPARKLE_RV32_TYPE3', 'SPARKLE_RV32_TYPE4' ] :
@@ -21,7 +21,7 @@ def rv32( args ) :
     CONF += [ 'SPARKLE_RV32_UNROLL' ]
     CONF += [ 'SPARKLE_RV32_ELL'    ]
     CONF += [ 'SPARKLE_RV32_RCON'   ]
-    CONF += [ 'DRIVER_TEST_BYPASS'  ]  
+    CONF += [ 'DRIVER_BYPASS_TEST'  ]  
     driver.run( args, 'sparkle', CONF, 'rv32', 'rv32' )
 
 # -----------------------------------------------------------------------------
