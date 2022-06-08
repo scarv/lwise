@@ -115,6 +115,11 @@ such as execution latency.*
 
 - The build system is controlled by several environment variables:
 
+  - `${API}`
+    - role: specifies the API,            i.e., the functionality and so interface supported
+    - values: `aead`, `hash`
+    - default: `aead`
+
   - `${ALG}`
     - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/sw/${ALG}`
     - values: `ascon`, `elephant`, `gift`, `grain`, `isap`, `photon`, `romulus`, `jambu`, `sparkle`, `xoodyak`
@@ -136,8 +141,8 @@ such as execution latency.*
   | Symbol               | Meaning                                                                                                               |
   | :------------------- | :-------------------------------------------------------------------------------------------------------------------- |
   | `DRIVER_RANDOM`      | use `/dev/random` as a source of randomness (rather than `rand`)                                                      |
-  | `DRIVER_TRIALS_WARM` | number of verification trials performed by the driver during "warm-up" (i.e., non-measured) phase (default is   `10`) |
-  | `DRIVER_TRIALS_REAL` | number of verification trials performed by the driver during "real"    (i.e.,     measured) phase (default is `1000`) |
+  | `DRIVER_TRIALS_WARM` | number of trials performed by the driver during "warm-up" (i.e., non-measured) phase              (default is   `10`) |
+  | `DRIVER_TRIALS_REAL` | number of trials performed by the driver during "real"    (i.e.,     measured) phase              (default is `1000`) |
   | `DRIVER_BYPASS_TEST` | bypass the driver phase for verification, e.g., vs. the KAT material                                                  |
   | `DRIVER_BYPASS_TIME` | bypass the driver phase for   evaluation, i.e., measurement of execution latency                                      |
   | `DRIVER_SIZEOF_A`    | number of bytes in `a`, i.e., additional data                                                     (default is   `16`) |

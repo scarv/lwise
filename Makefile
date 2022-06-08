@@ -13,10 +13,12 @@ endif
 
 # =============================================================================
 
+export API  ?= aead
 export ALG  ?= sparkle
-export CONF ?=
 export ARCH ?= generic
 export IMP  ?= nist
+
+export CONF ?=
 
 # -----------------------------------------------------------------------------
 

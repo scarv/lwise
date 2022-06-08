@@ -19,11 +19,17 @@ include ./${ALG}/Makefile.in
 # include build-related content for architecture
 include ./share/arch/${ARCH}/Makefile.in
 
-# pass-through environment variable as macros for use in source code
+# parameterise source code using environment variables
+ifeq "${API}" "aead"
+GCC_FLAGS += -DAPI_AEAD
+endif
+ifeq "${API}" "hash"
+GCC_FLAGS += -DAPI_HASH
+endif
 ifeq "${IMP}" "nist"
-GCC_FLAGS += -DALG="\"${ALG}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
+GCC_FLAGS += -DAPI="\"${API}\"" -DALG="\"${ALG}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
 else
-GCC_FLAGS += -DALG="\"${ALG}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
+GCC_FLAGS += -DAPI="\"${API}\"" -DALG="\"${ALG}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
 endif
 
 # -----------------------------------------------------------------------------
@@ -57,9 +63,9 @@ ${REPO_HOME}/build/${ALG}       :
 	@mkdir --parents ${@}
 
 ${REPO_HOME}/build/${ALG}/kat.h : ${NIST_KAT}
-	@python3 ./share/kat.py --header < ${<} > ${@}
+	@python3 ./share/kat.py --api="${API}" --header < ${<} > ${@}
 ${REPO_HOME}/build/${ALG}/kat.c : ${NIST_KAT}
-	@python3 ./share/kat.py --source < ${<} > ${@}
+	@python3 ./share/kat.py --api="${API}" --source < ${<} > ${@}
 
 ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf : ${SOURCES} 
 	@${GCC_PREFIX}-gcc ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -O3 -o ${@} $(filter %.c, ${^}) $(filter %.cpp, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
@@ -72,10 +78,12 @@ ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/
 .PHONY : run debug scan
 
 dump  :
+	@echo "API        = ${API}"
 	@echo "ALG        = ${ALG}"
-	@echo "CONF       = ${CONF}"
 	@echo "ARCH       = ${ARCH}"
 	@echo "IMP        = ${IMP}"
+
+	@echo "CONF       = ${CONF}"
 
 	@echo "NIST_HOME  = ${NIST_HOME}"
 	@echo "NIST_IMP   = ${NIST_IMP}"

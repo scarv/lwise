@@ -6,6 +6,7 @@
 
 # =============================================================================
 
+ifeq "${API}" "aead"
 export NIST_HOME     ?= ${REPO_HOME}/src/sw/ascon/nist/Implementations/crypto_aead/ascon128v12
 export NIST_IMP      ?= ref
 export NIST_KAT      ?= ${NIST_HOME}/LWC_AEAD_KAT_128_128.txt
@@ -17,5 +18,12 @@ export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.cpp)
 export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.s  ) 
 export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.S  )
 export NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h  )
+endif
+
+# -----------------------------------------------------------------------------
+
+ifeq "${API}" "hash"
+
+endif
 
 # =============================================================================

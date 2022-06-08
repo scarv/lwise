@@ -68,7 +68,7 @@ void rand_bytes(           uint8_t* x, int n ) {
 
 // ============================================================================
 
-#if !defined( DRIVER_BYPASS_TEST )
+#if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TEST )
 void test_encrypt() {
   for( int i = 0; KAT[ i ].i >= 0; i++ ) {
     unsigned long long k_n = KAT[ i ].k_n; uint8_t k[ k_n ]; parse_bytes( k, KAT[ i ].k, KAT[ i ].k_n );
@@ -95,7 +95,9 @@ void test_encrypt() {
 
   printf( "!! passed\n" );
 }
+#endif
 
+#if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TEST )
 void test_decrypt() {
   for( int i = 0; KAT[ i ].i >= 0; i++ ) {
     unsigned long long k_n = KAT[ i ].k_n; uint8_t k[ k_n ]; parse_bytes( k, KAT[ i ].k, KAT[ i ].k_n );
@@ -126,7 +128,7 @@ void test_decrypt() {
 
 // ----------------------------------------------------------------------------
 
-#if !defined( DRIVER_BYPASS_TIME )
+#if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TIME )
 void time_encrypt() {
   unsigned long long k_n = DRIVER_SIZEOF_K; uint8_t k[ k_n ];
   unsigned long long n_n = DRIVER_SIZEOF_N; uint8_t n[ n_n ];
@@ -158,7 +160,9 @@ void time_encrypt() {
 
   MEASURE_EPILOGUE( crypto_aead_encrypt );
 }
+#endif
 
+#if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TIME )
 void time_decrypt() {
   unsigned long long k_n = DRIVER_SIZEOF_K; uint8_t k[ k_n ];
   unsigned long long n_n = DRIVER_SIZEOF_N; uint8_t n[ n_n ];
