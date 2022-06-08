@@ -1,0 +1,21 @@
+# Copyright (C) 2021 SCARV project <info@scarv.org>
+#
+# Use of this source code is restricted per the MIT license, a copy of which 
+# can be found at https://opensource.org/licenses/MIT (or should be included 
+# as LICENSE.txt within the associated archive or repository).
+
+# =============================================================================
+
+export NIST_HOME     ?= ${REPO_HOME}/src/sw/isap/nist/Implementations/crypto_aead/isapa128v20
+export NIST_IMP      ?= ref
+export NIST_KAT      ?= ${NIST_HOME}/LWC_AEAD_KAT_128_128.txt
+
+export NIST_INCLUDES  = ${NIST_HOME}/${NIST_IMP}
+
+export NIST_SOURCES   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c  )
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.cpp) 
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.s  ) 
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.S  )
+export NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h  )
+
+# =============================================================================

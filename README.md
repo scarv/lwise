@@ -117,7 +117,7 @@ such as execution latency.*
 
   - `${ALG}`
     - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/sw/${ALG}`
-    - values: `ascon`, `elephant`, `gift`, `grain`, `photon`, `romulus`, `jambu`, `sparkle`, `xoodyak`
+    - values: `ascon`, `elephant`, `gift`, `grain`, `isap`, `photon`, `romulus`, `jambu`, `sparkle`, `xoodyak`
     - default: `sparkle`
 
   - `${ARCH}`
