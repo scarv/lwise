@@ -17,8 +17,17 @@
 #include   "kat.h"
 #endif
 
+#if defined( API_AEAD )
 #include         "api.h"
 #include "crypto_aead.h"
+#endif
+
+#if defined( API_HASH )
+#include         "api.h"
+#include "crypto_hash.h"
+#endif
+
+#include "lwc_kernels.h"
 
 // ----------------------------------------------------------------------------
 
@@ -29,6 +38,7 @@
 #define DRIVER_TRIALS_REAL 1000
 #endif
 
+#if defined( API_AEAD )
 #if !defined( DRIVER_SIZEOF_A    )
 #define DRIVER_SIZEOF_A ( 16 )
 #endif
@@ -39,6 +49,15 @@
 #define DRIVER_SIZEOF_K ( CRYPTO_KEYBYTES )
 #define DRIVER_SIZEOF_N ( CRYPTO_NSECBYTES + CRYPTO_NPUBBYTES )
 #define DRIVER_SIZEOF_C ( DRIVER_SIZEOF_M + CRYPTO_ABYTES )
+#endif
+
+#if defined( API_HASH )
+#if !defined( DRIVER_SIZEOF_M    )
+#define DRIVER_SIZEOF_M ( 16 )
+#endif
+
+#define DRIVER_SIZEOF_D ( CRYPTO_BYTES )
+#endif
 
 // ----------------------------------------------------------------------------
 

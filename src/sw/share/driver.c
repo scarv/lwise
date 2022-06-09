@@ -6,7 +6,6 @@
  */
 
 #include "driver.h"
-#include "lwc_kernels.h"
 
 // ============================================================================
 
@@ -25,6 +24,8 @@ void parse_bytes( uint8_t* r, char* x, int n ) {
 }
 
 void dump_bytes( uint8_t* x, int n ) {
+ printf( "%02X:", n );
+
   for( int i = ( n - 1 ); i >= 0; i-- ) {
     printf( "%02X", x[ i ] );
   }
@@ -80,7 +81,7 @@ void test_encrypt() {
     unsigned long long t_n;                uint8_t t[ m_n + CRYPTO_ABYTES ];
 
     if( ( 0 != crypto_aead_encrypt( t, &t_n, m, m_n, a, a_n, NULL, n, k ) ) || ( t_n != c_n ) || memcmp( t, c, c_n * sizeof( uint8_t ) ) ) {
-      printf( "!! failed encrypt KAT %ld\n", KAT[ i ].i );
+      printf( "!! failed " "encrypt" " KAT %ld\n", KAT[ i ].i );
 
       dump_bytes( k, k_n );
       dump_bytes( n, n_n );
@@ -109,13 +110,38 @@ void test_decrypt() {
     unsigned long long t_n;                uint8_t t[ c_n                 ];
 
     if( ( 0 != crypto_aead_decrypt( t, &t_n, NULL, c, c_n, a, a_n, n, k ) ) || ( t_n != m_n ) || memcmp( t, m, m_n * sizeof( uint8_t ) ) ) {
-      printf( "!! failed decrypt KAT %ld\n", KAT[ i ].i );
+      printf( "!! failed " "decrypt" " KAT %ld\n", KAT[ i ].i );
 
       dump_bytes( k, k_n );
       dump_bytes( n, n_n );
       dump_bytes( a, a_n );
       dump_bytes( m, m_n );
       dump_bytes( c, c_n );
+      dump_bytes( t, t_n );
+
+      abort();
+    }
+  }
+
+  printf( "!! passed\n" );
+}
+#endif
+
+// ----------------------------------------------------------------------------
+
+#if defined( API_HASH ) && !defined( DRIVER_BYPASS_TEST )
+void test_hash() {
+  for( int i = 0; KAT[ i ].i >= 0; i++ ) {
+    unsigned long long m_n = KAT[ i ].m_n; uint8_t m[ m_n ]; parse_bytes( m, KAT[ i ].m, KAT[ i ].m_n );
+    unsigned long long d_n = KAT[ i ].d_n; uint8_t d[ d_n ]; parse_bytes( d, KAT[ i ].d, KAT[ i ].d_n );
+
+    unsigned long long t_n =          d_n; uint8_t t[ d_n                 ];
+
+    if( ( 0 != crypto_hash( t, m, m_n ) ) || memcmp( t, d, d_n * sizeof( uint8_t ) ) ) {
+      printf( "!! failed " "hash"    " KAT %ld\n", KAT[ i ].i );
+
+      dump_bytes( m, m_n );
+      dump_bytes( d, d_n );
       dump_bytes( t, t_n );
 
       abort();
@@ -198,31 +224,68 @@ void time_decrypt() {
 
 // ----------------------------------------------------------------------------
 
+#if defined( API_HASH ) && !defined( DRIVER_BYPASS_TIME )
+void time_hash() {
+  unsigned long long d_n = DRIVER_SIZEOF_D; uint8_t d[ d_n ];
+  unsigned long long m_n = DRIVER_SIZEOF_M; uint8_t m[ m_n ];
+
+  int trials_warm = DRIVER_TRIALS_WARM;
+  int trials_real = DRIVER_TRIALS_REAL;
+
+  int trials      = trials_warm + trials_real;
+
+  printf( "sizeof( d ) = %llu\n", d_n );
+  printf( "sizeof( m ) = %llu\n", m_n );
+
+  MEASURE_PROLOGUE( crypto_hash );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes( m, m_n );
+
+    MEASURE_STEP( crypto_hash, d, m, m_n );
+  }
+
+  MEASURE_EPILOGUE( crypto_hash );
+}
+#endif
+
+// ----------------------------------------------------------------------------
+
 int main( int argc, char* argv[] ) {
   rand_bytes_init();
 
-#if !defined( DRIVER_BYPASS_TEST )
-  printf( "++ test : encrypt\n" );
+#if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TEST )
+  printf( "++ test : encrypt" "\n" );
   test_encrypt();
-  printf( "-- test : encrypt\n" );
+  printf( "-- test : encrypt" "\n" );
 
-  printf( "++ test : decrypt\n" );
+  printf( "++ test : decrypt" "\n" );
   test_decrypt();
-  printf( "-- test : decrypt\n" );
+  printf( "-- test : decrypt" "\n" );
+#endif
+#if defined( API_HASH ) && !defined( DRIVER_BYPASS_TEST )
+  printf( "++ test : hash"    "\n" );
+  test_hash();
+  printf( "-- test : hash"    "\n" );
 #endif
 
-#if !defined( DRIVER_BYPASS_TIME )
-  printf( "++ time : encrypt\n" );
+#if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TIME )
+  printf( "++ time : encrypt" "\n" );
   time_encrypt();
-  printf( "-- time : encrypt\n" );
+  printf( "-- time : encrypt" "\n" );
 
-  printf( "++ time : decrypt\n" );
+  printf( "++ time : decrypt" "\n" );
   time_decrypt();
-  printf( "-- time : decrypt\n" );
+  printf( "-- time : decrypt" "\n" );
 
-  printf( "++ time : kernel\n" );
+  printf( "++ time : kernel"  "\n" );
   time_kernel();
-  printf( "-- time : kernel\n" );
+  printf( "-- time : kernel"  "\n" );
+#endif
+#if defined( API_HASH ) && !defined( DRIVER_BYPASS_TIME )
+  printf( "++ time : hash"    "\n" );
+  time_hash();
+  printf( "-- time : hash"    "\n" );
 #endif
 
   rand_bytes_fini();

@@ -7,7 +7,7 @@
 # =============================================================================
 
 ifeq "${API}" "aead"
-export NIST_HOME     ?= ${REPO_HOME}/src/sw/isap/nist/Implementations/crypto_aead/isapa128v20
+export NIST_HOME     ?= ${REPO_HOME}/src/sw/isap/nist/Implementations/crypto_aead/isapa128av20
 export NIST_IMP      ?= ref
 export NIST_KAT      ?= ${NIST_HOME}/LWC_AEAD_KAT_128_128.txt
 
@@ -23,7 +23,17 @@ endif
 # -----------------------------------------------------------------------------
 
 ifeq "${API}" "hash"
+export NIST_HOME     ?= ${REPO_HOME}/src/sw/isap/nist/Implementations/crypto_aead_hash/isapa128ahv20
+export NIST_IMP      ?= ref
+export NIST_KAT      ?= ${NIST_HOME}/LWC_HASH_KAT_256.txt
 
+export NIST_INCLUDES  = ${NIST_HOME}/${NIST_IMP}
+
+export NIST_SOURCES   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c  )
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.cpp) 
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.s  ) 
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.S  )
+export NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h  )
 endif
 
 # =============================================================================
