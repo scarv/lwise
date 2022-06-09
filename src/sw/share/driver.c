@@ -33,7 +33,7 @@ void dump_bytes( uint8_t* x, int n ) {
   printf( "\n" );
 }
 
-#if  defined( DRIVER_RANDOM )
+#if defined( DRIVER_RANDOM )
 FILE* rand_bytes_prg = NULL;
 
 void rand_bytes_init() {
@@ -71,17 +71,17 @@ void rand_bytes(           uint8_t* x, int n ) {
 
 #if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TEST )
 void test_encrypt() {
-  for( int i = 0; KAT[ i ].i >= 0; i++ ) {
-    unsigned long long k_n = KAT[ i ].k_n; uint8_t k[ k_n ]; parse_bytes( k, KAT[ i ].k, KAT[ i ].k_n );
-    unsigned long long n_n = KAT[ i ].n_n; uint8_t n[ n_n ]; parse_bytes( n, KAT[ i ].n, KAT[ i ].n_n );
-    unsigned long long a_n = KAT[ i ].a_n; uint8_t a[ a_n ]; parse_bytes( a, KAT[ i ].a, KAT[ i ].a_n );
-    unsigned long long m_n = KAT[ i ].m_n; uint8_t m[ m_n ]; parse_bytes( m, KAT[ i ].m, KAT[ i ].m_n );
-    unsigned long long c_n = KAT[ i ].c_n; uint8_t c[ c_n ]; parse_bytes( c, KAT[ i ].c, KAT[ i ].c_n );
+  for( int i = 0; KAT_AEAD[ i ].i >= 0; i++ ) {
+    unsigned long long k_n = KAT_AEAD[ i ].k_n; uint8_t k[ k_n ]; parse_bytes( k, KAT_AEAD[ i ].k, KAT_AEAD[ i ].k_n );
+    unsigned long long n_n = KAT_AEAD[ i ].n_n; uint8_t n[ n_n ]; parse_bytes( n, KAT_AEAD[ i ].n, KAT_AEAD[ i ].n_n );
+    unsigned long long a_n = KAT_AEAD[ i ].a_n; uint8_t a[ a_n ]; parse_bytes( a, KAT_AEAD[ i ].a, KAT_AEAD[ i ].a_n );
+    unsigned long long m_n = KAT_AEAD[ i ].m_n; uint8_t m[ m_n ]; parse_bytes( m, KAT_AEAD[ i ].m, KAT_AEAD[ i ].m_n );
+    unsigned long long c_n = KAT_AEAD[ i ].c_n; uint8_t c[ c_n ]; parse_bytes( c, KAT_AEAD[ i ].c, KAT_AEAD[ i ].c_n );
 
-    unsigned long long t_n;                uint8_t t[ m_n + CRYPTO_ABYTES ];
+    unsigned long long t_n;                     uint8_t t[ m_n + CRYPTO_ABYTES ];
 
     if( ( 0 != crypto_aead_encrypt( t, &t_n, m, m_n, a, a_n, NULL, n, k ) ) || ( t_n != c_n ) || memcmp( t, c, c_n * sizeof( uint8_t ) ) ) {
-      printf( "!! failed " "encrypt" " KAT %ld\n", KAT[ i ].i );
+      printf( "!! failed " "encrypt" " KAT %ld\n", KAT_AEAD[ i ].i );
 
       dump_bytes( k, k_n );
       dump_bytes( n, n_n );
@@ -100,17 +100,17 @@ void test_encrypt() {
 
 #if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TEST )
 void test_decrypt() {
-  for( int i = 0; KAT[ i ].i >= 0; i++ ) {
-    unsigned long long k_n = KAT[ i ].k_n; uint8_t k[ k_n ]; parse_bytes( k, KAT[ i ].k, KAT[ i ].k_n );
-    unsigned long long n_n = KAT[ i ].n_n; uint8_t n[ n_n ]; parse_bytes( n, KAT[ i ].n, KAT[ i ].n_n );
-    unsigned long long a_n = KAT[ i ].a_n; uint8_t a[ a_n ]; parse_bytes( a, KAT[ i ].a, KAT[ i ].a_n );
-    unsigned long long m_n = KAT[ i ].m_n; uint8_t m[ m_n ]; parse_bytes( m, KAT[ i ].m, KAT[ i ].m_n );
-    unsigned long long c_n = KAT[ i ].c_n; uint8_t c[ c_n ]; parse_bytes( c, KAT[ i ].c, KAT[ i ].c_n );
+  for( int i = 0; KAT_AEAD[ i ].i >= 0; i++ ) {
+    unsigned long long k_n = KAT_AEAD[ i ].k_n; uint8_t k[ k_n ]; parse_bytes( k, KAT_AEAD[ i ].k, KAT_AEAD[ i ].k_n );
+    unsigned long long n_n = KAT_AEAD[ i ].n_n; uint8_t n[ n_n ]; parse_bytes( n, KAT_AEAD[ i ].n, KAT_AEAD[ i ].n_n );
+    unsigned long long a_n = KAT_AEAD[ i ].a_n; uint8_t a[ a_n ]; parse_bytes( a, KAT_AEAD[ i ].a, KAT_AEAD[ i ].a_n );
+    unsigned long long m_n = KAT_AEAD[ i ].m_n; uint8_t m[ m_n ]; parse_bytes( m, KAT_AEAD[ i ].m, KAT_AEAD[ i ].m_n );
+    unsigned long long c_n = KAT_AEAD[ i ].c_n; uint8_t c[ c_n ]; parse_bytes( c, KAT_AEAD[ i ].c, KAT_AEAD[ i ].c_n );
 
-    unsigned long long t_n;                uint8_t t[ c_n                 ];
+    unsigned long long t_n;                     uint8_t t[ c_n                 ];
 
     if( ( 0 != crypto_aead_decrypt( t, &t_n, NULL, c, c_n, a, a_n, n, k ) ) || ( t_n != m_n ) || memcmp( t, m, m_n * sizeof( uint8_t ) ) ) {
-      printf( "!! failed " "decrypt" " KAT %ld\n", KAT[ i ].i );
+      printf( "!! failed " "decrypt" " KAT %ld\n", KAT_AEAD[ i ].i );
 
       dump_bytes( k, k_n );
       dump_bytes( n, n_n );
@@ -131,14 +131,14 @@ void test_decrypt() {
 
 #if defined( API_HASH ) && !defined( DRIVER_BYPASS_TEST )
 void test_hash() {
-  for( int i = 0; KAT[ i ].i >= 0; i++ ) {
-    unsigned long long m_n = KAT[ i ].m_n; uint8_t m[ m_n ]; parse_bytes( m, KAT[ i ].m, KAT[ i ].m_n );
-    unsigned long long d_n = KAT[ i ].d_n; uint8_t d[ d_n ]; parse_bytes( d, KAT[ i ].d, KAT[ i ].d_n );
+  for( int i = 0; KAT_HASH[ i ].i >= 0; i++ ) {
+    unsigned long long m_n = KAT_HASH[ i ].m_n; uint8_t m[ m_n ]; parse_bytes( m, KAT_HASH[ i ].m, KAT_HASH[ i ].m_n );
+    unsigned long long d_n = KAT_HASH[ i ].d_n; uint8_t d[ d_n ]; parse_bytes( d, KAT_HASH[ i ].d, KAT_HASH[ i ].d_n );
 
-    unsigned long long t_n =          d_n; uint8_t t[ d_n                 ];
+    unsigned long long t_n =               d_n; uint8_t t[ d_n                 ];
 
     if( ( 0 != crypto_hash( t, m, m_n ) ) || memcmp( t, d, d_n * sizeof( uint8_t ) ) ) {
-      printf( "!! failed " "hash"    " KAT %ld\n", KAT[ i ].i );
+      printf( "!! failed " "hash"    " KAT %ld\n", KAT_HASH[ i ].i );
 
       dump_bytes( m, m_n );
       dump_bytes( d, d_n );
@@ -254,7 +254,7 @@ void time_hash() {
 int main( int argc, char* argv[] ) {
   rand_bytes_init();
 
-#if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TEST )
+  #if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TEST )
   printf( "++ test : encrypt" "\n" );
   test_encrypt();
   printf( "-- test : encrypt" "\n" );
@@ -262,14 +262,15 @@ int main( int argc, char* argv[] ) {
   printf( "++ test : decrypt" "\n" );
   test_decrypt();
   printf( "-- test : decrypt" "\n" );
-#endif
-#if defined( API_HASH ) && !defined( DRIVER_BYPASS_TEST )
+  #endif
+
+  #if defined( API_HASH ) && !defined( DRIVER_BYPASS_TEST )
   printf( "++ test : hash"    "\n" );
   test_hash();
   printf( "-- test : hash"    "\n" );
-#endif
+  #endif
 
-#if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TIME )
+  #if defined( API_AEAD ) && !defined( DRIVER_BYPASS_TIME )
   printf( "++ time : encrypt" "\n" );
   time_encrypt();
   printf( "-- time : encrypt" "\n" );
@@ -281,12 +282,13 @@ int main( int argc, char* argv[] ) {
   printf( "++ time : kernel"  "\n" );
   time_kernel();
   printf( "-- time : kernel"  "\n" );
-#endif
-#if defined( API_HASH ) && !defined( DRIVER_BYPASS_TIME )
+  #endif
+
+  #if defined( API_HASH ) && !defined( DRIVER_BYPASS_TIME )
   printf( "++ time : hash"    "\n" );
   time_hash();
   printf( "-- time : hash"    "\n" );
-#endif
+  #endif
 
   rand_bytes_fini();
 

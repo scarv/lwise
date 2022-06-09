@@ -13,18 +13,20 @@
 #include "share.h"
 #include "rdtsc.h"
 
-#if !defined( DRIVER_BYPASS_TEST )
-#include   "kat.h"
-#endif
-
-#if defined( API_AEAD )
+#if  defined( API_AEAD )
 #include         "api.h"
 #include "crypto_aead.h"
+#if !defined( DRIVER_BYPASS_TEST )
+#include    "kat_aead.h"
+#endif
 #endif
 
-#if defined( API_HASH )
+#if  defined( API_HASH )
 #include         "api.h"
 #include "crypto_hash.h"
+#if !defined( DRIVER_BYPASS_TEST )
+#include    "kat_hash.h"
+#endif
 #endif
 
 #include "lwc_kernels.h"

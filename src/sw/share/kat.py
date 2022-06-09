@@ -14,32 +14,42 @@ def array( xs ) :
 # -----------------------------------------------------------------------------
 
 def generate_header() :
-  print( '#ifndef __KAT_H'          )
-  print( '#define __KAT_H'          )
-
-  print( '#include <stddef.h>'      )
-  print( '#include <stdint.h>'      )
-
   if   ( args.api == 'aead' ) :
-    print( 'typedef struct {'         )
+    print( '#ifndef __KAT_AEAD_H'               )
+    print( '#define __KAT_AEAD_H'               )
+
+    print( '#include <stddef.h>'                )
+    print( '#include <stdint.h>'                )
+
+    print( 'typedef struct {'                   )
     print( '                long            i;' )
     print( '  unsigned long long k_n; char* k;' )
     print( '  unsigned long long n_n; char* n;' )
     print( '  unsigned long long a_n; char* a;' )
     print( '  unsigned long long m_n; char* m;' )
     print( '  unsigned long long c_n; char* c;' )
-    print( '} kat_t;'                 )
+    print( '} kat_aead_t;'                      )
+
+    print( 'extern kat_aead_t KAT_AEAD[];'      )
+
+    print( '#endif'                             )
 
   elif ( args.api == 'hash' ) :
-    print( 'typedef struct {'         )
+    print( '#ifndef __KAT_HASH_H'               )
+    print( '#define __KAT_HASH_H'               )
+
+    print( '#include <stddef.h>'                )
+    print( '#include <stdint.h>'                )
+
+    print( 'typedef struct {'                   )
     print( '                long            i;' )
     print( '  unsigned long long m_n; char* m;' )
     print( '  unsigned long long d_n; char* d;' )
-    print( '} kat_t;'                 )
+    print( '} kat_hash_t;'                      )
 
-  print( 'extern kat_t KAT[];'      )
+    print( 'extern kat_hash_t KAT_HASH[];'      )
 
-  print( '#endif'                   )
+    print( '#endif'                             )
 
 # -----------------------------------------------------------------------------
 
@@ -94,9 +104,15 @@ def generate_source() :
   elif ( args.api == 'hash' ) :
     rs.append( { 'i' : -1, 'm' : None, 'd' : None                                     } )
 
-  print( '#include "kat.h"' );
+  if   ( args.api == 'aead' ) :
+    print( '#include "kat_aead.h"' )
 
-  print( 'kat_t KAT[] = {' );
+    print( 'kat_aead_t KAT_AEAD[] = {' );
+
+  elif ( args.api == 'hash' ) :
+    print( '#include "kat_hash.h"' )
+
+    print( 'kat_hash_t KAT_HASH[] = {' );
   
   for ( i, r ) in enumerate( rs ) :
     if ( i != 0 ) :

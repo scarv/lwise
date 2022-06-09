@@ -14,6 +14,7 @@ endif
 # =============================================================================
 
 export ALG  ?= sparkle
+
 export API  ?= aead
 export ARCH ?= generic
 export IMP  ?= nist

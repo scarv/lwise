@@ -48,29 +48,29 @@ export LWISE_HEADERS  += $(wildcard $(addsuffix /*.h,   ${LWISE_INCLUDES}))
 
 export       INCLUDES := ${LWISE_INCLUDES} ${NIST_INCLUDES}
 
-export       SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/${ALG}/kat.c 
-export       HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/${ALG}/kat.h 
+export       SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/${ALG}/kat_${API}.c 
+export       HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/${ALG}/kat_${API}.h 
 
 export       TARGETS  += ${REPO_HOME}/build/${ALG}
-export       TARGETS  += ${REPO_HOME}/build/${ALG}/kat.h
-export       TARGETS  += ${REPO_HOME}/build/${ALG}/kat.c
-export       TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
-export       TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm
+export       TARGETS  += ${REPO_HOME}/build/${ALG}/kat_${API}.h
+export       TARGETS  += ${REPO_HOME}/build/${ALG}/kat_${API}.c
+export       TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${API}_${ARCH}_${IMP}.elf
+export       TARGETS  += ${REPO_HOME}/build/${ALG}/driver-${API}_${ARCH}_${IMP}.asm
 
 # -----------------------------------------------------------------------------
 
 ${REPO_HOME}/build/${ALG}       :
 	@mkdir --parents ${@}
 
-${REPO_HOME}/build/${ALG}/kat.h : ${NIST_KAT}
+${REPO_HOME}/build/${ALG}/kat_${API}.h : ${NIST_KAT}
 	@python3 ./share/kat.py --api="${API}" --header < ${<} > ${@}
-${REPO_HOME}/build/${ALG}/kat.c : ${NIST_KAT}
+${REPO_HOME}/build/${ALG}/kat_${API}.c : ${NIST_KAT}
 	@python3 ./share/kat.py --api="${API}" --source < ${<} > ${@}
 
-${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf : ${SOURCES} 
+${REPO_HOME}/build/${ALG}/driver-${API}_${ARCH}_${IMP}.elf : ${SOURCES} 
 	@${GCC_PREFIX}-gcc ${GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${INCLUDES}) -std='gnu99' -O3 -o ${@} $(filter %.c, ${^}) $(filter %.cpp, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
 
-${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.elf
+${REPO_HOME}/build/${ALG}/driver-${API}_${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/driver-${API}_${ARCH}_${IMP}.elf
 	@${GCC_PREFIX}-objdump --disassemble-all ${<} > ${@}
 
 # -----------------------------------------------------------------------------
@@ -79,6 +79,7 @@ ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/
 
 dump  :
 	@echo "ALG        = ${ALG}"
+
 	@echo "API        = ${API}"
 	@echo "ARCH       = ${ARCH}"
 	@echo "IMP        = ${IMP}"

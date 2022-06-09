@@ -23,7 +23,17 @@ endif
 # -----------------------------------------------------------------------------
 
 ifeq "${API}" "hash"
+export NIST_HOME     ?= ${REPO_HOME}/src/sw/photon/nist/Implementations/crypto_hash/photonbeetlehash256rate32v1
+export NIST_IMP      ?= ref
+export NIST_KAT      ?= ${NIST_HOME}/LWC_HASH_KAT_256.txt
 
+export NIST_INCLUDES  = ${NIST_HOME}/${NIST_IMP}
+
+export NIST_SOURCES   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.c  )
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.cpp) 
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.s  ) 
+export NIST_SOURCES  += $(wildcard ${NIST_HOME}/${NIST_IMP}/*.S  )
+export NIST_HEADERS   = $(wildcard ${NIST_HOME}/${NIST_IMP}/*.h  )
 endif
 
 # =============================================================================
