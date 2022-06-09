@@ -13,8 +13,8 @@ endif
 
 # =============================================================================
 
-export API  ?= aead
 export ALG  ?= sparkle
+export API  ?= aead
 export ARCH ?= generic
 export IMP  ?= nist
 

@@ -27,9 +27,9 @@ ifeq "${API}" "hash"
 GCC_FLAGS += -DAPI_HASH
 endif
 ifeq "${IMP}" "nist"
-GCC_FLAGS += -DAPI="\"${API}\"" -DALG="\"${ALG}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
+GCC_FLAGS += -DALG="\"${ALG}\"" -DAPI="\"${API}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\""
 else
-GCC_FLAGS += -DAPI="\"${API}\"" -DALG="\"${ALG}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
+GCC_FLAGS += -DALG="\"${ALG}\"" -DAPI="\"${API}\"" ${CONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
 endif
 
 # -----------------------------------------------------------------------------
@@ -78,8 +78,8 @@ ${REPO_HOME}/build/${ALG}/driver-${ARCH}_${IMP}.asm : ${REPO_HOME}/build/${ALG}/
 .PHONY : run debug scan
 
 dump  :
-	@echo "API        = ${API}"
 	@echo "ALG        = ${ALG}"
+	@echo "API        = ${API}"
 	@echo "ARCH       = ${ARCH}"
 	@echo "IMP        = ${IMP}"
 

@@ -115,15 +115,15 @@ such as execution latency.*
 
 - The build system is controlled by several environment variables:
 
-  - `${API}`
-    - role: specifies the API,            i.e., the functionality and so interface supported
-    - values: `aead`, `hash`
-    - default: `aead`
-
   - `${ALG}`
     - role: specifies the      algorithm, i.e., select `${REPO_HOME}/src/sw/${ALG}`
     - values: `ascon`, `elephant`, `gift`, `grain`, `isap`, `photon`, `romulus`, `jambu`, `sparkle`, `xoodyak`
     - default: `sparkle`
+
+  - `${API}`
+    - role: specifies the API,            i.e., the functionality and so interface supported
+    - values: `aead`, `hash`
+    - default: `aead`
 
   - `${ARCH}`
     - role: specifies the   architecture, i.e., select `${REPO_HOME}/src/sw/${ALG}/arch/${ARCH}`
