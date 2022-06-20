@@ -925,7 +925,7 @@ precompute_rtk2_3:
 
 .section .data
 
-.align 2
+.align 4
 
 RCONST32:
 .word 0x00000004, 0xffffffbf, 0x00000000, 0x00000000, 0x00000000, 0x00000000
