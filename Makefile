@@ -52,7 +52,7 @@ hw-get-rocketchip :
 	@make --directory="${REPO_HOME}/src/hw" rocketchip-clone
 	@make --directory="${REPO_HOME}/src/hw" rocketchip-apply
 
-hw-fpga : 
+fpga-hw : 
 	@make --directory="${REPO_HOME}/src/hw" fpga-verilog
 	@make --directory="${REPO_HOME}/src/hw" program-fpga
 

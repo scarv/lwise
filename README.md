@@ -291,7 +291,7 @@ such as execution latency.*
   - Generate the verilog files, then bit-stream, and finally download bit-stream into FPGA, e.g.,
 
   ```sh
-  ALG="sparkle" ARCH="rv32" IMP="rv32" make hw-fpga
+  ALG="sparkle" ARCH="rv32" IMP="rv32" make fpga-hw
   ```
  
   - Build and execute software on the FPGA implementation, e.g.,
