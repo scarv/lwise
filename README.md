@@ -257,8 +257,7 @@ such as execution latency.*
   into `${RISCV_ROCKET}`:
 
   ```sh
-  make -f ${REPO_HOME}/src/hw-toolchain/Makefile clone
-  make -f ${REPO_HOME}/src/hw-toolchain/Makefile build
+  make hw-toolchain-build
   ```
 
 - The build system in
@@ -269,20 +268,18 @@ such as execution latency.*
   
   includes 
   - ISE-enabled Rocket Chip implementation, 
-  - an emulator for the implementation, 
   - an FPGA implementation using Vivado,
-  - hardware synthesis flow.
+  - an emulator for the implementation.
 
 - Get an ISE-enabled
   [Rocket-Chip](https://github.com/chipsalliance/rocket-chip.git)
   implementation
 
   ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile rocketchip-clone
-  make -f ${REPO_HOME}/src/hw/Makefile rocketchip-apply
+  make hw-get-rocketchip
   ```
 
-- Build the bitstream of the Xilinx FPGA and run a software on the FPGA using Vivado:
+- Build the Xilinx FPGA bitstream for the Rocket Chip system and run a software on it using Vivado:
 
   - Fix path for the installed Vivado Design Suite, e.g., 
   
@@ -291,42 +288,21 @@ such as execution latency.*
   source ./bin/Vivado-conf.sh
   ```
 
-  - Generate the verilog files for FPGA, e.g.,
+  - Generate the verilog files, then bit-stream, and finally download bit-stream into FPGA, e.g.,
 
   ```sh
-  ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" make -C src/hw  fpga-verilog
+  ALG="sparkle" ARCH="rv32" IMP="rv32" make hw-fpga
   ```
-  
-  - Make Vivado project, generate bit-stream, and download bit-stream into FPGA, e.g.,
+ 
+  - Build and execute software on the FPGA implementation, e.g.,
 
   ```sh
-  ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" make -C src/hw program-fpga
+  ALG="sparkle" ARCH="rv32" IMP="rv32" make fpga-run
   ```
-
-  - Build and execute software on the hardware implementation on the FPGA, e.g.,
-
-  ```sh
-  ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" make -C src/hw fpga-clean fpga-run
-  ```
-
-- Build the emulator of the implementation using 
-  [verilator](https://www.veripool.org/verilator): 
+  - Or use the script provided, e.g.,
 
   ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" ISE="xalu" emulator
-  ```
-
-  - Build and execute software on the emulator of the hardware implementation, e.g.,
-
-    ```sh
-    make -f ${REPO_HOME}/src/hw/Makefile ALG="sparkle" ARCH="rv32" IMP="rv32" ISE="xalu" emu-clean emulate
-    ```
-
-- Run hardware synthesis flow using
-  [yosys](https://github.com/YosysHQ/yosys)
-
-  ```sh
-  make -f ${REPO_HOME}/src/hw/Makefile synthesise ALG="sparkle" ARCH="rv32" ISE="xalu"
+  ALG="sparkle" ARCH="rv32" IMP="rv32" make fpga-scan
   ```
 
 <!--- ==================================================================== --->

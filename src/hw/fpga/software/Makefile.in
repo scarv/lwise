@@ -46,8 +46,8 @@ export LWISE_SOURCES += $(wildcard $(addsuffix /*.S,   ${LWISE_INCLUDES}))
 export LWISE_HEADERS  = $(wildcard $(addsuffix /*.h,   ${LWISE_INCLUDES}))
 
 export FPGA_INCLUDES := ${SOC_HAL} ${REPO_HOME}/build/fpga/${ALG} ${LWISE_INCLUDES} ${NIST_INCLUDES}
-export FPGA_SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/fpga/${ALG}/kat.c $(wildcard $(addsuffix /*.c, ${SOC_HAL})) $(wildcard $(addsuffix /*.S, ${SOC_HAL}))
-export FPGA_HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/fpga/${ALG}/kat.h $(wildcard $(addsuffix /*.h, ${SOC_HAL}))
+export FPGA_SOURCES  := ${LWISE_SOURCES}  ${NIST_SOURCES} ${REPO_HOME}/build/fpga/${ALG}/kat_${API}.c $(wildcard $(addsuffix /*.c, ${SOC_HAL})) $(wildcard $(addsuffix /*.S, ${SOC_HAL}))
+export FPGA_HEADERS  := ${LWISE_HEADERS}  ${NIST_HEADERS} ${REPO_HOME}/build/fpga/${ALG}/kat_${API}.h $(wildcard $(addsuffix /*.h, ${SOC_HAL}))
 
 MABI       = $(findstring i,$(ARCH:rv32=i))lp$(ARCH:rv%=%)
 FPGA_GCC_FLAGS  = -march=$(ARCH)imac -mabi=$(MABI)  -DPREALLOCATE=1 -mcmodel=medany
@@ -55,10 +55,17 @@ FPGA_GCC_FLAGS += -fno-builtin-printf -static -nostartfiles -T$(SOC_HAL)/lscript
 GCC_PREFIX = ${RISCV_ROCKET}/bin/riscv64-unknown-elf
 
 # pass-through environment variable as macros for use in source code
+ifeq "${API}" "aead"
+FPGA_GCC_FLAGS += -DAPI_AEAD
+endif
+ifeq "${API}" "hash"
+FPGA_GCC_FLAGS += -DAPI_HASH
+endif
+
 ifeq "${IMP}" "nist"
-FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -D${ALG}_alg
+FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DAPI="\"${API}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -D${ALG}_alg
 else
-FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
+FPGA_GCC_FLAGS += -DALG="\"${ALG}\"" ${FPGA_SWCONF} -DAPI="\"${API}\"" -DARCH="\"${ARCH}\"" -DIMP="\"${IMP}\"" -DLWISE
 endif
 
 
@@ -70,11 +77,11 @@ FPGA_OUTBIN   = ${REPO_HOME}/build/fpga/${ALG}/fpga_${ARCH}_${ISE}.bin
 ${REPO_HOME}/build/fpga/${ALG}       :
 	@mkdir --parents ${@}
 
-${REPO_HOME}/build/fpga/${ALG}/kat.h : ${NIST_KAT} ${REPO_HOME}/build/fpga/${ALG}
-	@python3 ${SW}/share/kat.py --header < ${<} > ${@}
+${REPO_HOME}/build/fpga/${ALG}/kat_${API}.h : ${NIST_KAT} ${REPO_HOME}/build/fpga/${ALG}
+	@python3 ${SW}/share/kat.py --api="${API}" --header < ${<} > ${@}
 
-${REPO_HOME}/build/fpga/${ALG}/kat.c : ${NIST_KAT} ${REPO_HOME}/build/fpga/${ALG}
-	@python3 ${SW}/share/kat.py --source < ${<} > ${@}
+${REPO_HOME}/build/fpga/${ALG}/kat_${API}.c : ${NIST_KAT} ${REPO_HOME}/build/fpga/${ALG}
+	@python3 ${SW}/share/kat.py --api="${API}" --source < ${<} > ${@}
 
 ${FPGA_TARGET} : ${FPGA_SOURCES} ${FPGA_HEADERS} 
 	@${GCC_PREFIX}-gcc ${FPGA_GCC_FLAGS} ${GCC_PATHS} $(addprefix -I ,${FPGA_INCLUDES}) -std='gnu99' -O2 -o ${@} $(filter %.c, ${^}) $(filter %.S, ${^}) ${GCC_LIBS}
@@ -91,7 +98,7 @@ fpga-run : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm
 
 
 #all   : ${TARGET}.elf ${TARGET}.asm
-fpga-clean : 
+fpga-swclean : 
 	@rm --force ${FPGA_TARGET}
 	@rm --force ${FPGA_TARGET}.asm
 	@rm --force ${FPGA_OUTBIN}

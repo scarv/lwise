@@ -18,6 +18,7 @@ export ALG  ?= sparkle
 export API  ?= aead
 export ARCH ?= generic
 export IMP  ?= nist
+export ISE  ?= xalu
 
 export CONF ?=
 
@@ -39,6 +40,27 @@ sw-scan  :
 sw-clean :
 	@make --directory="${REPO_HOME}/src/sw" clean
 
+# -----------------------------------------------------------------------------
+
+hw-toolchain-build :
+	@make --directory="${REPO_HOME}/src/hw-toolchain" clone 
+	@make --directory="${REPO_HOME}/src/hw-toolchain" build
+hw-toolchain-clean :
+	@make --directory="${REPO_HOME}/src/hw-toolchain" clean
+
+hw-get-rocketchip :
+	@make --directory="${REPO_HOME}/src/hw" rocketchip-clone
+	@make --directory="${REPO_HOME}/src/hw" rocketchip-apply
+
+hw-fpga : 
+	@make --directory="${REPO_HOME}/src/hw" fpga-verilog
+	@make --directory="${REPO_HOME}/src/hw" program-fpga
+
+fpga-run :
+	@make --directory="${REPO_HOME}/src/hw" fpga-swclean fpga-run	
+
+fpga-scan :
+	@make --directory="${REPO_HOME}/src/hw" fpga-scan
 # -----------------------------------------------------------------------------
 
 clean :
