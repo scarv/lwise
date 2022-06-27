@@ -25,19 +25,32 @@ void isap_rk(
 	Ascon_Initialize(state);
 	Ascon_AddBytes(state,k,0,CRYPTO_KEYBYTES);
 	Ascon_AddBytes(state,iv,CRYPTO_KEYBYTES,ISAP_IV_SZ);
+#if !defined( LWISE )
 	Ascon_Permute_Nrounds(state,ISAP_sK);
-
+#else
+    P_sK(state);
+#endif
 	// Absorb
 	for (size_t i = 0; i < inlen*8-1; i++){
 		size_t cur_byte_pos = i/8;
 		size_t cur_bit_pos = 7-(i%8);
 		unsigned char cur_bit = ((in[cur_byte_pos] >> (cur_bit_pos)) & 0x01) << 7;
 		Ascon_AddBytes(state,(const unsigned char*)&cur_bit,0,1);
-		Ascon_Permute_Nrounds(state,ISAP_sB);
+#if !defined( LWISE )
+        Ascon_Permute_Nrounds(state,ISAP_sB);
+#else
+        P_sB(state);
+#endif
+
 	}
 	unsigned char cur_bit = ((in[inlen-1]) & 0x01) << 7;
 	Ascon_AddBytes(state,(const unsigned char*)&cur_bit,0,1);
+#if !defined( LWISE )
 	Ascon_Permute_Nrounds(state,ISAP_sK);
+#else
+    P_sK(state);
+#endif
+
 
 	// Squeeze K*
 	Ascon_ExtractBytes(state,out,0,outlen);
@@ -59,14 +72,22 @@ void isap_mac(
 	Ascon_Initialize(state);
 	Ascon_AddBytes(state,npub,0,CRYPTO_NPUBBYTES);
 	Ascon_AddBytes(state,ISAP_IV_A,CRYPTO_NPUBBYTES,ISAP_IV_SZ);
+#if !defined( LWISE )
 	Ascon_Permute_Nrounds(state,ISAP_sH);
+#else
+    P_sK(state);
+#endif
 
 	// Absorb AD
 	size_t rate_bytes_avail = ISAP_rH_SZ;
 	unsigned char cur_ad;
 	for (unsigned long long i = 0; i < adlen; i++){
 		if(rate_bytes_avail == 0){
-			Ascon_Permute_Nrounds(state,ISAP_sH);
+#if !defined( LWISE )
+	        Ascon_Permute_Nrounds(state,ISAP_sH);
+#else
+            P_sK(state);
+#endif
 			rate_bytes_avail = ISAP_rH_SZ;
 		}
 		cur_ad = ad[i];
@@ -76,12 +97,20 @@ void isap_mac(
 
 	// Absorb Padding: 0x80
 	if(rate_bytes_avail == 0){
-		Ascon_Permute_Nrounds(state,ISAP_sH);
+#if !defined( LWISE )
+	    Ascon_Permute_Nrounds(state,ISAP_sH);
+#else
+        P_sK(state);
+#endif
 		rate_bytes_avail = ISAP_rH_SZ;
 	}
 	unsigned char pad = 0x80;
 	Ascon_AddBytes(state,&pad,ISAP_rH_SZ-rate_bytes_avail,1);
+#if !defined( LWISE )
 	Ascon_Permute_Nrounds(state,ISAP_sH);
+#else
+    P_sK(state);
+#endif
 
 	// Domain Seperation: 0x01
 	unsigned char dom_sep = 0x01;
@@ -95,7 +124,11 @@ void isap_mac(
 		Ascon_AddBytes(state,&cur_c,ISAP_rH_SZ-rate_bytes_avail,1);
 		rate_bytes_avail--;
 		if(rate_bytes_avail == 0){
-			Ascon_Permute_Nrounds(state,ISAP_sH);
+#if !defined( LWISE )
+	        Ascon_Permute_Nrounds(state,ISAP_sH);
+#else
+            P_sK(state);
+#endif
 			rate_bytes_avail = ISAP_rH_SZ;
 		}
 	}
@@ -103,7 +136,11 @@ void isap_mac(
 	// Absorb Padding: 0x80
 	pad = 0x80;
 	Ascon_AddBytes(state,&pad,ISAP_rH_SZ-rate_bytes_avail,1);
+#if !defined( LWISE )
 	Ascon_Permute_Nrounds(state,ISAP_sH);
+#else
+    P_sK(state);
+#endif
 
 	// Derive Ka*
 	unsigned char y[CRYPTO_KEYBYTES];
@@ -113,7 +150,11 @@ void isap_mac(
 
 	// Squeezing Tag
 	Ascon_OverwriteBytes(state,ka_star,0,CRYPTO_KEYBYTES);
+#if !defined( LWISE )
 	Ascon_Permute_Nrounds(state,ISAP_sH);
+#else
+    P_sK(state);
+#endif
 	Ascon_ExtractBytes(state,tag,0,CRYPTO_KEYBYTES);
 }
 
@@ -136,7 +177,11 @@ void isap_enc(
 	size_t key_bytes_avail = 0;
 	for (unsigned long long i = 0; i < mlen; i++) {
 		if(key_bytes_avail == 0){
-			Ascon_Permute_Nrounds(state,ISAP_sE);
+#if !defined( LWISE )
+	        Ascon_Permute_Nrounds(state,ISAP_sE);
+#else
+            P_sE(state);
+#endif
 			key_bytes_avail = ISAP_rH_SZ;
 		}
 		unsigned char keybyte;
