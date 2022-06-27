@@ -288,13 +288,13 @@ such as execution latency.*
   source ./bin/Vivado-conf.sh
   ```
 
-  - Generate the verilog files, then bit-stream, and finally download bit-stream into FPGA, e.g.,
+  - Generate the verilog files, and then bit-stream for the FPGA implementation, e.g.,
 
   ```sh
   ALG="sparkle" ARCH="rv32" IMP="rv32" make fpga-hw
   ```
  
-  - Build and execute software on the FPGA implementation, e.g.,
+  - Download FPGA bit-stream, and then build and execute software on the FPGA implementation, e.g.,
 
   ```sh
   ALG="sparkle" ARCH="rv32" IMP="rv32" make fpga-run
