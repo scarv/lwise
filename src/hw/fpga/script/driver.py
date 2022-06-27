@@ -34,7 +34,7 @@ def run( args, ALG, CONF, ARCH, IMP, NIST_IMP = None ) :
   else :
     env.update( { 'ALG' : ALG, 'FPGA_SWCONF' : CONF, 'ARCH' : ARCH, 'IMP' : IMP                        } )
 
-  subprocess.run( [ 'make', os.path.expandvars( '--directory=${REPO_HOME}/src/hw' ), 'fpga-clean', 'fpga-run' ], env = env )
+  subprocess.run( [ 'make', os.path.expandvars( '--directory=${REPO_HOME}/src/hw' ), 'fpga-swclean', 'fpga-run' ], env = env )
 
   print( '<<<'                                )
 
