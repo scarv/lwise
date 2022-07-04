@@ -214,78 +214,53 @@
 
 .section .text
 
-.global P_sB
+.global Ascon_Permute_Nrounds
 
-P_sB:
+Ascon_Permute_Nrounds:
   ISAP_PROLOGUE
   ISAP_LDSTATE a2, a3, a4, a5, a6, a7, t2, t3, t4, t5
   //
 #if (ISAP_RV32_TYPE1)
+  li t0, 1
+  bne a1, t0, N12
+N1:
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x4B, t0, t1, t6 
   ISAP_STSTATE t2, t3, a4, a5, a6, a7, a2, a3, t4, t5
-#elif (ISAP_RV32_TYPE2)
-  ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x4B, t0, t1, t6 
-  ISAP_STSTATE t0, t1, t2, t3, a4, a5, a6, a7, a2, a3
-#endif
-  //
-
-  ISAP_EPILOGUE
-
-
-.global P_sE
-
-P_sE:
-  ISAP_PROLOGUE
-  ISAP_LDSTATE a2, a3, a4, a5, a6, a7, t2, t3, t4, t5
-  //
-#if (ISAP_RV32_TYPE1)
-  ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x96, t0, t1, t6 
-  ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x87, t0, t1, t6 
-  ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x78, t0, t1, t6 
-  ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x69, t0, t1, t6 
-  ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x5A, t0, t1, t6 
-  ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x4B, t0, t1, t6 
-#elif (ISAP_RV32_TYPE2)
-  ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x96, t0, t1, t6 
-  ASCON_ROUND   t0, t1, t2, t3, a4, a5, a6, a7, a2, a3, 0x87, t4, t5, t6 
-  ASCON_ROUND   t4, t5, a6, a7, t2, t3, a4, a5, t0, t1, 0x78, a2, a3, t6 
-  ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x69, t0, t1, t6 
-  ASCON_ROUND   t0, t1, t2, t3, a4, a5, a6, a7, a2, a3, 0x5A, t4, t5, t6 
-  ASCON_ROUND   t4, t5, a6, a7, t2, t3, a4, a5, t0, t1, 0x4B, a2, a3, t6 
-#endif
-  //
-  ISAP_STSTATE a2, a3, a4, a5, a6, a7, t2, t3, t4, t5
-  ISAP_EPILOGUE
-
-
-.section .text
-
-.global P_sK
-
-P_sK:
-  ISAP_PROLOGUE
-  ISAP_LDSTATE a2, a3, a4, a5, a6, a7, t2, t3, t4, t5
-  //
-#if (ISAP_RV32_TYPE1)
+  j EPILOGUE
+N12:
+  li t0, 6
+  beq a1, t0, N6
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0xF0, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0xE1, t0, t1, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0xD2, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0xC3, t0, t1, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0xB4, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0xA5, t0, t1, t6 
+N6:
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x96, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x87, t0, t1, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x78, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x69, t0, t1, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x5A, t0, t1, t6 
   ASCON_ROUND   t2, t3, a4, a5, a6, a7, a2, a3, t4, t5, 0x4B, t0, t1, t6 
+  
 #elif (ISAP_RV32_TYPE2)
+  li t0, 1
+  bne a1, t0, N12
+N1:
+  ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x4B, t0, t1, t6 
+  ISAP_STSTATE t0, t1, t2, t3, a4, a5, a6, a7, a2, a3
+  j EPILOGUE
+N12:
+  li t0, 6
+  beq a1, t0, N6
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0xF0, t0, t1, t6 
   ASCON_ROUND   t0, t1, t2, t3, a4, a5, a6, a7, a2, a3, 0xE1, t4, t5, t6 
   ASCON_ROUND   t4, t5, a6, a7, t2, t3, a4, a5, t0, t1, 0xD2, a2, a3, t6 
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0xC3, t0, t1, t6 
   ASCON_ROUND   t0, t1, t2, t3, a4, a5, a6, a7, a2, a3, 0xB4, t4, t5, t6 
   ASCON_ROUND   t4, t5, a6, a7, t2, t3, a4, a5, t0, t1, 0xA5, a2, a3, t6 
+N6:
   ASCON_ROUND   a2, a3, a4, a5, a6, a7, t2, t3, t4, t5, 0x96, t0, t1, t6 
   ASCON_ROUND   t0, t1, t2, t3, a4, a5, a6, a7, a2, a3, 0x87, t4, t5, t6 
   ASCON_ROUND   t4, t5, a6, a7, t2, t3, a4, a5, t0, t1, 0x78, a2, a3, t6 
@@ -293,7 +268,9 @@ P_sK:
   ASCON_ROUND   t0, t1, t2, t3, a4, a5, a6, a7, a2, a3, 0x5A, t4, t5, t6 
   ASCON_ROUND   t4, t5, a6, a7, t2, t3, a4, a5, t0, t1, 0x4B, a2, a3, t6 
 #endif
-  //
+
   ISAP_STSTATE a2, a3, a4, a5, a6, a7, t2, t3, t4, t5
+  //
+
+EPILOGUE:
   ISAP_EPILOGUE
-    

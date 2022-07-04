@@ -56,7 +56,7 @@ void Ascon_OverwriteBytes(void *state, const unsigned char *data, unsigned int o
 }
 
 /* ---------------------------------------------------------------- */
-
+#if !defined( LWISE )
 void Ascon_Permute_Nrounds(u8 *S, unsigned int rounds){
   assert(rounds <= 12);
   int start = 12 - rounds;
@@ -91,7 +91,7 @@ void Ascon_Permute_Nrounds(u8 *S, unsigned int rounds){
   store64(S + 24, x3);
   store64(S + 32, x4);
 }
-
+#endif
 /* ---------------------------------------------------------------- */
 
 void Ascon_ExtractBytes(const void *state, unsigned char *data, unsigned int offset, unsigned int length){

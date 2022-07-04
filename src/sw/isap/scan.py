@@ -15,7 +15,7 @@ def rv32( args ) :
     driver.run( args, 'isap', CONF, 'rv32', 'nist', NIST_IMP = 'ref'    )
     driver.run( args, 'isap', CONF, 'rv32', 'nist', NIST_IMP = 'opt_32' )
 
-  for TYPE in [ 'ISAP_RV32_TYPE1' ] :
+  for TYPE in [ 'ISAP_RV32_TYPE1', 'ISAP_RV32_TYPE2'] :
     CONF = [ TYPE ]
 
     driver.run( args, 'isap', CONF, 'rv32', 'rv32' )

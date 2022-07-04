@@ -16,9 +16,10 @@ include ${SW}/${ALG}/Makefile.in
 
 # interested kernels in LWC algorithms
 ifeq "${IMP}" "nist"
-    KERNEL     = P6_nist grain_keystream32_aligned permutation giftb128 PHOTON_Permutation skinny_128_384_plus_enc skinny128_384_plus sparkle_opt state_update Xoodoo_Permute_Nrounds
+    KERNEL     = P6_nist Ascon_Permute_Nrounds grain_keystream32_aligned permutation giftb128 PHOTON_Permutation skinny_128_384_plus_enc skinny128_384_plus sparkle_opt state_update Xoodoo_Permute_Nrounds
 else 
     KERNEL     = P6 
+    KERNEL    += Ascon_Permute_Nrounds N1 N12 N6
     KERNEL    += permutation
     KERNEL    += grain_keystream32_rv32
     KERNEL    += giftb128_bitslicing giftb128_fixslicing precompute_rkeys 
@@ -95,6 +96,8 @@ ${FPGA_TARGET}.asm : ${FPGA_TARGET}
 
 fpga-run : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
 	@$(FPGA)/script/upload.py --port $(PORT) --baud 115200 upload $(FPGA_OUTBIN) --stdout
+
+fpga-build: ${FPGA_TARGET}.asm 
 
 
 #all   : ${TARGET}.elf ${TARGET}.asm

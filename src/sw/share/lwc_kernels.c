@@ -41,6 +41,20 @@ void time_kernel() {
 
   MEASURE_EPILOGUE( P6 );
 
+#elif defined(isap_alg) || defined(ISAP_RV32_TYPE1) || defined(ISAP_RV32_TYPE2)
+  unsigned long long s_n = 40; uint8_t s[ s_n ];
+  printf( "sizeof( s ) = %llu\n", s_n );
+
+  MEASURE_PROLOGUE( Ascon_Permute_Nrounds );
+
+  for( int i = 0; i < trials; i++ ) {
+    rand_bytes((uint8_t*) s, s_n );
+
+    MEASURE_STEP( Ascon_Permute_Nrounds, s, 6 );
+  }
+
+  MEASURE_EPILOGUE( Ascon_Permute_Nrounds );
+
 #elif defined(elephant_alg) || defined(ELEPHANT_RV32_TYPE1) || defined(ELEPHANT_RV32_TYPE2)
 unsigned long long s_n = 20; uint8_t s[ s_n ];
 

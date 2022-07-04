@@ -16,6 +16,10 @@ extern void P6(void * state);
 extern void P12(void * state);
 #endif
 
+
+//for isap
+extern void Ascon_Permute_Nrounds(void *state, unsigned int nrounds);
+
 extern void permutation(void* state);
 
 #if defined(gift_alg) && !defined(LWISE)
