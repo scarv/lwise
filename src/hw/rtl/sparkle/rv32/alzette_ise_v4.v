@@ -8,7 +8,8 @@ input  wire         op_enc,
 
 output wire [31:0]  rd
 );
-                           
+parameter           DEC_E  = 1'b0;  //enable alzette decrypting instruction in variant 4
+                                    //this isn't required in the LW Sparkle                         
 wire [31:0] x = rs1; 
 wire [31:0] y = rs2; 
 
@@ -69,6 +70,8 @@ wire [31:0] enc_xor7_lhs =  enc_add3;
 wire [31:0] enc_xor7_rhs =  c;
 wire [31:0] enc_xor7     =  enc_xor7_lhs ^ enc_xor7_rhs;       //x <- x ^ c
 
+generate
+if (DEC_E    == 1'b1) begin : DEC_gen
 //decryption
 //quarter 0
 wire [31:0] dec_xor0_lhs =  x;
@@ -119,5 +122,9 @@ wire [31:0] rd_x   =  op_enc ? enc_xor7 :
 
 assign      rd     =  op_x   ? rd_x     :
                    /* op_y  */ rd_y     ;
-
+end else begin // ! DEC_gen
+assign      rd     =  op_x   ? enc_xor7     :
+                   /* op_y  */ enc_xor6     ;
+end
+endgenerate
 endmodule

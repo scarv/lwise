@@ -23,6 +23,8 @@ input  [31:0]   cop_rs2;
 output [31:0]   cop_rd;  
 
 parameter [4:0] ISE_V  = 5'b11110;
+parameter       DEC_E  = 1'b0;      //enable alzette decrypting instruction in variant 4
+                                    //this isn't required in the LW Sparkle 
 
 localparam [6:0] CUSTOM_0 = 7'b0001011;
 localparam [6:0] CUSTOM_1 = 7'b0101011;
@@ -124,15 +126,23 @@ generate
     if (ISE_V[4] == 1'b1) begin : ISE_V4
 wire   op_enc_x     = (funct[6:3] == 4'b1000) && (cop_insn[6:0] == CUSTOM_2);  
 wire   op_enc_y     = (funct[6:3] == 4'b1001) && (cop_insn[6:0] == CUSTOM_2);  
+
+wire   op_x_v4;
+
+    if (DEC_E    == 1'b1) begin : DEC_gen
 wire   op_dec_x     = (funct[6:3] == 4'b1010) && (cop_insn[6:0] == CUSTOM_2);  
 wire   op_dec_y     = (funct[6:3] == 4'b1011) && (cop_insn[6:0] == CUSTOM_2); 
+assign  op_x_v4  = op_enc_x | op_dec_x ;
+assign  v04_sel  = op_enc_x | op_enc_y | op_dec_x | op_dec_y;
+    end else begin
+assign  op_x_v4  = op_enc_x;
+assign  v04_sel  = op_enc_x | op_enc_y;       
+    end
 
-wire   op_x_v4      = op_enc_x | op_dec_x ;
 wire   op_enc_v4    = op_enc_x | op_enc_y ;
 
-assign v04_sel      = op_enc_x | op_enc_y | op_dec_x | op_dec_y;
-
-alzette_ise_v4 alzetteise_ins4(
+alzette_ise_v4 #(.DEC_E(DEC_E))
+alzetteise_ins4 (
     .rs1(cop_rs1),
     .rs2(cop_rs2),
     .rd (v04_rd ),
