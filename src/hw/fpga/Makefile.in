@@ -12,7 +12,7 @@ export SOC	           = $(ARCH)-rocket
 
 ALGs = ascon elephant gift grain photon romulus sparkle jambu xoodyak
 
-VIVADO_PROJECT = $(ALG)-$(SOC)-$(ISE)-imp
+VIVADO_PROJECT = $(ALG)-$(SOC)-$(ISE)_$(BOARD)-imp
 prog_mem       = $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin/prog.mem
 
 VIVADO = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && vivado
@@ -40,7 +40,7 @@ rocketchip_support_src = \
 rocketchip_cop_ram_src =\
     $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(COP_FPGACONFIG).behav_srams.v
 
-rocketchip_xalu_ram_src =\
+rocketchip_xalu_ram_src ?=\
     $(ROCKETCHIP_REPO)/vsim/generated-src/$(ROCKET).$(XALU_FPGACONFIG).behav_srams.v
 
 rtl_sources = $(wildcard $(FPGA_BUILD)/$(VIVADO_PROJECT)/rtl_sources/*.v)
