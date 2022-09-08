@@ -8,7 +8,7 @@
 #include "rdtsc.h"
 
 uint64_t rdtsc() {
-  uint64_t t, tsc_lo = 0, tsc_hi = 0;
+  uint32_t t, tsc_lo = 0, tsc_hi = 0;
 
   __asm__ __volatile__( "1: rdcycleh %0    ;"
                         "   rdcycle  %1    ;"
