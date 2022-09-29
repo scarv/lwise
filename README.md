@@ -285,7 +285,7 @@ such as execution latency.*
 
 - Run a software on FPGA implemetation with a pre-built bitstream:
 
-  - Connect the arty100T board to a Computer via a USB port. Assummingly, the `port /dev/ttyUSB0` is used. 
+  - Connect the arty100T board to a Computer via a USB port. Assumingly, the port `/dev/ttyUSB0` is used. 
   - Build and execute implementation on the Arty100T, e.g.,
 
   ```sh
@@ -297,7 +297,7 @@ such as execution latency.*
   PORT="/dev/ttyUSB0" BOARD="arty100T" ALG="sparkle" ARCH="rv32" make fpga-scan
   ```
 
-- Rebuild the Xilinx Vivado project and the bitstream with the Rocket Chip system:
+- Rebuild the Xilinx Vivado project and the bitstream for the Rocket Chip system:
 
   - Generate the verilog files, and then the bit-stream for the FPGA implementation, e.g.,
 
