@@ -238,7 +238,7 @@ such as execution latency.*
   - The base Rocket Chip can be configured with a 32-bit or 64-bit architecture (i.e., `ARCH=rv32` or `ARCH=rv64`, respectively).
     `${ARCH}` is consistent with the build software system. 
   - The hardware system is synthesized targeting to two supported boards (i.e., `BOARD=arty100T` or `BOARD="sakura-x"`).
-    Prebuilt-bitstreams for the arty100T board are provided in this Repos.
+    Only the pre-built bitstreams for the arty100T board are provided in this Repos.
 
 ### Toolchain
 
