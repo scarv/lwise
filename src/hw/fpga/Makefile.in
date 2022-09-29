@@ -63,13 +63,17 @@ $(vivado_project_file):
 	$(shell sed -i 's/set_property verilog_define.*/''set_property verilog_define \[list FPGA $(clktype)\] \[get_filesets sources_1\] ''/g' $(FPGA)/soc/$(SOC)/script/make_project.tcl)
 	$(VIVADO) -mode batch -source $(FPGA)/soc/$(SOC)/script/make_project.tcl -tclargs $(VIVADO_PROJECT) $(FPGA) $(FPGA_BUILD) $(BOARD) $(part)  
 
+prebuilt  = ${REPO_HOME}/bitstream/$(BOARD)_$(ARCH)_$(ALG).bit
 bitstream = $(FPGA_BUILD)/$(VIVADO_PROJECT)/$(VIVADO_PROJECT).runs/impl_1/system_top_wrapper.bit
 bitstream: $(bitstream) 
 $(bitstream) : $(rtl_sources)  $(vivado_project_file)
 	$(VIVADO) -mode batch -source $(FPGA)/script/make_bitstream.tcl -tclargs $(VIVADO_PROJECT) $(FPGA_BUILD)
 
-program-fpga: $(bitstream)
-	$(VIVADO) -mode batch -source $(FPGA)/script/program.tcl -tclargs $(device) $(bitstream)
+update-bistream: $(bitstream)
+	cp -f $(bitstream) $(prebuilt)
+
+program-fpga: $(prebuilt)
+	$(VIVADO) -mode batch -source $(FPGA)/script/program.tcl -tclargs $(device) $(prebuilt)
 
 vivado: $(vivado_project_file)
 	$(VIVADO) $(vivado_project_file) &

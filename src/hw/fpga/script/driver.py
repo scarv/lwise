@@ -39,8 +39,7 @@ def run( args, ALG, CONF, ARCH, IMP, NIST_IMP = None ) :
   print( '<<<'                                )
 
 def program_fpga( args, ALG, ARCH, ISE = 'xalu' ) :
-  print( '>>> ALG = "%s", ARCH = "%s", ISE = "%s"' % ( ALG, ARCH, ISE ) )
-  print( '>>> Program FPGA ...')
+
 
   env = dict()
   env[ 'PATH'            ] = os.environ[ 'PATH'            ]
@@ -49,6 +48,10 @@ def program_fpga( args, ALG, ARCH, ISE = 'xalu' ) :
   env[ 'REPO_VERSION'    ] = os.environ[ 'REPO_VERSION'    ]
   env[ 'RISCV_ROCKET'    ] = os.environ[ 'RISCV_ROCKET'    ]
   env[ 'ROCKETCHIP_REPO' ] = os.environ[ 'ROCKETCHIP_REPO' ]
+  env[ 'BOARD'           ] = os.environ[ 'BOARD'           ]
+
+  print( '>>> BOARD = "%s", ALG = "%s", ARCH = "%s", ISE = "%s"' % ( env['BOARD'], ALG, ARCH, ISE ) )
+  print( '>>> Program FPGA ...')
 
   env.update( { 'ALG' : ALG, 'ARCH' : ARCH, 'ISE' : ISE } )
   subprocess.run( [ 'make', '--quiet', os.path.expandvars( '--directory=${REPO_HOME}/src/hw' ), 'program-fpga' ], env = env, stdout=subprocess.DEVNULL)

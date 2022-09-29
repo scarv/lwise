@@ -11,6 +11,8 @@ ifndef REPO_VERSION
   $(error "execute 'source ./bin/conf.sh' to configure environment")
 endif
 
+export API  ?= aead
+
 # =============================================================================
 
 # include build-related content for algorithm
