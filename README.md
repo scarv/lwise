@@ -54,7 +54,7 @@ such as execution latency.*
   | [Elephant](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/elephant-spec-final.pdf)           | `elephant` | [o](./doc/elephant/design.md) | [o](./doc/elephant/encoding.txt) | o         | o        | o        |
   | [GIFT-COFB](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/gift-cofb-spec-final.pdf)         | `gift`     | [o](./doc/gift/design.md)     | [o](./doc/gift/encoding.txt)     | o         | o        | o        |
   | [Grain128-AEAD](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/grain-128aead-spec-final.pdf) | `grain`    | [o](./doc/grain/design.md)    | [o](./doc/grain/encoding.txt)    | o         | o        | o        |
-  | [ISAP](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/isap-spec-final.pdf)                   | `isap`     |  x                            |  x                               | x         | x        | x        |
+  | [ISAP](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/isap-spec-final.pdf)                   | `isap`     | [o]                           | [o]                              | o         | o        | o        |
   | [PHOTON-Beetle](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/photon-beetle-spec-final.pdf) | `photon`   | [o](./doc/photon/design.md)   | [o](./doc/photon/encoding.txt)   | o         | o        | o        |
   | [Romulus](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/romulus-spec-final.pdf)             | `romulus`  | [o](./doc/romulus/design.md)  | [o](./doc/romulus/encoding.txt)  | o         | o        | o        |
   | [Schwaemm and Esch](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/finalist-round/updated-spec-doc/sparkle-spec-final.pdf)   | `sparkle`  | [o](./doc/sparkle/design.md)  | [o](./doc/sparkle/encoding.txt)  | o         | o        | o        |
@@ -232,15 +232,13 @@ such as execution latency.*
 ### Build system
 
 - ISE supporting hardware is implemented in Verilog and integrated into a Rocket Chip. 
-  The build hardware system is controlled by two environment variables, 
-  namely `${ARCH}` and `${ISE}`.
+  The built hardware system is controlled by two environment variables, 
+  namely `${BOARD}` and `${ARCH}`.
 
   - The base Rocket Chip can be configured with a 32-bit or 64-bit architecture (i.e., `ARCH=rv32` or `ARCH=rv64`, respectively).
     `${ARCH}` is consistent with the build software system. 
-  - The ISE supporting hardware can be integrated into the base processor 
-    as a co-processor via a RoCC interface or 
-    as a functional module, i.e., extended ALU, inside the processor pipeline 
-    by configuring `ISE=cop` or `ISE=xalu`, respectively. 
+  - The hardware system is synthesized targeting to two supported boards (i.e., `BOARD=arty100T` or `BOARD="sakura-x"`).
+    Prebuilt-bitstreams for the arty100T board are provided in this Repos.
 
 ### Toolchain
 
@@ -278,33 +276,40 @@ such as execution latency.*
   ```sh
   make hw-get-rocketchip
   ```
-
-- Build the Xilinx FPGA bitstream for the Rocket Chip system and run a software on it using Vivado:
-
-  - Fix path for the installed Vivado Design Suite, e.g., 
+- Fix path for the installed Vivado Design Suite, e.g., 
   
   ```sh
   export VIVADO_TOOL_DIR="/opt/Xilinx/Vivado/2019.1"
   source ./bin/Vivado-conf.sh
   ```
 
-  - Generate the verilog files, and then bit-stream for the FPGA implementation, e.g.,
+- Run a software on FPGA implemetation with a pre-built bitstream:
+
+  - Connect the arty100T board to a Computer via a USB port. Assummingly, the `port /dev/ttyUSB0` is used. 
+  - Build and execute implementation on the Arty100T, e.g.,
 
   ```sh
-  ALG="sparkle" ARCH="rv32" IMP="rv32" make fpga-hw
-  ```
- 
-  - Download FPGA bit-stream, and then build and execute software on the FPGA implementation, e.g.,
-
-  ```sh
-  ALG="sparkle" ARCH="rv32" IMP="rv32" make fpga-run
+  PORT="/dev/ttyUSB0" BOARD="arty100T" ALG="sparkle" ARCH="rv32" make fpga-run
   ```
   - Or use the script provided, e.g.,
 
   ```sh
-  ALG="sparkle" ARCH="rv32" IMP="rv32" make fpga-scan
+  PORT="/dev/ttyUSB0" BOARD="arty100T" ALG="sparkle" ARCH="rv32" make fpga-scan
   ```
 
+- Rebuild the Xilinx Vivado project and the bitstream with the Rocket Chip system:
+
+  - Generate the verilog files, and then the bit-stream for the FPGA implementation, e.g.,
+
+  ```sh
+  BOARD="arty100T" ALG="sparkle" ARCH="rv32" make fpga-hw
+  ```
+
+  - Update a pre-built bitstream with a new bitstream, e.g.,
+
+  ```sh
+  BOARD="arty100T" ALG="sparkle" ARCH="rv32" make fpga-update
+  ```
 <!--- ==================================================================== --->
 
 ## Acknowledgements

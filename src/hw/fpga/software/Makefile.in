@@ -92,7 +92,7 @@ $(FPGA_OUTBIN) : $(FPGA_TARGET)
 
 ${FPGA_TARGET}.asm : ${FPGA_TARGET}
 	@${GCC_PREFIX}-objdump -fhSD ${<} > ${@}
-	@python3 ${REPO_HOME}/bin/size.py ${@} $(KERNEL)
+#@python3 ${REPO_HOME}/bin/size.py ${@} $(KERNEL) #uncomment this line to measure the size of kennels
 
 fpga-run : $(FPGA_OUTBIN) ${FPGA_TARGET}.asm 
 	@$(FPGA)/script/upload.py --port $(PORT) --baud 115200 upload $(FPGA_OUTBIN) --stdout

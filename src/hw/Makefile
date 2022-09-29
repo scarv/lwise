@@ -21,6 +21,7 @@ ifndef ROCKETCHIP_REPO
 endif
 
 export PORT ?= /dev/ttyUSB0
+export BOARD?= arty100T
 export ALG  ?= sparkle
 export API  ?= aead
 export ARCH ?= rv32
