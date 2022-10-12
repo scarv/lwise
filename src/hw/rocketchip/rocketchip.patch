@@ -1,6 +1,3 @@
-diff --git a/bootrom/bootrom.img b/bootrom/bootrom.img
-index b9eb2bc7a..57af68279 100644
-Binary files a/bootrom/bootrom.img and b/bootrom/bootrom.img differ
 diff --git a/emulator/Makefile b/emulator/Makefile
 index dffa41713..9defc4d32 100644
 --- a/emulator/Makefile
