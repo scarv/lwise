@@ -70,8 +70,9 @@ such as execution latency.*
 
 ```
 ├── bin                     - scripts (e.g., environment configuration)
-├── doc                     - documentation
+├── bitstream               - pre-built bitstreams for the arty100T board 
 ├── build                   - working directory for build
+├── doc                     - documentation
 └── src                     - source code
     ├── hw                    - source code for hardware
     │   ├── fpga                - source code for the FPGA implementation using Vivado
@@ -274,6 +275,7 @@ such as execution latency.*
   implementation
 
   ```sh
+  export ROCKETCHIP_REPO=${REPO_HOME}/build/rocketchip
   make hw-get-rocketchip
   ```
 - Fix path for the installed Vivado Design Suite, e.g., 
@@ -297,7 +299,7 @@ such as execution latency.*
   PORT="/dev/ttyUSB0" BOARD="arty100T" ALG="sparkle" ARCH="rv32" make fpga-scan
   ```
 
-- Rebuild the Xilinx Vivado project and the bitstream for the Rocket Chip system:
+- Rebuild the Xilinx Vivado project and the bitstream for the Rocket Chip system (for developments/modifications):
 
   - Generate the verilog files, and then the bit-stream for the FPGA implementation, e.g.,
 

@@ -14,8 +14,7 @@ ALGs = ascon elephant gift grain photon romulus sparkle jambu xoodyak
 VIVADO_PROJECT = $(ALG)-$(SOC)-$(ISE)_$(BOARD)-imp
 prog_mem       = $(FPGA_BUILD)/$(VIVADO_PROJECT)/prog-bin/prog.mem
 
-VIVADO = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && vivado
-UPDMEM = cd $(FPGA_BUILD)/$(VIVADO_PROJECT) && updatemem
+VIVADO = vivado -nolog -nojournal
 
 #--------------------------------------------------------------------
 # ISE Implementation

@@ -24,7 +24,7 @@ export PORT ?= /dev/ttyUSB0
 export BOARD?= arty100T
 export ALG  ?= sparkle
 export API  ?= aead
-export ARCH ?= rv32
+export ARCH  = rv32
 export IMP  ?= rv32
 export ISE  ?= xalu
 
