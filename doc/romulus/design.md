@@ -36,40 +36,26 @@
 - define the functions
 
   ```
-  RC_LFSR_FWD( x ) {
+  LFSR_RC( x ) {
     return x_4 || x_3 || x_2 || x_1 || x_0 || ( x_5 ^ x_4 ^ 1 )
-  }
-
-  RC_LFSR_REV( x ) {
-    return ( x_5 ^ x_0 ^ 1 ) || x_4 || x_3 || x_2 || x_1 || x_0
   }
   ```
 
 - define the functions
 
   ```
-  TK2_LFSR_FWD( x ) {
+  LFSR_TK2( x ) {
     return x_6 || x_5 || x_4 || x_3 || x_2 || x_1 || x_0 || ( x_5 ^ x_7 )
   }
 
-  TK2_LFSR_REV( x ) {
-    return ( x_6 ^ x_0 ) || x_6 || x_5 || x_4 || x_3 || x_2 || x_1 || x_0
-  }
-
-  TK3_LFSR_FWD( x ) {
+  LFSR_TK3( x ) {
     return ( x_6 ^ x_0 ) || x_7 || x_6 || x_5 || x_4 || x_3 || x_2 || x_1
-  }
-
-  TK3_LFSR_REV( x ) {
-    return x_6 || x_5 || x_4 || x_3 || x_2 || x_1 || x_0 || ( x_5 ^ x_7 )
   }
   ```
 
 - define the look-up tables
-  `SBOX_ENC` 
-  and 
-  `SBOX_DEC`
-  to be the Skinny encryption and decryption S-boxes
+  `SBOX` 
+  to be the Skinny S-box
 
 <!--- -------------------------------------------------------------------- --->
 
@@ -165,8 +151,8 @@
       y <- 0
     }
 
-    t       <- SBOX_ENC[ x_{31..24} ] || SBOX_ENC[ x_{23..16} ] ||
-               SBOX_ENC[ x_{15.. 8} ] || SBOX_ENC[ x_{ 7.. 0} ]
+    t       <- SBOX[ x_{31..24} ] || SBOX[ x_{23..16} ] ||
+               SBOX[ x_{15.. 8} ] || SBOX[ x_{ 7.. 0} ]
 
     t       <- t ^ y
 
@@ -439,10 +425,10 @@
       y <- 2
     }
 
-    t       <- SBOX_ENC[ x_{63..56} ] || SBOX_ENC[ x_{55..48} ] ||
-               SBOX_ENC[ x_{47..40} ] || SBOX_ENC[ x_{39..32} ] ||
-               SBOX_ENC[ x_{31..24} ] || SBOX_ENC[ x_{23..16} ] ||
-               SBOX_ENC[ x_{15.. 8} ] || SBOX_ENC[ x_{ 7.. 0} ]
+    t       <- SBOX[ x_{63..56} ] || SBOX[ x_{55..48} ] ||
+               SBOX[ x_{47..40} ] || SBOX[ x_{39..32} ] ||
+               SBOX[ x_{31..24} ] || SBOX[ x_{23..16} ] ||
+               SBOX[ x_{15.. 8} ] || SBOX[ x_{ 7.. 0} ]
 
     t       <- t ^ y
 
