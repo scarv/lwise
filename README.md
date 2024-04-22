@@ -1,4 +1,4 @@
-# ISEs for NIST LWC submissions
+# RISC-V ISEs for NIST LWC submissions
 
 <!--- ==================================================================== --->
 
